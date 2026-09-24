@@ -1,0 +1,137 @@
+name: Apply verified ConduitCAD 0.2.0 upgrade
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/apply-upgrade.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-source-upgrade
+  cancel-in-progress: false
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify complete patch and preserve concurrent source changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, hashlib, json, lzma, os, pathlib, subprocess, urllib.request
+          base = '8b063b1c96c5c85aea7d7b68c4b70fd73078138d'
+          shas = '''b1a3d01531e0960334a05ce07d2853b842001700
+          5eab455af2cffb1602ea317d03e1a8a73e634adf
+          86eb6ac9f3dc8969b4f33475645cffcf760fbf37
+          6f62dfa8ffe57db0183fd88c9a175c1bd844f65a
+          5685d38c29cd0804eb06e103b85fedf3cbed5e99
+          ec2faf13620da02249e52297750239f147f67671
+          43dade007fe435c9240f9b67f36afd0b3bc99713
+          ba4256e4a706f5938710fe4fb3381379f258db8a
+          615e3ba51a9dd1f316210b33a295b269408aee15
+          9b73c3137a5749440ab3c2c1c305327bf57dc647'''.split()
+          parts = []
+          for index, sha in enumerate(shas):
+              url = f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}'
+              request = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  record = json.load(response)
+              data = base64.b64decode(record['content'])
+              assert len(data) == (6000 if index < 9 else 932), f'Part {index+1}: invalid length'
+              assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == sha
+              parts.append(data)
+          compressed = b''.join(parts)
+          assert len(compressed) == 54932
+          assert hashlib.sha256(compressed).hexdigest() == 'e5546fff68df6342e4623c0dce68fc3925115d31eaf5614fbfaef977fc7caeac'
+          decoder = lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch = decoder.decompress(compressed, max_length=223405)
+          assert decoder.eof and not decoder.unused_data and len(patch) == 223404
+          assert hashlib.sha256(patch).hexdigest() == '5be8e34d3bb46faf729484711069237edc35189f7803cb84c55d80bebfd42653'
+          patch_path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'conduitcad-upgrade.patch'
+          patch_path.write_bytes(patch)
+          stat = subprocess.check_output(['git', 'apply', '--numstat', str(patch_path)], text=True)
+          paths = [line.split('\t', 2)[2] for line in stat.splitlines()]
+          assert len(paths) == 45 and len(set(paths)) == 45
+          for name in paths:
+              path = pathlib.PurePosixPath(name)
+              assert not path.is_absolute() and '..' not in path.parts and '\\' not in name
+              assert not any(part in ('.git', '.github', 'node_modules') for part in path.parts)
+              assert path.parts[0] in ('README.md', 'RELEASE_NOTES.md', 'docs', 'package.json', 'packages', 'scripts', 'tests')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', base, 'HEAD'], check=True)
+          subprocess.run(['git', 'diff', '--quiet', base, 'HEAD', '--', *paths], check=True)
+          subprocess.run(['git', 'apply', '--unidiff-zero', '--check', str(patch_path)], check=True)
+          subprocess.run(['git', 'apply', '--unidiff-zero', str(patch_path)], check=True)
+          print('Verified and applied all 45 source, declaration, test, and documentation files.')
+          PY
+      - name: Link packages, test, build, and regenerate engineering examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run build
+          node --input-type=module <<'JS'
+          import {createDemo} from '@conduitcad/symbols';
+          import {writeDXF} from '@conduitcad/dxf';
+          import {writeFile} from 'node:fs/promises';
+          for (const kind of ['pid', 'electrical', 'flow']) {
+            const document = createDemo(kind);
+            await writeFile(`samples/${kind}.dxf`, writeDXF(document));
+            await writeFile(`samples/${kind}.conduit.json`, JSON.stringify(document, null, 2));
+          }
+          JS
+          rm -f artifacts/npm/*-0.1.0.tgz
+          npm run pack:packages
+      - name: Install independent validation dependencies
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as playwright:
+              print('CHROMIUM_EXECUTABLE=' + playwright.chromium.executable_path)
+          PY
+      - name: Browser, native touch, pixel clipping, and independent DXF audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/browser_smoke.py
+          python tests/browser_workflows.py
+          python tests/browser_fidelity.py
+          python tests/audit_dxf.py
+          python tests/audit_fidelity.py
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Commit complete validated release to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git add -f dist artifacts/npm
+          git diff --cached --stat
+          git commit -m 'feat: release ConduitCAD 0.2.0 with native DXF fidelity, clipping and touch library upgrades'
+          git push origin HEAD:main
+          echo "Committed release: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve validation evidence and package archives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduitcad-020-upgrade-validation
+          path: artifacts
+          if-no-files-found: warn
