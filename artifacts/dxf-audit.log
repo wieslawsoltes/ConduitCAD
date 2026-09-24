@@ -1,0 +1,26 @@
+[
+  {
+    "file": "samples/electrical.dxf",
+    "ezdxfVersion": "1.4.4",
+    "dxfVersion": "AC1024",
+    "entities": 23,
+    "errors": [],
+    "fixes": []
+  },
+  {
+    "file": "samples/flow.dxf",
+    "ezdxfVersion": "1.4.4",
+    "dxfVersion": "AC1024",
+    "entities": 20,
+    "errors": [],
+    "fixes": []
+  },
+  {
+    "file": "samples/pid.dxf",
+    "ezdxfVersion": "1.4.4",
+    "dxfVersion": "AC1024",
+    "entities": 39,
+    "errors": [],
+    "fixes": []
+  }
+]

@@ -1,0 +1,255 @@
+
+> conduit-cad-workspace@0.1.0 pack:packages
+> node scripts/pack.mjs
+
+npm notice
+npm notice package: @conduitcad/constraints@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.5kB README.md
+npm notice 593B package.json
+npm notice 773B src/index.d.ts
+npm notice 11.6kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/constraints
+npm notice version: 0.1.0
+npm notice filename: conduitcad-constraints-0.1.0.tgz
+npm notice package size: 5.0 kB
+npm notice unpacked size: 15.5 kB
+npm notice shasum: dc9bb73cd114150a00302b72a370295837e45960
+npm notice integrity: sha512-T9drP/xAzXTwy[...]En0Tg3tgHq1vw==
+npm notice total files: 5
+npm notice
+conduitcad-constraints-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/dxf@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.6kB README.md
+npm notice 2.0kB THIRD_PARTY_NOTICES.md
+npm notice 641B package.json
+npm notice 718B src/index.d.ts
+npm notice 37.3kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/dxf
+npm notice version: 0.1.0
+npm notice filename: conduitcad-dxf-0.1.0.tgz
+npm notice package size: 13.3 kB
+npm notice unpacked size: 43.4 kB
+npm notice shasum: 2058aa31c6e20d10700359afaa5c935d3d7a7a2f
+npm notice integrity: sha512-W6JIszmqFxIND[...]ADiavWm0ujf+w==
+npm notice total files: 6
+npm notice
+conduitcad-dxf-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/exchange@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.4kB README.md
+npm notice 658B package.json
+npm notice 322B src/index.d.ts
+npm notice 3.4kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/exchange
+npm notice version: 0.1.0
+npm notice filename: conduitcad-exchange-0.1.0.tgz
+npm notice package size: 3.4 kB
+npm notice unpacked size: 6.9 kB
+npm notice shasum: 8b81947b9d29beb8d5565555c3f55a6d01c396dd
+npm notice integrity: sha512-CV8P8r9NJevEG[...]9gUoSoikknIEA==
+npm notice total files: 5
+npm notice
+conduitcad-exchange-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/geometry@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.9kB README.md
+npm notice 526B package.json
+npm notice 4.0kB src/index.d.ts
+npm notice 12.6kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/geometry
+npm notice version: 0.1.0
+npm notice filename: conduitcad-geometry-0.1.0.tgz
+npm notice package size: 6.7 kB
+npm notice unpacked size: 20.1 kB
+npm notice shasum: 657f34717a36bfa660ad9754854d8496c7cfcc43
+npm notice integrity: sha512-FPxzZELWgjCEc[...]0mFSqC4QIoOcw==
+npm notice total files: 5
+npm notice
+conduitcad-geometry-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/history@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.3kB README.md
+npm notice 524B package.json
+npm notice 762B src/index.d.ts
+npm notice 2.5kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/history
+npm notice version: 0.1.0
+npm notice filename: conduitcad-history-0.1.0.tgz
+npm notice package size: 2.6 kB
+npm notice unpacked size: 6.2 kB
+npm notice shasum: c0c6f7412416e8298dbe905123dd280f0bcc9148
+npm notice integrity: sha512-VxdSW7yJ/U9f6[...]wUMBV7H95s86Q==
+npm notice total files: 5
+npm notice
+conduitcad-history-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/input@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.3kB README.md
+npm notice 581B package.json
+npm notice 1.1kB src/index.d.ts
+npm notice 4.2kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/input
+npm notice version: 0.1.0
+npm notice filename: conduitcad-input-0.1.0.tgz
+npm notice package size: 3.2 kB
+npm notice unpacked size: 8.3 kB
+npm notice shasum: d8aa08e74b1140c4048f29c8e5d325fe68ee0d13
+npm notice integrity: sha512-dkuyEr59tWxuG[...]hh4V6JpFx0l2A==
+npm notice total files: 5
+npm notice
+conduitcad-input-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/model@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.6kB README.md
+npm notice 581B package.json
+npm notice 5.3kB src/index.d.ts
+npm notice 15.7kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/model
+npm notice version: 0.1.0
+npm notice filename: conduitcad-model-0.1.0.tgz
+npm notice package size: 7.9 kB
+npm notice unpacked size: 24.3 kB
+npm notice shasum: a8eed304fbb2dd87f8d6fe373655c4b23a249759
+npm notice integrity: sha512-oJ5HrwZ7A5UdJ[...]XeObFXpniAj1w==
+npm notice total files: 5
+npm notice
+conduitcad-model-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/renderer@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.7kB README.md
+npm notice 657B package.json
+npm notice 4.8kB src/index.d.ts
+npm notice 30.8kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/renderer
+npm notice version: 0.1.0
+npm notice filename: conduitcad-renderer-0.1.0.tgz
+npm notice package size: 11.8 kB
+npm notice unpacked size: 39.1 kB
+npm notice shasum: a8089a6ab2e83000f961a0668dad53a1d52ef631
+npm notice integrity: sha512-aZMxKB3LXNtBc[...]PVG8pThEmUK3Q==
+npm notice total files: 5
+npm notice
+conduitcad-renderer-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/routing@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.4kB README.md
+npm notice 621B package.json
+npm notice 1.0kB src/index.d.ts
+npm notice 5.7kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/routing
+npm notice version: 0.1.0
+npm notice filename: conduitcad-routing-0.1.0.tgz
+npm notice package size: 3.9 kB
+npm notice unpacked size: 9.9 kB
+npm notice shasum: 573b2314602bcfed39e33b20b130dcfab38c23b3
+npm notice integrity: sha512-kSCPzwMv5ZT40[...]edOqAVP9f6yJQ==
+npm notice total files: 5
+npm notice
+conduitcad-routing-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/spatial@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.3kB README.md
+npm notice 585B package.json
+npm notice 419B src/index.d.ts
+npm notice 2.4kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/spatial
+npm notice version: 0.1.0
+npm notice filename: conduitcad-spatial-0.1.0.tgz
+npm notice package size: 2.7 kB
+npm notice unpacked size: 5.8 kB
+npm notice shasum: 7813d3962a32fca4f058072ceb0afb398522c4a5
+npm notice integrity: sha512-wdYy4VBXWSnWd[...]+MAK1gJfujpCw==
+npm notice total files: 5
+npm notice
+conduitcad-spatial-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/storage@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.4kB README.md
+npm notice 524B package.json
+npm notice 711B src/index.d.ts
+npm notice 3.3kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/storage
+npm notice version: 0.1.0
+npm notice filename: conduitcad-storage-0.1.0.tgz
+npm notice package size: 3.0 kB
+npm notice unpacked size: 7.0 kB
+npm notice shasum: 9c73901b7edd7e88af96c76f2b435ab8cf66cf77
+npm notice integrity: sha512-u3VfoAWxA0Fpy[...]DAvlDcWMAU5Ng==
+npm notice total files: 5
+npm notice
+conduitcad-storage-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/symbols@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.5kB README.md
+npm notice 619B package.json
+npm notice 497B src/index.d.ts
+npm notice 18.4kB src/index.js
+npm notice Tarball Details
+npm notice name: @conduitcad/symbols
+npm notice version: 0.1.0
+npm notice filename: conduitcad-symbols-0.1.0.tgz
+npm notice package size: 7.7 kB
+npm notice unpacked size: 22.1 kB
+npm notice shasum: 1d3be4d577014cdd081e5c9ae30968ed9c63e6e6
+npm notice integrity: sha512-ygtMOWkTFyXfD[...]juOXGt/MBF1Fg==
+npm notice total files: 5
+npm notice
+conduitcad-symbols-0.1.0.tgz
+npm notice
+npm notice package: @conduitcad/workbench@0.1.0
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 1.7kB README.md
+npm notice 1.0kB package.json
+npm notice 99B src/icons.d.ts
+npm notice 3.3kB src/icons.js
+npm notice 10.5kB src/index.d.ts
+npm notice 127.0kB src/index.js
+npm notice 25.5kB src/styles.css
+npm notice Tarball Details
+npm notice name: @conduitcad/workbench
+npm notice version: 0.1.0
+npm notice filename: conduitcad-workbench-0.1.0.tgz
+npm notice package size: 42.7 kB
+npm notice unpacked size: 170.2 kB
+npm notice shasum: c4939ed13cf41b28d0dd9454497f3b486d7b3286
+npm notice integrity: sha512-71738kO/quWmD[...]1PQxNi+z3p/nA==
+npm notice total files: 8
+npm notice
+conduitcad-workbench-0.1.0.tgz

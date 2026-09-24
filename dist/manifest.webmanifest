@@ -1,0 +1,19 @@
+{
+  "name": "Conduit CAD",
+  "short_name": "Conduit",
+  "description": "Touch-first DXF-native CAD and diagramming",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbfcfb",
+  "theme_color": "#167c70",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

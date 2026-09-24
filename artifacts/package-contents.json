@@ -1,0 +1,80 @@
+[
+  {
+    "file": "conduitcad-constraints-0.1.0.tgz",
+    "name": "@conduitcad/constraints",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-dxf-0.1.0.tgz",
+    "name": "@conduitcad/dxf",
+    "version": "0.1.0",
+    "files": 6
+  },
+  {
+    "file": "conduitcad-exchange-0.1.0.tgz",
+    "name": "@conduitcad/exchange",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-geometry-0.1.0.tgz",
+    "name": "@conduitcad/geometry",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-history-0.1.0.tgz",
+    "name": "@conduitcad/history",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-input-0.1.0.tgz",
+    "name": "@conduitcad/input",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-model-0.1.0.tgz",
+    "name": "@conduitcad/model",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-renderer-0.1.0.tgz",
+    "name": "@conduitcad/renderer",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-routing-0.1.0.tgz",
+    "name": "@conduitcad/routing",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-spatial-0.1.0.tgz",
+    "name": "@conduitcad/spatial",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-storage-0.1.0.tgz",
+    "name": "@conduitcad/storage",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-symbols-0.1.0.tgz",
+    "name": "@conduitcad/symbols",
+    "version": "0.1.0",
+    "files": 5
+  },
+  {
+    "file": "conduitcad-workbench-0.1.0.tgz",
+    "name": "@conduitcad/workbench",
+    "version": "0.1.0",
+    "files": 8
+  }
+]

@@ -1,0 +1,35 @@
+/** Optional compile-only consumer check: tsc -p tests/tsconfig.json. */
+import {createDocument, line, circle, entity, moveEntity, type CadDocument} from '@conduitcad/model';
+import {lineIntersection, offsetPolyline} from '@conduitcad/geometry';
+import {CadRenderer, Camera, buildScene, updateSceneEntities} from '@conduitcad/renderer';
+import {installSymbols, insertSymbol} from '@conduitcad/symbols';
+import {parseDXF, writeDXF} from '@conduitcad/dxf';
+import {ConstraintSolver, evaluateExpression} from '@conduitcad/constraints';
+import {History} from '@conduitcad/history';
+import {routePorts} from '@conduitcad/routing';
+import {SpatialIndex} from '@conduitcad/spatial';
+import {mountWorkbench} from '@conduitcad/workbench';
+import {PointerController} from '@conduitcad/input';
+import {ProjectStore} from '@conduitcad/storage';
+import {writeSVG, writeBOM} from '@conduitcad/exchange';
+
+let documentModel: CadDocument = installSymbols(createDocument('Integration'));
+const e = line({x:0,y:0},{x:100,y:0});
+documentModel.entities.push(e, circle({x:10,y:10},20), insertSymbol(documentModel,'pump',100,100));
+const scene = buildScene(documentModel);
+moveEntity(e,2,3);
+const changes = updateSceneEntities(scene,documentModel,[e.id]);
+if (changes) changes.forEach(range=>console.log(range.offset));
+const history = new History({capture:()=>documentModel,restore:(value:CadDocument)=>{documentModel=value;}});
+history.run('Sketch',()=>new ConstraintSolver().solve(documentModel.entities,[{type:'horizontal',entityId:e.id}],documentModel.parameters));
+const output = writeDXF(documentModel,{version:'AC1032'});
+const reread:CadDocument = parseDXF(output);
+const svg:string = writeSVG(reread);
+const bom:string = writeBOM(reread);
+const value:number = evaluateExpression('2+3');
+const host = document.createElement('div');
+const renderer = new CadRenderer(host,{camera:new Camera(),onStatus:status=>console.log(status.backend)});
+renderer.setDocument(documentModel);
+renderer.updateEntities([e.id]);
+const app = mountWorkbench(host,{document:documentModel,backend:'canvas'});
+void [lineIntersection,offsetPolyline,entity,routePorts,SpatialIndex,PointerController,ProjectStore,svg,bom,value,app];

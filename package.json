@@ -1,0 +1,21 @@
+{
+  "name": "conduit-cad-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "npm test && npm run build",
+    "pack:packages": "node scripts/pack.mjs",
+    "benchmark": "node scripts/benchmark.mjs",
+    "bootstrap": "node scripts/bootstrap.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

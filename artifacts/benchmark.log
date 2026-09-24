@@ -1,0 +1,52 @@
+
+> conduit-cad-workspace@0.1.0 benchmark
+> node scripts/benchmark.mjs
+
+{
+  "kind": "CPU-only synthetic microbenchmark; not a browser/GPU/fps measurement",
+  "node": "v22.16.0",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "scene": [
+    {
+      "singleEntityPatchMs": 0.426,
+      "entities": 1000,
+      "segments": 1000,
+      "geometryUploadBytes": 64000,
+      "sceneCompileMs": 13.391,
+      "spatialQueries1000Ms": 2.793,
+      "queryHits": 11000
+    },
+    {
+      "singleEntityPatchMs": 0.497,
+      "entities": 10000,
+      "segments": 10000,
+      "geometryUploadBytes": 640000,
+      "sceneCompileMs": 80.56,
+      "spatialQueries1000Ms": 2.071,
+      "queryHits": 110000
+    },
+    {
+      "singleEntityPatchMs": 3.787,
+      "entities": 100000,
+      "segments": 100000,
+      "geometryUploadBytes": 6400000,
+      "sceneCompileMs": 526.987,
+      "spatialQueries1000Ms": 2.698,
+      "queryHits": 121000
+    }
+  ],
+  "dxf": {
+    "entities": 10000,
+    "bytes": 1655146,
+    "writeMs": 65.271,
+    "parseMs": 88.588,
+    "parsedEntities": 10000
+  },
+  "routing": {
+    "runs": 100,
+    "ms": 16.606,
+    "successful": 100
+  }
+}

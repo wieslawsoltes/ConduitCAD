@@ -1,0 +1,93 @@
+[
+  {
+    "requested": "canvas",
+    "errors": [],
+    "data": {
+      "app": true,
+      "stats": {
+        "backend": "Canvas 2D",
+        "frameMs": 2.400000000372529,
+        "buildMs": 3.2999999998137355,
+        "segments": 226,
+        "entities": 39,
+        "draws": 2
+      },
+      "rendererMessage": "",
+      "entities": 39,
+      "canvas": {
+        "x": 570.625,
+        "y": 361,
+        "scale": 0.7528857479387515,
+        "width": 939,
+        "height": 819
+      },
+      "scroll": 1440,
+      "inner": 1440
+    }
+  },
+  {
+    "requested": "webgl2",
+    "errors": [],
+    "data": {
+      "app": true,
+      "stats": {
+        "backend": "Canvas 2D",
+        "frameMs": 2.2000000001862645,
+        "buildMs": 3.099999999627471,
+        "segments": 226,
+        "entities": 39,
+        "draws": 2
+      },
+      "rendererMessage": "GLBackend: WebGL2 unavailable; ",
+      "entities": 39,
+      "canvas": {
+        "x": 570.625,
+        "y": 361,
+        "scale": 0.7528857479387515,
+        "width": 939,
+        "height": 819
+      },
+      "scroll": 1440,
+      "inner": 1440
+    }
+  },
+  {
+    "requested": "webgpu",
+    "errors": [],
+    "data": {
+      "app": true,
+      "stats": {
+        "backend": "Canvas 2D",
+        "frameMs": 1.2000000001862645,
+        "buildMs": 2.900000000372529,
+        "segments": 226,
+        "entities": 39,
+        "draws": 2
+      },
+      "rendererMessage": "GPUBackend: WebGPU API unavailable; GLBackend: WebGL2 unavailable; ",
+      "entities": 39,
+      "canvas": {
+        "x": 570.625,
+        "y": 361,
+        "scale": 0.7528857479387515,
+        "width": 939,
+        "height": 819
+      },
+      "scroll": 1440,
+      "inner": 1440
+    }
+  },
+  {
+    "mobile": true,
+    "errors": [],
+    "overflow": false,
+    "stats": {
+      "backend": "Canvas 2D",
+      "frameMs": 0.7999999998137355,
+      "buildMs": 2.1999999997206032,
+      "segments": 214,
+      "entities": 39,
+      "draws": 2
+    }
+  }
+]
