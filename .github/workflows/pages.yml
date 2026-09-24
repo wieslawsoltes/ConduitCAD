@@ -36,6 +36,10 @@ jobs:
           npm test 2>&1 | tee artifacts/ci-unit-tests.log
           npm run build
           npm run pack:packages
+      - name: Clean offline installation and integration of all reusable packages
+        run: node scripts/verify-packages.mjs
+      - name: Strict TypeScript consumer contracts
+        run: npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
       - name: Install independent validation dependencies
         run: |
           python -m pip install -r tests/requirements.txt
@@ -45,11 +49,15 @@ jobs:
           with sync_playwright() as playwright:
               print('CHROMIUM_EXECUTABLE=' + playwright.chromium.executable_path)
           PY
-      - name: Browser smoke, touch workflows, and independent DXF audit
+      - name: Browser smoke, native touch, pixel clipping, and independent DXF audits
+        shell: bash
         run: |
+          set -euo pipefail
           python tests/browser_smoke.py
           python tests/browser_workflows.py
+          python tests/browser_fidelity.py
           python tests/audit_dxf.py
+          python tests/audit_fidelity.py
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
