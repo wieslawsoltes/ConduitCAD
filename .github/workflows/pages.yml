@@ -2,100 +2,40 @@ name: Validate and publish ConduitCAD
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
 concurrency:
-  group: conduitcad-pages
+  group: conduitcad-pages-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: read
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Recover and verify complete delivered workspace
-        if: ${{ hashFiles('package.json') == '' }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPOSITORY: ${{ github.repository }}
-        run: |
-          python - <<'PY'
-          import base64, hashlib, json, lzma, os, pathlib, urllib.request
-          shas = '''167d05196d70fc80a610db540d0bebccde083937
-          6bfbe4d2290c4c7f35511663febe04ea41743b97
-          a65f80ed45531bef649991256f1edae8e1cb78e6
-          89c4fe5f06dce16c5c74c2011d87d0ec07fce1ae
-          f1074014818d5a8b242263147d5315b3452a08ad
-          1ff5a794edc9561d729b209c2bdc5741708eedee
-          267deea025dcb71f7b1d129f665431160ec1a5c3
-          6378eff9981773f8eb1315ab66e1e0d76811a303
-          18d311a53a650b9e6ea88600e6fc1ecb93aaba21
-          68064ab1fb22bc69279955b9dc09281fb1dd07f0
-          46d5daf2fa421c601eb69caa58235f8a385c1a78
-          710881c0018737c56b612db3b67c2811416a6700
-          5475e20d4769738fe9b65e66c54b795f65f409e8
-          dc8d1c6a62e434157b8b397cef2617798cc92f77
-          4d63d42c538c278bf1c17a7c6a7b9575b9542a9c
-          fdf93dadf4b8a5ef94a12b9ce3e3a065e902e496
-          f273ca5529ad60a97c31eccd8dd4eeaddf087d03
-          942309d49f947ab9f780b5001297224ebaa80ce6
-          3748fdaf6d0613610df4448840a801a0e2a3bb34
-          8ef89f281aef75849aefbe72b973e17378c557d8
-          95490282bbee0ced5b9b338d134833a7d0787ecd
-          3172e36d8b23ca1de06649ee246fd970564d396f
-          439b60b4a544c490fb3245471738856133033e6e'''.split()
-          parts = []
-          for index, sha in enumerate(shas):
-              url = f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}'
-              request = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
-              with urllib.request.urlopen(request, timeout=60) as response:
-                  record = json.load(response)
-              data = base64.b64decode(record['content'])
-              assert len(data) == (6000 if index < 22 else 3704), f'Invalid size: part {index+1}'
-              actual = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
-              assert actual == sha, f'Invalid Git hash: part {index+1}'
-              parts.append(data)
-          compressed = b''.join(parts)
-          assert len(compressed) == 135704
-          assert hashlib.sha256(compressed).hexdigest() == '07f8662d6cceb58ff0b90fb1759ce9809dc70cd99441b1780ba23c60026eb7ba'
-          decompressor = lzma.LZMADecompressor(memlimit=256*1024*1024)
-          payload = decompressor.decompress(compressed, max_length=2185460)
-          assert decompressor.eof and not decompressor.unused_data
-          assert len(payload) == 2185459
-          assert hashlib.sha256(payload).hexdigest() == 'cd6d5e0156d12352e1ecb1b71af9a4d7d90deb3ae2203a5f06a622d98894f4a8'
-          files = json.loads(payload)
-          assert isinstance(files, dict) and len(files) == 131
-          for name, text in files.items():
-              path = pathlib.PurePosixPath(name)
-              assert not path.is_absolute() and '..' not in path.parts and '\\' not in name
-              assert not any(part in ('.git', '.github', 'node_modules') for part in path.parts)
-              assert isinstance(text, str)
-          for name, text in files.items():
-              path = pathlib.Path(name)
-              path.parent.mkdir(parents=True, exist_ok=True)
-              path.write_bytes(text.encode('utf-8'))
-          print('Verified and restored all 131 delivered text files.')
-          PY
-      - name: Link reusable packages
+      - name: Link reusable packages without network dependencies
         run: node scripts/bootstrap.mjs
-      - name: Run unit tests
+      - name: Unit tests, production build, and reusable package archives
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p artifacts
           npm test 2>&1 | tee artifacts/ci-unit-tests.log
-      - name: Build app and standalone HTML
-        run: npm run build
-      - name: Pack all thirteen reusable npm packages
-        run: npm run pack:packages
+          npm run build
+          npm run pack:packages
       - name: Install independent validation dependencies
         run: |
           python -m pip install -r tests/requirements.txt
@@ -110,25 +50,15 @@ jobs:
           python tests/browser_smoke.py
           python tests/browser_workflows.py
           python tests/audit_dxf.py
-      - name: Commit complete normal source tree and generated deliverables
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git add -f dist artifacts/npm
-          if ! git diff --cached --quiet; then
-            git commit -m 'Import complete ConduitCAD 0.1.0 workspace, tests, examples, and validated deliverables'
-            git push origin HEAD:main
-          fi
       - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - name: Upload production website
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-      - name: Upload validation reports and npm packages
+      - name: Upload validation reports and all thirteen npm archives
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -136,8 +66,14 @@ jobs:
           path: artifacts
           if-no-files-found: warn
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -145,3 +81,21 @@ jobs:
       - name: Publish application
         id: deployment
         uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reproduce expected build and verify live hosted bytes
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          node scripts/build.mjs
+          node scripts/verify-pages.mjs "$PAGE_URL"
+      - name: Upload live deployment verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduitcad-live-deployment-verification
+          path: artifacts/pages-verification.json
+          if-no-files-found: error
