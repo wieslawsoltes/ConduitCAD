@@ -41,9 +41,10 @@ jobs:
                 page.on('console',lambda message:errors.append(message.text) if message.type=='error' else None)
                 page.goto('http://localhost:4173/?fresh=1&renderer='+backend)
                 page.wait_for_function('document.documentElement.dataset.ready === "true"')
-                page.evaluate("conduit.newDocument('blank');conduit.executeCommand('LINE 0,0 100,100');conduit.renderer.fit()")
+                page.evaluate("async()=>{await conduit.newDocument('blank');await conduit.renderer.ready;conduit.executeCommand('LINE 0,0 100,100');conduit.renderer.fit();}")
                 page.wait_for_timeout(500)
-                report=page.evaluate('''async()=>{let a=await navigator.gpu?.requestAdapter();return {stats:conduit.renderer.stats,secure:isSecureContext,adapter:a?{vendor:a.info.vendor,architecture:a.info.architecture,description:a.info.description}:null};}''')
+                report=page.evaluate('''async()=>{let a=await navigator.gpu?.requestAdapter();return {stats:conduit.renderer.stats,initialization:conduit.rendererMessage,entities:conduit.doc.entities.length,secure:isSecureContext,adapter:a?{vendor:a.info.vendor,architecture:a.info.architecture,description:a.info.description}:null};}''')
+                assert report['entities'] == 1 and report['stats']['segments'] > 0, report
                 report.update(requested=backend,errors=errors,physicalDevice=False)
                 reports.append(report)
                 pathlib.Path('artifacts').mkdir(exist_ok=True)
