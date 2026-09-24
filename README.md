@@ -1,6 +1,6 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.1.0.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.2.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, original P&ID / electrical / flow libraries, a planar
@@ -39,7 +39,9 @@ The development server listens on all interfaces by default (`HOST` and `PORT`
 are configurable). An ordinary LAN HTTP origin can exercise fallbacks, but
 must not be treated as the secure-origin WebGPU test. WebGPU availability also
 depends on browser, adapter and driver support. The active backend is visible
-on the canvas; initialization failures automatically fall back.
+on the canvas; initialization failures automatically fall back. Drawings requiring
+ordered fills, masked text, long dash arrays or dotted ink use the Canvas 2D
+fidelity compositor even when a GPU stroke backend is available.
 
 Useful startup options: `?renderer=canvas`, `?renderer=webgl2`,
 `?renderer=webgpu`, `?fresh=1` to skip loading the autosave, and `?no-sw=1` to
@@ -49,7 +51,7 @@ The single-file build does not register a service worker.
 ## Use the editor
 
 On a phone, tap **Symbols**, choose a symbol, then tap the drawing to place it.
-A long press followed by a drag also places a library item. Tap a placed symbol
+Drag the dedicated grab handle to place a library item without fighting touch scrolling. Tap a placed symbol
 to expose its ports and grips. Drag a port to another symbol, or use **Connect**
 and tap two ports. Connections remain native DXF polylines and are rerouted
 when attached equipment moves. Two fingers pan and zoom without creating geometry.
@@ -74,7 +76,7 @@ example drawings are available from **New** or `samples/`.
 | Precision | Grid, endpoint, midpoint, center, quadrant, insertion, port and line-intersection snapping; orthographic constraint; numeric commands |
 | Geometry kernel | Double-precision affine geometry, intersections, projections, bulge arcs, adaptive curve tessellation, rational NURBS evaluation, polyline offsets and two-line fillets |
 | Parametrics | Safe arithmetic expressions and named dependencies; authored radius, line length and rectangle dimensions; small-sketch numerical constraints with conflict rollback |
-| Symbols | 56 original editable block masters: 26 P&ID, 18 electrical, 12 flow; 10 line/connection styles; custom blocks from selected geometry |
+| Symbols | 64 original editable block masters: 28 P&ID, 24 electrical, 12 flow; 10 line/connection styles; custom blocks from selected geometry |
 | Connections | Named ports, obstacle-aware orthogonal A*, port leads, bend penalties, explicit waypoints, live rerouting, directed graph export |
 | Drawing management | Visible/locked/color layers, active layer and basic layout filtering, local autosave/recovery and portable native project files |
 | QA | Duplicate tags, missing blocks, zero-length lines, bad radii, free/missing connector endpoints, blocked routes, import-fidelity diagnostics |
@@ -84,6 +86,23 @@ example drawings are available from **New** or `samples/`.
 The default symbols are illustrative engineering symbols, not an ISA/IEC/ISO
 certified library. The geometry kernel is planar and is not a 3D B-rep / ACIS /
 Parasolid or general exact polygon-Boolean kernel.
+
+## New in 0.2.0
+
+Native HATCH polylines and line/arc/ellipse/rational-spline edge loops, nested
+island holes, pattern scanlines with signed dashes, variable-width bulged
+polylines, 3D POLYLINE/polyface/polygon-mesh wireframes, hidden 3DFACE edges,
+LEADER/RAY/XLINE, OCS projection, richer TEXT/MTEXT layout and background masks.
+Layer/ACI/true-color inheritance, lineweights, opacity and double-precision DXF
+serialization now have expanded regression coverage.
+
+Canvas geometry and selection overlays are clipped away from rulers; ruler taps
+cannot start edits. The mobile library uses dedicated 44px grab handles while
+cards remain scrollable and tap-to-place. Corrected valve, check-valve, diode,
+ground, instrumentation and flow-master geometry includes connected terminal
+leads. All 64 default masters have a terminal-to-geometry regression test.
+See [symbol conventions](docs/SYMBOLS.md), [release notes](RELEASE_NOTES.md) and
+[validation scope](docs/VALIDATION.md).
 
 ## Modular packages
 
@@ -152,7 +171,8 @@ imported-source preservation data.
 entities. Native blocks, inserts, tags, supported curve data, layers and
 Conduit XDATA are written. Unsupported geometry is not silently asserted to be
 supported: the export dialog reports omissions and approximations. Authored
-dimensions become visible line/text geometry; hatch export becomes boundaries.
+dimensions become visible line/text geometry. Hatches retain native edge loops,
+island styles and pattern definitions; edited export detaches association handles.
 
 **Export → Original DXF** returns the original imported input **without your
 edits**. Byte-oriented imports preserve the source bytes, including legacy
@@ -160,8 +180,8 @@ code pages and binary DXF. This is a preservation/download path, not a
 lossless edited round-trip engine. Other CAD applications need not preserve
 or interpret Conduit's application-specific metadata.
 
-Full DWG, nonplanar OCS/UCS, 3D solids/surfaces, proxy objects, dynamic blocks,
-XREF resolution, complex hatch/linetype definitions, SHX/font fidelity,
+Full DWG, arbitrary UCS editing, 3D solids/surfaces, proxy objects, dynamic blocks,
+XREF resolution, SHX/text linetype elements, complete SHX/font fidelity,
 complete paper-space plotting/viewports, raster/underlay support, and arbitrary
 OBJECTS/dictionary ownership graphs are outside this release.
 
@@ -169,13 +189,17 @@ OBJECTS/dictionary ownership graphs are outside this release.
 
 The release includes runnable tests and raw reports in `artifacts/`.
 
-* 86 Node tests pass: geometry, NURBS, expressions, constraints and rollback,
+* 124 Node tests pass: geometry, NURBS, expressions, constraints and rollback,
   history, spatial indexing, routing, DXF readers/writers, identity/ports/tags,
   original bytes, Unicode, scene compilation and incremental updates.
-* 29 integrated Chromium workflow checks pass, including touch placement,
+* 43 integrated Chromium checks pass (29 established workflows and 14 new
+  pixel/import/clipping/native-touch regressions), including touch placement,
   pinch arbitration, desktop dragging, rerouting, expressions, undo/redo,
   commands, copy/delete, responsive layouts and export-dialog options.
-* The three generated sample DXFs pass an independent ezdxf 1.4.4 audit with
+* A separate 37-entity DXF fixture generated by ezdxf verifies native hatch
+  edges, island styles, patterns, polyface/polygon meshes, OCS, text alignment,
+  background masks, lineweights, transparency and normalized re-export.
+* The three generated sample DXFs and the independent fixture pass ezdxf audits with
   **zero errors and zero repairs**. This is not an AutoCAD interoperability
   certificate or evidence that arbitrary customer DXFs are supported.
 

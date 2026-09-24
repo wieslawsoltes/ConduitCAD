@@ -1,0 +1,219 @@
+[
+  {
+    "name": "islands-0",
+    "handle": "2F",
+    "type": "HATCH"
+  },
+  {
+    "name": "islands-1",
+    "handle": "30",
+    "type": "HATCH"
+  },
+  {
+    "name": "islands-2",
+    "handle": "31",
+    "type": "HATCH"
+  },
+  {
+    "name": "pattern",
+    "handle": "32",
+    "type": "HATCH"
+  },
+  {
+    "name": "arc-False",
+    "handle": "33",
+    "type": "HATCH",
+    "start": [
+      216.252311481466,
+      206.90473046962796
+    ],
+    "end": [
+      145.35898384862244,
+      210.0
+    ]
+  },
+  {
+    "name": "arc-True",
+    "handle": "34",
+    "type": "HATCH",
+    "start": [
+      285.3589838486225,
+      210.0
+    ],
+    "end": [
+      356.252311481466,
+      206.90473046962796
+    ]
+  },
+  {
+    "name": "ellipse-False",
+    "handle": "35",
+    "type": "HATCH",
+    "start": [
+      99.36723345796874,
+      334.8946412255977
+    ],
+    "end": [
+      20.632766542031273,
+      285.1053587744023
+    ]
+  },
+  {
+    "name": "ellipse-True",
+    "handle": "36",
+    "type": "HATCH",
+    "start": [
+      190.63276654203128,
+      285.1053587744023
+    ],
+    "end": [
+      269.3672334579687,
+      334.8946412255977
+    ]
+  },
+  {
+    "name": "spline",
+    "handle": "37",
+    "type": "HATCH"
+  },
+  {
+    "name": "gradient",
+    "handle": "38",
+    "type": "HATCH"
+  },
+  {
+    "name": "wide-polyline",
+    "handle": "39",
+    "type": "LWPOLYLINE"
+  },
+  {
+    "name": "poly3d",
+    "handle": "3A",
+    "type": "POLYLINE"
+  },
+  {
+    "name": "polyface",
+    "handle": "3F",
+    "type": "POLYLINE"
+  },
+  {
+    "name": "polygon-mesh",
+    "handle": "46",
+    "type": "POLYLINE"
+  },
+  {
+    "name": "face-hidden-edge",
+    "handle": "4E",
+    "type": "3DFACE"
+  },
+  {
+    "name": "negative-ocs-circle",
+    "handle": "4F",
+    "type": "CIRCLE"
+  },
+  {
+    "name": "oblique-ocs-circle",
+    "handle": "50",
+    "type": "CIRCLE"
+  },
+  {
+    "name": "negative-ocs-ellipse",
+    "handle": "51",
+    "type": "ELLIPSE"
+  },
+  {
+    "name": "mtext-1",
+    "handle": "53",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-2",
+    "handle": "54",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-3",
+    "handle": "55",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-4",
+    "handle": "56",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-5",
+    "handle": "57",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-6",
+    "handle": "58",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-7",
+    "handle": "59",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-8",
+    "handle": "5A",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-9",
+    "handle": "5B",
+    "type": "MTEXT"
+  },
+  {
+    "name": "mtext-mask",
+    "handle": "5C",
+    "type": "MTEXT"
+  },
+  {
+    "name": "text-middle-center",
+    "handle": "5D",
+    "type": "TEXT"
+  },
+  {
+    "name": "text-baseline-right",
+    "handle": "5E",
+    "type": "TEXT"
+  },
+  {
+    "name": "text-aligned",
+    "handle": "5F",
+    "type": "TEXT"
+  },
+  {
+    "name": "text-fit",
+    "handle": "60",
+    "type": "TEXT"
+  },
+  {
+    "name": "signed-dashes",
+    "handle": "62",
+    "type": "LINE"
+  },
+  {
+    "name": "transparency",
+    "handle": "63",
+    "type": "LINE"
+  },
+  {
+    "name": "leader",
+    "handle": "64",
+    "type": "LEADER"
+  },
+  {
+    "name": "ray",
+    "handle": "65",
+    "type": "RAY"
+  },
+  {
+    "name": "xline",
+    "handle": "66",
+    "type": "XLINE"
+  }
+]

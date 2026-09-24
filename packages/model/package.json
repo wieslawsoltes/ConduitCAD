@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/model",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Modular Conduit CAD model engine",
   "type": "module",
   "main": "./src/index.js",
@@ -26,6 +26,6 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.1.0"
+    "@conduitcad/geometry": "0.2.0"
   }
 }

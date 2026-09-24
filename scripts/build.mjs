@@ -3,6 +3,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 const root = path.resolve(import.meta.dirname, '..'), out = path.join(root, 'dist');
 await fs.mkdir(out, { recursive: true });
+const { version } = JSON.parse(await fs.readFile(path.join(root, 'package.json'), 'utf8'));
+if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) throw new Error('Invalid package version');
 /** Purpose-built deterministic bundler for this workspace's static named ESM imports.
  * It rejects unsupported import/export syntax rather than silently rewriting it.
  * No network, package download, transpiler runtime, or eval is required.
@@ -43,9 +45,9 @@ await Promise.all([fs.writeFile(out + '/app.js', app), fs.writeFile(out + '/dxf-
 const manifest = { name: 'Conduit CAD', short_name: 'Conduit', description: 'Touch-first DXF-native CAD and diagramming', id: './', start_url: './', scope: './', display: 'standalone', background_color: '#fbfcfb', theme_color: '#167c70', icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }] };
 await fs.writeFile(out + '/manifest.webmanifest', JSON.stringify(manifest, null, 2));
 const hash = crypto.createHash('sha256').update(app).update(css).digest('hex').slice(0, 12);
-const sw = `const CACHE='conduit-0.1.0-${hash}';const FILES=['./','./index.html','./app.js','./styles.css','./icon.svg','./manifest.webmanifest'];self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('conduit-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(fetch(e.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return response;}).catch(()=>caches.match(e.request).then(r=>r||(e.request.mode==='navigate'?caches.match('./index.html'):Response.error()))));});`;
+const sw = `const CACHE='conduit-${version}-${hash}';const FILES=['./','./index.html','./app.js','./styles.css','./icon.svg','./manifest.webmanifest'];self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('conduit-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(fetch(e.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}return response;}).catch(()=>caches.match(e.request).then(r=>r||(e.request.mode==='navigate'?caches.match('./index.html'):Response.error()))));});`;
 await fs.writeFile(out + '/sw.js', sw);
 const standalone = html.replace(/<link rel="(?:icon|manifest)"[^>]*>/g, '').replace('<link rel="stylesheet" href="styles.css">', `<style>${css}</style>`).replace('<script src="app.js"></script>', `<script>globalThis.__CONDUIT_STANDALONE__=true;\n${app.replace(/<\/script/gi, '<\\/script')}</script>`);
 await fs.writeFile(out + '/ConduitCAD.html', standalone);
-await fs.writeFile(out + '/build-info.json', JSON.stringify({ version: '0.1.0', sha256: hash, packages: 13, applicationBytes: Buffer.byteLength(app), standaloneBytes: Buffer.byteLength(standalone) }, null, 2));
+await fs.writeFile(out + '/build-info.json', JSON.stringify({ version, sha256: hash, packages: 13, applicationBytes: Buffer.byteLength(app), standaloneBytes: Buffer.byteLength(standalone) }, null, 2));
 console.log(`Built dist/ and standalone ConduitCAD.html (${Math.round(Buffer.byteLength(standalone) / 1024)} KiB). Version hash: ${hash}`);

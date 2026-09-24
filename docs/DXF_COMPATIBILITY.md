@@ -1,95 +1,107 @@
-# DXF compatibility boundary — 0.1.0
+# DXF compatibility boundary — 0.2.0
 
-There are three distinct claims: recognizing records, editing/rendering their
-geometry, and exporting them without information loss. They are not equivalent.
-This release implements a useful planar subset, not every DXF feature.
+Recognizing a record, rendering its geometry and losslessly exporting all its
+semantics are different claims. This release is an expanded planar CAD editor,
+not a complete AutoCAD implementation or universal edited-DXF round-trip engine.
 
-## Input and output
+## Input, coordinates and output
 
-Input recognizes ASCII DXF group-code streams, modern binary DXF, and the R12
-binary byte-code variant. Modern Unicode and selected legacy code pages are
-decoded. An explicit encoding override is available for other browser-supported
-encodings. Binary string decoding is more limited than ASCII version/code-page
-handling. ASCII int64 group values are retained as decimal strings.
+ASCII DXF, modern binary DXF and the R12 binary byte-code variant are recognized.
+Input bytes and selected legacy code pages are handled by the existing readers;
+`parseDXF(input, {encoding})` can override decoding. Original bytes are retained
+separately. Binary legacy text decoding is less comprehensive than ASCII
+code-page handling. ASCII int64 values are retained as decimal strings.
 
-Normalized output is ASCII DXF R2000, R2004, R2007, R2010, R2013 or R2018. It
-regenerates supported tables, blocks and entities, with application XDATA where
-enabled. These versions are output encodings, not an assertion of complete
-version-specific feature coverage or AutoCAD interoperability certification.
+`writeDXF` emits normalized ASCII R2000/R2004/R2007/R2010/R2013/R2018. Supported
+entity data remains native rather than being replaced by rendering tessellation.
+Finite doubles use JavaScript's round-trippable decimal serialization. Export
+version selection is not a claim of complete version-specific feature coverage.
 
-| Construct | Editable/display behavior | Normalized export |
+Autodesk's arbitrary-axis OCS basis is evaluated and projected to document XY.
+Non-default normals, negative-Z extrusion and elevation are applied for supported
+OCS entity families. ELLIPSE and 3D POLYLINE retain their WCS distinctions. This
+is a planar projection, not a 3D camera, solid modeler or complete UCS editor.
+Native Z data in supported records is retained during normalized exchange.
+
+## Supported entity behavior
+
+| Construct | Display/edit behavior | Normalized output |
 |---|---|---|
-| LINE | Planar endpoints, grips, snapping | Native LINE |
-| LWPOLYLINE / 2D POLYLINE | Vertices, closure and bulge-arc display | Native LWPOLYLINE; known widths/bulges only |
-| CIRCLE / ARC | Adaptive curve display; circle creation/radius editing | Native curve records |
-| ELLIPSE | Major-axis and ratio-based curve display | Native ELLIPSE known fields |
-| SPLINE | Rational control-point/knot evaluation and adaptive display | Native SPLINE known fields; not full fit-point semantics |
-| TEXT / MTEXT | Browser-font text; partial formatting / paragraphs | Known text fields; not exact font/layout fidelity |
-| ATTRIB / ATTDEF | Attribute/tag support; invisible attributes hidden | Native known attribute fields |
-| BLOCK / INSERT | Named reusable definitions, insertion/rotation/scales, nested occurrences, bounded arrays | Native BLOCK / INSERT with associated attributes |
-| POINT | Small cross marker | Native POINT |
-| SOLID / TRACE / 3DFACE | Planar boundary and limited fill projection | Native known corner data |
-| HATCH | Recognized boundary loops, partial solid preview | Boundary polylines, with explicit loss warning |
-| DIMENSION | Imported anonymous block display; authored aligned visible dimensions | Known imported dimension form or visible line/text geometry |
-| Layers | Names, visibility, locks, colors, simple linetype inheritance | LAYER table known fields |
-| Linetypes | Common dash patterns | Simple LTYPE patterns; complex SHX/text patterns incomplete |
-| Layouts | Entity layout name and basic active-layout filtering | Limited paper-space flags; no complete layout/viewports/plot objects |
-| Unknown / unsupported entities | Original records retained, warning issued; not displayed as supported geometry | Omitted, with warning |
-| OBJECTS and opaque sections | Retained in native project/original source | Not regenerated or merged into edited export |
+| LINE | WCS endpoints, planar move and grips; preserved Z | Native LINE |
+| LWPOLYLINE / 2D POLYLINE | Closure, bulges, elevation, variable start/end widths and tapered ribbons | Native LWPOLYLINE with known widths/bulges |
+| 3D POLYLINE | Projected closed/open wireframe | POLYLINE/VERTEX/SEQEND, native Z |
+| Polyface / polygon mesh | Indexed faces/grid wireframe, hidden face-edge indices, closed mesh directions | Native flags, dimensions, indices and vertices |
+| CIRCLE / ARC | Adaptive OCS-aware projected curves | Native curves |
+| ELLIPSE | WCS major axis and normal-derived minor axis | Native known ELLIPSE fields |
+| SPLINE | Rational control/knot evaluation and bounded adaptive subdivision | Native known spline data; not all fit-only semantics |
+| HATCH, solid | Polyline/bulge or line/arc/ellipse/rational-spline edges, clockwise/CCW paths; normal/outer/ignore island styles | Native HATCH boundaries and style |
+| HATCH, pattern | Signed dash/dot scanlines clipped against island topology with explicit density limits | Native pattern-line records, scale and angle metadata |
+| HATCH, gradient | Flat-color preview with warning, not a gradient shader | Native gradient tags retained |
+| TEXT | Second alignment point, fit/aligned, baseline/vertical placement, style width/oblique, generation flags, affine placement | Native known alignment and style data |
+| MTEXT | Nine attachments, measured wrapping, paragraphs, selected scoped formatting, browser fonts, background masks | Native text chunks, wrap width, direction, spacing, background data |
+| ATTRIB / ATTDEF | Tags and visibility; known text placement | Native attribute data |
+| BLOCK / INSERT | Nested reusable instances, base point, scales, rotation, bounded arrays and ports | Native blocks/inserts/attributes |
+| SOLID / TRACE / 3DFACE | Correct corner order, projected fill/edges; 3DFACE hidden edges | Native known corners and visibility bits |
+| LEADER | Polyline and first-point arrow preview | Native vertices and known flags, not full dimension-style/annotation association |
+| RAY / XLINE | Bounded to current view rather than arbitrary huge endpoints | Native infinite-line records |
+| POINT | Cross marker | Native POINT |
+| DIMENSION | Imported anonymous block display; authored aligned visible dimensions | Known imported form or authored line/text geometry, not associative regeneration |
+| STYLE / LAYER / LTYPE | Browser font fallback, ACI/true color, visibility/locks, lineweights, inherited and signed dash patterns, opacity | Supported table and entity properties; not SHX/text pattern elements |
+| Layouts | Basic active-layout filtering | Limited paper-space flags, not complete plot/layout objects |
+| Unknown entities / OBJECTS | Source records retained and diagnostics produced, unsupported geometry not synthesized | Unsupported data can be omitted |
 
-Imported non-default extrusion/OCS is diagnosed; it is not fully transformed
-into a planar view. Z coordinates in known records are not a 3D modeling or
-camera implementation. Entity-specific groups not explicitly represented by the
-model can be dropped during normalized export, even for a recognized type.
+## Text, patterns and compositing
 
-## Native drawing semantics
+Wire DXF angle groups default to degrees. The reader also accepts an explicit
+`mtextRotationUnit: 'radians'` override for a known producer using the APP/API
+convention. MTEXT output uses its WCS direction vector to avoid that ambiguity.
+Reference width (41) is not treated as horizontal text scaling. Background true
+color (421) is kept distinct from entity foreground true color (420).
 
-Symbols authored by the app are actual DXF block geometry with INSERT instances.
-Tags are emitted as ATTRIB records, not only drawn as HTML labels. Connectors
-are editable native polylines. Registered `CONDUITCAD` XDATA stores stable IDs,
-port references and application fields; block metadata contains named ports.
-Header comments store selected parameter/constraint metadata.
+Browser fonts and partial formatting are not a full AutoCAD SHX/TTF/Bigfont
+engine. Vertical flow, columns, exact rich fractions, all paragraph controls,
+font-resource resolution and exact metrics are incomplete. These limitations
+are diagnosed where recognized. No proprietary font files are distributed.
 
-Conduit-to-Conduit export/import tests check ID stability, connector references,
-ports and duplicate-tag prevention. Another CAD system may preserve, discard,
-or ignore application metadata; it will not automatically implement Conduit's
-solver or connector routing. Application metadata is not a standardized Visio,
-Plant 3D, EPLAN or intelligent P&ID exchange format.
+The retained stroke engine is WebGPU, WebGL2 or Canvas according to availability.
+For filled/masked/long-dash/dotted scenes, an ordered Canvas 2D compositor avoids
+putting every fill below every line or truncating long dash arrays. It preserves
+entity sequence, even-odd holes and opacity. This is a correctness-first fallback,
+not a claim of all-GPU fills or support for arbitrary SORTENTSTABLE/nested draw
+ordering. The UI reports the actual compositor separately from the stroke engine.
 
-## Original source versus edited output
+Hatch work is bounded (line/segment/subdivision/count ceilings). A diagnostic
+reports truncated previews. Invalid counts fail before unbounded allocation.
+Variable-width polyline ribbons do not implement every AutoCAD join/endcap rule.
 
-For byte input the native project retains the exact input bytes as base64. For
-string input it retains the supplied decoded string. **Original DXF** downloads
-that source, with no edits applied. It preserves unknown records because it is
-the original file, not because unknown objects have been decoded and rewritten.
+## Editing and clipping boundaries
 
-**Edited DXF** generates a new drawing from supported model fields. It is not
-safe to describe this as lossless for arbitrary files. Store the `.conduit.json`
-project and the original DXF alongside any normalized exchange copy.
+Body dragging converts planar deltas back into supported non-degenerate OCS
+planes. Incorrect raw-OCS grips are not shown for non-default extrusion. Edge-on
+planes, unsupported native hatch reflections and nonuniform/sheared curve edits
+reject before mutation instead of silently damaging coordinates. Full OCS/UCS
+grip editing remains an extension point.
 
-## Boundaries still requiring implementation
+The drawing viewport, selection overlays and ruler exclusion use real Canvas
+clipping and device-pixel GPU scissor bounds. This fixes application-canvas
+clipping; it does **not** implement DXF XCLIP, IMAGE/WIPEOUT clipping objects or
+complete paper-space viewport clipping.
 
-Full nonplanar OCS/UCS; 3D solids/B-rep/ACIS and surfaces; general meshes/polyface
-semantics; arbitrary entity transforms; DWG; XREF resolution and external asset
-management; dynamic blocks and evaluation graphs; proxy objects/custom classes;
-full OBJECTS/dictionaries/reactors/ownership reconstruction; image/PDF/DGN
-underlays; complete hatch islands/patterns; variable polyline-width joins;
-full linetype scaling and complex linetypes; font/style/SHX fidelity and complex
-MTEXT; associative dimensions and comprehensive dimstyle handling; layout
-viewports, clipping, plotting/page setups and drawing-order/transparency parity.
+Curve explosion is a tessellating edit, not a lossless decomposition of rich
+text or every hatch association. Keep the native project before destructive
+conversion. New symbol definitions do not overwrite existing project masters.
 
-## Tests and external validation
+## Preservation and application metadata
 
-The included tests cover ASCII and binary readers, old polylines, common curve
-records, Unicode, source byte preservation, unsupported records, export warnings,
-version headers, native blocks/tags/IDs/ports and large-coordinate compilation.
+Save the Conduit project for the complete editable application state. Original
+DXF export returns the exact imported input **without edits**. Edited normalized
+DXF writes only represented tables/entities; arbitrary object ownership graphs,
+reactors, opaque groups and external resource definitions are not merged back.
+Hatch associations and source handles are deliberately detached on normalized
+export to avoid dangling cross-document references.
 
-`tests/audit_dxf.py` independently opens and audits the three generated examples
-with ezdxf 1.4.4. The delivered result is zero audit errors and zero repairs.
-Generated examples are not a representative industrial interoperability corpus.
-No claim is made that these files were opened and visually compared in AutoCAD,
-Visio, BricsCAD, DraftSight, EPLAN or a plant-engineering package.
-
-Before production acceptance, expand to independently authored files with
-measured reference geometry, randomized/fuzz input, version/encoding coverage,
-per-entity round-trip contracts and visual comparisons on real target CAD tools.
+Application XDATA stores Conduit IDs, ports, constraints and connectors. Other
+CAD systems need not execute or retain this application-specific intelligence.
+Full DWG, ACIS/B-rep solids, dynamic blocks, external references, raster/underlay
+resolution, associative dimensions, complete fonts and paper-space plotting
+remain outside this release. See REFERENCES.md and the independent test corpus.

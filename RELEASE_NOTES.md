@@ -1,3 +1,55 @@
+# Conduit CAD 0.2.0 — DXF fidelity and touch editing
+
+This release expands the native interchange/model/rendering pipeline, rather
+than flattening imported CAD into an image. All 13 reusable modules are versioned
+0.2.0; generated app/package artifacts are rebuilt from source.
+
+## DXF and rendering
+
+Native solid/pattern HATCH paths with bulge, line, clockwise/counterclockwise arc,
+ellipse and rational spline edges; normal/outer/ignore islands; bounded pattern
+scan conversion; retained native gradient tags with a diagnosed flat preview.
+Variable-width bulged ribbons, 3D polyline/polyface/polygon-mesh wireframes,
+hidden 3DFACE edges, LEADER, viewport-bounded RAY/XLINE and OCS projection.
+
+Improved TEXT alignment/fit/second points/style/oblique data and MTEXT attachment,
+wrap, scoped formatting, affine placement and masks. Correct foreground/background
+ACI/true-color separation, alpha semantics, signed linetypes, global/entity
+scales, lineweights and double-precision decimal export. Native export is tested
+against a separate 37-entity ezdxf-authored fixture, not only self-roundtrips.
+
+Canvas/SVG/PNG carry compound holes and opacity. Ordered fidelity compositing
+prevents later fills being placed behind earlier lines. GPU strokes remain the
+fast path for compatible scenes; filled/masked/long-dash/dotted scenes select
+Canvas 2D explicitly rather than silently sacrificing order or dash content.
+
+## Touch, clipping and symbols
+
+Real drawing/overlay clipping excludes rulers, and ruler input cannot start an
+edit. Dedicated 44px symbol grab handles reserve touch gestures before capture,
+while cards remain scrollable and tap-to-place. Portrait/landscape spacing,
+focus, overflow and safe-area behavior are refined. Non-default OCS raw grips
+are withheld rather than shown at incorrect positions; body dragging is projected.
+
+64 original masters now have connected leads and terminal-geometry checks.
+Revised valve/check-valve, instrumentation, diode/ground/contact and flow geometry
+plus eight additional variants improve convention clarity. New project examples
+use geometry revision 2; saved user masters are not silently overwritten.
+These are original, non-certified symbols, not a claim of IEC/ISA/ISO compliance.
+
+## Validation and remaining boundaries
+
+124 unit tests; 29 established browser workflows plus 14 new pixel/import/touch
+checks; strict TypeScript consumer compilation; independent normalized-fixture
+and sample audits with zero errors/repairs. Actual browser execution is Canvas 2D.
+Hardware WebGPU/WebGL2, real-device storage/PWA durability and complete CAD-system
+interoperability are not certified. Full fonts, XCLIP/layout clipping, associative
+regeneration, dynamic blocks, object graphs and 3D solid modeling remain open.
+
+See docs/DXF_COMPATIBILITY.md, docs/SYMBOLS.md and docs/VALIDATION.md for exact scope.
+
+---
+
 # Conduit CAD 0.1.0
 
 Initial working touch-first 2D CAD and engineering-diagram editor, built from

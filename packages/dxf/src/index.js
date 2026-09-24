@@ -1,3 +1,4 @@
+import { readEntityFidelity, writeHatchData } from './fidelity.js';
 import { createDocument, entity, uid, cleanText, clone, entityGeometry } from '@conduitcad/model';
 import { TAU, arcPoints } from '@conduitcad/geometry';
 const NUMBER_CODES = c => (c >= 10 && c <= 59) || (c >= 110 && c <= 149) || (c >= 210 && c <= 239) || (c >= 460 && c <= 469) || (c >= 1010 && c <= 1059);
@@ -36,7 +37,7 @@ export function parseAsciiPairs(source, { maxPairs = 8000000 } = {}) {
 export function parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {
     const u = input instanceof Uint8Array ? input : new Uint8Array(input), v = new DataView(u.buffer, u.byteOffset, u.byteLength);
     let pos = 22;
-    const pairs = [], decoder = new TextDecoder('windows-1252');
+    const pairs = []; let decoder = new TextDecoder('windows-1252'), headerKey = ''; 
     const r12 = u[23] !== 0;
     const need = n => {
         if (pos + n > u.length)
@@ -103,6 +104,9 @@ export function parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {
         if (typeof value === 'number' && !Number.isFinite(value))
             throw new Error('Non-finite binary DXF value');
         pairs.push([code, value]);
+        if (code === 9) headerKey = value;
+        else if (headerKey === '$ACADVER' && code === 1 && /^AC\d+$/.test(value) && +value.slice(2) >= 1021) decoder = new TextDecoder('utf-8');
+        else if (headerKey === '$DWGCODEPAGE' && code === 3 && decoder.encoding !== 'utf-8') { try { decoder = new TextDecoder(({ ANSI_1250: 'windows-1250', ANSI_1251: 'windows-1251', ANSI_932: 'shift_jis', ANSI_936: 'gbk', ANSI_950: 'big5' })[value] || 'windows-1252'); } catch {} }
         if (code === 0 && value === 'EOF')
             break;
     }
@@ -162,58 +166,10 @@ function metadata(raw) {
         return {};
     }
 }
-function parseHatch(raw) {
-    const loops = [];
-    let i = raw.findIndex(([c]) => c === 91) + 1;
-    while (i > 0 && i < raw.length) {
-        if (raw[i][0] !== 92) {
-            i++;
-            continue;
-        }
-        const flags = Number(raw[i++][1]), loop = { points: [], closed: true, flags };
-        if (flags & 2) {
-            let n = 0;
-            while (i < raw.length && raw[i][0] !== 93)
-                i++;
-            if (i < raw.length)
-                n = Number(raw[i++][1]);
-            for (let j = 0; j < n && i < raw.length; j++) {
-                if (raw[i][0] !== 10)
-                    break;
-                const p = { x: Number(raw[i++][1]), y: 0 };
-                if (raw[i]?.[0] === 20)
-                    p.y = Number(raw[i++][1]);
-                if (raw[i]?.[0] === 42)
-                    p.bulge = Number(raw[i++][1]);
-                loop.points.push(p);
-            }
-        }
-        else {
-            while (i < raw.length && raw[i][0] !== 93)
-                i++;
-            const n = Number(raw[i++]?.[1] || 0);
-            for (let j = 0; j < n && i < raw.length; j++) {
-                if (raw[i][0] !== 72)
-                    break;
-                const type = Number(raw[i++][1]), edge = [];
-                while (i < raw.length && ![72, 92, 97, 75, 76, 98].includes(raw[i][0]))
-                    edge.push(raw[i++]);
-                if (type === 1)
-                    loop.points.push(pt(edge, 10), pt(edge, 11));
-                else if (type === 2) {
-                    const c = pt(edge), r = Number(get(edge, 40, 1)), s = Number(get(edge, 50, 0)) * Math.PI / 180, e = Number(get(edge, 51, 360)) * Math.PI / 180;
-                    loop.points.push(...arcPoints(c, r, s, e, .2, !get(edge, 73, 1)));
-                }
-            }
-        }
-        if (loop.points.length)
-            loops.push(loop);
-    }
-    return loops;
-}
-function parseEntity(raw, diagnostics) {
+function parseEntity(raw, diagnostics, options = {}) {
     const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw, handle: get(raw, 5) }, dirty: false };
     const aci = Number(get(raw, 62, 256)), trueColor = get(raw, 420);
+    e.colorIndex = aci; e.colorMode = trueColor === undefined ? 'aci' : 'truecolor';
     if (trueColor !== undefined)
         e.color = '#' + Number(trueColor).toString(16).padStart(6, '0');
     else if (aci === 0)
@@ -237,7 +193,7 @@ function parseEntity(raw, diagnostics) {
         case 'POLYLINE':
             e.points = [];
             e.closed = !!(get(raw, 70, 0) & 1);
-            e.flags = get(raw, 70, 0);
+            e.flags = get(raw, 70, 0); e.mCount = +get(raw,71,0); e.nCount = +get(raw,72,0);
             break;
         case 'CIRCLE':
         case 'ARC':
@@ -309,10 +265,9 @@ function parseEntity(raw, diagnostics) {
             e.points = [pt(raw, 10), pt(raw, 11), pt(raw, 13), pt(raw, 12)];
             break;
         case 'HATCH':
-            e.loops = parseHatch(raw);
+            e.loops = [];
             e.solid = !!get(raw, 70, 0);
             e.pattern = get(raw, 2, 'SOLID');
-            diagnostics.push({ severity: 'warning', type, message: `HATCH ${e.solid ? 'solid boundary' : 'pattern'} is displayed as boundary geometry; island/pattern fidelity is not complete.` });
             break;
         case 'DIMENSION':
             e.block = get(raw, 2);
@@ -323,7 +278,12 @@ function parseEntity(raw, diagnostics) {
         case 'VERTEX':
             e.p = pt(raw);
             e.p.bulge = get(raw, 42, 0);
+            e.p.startWidth = get(raw, 40, 0); e.p.endWidth = get(raw, 41, 0);
+            e.vertexFlags=+get(raw,70,0); e.faceIndices=[71,72,73,74].map(c=>+get(raw,c,0)).filter(Boolean);
             break;
+        case 'LEADER':
+        case 'RAY':
+        case 'XLINE':
         case 'SEQEND': break;
         default:
             e.unsupported = true;
@@ -335,8 +295,15 @@ function parseEntity(raw, diagnostics) {
     for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])
         if (k in meta)
             e[k] = meta[k];
-    if (get(raw, 210, 0) !== 0 || get(raw, 220, 0) !== 0 || get(raw, 230, 1) !== 1)
-        diagnostics.push({ severity: 'warning', type, message: `${type}: non-default extrusion/OCS is not fully projected; original records retained.` });
+    readEntityFidelity(e, raw, diagnostics, options);
+    if(type === 'MTEXT') {
+        const pos=raw.findIndex(p=>p[0]===100&&p[1]==='AcDbMText');
+        if(pos>=0) { const common=raw.slice(0,pos), value=get(common,420), index=+get(common,62,256);
+            e.colorMode = value===undefined ? 'aci' : 'truecolor';
+            if(value!==undefined)e.color='#'+(+value&0xffffff).toString(16).padStart(6,'0');
+            else if(index===256)delete e.color; else e.color=index===0?'BYBLOCK':aciColor(index);
+        }
+    }
     return e;
 }
 function base64(bytes) {
@@ -372,7 +339,7 @@ export function parseDXF(input, options = {}) {
         source = bytes ? { format: 'ascii', base64: base64(bytes) } : { format: 'ascii', text: rawText };
     }
     const doc = createDocument(options.name || 'Imported DXF');
-    doc.layers = [];
+    doc.layers = []; doc.textStyles = {}; doc.linetypes = { CONTINUOUS: [] }; doc.signedLinetypes = true;
     doc.source = source;
     doc.rawSections = {};
     doc.importDiagnostics = [];
@@ -399,6 +366,7 @@ export function parseDXF(input, options = {}) {
             key = String(v);
         else if (key === '$INSUNITS' && c === 70)
             doc.units = ({ 0: 'unitless', 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm' })[v] || 'unitless';
+        else if (key === '$LTSCALE' && c === 40) doc.linetypeScale = v;
         else if (key === '$ACADVER')
             doc.importVersion = v;
     }
@@ -411,10 +379,12 @@ export function parseDXF(input, options = {}) {
             table = '';
         else if (table === 'LAYER' && t === 'LAYER') {
             const n = get(r, 2, '0'), aci = Number(get(r, 62, 7));
-            doc.layers.push({ name: n, color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS') });
+            doc.layers.push({ name: n, colorIndex:Math.abs(aci), colorMode:get(r,420)===undefined?'aci':'truecolor', color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS'), lineweight: +get(r, 370, -3) });
         }
         else if (table === 'LTYPE' && t === 'LTYPE')
-            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(v => Math.abs(Number(v)));
+            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(Number);
+        else if (table === 'STYLE' && t === 'STYLE')
+            doc.textStyles[get(r, 2, 'STANDARD')] = { font: get(r, 3, 'sans-serif'), bigFont: get(r, 4, ''), height: +get(r, 40, 0), widthFactor: +get(r, 41, 1), oblique: +get(r, 50, 0), flags: +get(r, 71, 0) };
     }
     if (!doc.layers.length)
         doc.layers.push({ name: '0', color: '#344755', visible: true, locked: false });
@@ -422,9 +392,10 @@ export function parseDXF(input, options = {}) {
         const es = [];
         let poly = null, insert = null;
         for (const raw of rs) {
-            const e = parseEntity(raw, doc.importDiagnostics);
+            const e = parseEntity(raw, doc.importDiagnostics, options);
             if (e.type === 'VERTEX' && poly) {
-                poly.points.push(e.p);
+                if ((poly.flags & 64) && e.faceIndices.length) { poly.faces ??= []; poly.faces.push(e.faceIndices); }
+                else poly.points.push(e.p);
                 continue;
             }
             if (e.type === 'ATTRIB' && insert) {
@@ -515,7 +486,7 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     const pair = (c, v) => {
         if (typeof v === 'number' && !Number.isFinite(v))
             throw new Error(`Nonfinite DXF value for code ${c}`);
-        let s = typeof v === 'number' ? Number(v.toPrecision(14)).toString() : String(v ?? '');
+        let s = typeof v === 'number' ? String(v) : String(v ?? '');
         s = s.replace(/\r?\n/g, '\\P');
         if (Number(version.slice(2)) < 1021)
             s = s.replace(/[\u007f-\uffff]/g, c => '\\U+' + c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0'));
@@ -537,6 +508,7 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     pair(1, version);
     pair(9, '$INSUNITS');
     pair(70, ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4);
+    pair(9, '$LTSCALE'); pair(40, doc.linetypeScale || 1);
     pair(9, '$MEASUREMENT');
     pair(70, doc.units === 'in' || doc.units === 'ft' ? 0 : 1);
     if (includeMetadata) {
@@ -563,7 +535,7 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     pair(73, 0);
     pair(40, 0);
     const types = { ...doc.linetypes };
-    for (const e of doc.entities)
+    for (const e of [...doc.entities, ...Object.values(doc.blocks).flatMap(b=>b.entities || [])])
         if (e.dash?.length)
             types['CC_DASH_' + e.dash.join('_')] = e.dash;
     for (const [name, pattern] of Object.entries(types)) {
@@ -579,7 +551,7 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
         pair(72, 65);
         pair(73, pattern.length);
         pair(40, pattern.reduce((a, b) => a + Math.abs(b), 0));
-        pattern.forEach((v, i) => { pair(49, Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });
+        pattern.forEach((v, i) => { pair(49, doc.signedLinetypes && !name.startsWith('CC_DASH_') ? v : Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });
     }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
@@ -595,9 +567,11 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
         pair(100, 'AcDbLayerTableRecord');
         pair(2, l.name);
         pair(70, l.locked ? 4 : 0);
-        pair(62, l.visible === false ? -7 : 7);
-        pair(420, parseInt((l.color || '#344755').slice(1), 16));
+        const layerACI = l.colorMode === 'aci' && l.colorIndex > 0 && l.colorIndex < 256 && aciColor(l.colorIndex).toLowerCase() === l.color?.toLowerCase();
+        pair(62, (l.visible === false ? -1 : 1) * (layerACI ? l.colorIndex : 7));
+        if (!layerACI) pair(420, parseInt((l.color || '#344755').slice(1), 16));
         pair(6, l.linetype || 'CONTINUOUS');
+        if (l.lineweight !== undefined) pair(370, l.lineweight);
     }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
@@ -605,20 +579,13 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     pair(5, next());
     pair(330, '0');
     pair(100, 'AcDbSymbolTable');
-    pair(70, 1);
-    pair(0, 'STYLE');
-    pair(5, next());
-    pair(100, 'AcDbSymbolTableRecord');
-    pair(100, 'AcDbTextStyleTableRecord');
-    pair(2, 'STANDARD');
-    pair(70, 0);
-    pair(40, 0);
-    pair(41, 1);
-    pair(50, 0);
-    pair(71, 0);
-    pair(42, 2.5);
-    pair(3, 'txt');
-    pair(4, '');
+    const textStyles = { STANDARD: { font: 'txt', widthFactor: 1 }, ...doc.textStyles };
+    pair(70, Object.keys(textStyles).length);
+    for (const [name, style] of Object.entries(textStyles)) {
+        pair(0, 'STYLE'); pair(5, next()); pair(100, 'AcDbSymbolTableRecord'); pair(100, 'AcDbTextStyleTableRecord');
+        pair(2, name); pair(70, 0); pair(40, style.height || 0); pair(41, style.widthFactor || 1);
+        pair(50, style.oblique || 0); pair(71, style.flags || 0); pair(42, 2.5); pair(3, style.font || 'txt'); pair(4, style.bigFont || '');
+    }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
     pair(2, 'APPID');
@@ -652,7 +619,7 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     end();
     const header = (e, t = e.type, owner) => {
         pair(0, t);
-        pair(5, next());
+        const emittedHandle = next(); pair(5, emittedHandle);
         if (owner)
             pair(330, owner);
         pair(100, 'AcDbEntity');
@@ -663,18 +630,23 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
         }
         if (e.color === 'BYBLOCK')
             pair(62, 0);
+        else if (e.color && e.color !== 'BYLAYER' && e.colorMode==='aci' && e.colorIndex>0 && e.colorIndex<256 && aciColor(e.colorIndex).toLowerCase()===e.color.toLowerCase()) pair(62,e.colorIndex);
         else if (e.color && e.color !== 'BYLAYER') {
             pair(62, 7);
             pair(420, parseInt(e.color.slice(1), 16));
         }
         if (e.hidden)
             pair(60, 1);
-        if (e.lineweight > 0)
+        if (e.opacity !== undefined) pair(440, 0x02000000 | Math.round(255 * Math.max(0, Math.min(1, e.opacity))));
+        else if (e.transparency != null) pair(440, e.transparency);
+        if (e.linetypeScale !== undefined) pair(48, e.linetypeScale);
+        if (e.lineweight !== undefined)
             pair(370, e.lineweight);
         if (e.dash?.length)
             pair(6, 'CC_DASH_' + e.dash.join('_'));
         else if (e.linetype && e.linetype !== 'BYLAYER')
             pair(6, e.linetype);
+        return emittedHandle;
     };
     const emit = (e, owner) => {
         if (e.unsupported) {
@@ -688,14 +660,20 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
                 emit({ type: 'TEXT', ...t, layer: e.layer }, owner);
             return;
         }
-        if (e.type === 'HATCH') {
-            for (const l of e.loops || [])
-                emit({ type: 'LWPOLYLINE', points: l.points, closed: true, layer: e.layer, color: e.color }, owner);
-            return;
-        }
-        const type = e.type === 'POLYLINE' ? 'LWPOLYLINE' : e.type;
-        header(e, type, owner);
+        const type = e.type === 'POLYLINE' && !(e.flags & (8|16|64)) ? 'LWPOLYLINE' : e.type;
+        const entityHandle = header(e, type, owner);
         switch (type) {
+            case 'POLYLINE':
+                pair(100,(e.flags&64)?'AcDbPolyFaceMesh':(e.flags&16)?'AcDbPolygonMesh':'AcDb3dPolyline');
+                pair(66,1); pp(10,{x:0,y:0,z:e.elevation || 0}); pair(70,(e.flags || 8)|(e.closed?1:0));
+                if(e.flags&16){pair(71,e.mCount || 0);pair(72,e.nCount || 0);}
+                if(e.flags&64){pair(71,e.points.length);pair(72,e.faces?.length || 0);}
+                break;
+            case 'HATCH': writeHatchData(e, pair); break;
+            case 'LEADER':
+                pair(100, 'AcDbLeader'); pair(3, e.dimstyle || 'STANDARD'); pair(71, e.arrow === false ? 0 : 1); pair(72, e.spline ? 1 : 0); pair(73, 3); pair(74, 0); pair(75, 0); pair(76, e.points.length); for (const p of e.points) pp(10, p); break;
+            case 'RAY':
+            case 'XLINE': pair(100, type === 'RAY' ? 'AcDbRay' : 'AcDbXline'); pp(10, e.p); pp(11, e.direction); break;
             case 'LINE':
                 pair(100, 'AcDbLine');
                 pp(10, e.a);
@@ -705,11 +683,14 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
                 pair(100, 'AcDbPolyline');
                 pair(90, e.points.length);
                 pair(70, e.closed ? 1 : 0);
+                if (e.elevation) pair(38, e.elevation);
                 if (e.constantWidth)
                     pair(43, e.constantWidth);
                 for (const p of e.points) {
                     pair(10, p.x);
                     pair(20, p.y);
+                    if (p.startWidth) pair(40, p.startWidth);
+                    if (p.endWidth) pair(41, p.endWidth);
                     if (p.bulge)
                         pair(42, p.bulge);
                 }
@@ -758,30 +739,32 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
                 pair(1, e.text || '');
                 pair(50, e.rotation || 0);
                 pair(41, e.widthFactor || 1);
-                pair(7, 'STANDARD');
-                if (e.align && e.align !== 'left') {
-                    pair(72, e.align === 'center' ? 1 : 2);
-                    pp(11, e.p);
+                pair(7, e.styleName || 'STANDARD');
+                if (e.oblique) pair(51, e.oblique); if (e.textFlags) pair(71, e.textFlags);
+                if (e.halign || e.valign || (e.align && e.align !== 'left')) {
+                    pair(72, e.halign ?? (e.align === 'center' ? 1 : e.align === 'right' ? 2 : 0));
+                    pp(11, e.alignPoint || e.p);
                 }
-                if (type === 'TEXT')
-                    pair(100, 'AcDbText');
+                if (type === 'TEXT') { pair(100, 'AcDbText'); pair(73, e.valign || 0); }
                 else {
                     pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');
                     pair(2, e.attributeTag || 'TAG');
                     if (type === 'ATTDEF')
                         pair(3, 'Equipment tag');
-                    pair(70, e.invisible ? 1 : 0);
+                    pair(70, e.invisible ? 1 : 0); pair(74, e.valign || 0);
                 }
                 break;
-            case 'MTEXT':
-                pair(100, 'AcDbMText');
-                pp(10, e.p);
-                pair(40, e.height || 12);
-                pair(41, e.mtextWidth || 200);
-                pair(71, e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1);
-                pair(1, e.text || '');
-                pair(50, e.rotation || 0);
+            case 'MTEXT': {
+                pair(100, 'AcDbMText'); pp(10, e.p); pair(40, e.height || 12); pair(41, e.mtextWidth || 0);
+                pair(71, e.attachment || (e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1)); pair(7, e.styleName || 'STANDARD');
+                const value = String(e.text || '').replace(/\r?\n/g, '\\P');
+                for (let i = 0; i < value.length - 250; i += 250) pair(3, value.slice(i, i + 250));
+                pair(1, value.slice(Math.max(0, Math.ceil((value.length - 250) / 250)) * 250));
+                const a = (e.rotation || 0) * Math.PI / 180; pp(11, { x: Math.cos(a), y: Math.sin(a) });
+                pair(73, e.lineSpacingStyle || 1); pair(44, e.lineSpacing || 1);
+                if (e.backgroundFill) { pair(90, e.backgroundFill); pair(45, e.backgroundScale || 1.5); pair(63, 7); if (e.backgroundColor) pair(421, parseInt(e.backgroundColor.slice(1), 16)); }
                 break;
+            }
             case 'POINT':
                 pair(100, 'AcDbPoint');
                 pp(10, e.p);
@@ -790,7 +773,8 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
             case 'TRACE':
             case '3DFACE':
                 pair(100, type === '3DFACE' ? 'AcDbFace' : 'AcDbTrace');
-                for (const [i, j] of [[0, 0], [1, 1], [2, 3], [3, 2]])
+                if (type === '3DFACE') pair(70, e.edgeFlags || 0);
+                for (const [i, j] of (type === '3DFACE' ? [[0, 0], [1, 1], [2, 2], [3, 3]] : [[0, 0], [1, 1], [2, 3], [3, 2]]))
                     pp(10 + i, e.points[j] || e.points.at(-1));
                 break;
             case 'DIMENSION':
@@ -824,6 +808,8 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
                 break;
             }
         }
+        if (e.type !== 'HATCH' && e.extrusion) pp(210, e.extrusion);
+        if (e.thickness) pair(39, e.thickness);
         const m = {};
         if (e.id)
             m.id = e.id;
@@ -831,6 +817,18 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
             if (e[k] !== undefined)
                 m[k] = e[k];
         meta(m);
+        if (type === 'POLYLINE') {
+            for (const p of e.points || []) {
+                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbVertex');
+                pair(100,(e.flags&64)?'AcDbPolyFaceMeshVertex':(e.flags&16)?'AcDbPolygonMeshVertex':'AcDb3dPolylineVertex');
+                pp(10,p);pair(70,(e.flags&64)?192:(e.flags&16)?64:32);
+            }
+            for (const face of e.faces || []) {
+                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbFaceRecord');pp(10,{x:0,y:0,z:0});pair(70,128);
+                face.forEach((n,i)=>pair(71+i,n));
+            }
+            header({layer:e.layer},'SEQEND',entityHandle);
+        }
         if (type === 'INSERT' && (e.attributes?.length || e.tag)) {
             for (const a of e.attributes || [])
                 emit(a, owner);
@@ -876,4 +874,4 @@ export function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {
     pair(0, 'EOF');
     return out.join('\r\n') + '\r\n';
 }
-export function exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.length ? [`${hatches.length} hatches exported as boundaries; fills/patterns are not retained.`] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }
+export function exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.some(e => e.associative) ? ['Hatch boundaries exported natively, but associativity is detached to avoid dangling handles.'] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }

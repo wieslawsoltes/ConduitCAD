@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/geometry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Modular Conduit CAD geometry engine",
   "type": "module",
   "main": "./src/index.js",

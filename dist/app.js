@@ -1,4 +1,4 @@
-globalThis.__CONDUIT_DXF_WORKER__="'use strict';\n(()=>{\nconst __modules=Object.create(null);\n// packages/geometry/src/index.js\n__modules[\"packages/geometry/src/index.js\"]=(()=>{\n/** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */\nconst EPS = 1e-9;\nconst TAU = Math.PI * 2;\nconst clamp = (v, a, b) => Math.min(b, Math.max(a, v));\nconst point = (x = 0, y = 0) => ({ x, y });\nconst add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });\nconst sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });\nconst mul = (a, s) => ({ x: a.x * s, y: a.y * s });\nconst dot = (a, b) => a.x * b.x + a.y * b.y;\nconst cross = (a, b) => a.x * b.y - a.y * b.x;\nconst length = a => Math.hypot(a.x, a.y);\nconst distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);\nconst normalize = a => mul(a, 1 / (length(a) || 1));\nconst lerp = (a, b, t) => add(a, mul(sub(b, a), t));\nconst almost = (a, b, tolerance = EPS) => Math.abs(a - b) <= tolerance;\nconst equalPoint = (a, b, tolerance = EPS) => distance(a, b) <= tolerance;\nconst identity = () => [1, 0, 0, 1, 0, 0];\nconst transform = (p, m) => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });\nfunction matrix({ x = 0, y = 0, rotation = 0, sx = 1, sy = sx } = {}) { const a = rotation * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [c * sx, s * sx, -s * sy, c * sy, x, y]; }\nfunction compose(a, b) { return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]]; }\nfunction inverse(m) {\n    const d = m[0] * m[3] - m[1] * m[2];\n    if (Math.abs(d) < EPS)\n        throw new Error('Singular transform');\n    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d, (m[2] * m[5] - m[3] * m[4]) / d, (m[1] * m[4] - m[0] * m[5]) / d];\n}\nfunction bounds(points) {\n    const b = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };\n    for (const p of points) {\n        if (!Number.isFinite(p.x) || !Number.isFinite(p.y))\n            continue;\n        b.minX = Math.min(b.minX, p.x);\n        b.minY = Math.min(b.minY, p.y);\n        b.maxX = Math.max(b.maxX, p.x);\n        b.maxY = Math.max(b.maxY, p.y);\n    }\n    return b;\n}\nconst emptyBounds = () => bounds([]);\nconst validBounds = b => Number.isFinite(b.minX) && b.minX <= b.maxX && b.minY <= b.maxY;\nconst inflate = (b, n) => ({ minX: b.minX - n, minY: b.minY - n, maxX: b.maxX + n, maxY: b.maxY + n });\nconst intersects = (a, b) => a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY;\nconst contains = (b, p) => p.x >= b.minX && p.x <= b.maxX && p.y >= b.minY && p.y <= b.maxY;\nconst union = (a, b) => ({ minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) });\nconst center = b => ({ x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 });\nfunction projectPoint(p, a, b, segment = true) { const v = sub(b, a), n = dot(v, v); const t = n < EPS * EPS ? 0 : dot(sub(p, a), v) / n; return lerp(a, b, segment ? clamp(t, 0, 1) : t); }\nconst distanceToSegment = (p, a, b) => distance(p, projectPoint(p, a, b));\nfunction lineIntersection(a, b, c, d, segments = true) {\n    const r = sub(b, a), s = sub(d, c), det = cross(r, s);\n    if (Math.abs(det) <= EPS * Math.max(1, length(r) * length(s)))\n        return null;\n    const q = sub(c, a), t = cross(q, s) / det, u = cross(q, r) / det;\n    if (segments && (t < -EPS || t > 1 + EPS || u < -EPS || u > 1 + EPS))\n        return null;\n    return { ...lerp(a, b, t), t, u };\n}\nfunction segmentIntersectsBox(a, b, box) {\n    if (contains(box, a) || contains(box, b))\n        return true;\n    const p = [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.minY }, { x: box.maxX, y: box.maxY }, { x: box.minX, y: box.maxY }];\n    return p.some((v, i) => lineIntersection(a, b, v, p[(i + 1) % 4]));\n}\nfunction polygonContains(p, points) {\n    let inside = false;\n    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {\n        const a = points[i], b = points[j];\n        if (distanceToSegment(p, a, b) < EPS)\n            return true;\n        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)\n            inside = !inside;\n    }\n    return inside;\n}\nfunction polygonArea(points) {\n    let n = 0;\n    for (let i = 0; i < points.length; i++)\n        n += cross(points[i], points[(i + 1) % points.length]);\n    return n / 2;\n}\nfunction polylineLength(points, closed = false) {\n    let n = 0;\n    for (let i = 1; i < points.length; i++)\n        n += distance(points[i - 1], points[i]);\n    if (closed && points.length > 1)\n        n += distance(points.at(-1), points[0]);\n    return n;\n}\nfunction simplifyOrthogonal(points) {\n    const r = [];\n    for (const p of points) {\n        if (r.length && equalPoint(r.at(-1), p))\n            continue;\n        if (r.length > 1) {\n            const a = r.at(-2), b = r.at(-1);\n            if (Math.abs(cross(sub(b, a), sub(p, b))) < EPS && dot(sub(b, a), sub(p, b)) >= 0)\n                r.pop();\n        }\n        r.push({ ...p });\n    }\n    return r;\n}\nfunction arcPoints(c, r, start = 0, end = TAU, tolerance = .2, clockwise = false) {\n    if (!Number.isFinite(r) || r <= 0)\n        return [c];\n    let sweep = end - start;\n    if (clockwise) {\n        while (sweep > 0)\n            sweep -= TAU;\n    }\n    else {\n        while (sweep < 0)\n            sweep += TAU;\n    }\n    if (Math.abs(sweep) < EPS)\n        sweep = clockwise ? -TAU : TAU;\n    const step = 2 * Math.acos(clamp(1 - Math.max(tolerance, 1e-7) / r, -1, 1));\n    const n = clamp(Math.ceil(Math.abs(sweep) / Math.max(step, .0005)), 2, 8192);\n    return Array.from({ length: n + 1 }, (_, i) => ({ x: c.x + r * Math.cos(start + sweep * i / n), y: c.y + r * Math.sin(start + sweep * i / n) }));\n}\nfunction bulgeArc(a, b, bulge) {\n    if (Math.abs(bulge) < EPS || distance(a, b) < EPS)\n        return null;\n    const chord = sub(b, a), mid = lerp(a, b, .5), c = add(mid, mul({ x: -chord.y, y: chord.x }, (1 - bulge * bulge) / (4 * bulge)));\n    return { c, r: distance(a, c), start: Math.atan2(a.y - c.y, a.x - c.x), sweep: 4 * Math.atan(bulge), clockwise: bulge < 0 };\n}\nfunction tessellatePolyline(points, closed = false, tolerance = .2) {\n    if (!points.length)\n        return [];\n    const out = [];\n    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {\n        const a = points[i], b = points[(i + 1) % points.length], arc = bulgeArc(a, b, a.bulge || 0);\n        if (arc)\n            out.push(...arcPoints(arc.c, arc.r, arc.start, arc.start + arc.sweep, tolerance, arc.clockwise).slice(0, -1));\n        else\n            out.push(a);\n    }\n    out.push(closed ? points[0] : points.at(-1));\n    return out;\n}\n/** Rational de Boor evaluation; input is never mutated. */\nfunction nurbsPoint(control, degree, knots, t, weights = []) {\n    const n = control.length - 1, p = Math.min(degree, n);\n    if (n < 0)\n        return point();\n    if (p < 1)\n        return { ...control[0] };\n    if (knots.length < n + p + 2)\n        throw new Error('Invalid NURBS knot vector');\n    const lo = knots[p], hi = knots[n + 1];\n    t = clamp(t, lo, hi);\n    let k = n;\n    if (t < hi) {\n        k = p;\n        while (k < n && !(t >= knots[k] && t < knots[k + 1]))\n            k++;\n    }\n    const d = [];\n    for (let j = 0; j <= p; j++) {\n        const i = k - p + j, w = weights[i] ?? 1;\n        d.push([control[i].x * w, control[i].y * w, w]);\n    }\n    for (let r = 1; r <= p; r++)\n        for (let j = p; j >= r; j--) {\n            const i = k - p + j, den = knots[i + p - r + 1] - knots[i], a = Math.abs(den) < EPS ? 0 : (t - knots[i]) / den;\n            d[j] = d[j].map((v, q) => (1 - a) * d[j - 1][q] + a * v);\n        }\n    const w = d[p][2];\n    return Math.abs(w) > EPS ? { x: d[p][0] / w, y: d[p][1] / w } : { ...control[Math.min(n, k)] };\n}\nfunction splinePoints(e, tolerance = .2) {\n    const cp = e.controlPoints || [];\n    if (cp.length < 2)\n        return cp;\n    const p = Math.min(e.degree || 3, cp.length - 1), n = cp.length;\n    let knots = e.knots;\n    if (!knots || knots.length < n + p + 1) {\n        knots = [];\n        for (let i = 0; i < n + p + 1; i++)\n            knots.push(i <= p ? 0 : i >= n ? 1 : (i - p) / (n - p));\n    }\n    const start = knots[p], end = knots[n], out = [nurbsPoint(cp, p, knots, start, e.weights)];\n    function split(t0, a, t1, b, depth) {\n        const tm = (t0 + t1) / 2, m = nurbsPoint(cp, p, knots, tm, e.weights), q1 = nurbsPoint(cp, p, knots, (t0 + tm) / 2, e.weights), q3 = nurbsPoint(cp, p, knots, (tm + t1) / 2, e.weights);\n        if (depth < 12 && Math.max(distanceToSegment(m, a, b), distanceToSegment(q1, a, b), distanceToSegment(q3, a, b)) > tolerance) {\n            split(t0, a, tm, m, depth + 1);\n            split(tm, m, t1, b, depth + 1);\n        }\n        else\n            out.push(b);\n    }\n    for (let i = p; i < n; i++) {\n        if (knots[i + 1] > knots[i])\n            split(knots[i], out.at(-1), knots[i + 1], nurbsPoint(cp, p, knots, knots[i + 1], e.weights), 0);\n    }\n    return out;\n}\n/** Planar polyline offset with bounded miters; not a polygon Boolean engine. */\nfunction offsetPolyline(points, amount, closed = false, miterLimit = 6) {\n    if (points.length < 2)\n        throw new Error('Offset requires two vertices');\n    const seg = [];\n    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {\n        const a = points[i], b = points[(i + 1) % points.length], v = normalize(sub(b, a)), o = mul({ x: -v.y, y: v.x }, amount);\n        seg.push([add(a, o), add(b, o)]);\n    }\n    const out = [];\n    for (let i = 0; i < points.length; i++) {\n        if (!closed && i === 0) {\n            out.push(seg[0][0]);\n            continue;\n        }\n        if (!closed && i === points.length - 1) {\n            out.push(seg.at(-1)[1]);\n            continue;\n        }\n        const prev = seg[(i - 1 + seg.length) % seg.length], next = seg[i % seg.length], hit = lineIntersection(...prev, ...next, false);\n        if (hit && distance(hit, points[i]) <= Math.abs(amount) * miterLimit + EPS)\n            out.push({ x: hit.x, y: hit.y });\n        else\n            out.push(prev[1], next[0]);\n    }\n    return out;\n}\nfunction filletLines(a, b, c, d, radius) {\n    const hit = lineIntersection(a, b, c, d, false);\n    if (!hit || radius <= 0)\n        throw new Error('Fillet needs intersecting nonparallel lines and positive radius');\n    const u = normalize(sub(distance(a, hit) > distance(b, hit) ? a : b, hit)), v = normalize(sub(distance(c, hit) > distance(d, hit) ? c : d, hit)), theta = Math.acos(clamp(dot(u, v), -1, 1));\n    if (theta < EPS || Math.abs(theta - Math.PI) < EPS)\n        throw new Error('Degenerate fillet');\n    const t = radius / Math.tan(theta / 2), p = add(hit, mul(u, t)), q = add(hit, mul(v, t)), cen = add(hit, mul(normalize(add(u, v)), radius / Math.sin(theta / 2)));\n    return { p, q, c: cen, r: radius, start: Math.atan2(p.y - cen.y, p.x - cen.x), end: Math.atan2(q.y - cen.y, q.x - cen.x), clockwise: cross(sub(p, cen), sub(q, cen)) < 0 };\n}\nfunction snapCandidates(entity) {\n    switch (entity.type) {\n        case 'LINE': return [{ ...entity.a, kind: 'endpoint' }, { ...entity.b, kind: 'endpoint' }, { ...lerp(entity.a, entity.b, .5), kind: 'midpoint' }];\n        case 'CIRCLE':\n        case 'ARC': {\n            const onArc = a => {\n                if (entity.type === 'CIRCLE')\n                    return true;\n                const norm = x => ((x % TAU) + TAU) % TAU;\n                return entity.clockwise ? norm(entity.start - a) <= norm(entity.start - entity.end) + EPS : norm(a - entity.start) <= norm(entity.end - entity.start) + EPS;\n            };\n            const at = a => ({ x: entity.c.x + entity.r * Math.cos(a), y: entity.c.y + entity.r * Math.sin(a) });\n            return [{ ...entity.c, kind: 'center' }, ...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].filter(onArc).map(a => ({ ...at(a), kind: 'quadrant' })), ...(entity.type === 'ARC' ? [{ ...at(entity.start), kind: 'endpoint' }, { ...at(entity.end), kind: 'endpoint' }] : [])];\n        }\n        case 'LWPOLYLINE': return entity.points.flatMap((p, i) => [{ ...p, kind: 'endpoint' }, ...(i < entity.points.length - 1 || entity.closed ? [{ ...lerp(p, entity.points[(i + 1) % entity.points.length], .5), kind: 'midpoint' }] : [])]);\n        case 'INSERT': return [{ x: entity.x, y: entity.y, kind: 'insertion' }];\n        default: return [];\n    }\n}\n\nreturn {EPS,TAU,clamp,point,add,sub,mul,dot,cross,length,distance,normalize,lerp,almost,equalPoint,identity,transform,matrix,compose,inverse,bounds,emptyBounds,validBounds,inflate,intersects,contains,union,center,projectPoint,distanceToSegment,lineIntersection,segmentIntersectsBox,polygonContains,polygonArea,polylineLength,simplifyOrthogonal,arcPoints,bulgeArc,tessellatePolyline,nurbsPoint,splinePoints,offsetPolyline,filletLines,snapCandidates};\n})();\n// packages/model/src/index.js\n__modules[\"packages/model/src/index.js\"]=(()=>{\nconst {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules[\"packages/geometry/src/index.js\"];\nlet sequence = 0;\nconst uid = (prefix = 'e') => `${prefix}-${Date.now().toString(36)}-${(++sequence).toString(36)}`;\nconst clone = value => JSON.parse(JSON.stringify(value));\nfunction createDocument(name = 'Untitled drawing') { return { schema: 'conduitcad/1', name, units: 'mm', version: 0, entities: [], blocks: {}, layers: [{ name: '0', color: '#344755', visible: true, locked: false }, { name: 'Equipment', color: '#355463', visible: true, locked: false }, { name: 'Process', color: '#147c77', visible: true, locked: false }, { name: 'Instruments', color: '#9b7246', visible: true, locked: false, dash: [5, 4] }, { name: 'Electrical', color: '#6477ba', visible: true, locked: false }, { name: 'Annotations', color: '#71808a', visible: true, locked: false }], linetypes: { CONTINUOUS: [], DASHED: [8, 4], CENTER: [12, 3, 2, 3], HIDDEN: [4, 3] }, parameters: { grid: '10', pipeWidth: '2', valveSize: '64' }, constraints: [], metadata: { author: '', description: '' }, activeLayout: 'Model', layouts: ['Model'], importDiagnostics: [] }; }\nfunction validateDocument(doc) {\n    if (!doc || doc.schema !== 'conduitcad/1' || !Array.isArray(doc.entities) || !doc.blocks || !Array.isArray(doc.layers))\n        throw new Error('Not a Conduit CAD project');\n    if (doc.entities.length > 1000000)\n        throw new Error('Entity safety limit exceeded');\n    const ids = new Set();\n    for (const e of doc.entities) {\n        if (!e.id || ids.has(e.id))\n            throw new Error('Missing or duplicate entity ID');\n        ids.add(e.id);\n        if (!e.type)\n            throw new Error('Missing entity type');\n    }\n    return doc;\n}\nfunction entity(type, props = {}) { return { id: uid(), type, layer: '0', ...props }; }\nconst line = (a, b, props = {}) => entity('LINE', { a: { ...a }, b: { ...b }, ...props });\nconst polyline = (points, closed = false, props = {}) => entity('LWPOLYLINE', { points: points.map(p => ({ ...p })), closed, ...props });\nconst circle = (c, r, props = {}) => entity('CIRCLE', { c: { ...c }, r, ...props });\nconst text = (p, value, height = 14, props = {}) => entity('TEXT', { p: { ...p }, text: value, height, rotation: 0, ...props });\nconst rect = (x, y, w, h, props = {}) => polyline([{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }], true, props);\nfunction layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '0')) || doc.layers[0]; }\nfunction isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }\nfunction isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }\nfunction cleanText(value = '') { return String(value).replace(/\\\\P/g, '\\n').replace(/\\\\U\\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\\\[ACFHQTW][^;]*;/g, '').replace(/\\\\[LlOoKk]/g, '').replace(/\\\\S([^;]+);/g, (_, s) => s.replace(/[\\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\\\~/g, ' '); }\nfunction resolveStyle(e, doc, parentStyle = null, parentLayer = null) { const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc); return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color), width: e.width ?? (e.lineweight > 0 ? Math.max(1, e.lineweight / 35) : 1.5), dash: e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? doc.linetypes?.[e.linetype] ?? doc.linetypes?.[layer?.linetype] ?? layer?.dash ?? [], opacity: e.opacity ?? 1 }; }\n/** Returns portable paths/text. Blocks retain their native definitions in the model. */\nfunction entityGeometry(e, doc, options = {}) {\n    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options, m = options.matrix || identity();\n    if (depth > 24)\n        return { paths: [], texts: [] };\n    const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));\n    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [];\n    const path = (pts, closed = false, fill = null) => {\n        if (pts.length > 1)\n            paths.push({ points: pts.map(p => transform(p, m)), closed, fill, ...style, entityId: e.id });\n    };\n    const label = (p, value, height, rotation = 0, align = 'left') => { const q = transform(p, m), sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]); texts.push({ p: q, text: cleanText(value), height: height * sy, rotation: rotation + Math.atan2(m[1], m[0]) * 180 / Math.PI, align, color: style.color, entityId: e.id, font: e.font || 'sans-serif', widthFactor: (e.widthFactor || 1) * sx / (sy || 1) }); };\n    switch (e.type) {\n        case 'LINE':\n            path([e.a, e.b]);\n            break;\n        case 'LWPOLYLINE':\n        case 'POLYLINE':\n            path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill);\n            break;\n        case 'CIRCLE':\n            path(arcPoints(e.c, e.r, 0, TAU, curveTolerance), true, e.fill);\n            break;\n        case 'ARC':\n            path(arcPoints(e.c, e.r, e.start, e.end, curveTolerance, !!e.clockwise));\n            break;\n        case 'ELLIPSE': {\n            const a = e.major || { x: e.rx || 1, y: 0 }, r = e.ratio ?? 1, s = e.start ?? 0;\n            let sweep = (e.end ?? TAU) - s;\n            while (sweep <= 0)\n                sweep += TAU;\n            const n = Math.min(4096, Math.max(24, Math.ceil(sweep * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(curveTolerance, .0000001)))));\n            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) - a.y * r * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + a.x * r * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);\n            break;\n        }\n        case 'SPLINE':\n            path(splinePoints(e, curveTolerance), !!e.closed);\n            break;\n        case 'TEXT':\n        case 'MTEXT':\n        case 'ATTRIB':\n        case 'ATTDEF':\n            if (!e.invisible)\n                label(e.p, e.text || '', e.height || 12, e.rotation || 0, e.align || 'left');\n            break;\n        case 'POINT': {\n            const r = 1.5;\n            path([{ x: e.p.x - r, y: e.p.y }, { x: e.p.x + r, y: e.p.y }]);\n            path([{ x: e.p.x, y: e.p.y - r }, { x: e.p.x, y: e.p.y + r }]);\n            break;\n        }\n        case 'SOLID':\n        case 'TRACE':\n        case '3DFACE':\n            path(e.points || [], true, e.type === '3DFACE' ? null : style.color);\n            break;\n        case 'HATCH':\n            for (const loop of e.loops || [])\n                path(tessellatePolyline(loop.points || [], true, curveTolerance), true, e.solid ? style.color : null);\n            break;\n        case 'DIMENSION': {\n            if (e.block && doc.blocks[e.block]) {\n                const g = entityGeometry({ ...e, type: 'INSERT', x: 0, y: 0 }, doc, { ...options, depth: depth + 1 });\n                for (const p of g.paths)\n                    paths.push(p);\n                for (const t of g.texts)\n                    texts.push(t);\n                break;\n            }\n            const a = e.a, b = e.b;\n            if (!a || !b)\n                break;\n            const n = normalize({ x: -(b.y - a.y), y: b.x - a.x }), off = e.offset ?? 30, p = add(a, mul(n, off)), q = add(b, mul(n, off));\n            path([a, add(p, mul(n, 6))]);\n            path([b, add(q, mul(n, 6))]);\n            path([p, q]);\n            const u = normalize(sub(q, p));\n            for (const [v, dir] of [[p, 1], [q, -1]]) {\n                path([add(v, add(mul(u, dir * 7), mul(n, 3))), v, add(v, add(mul(u, dir * 7), mul(n, -3)))]);\n            }\n            label(add(lerp(p, q, .5), mul(n, 5)), e.text && e.text !== '<>' ? e.text : distance(a, b).toFixed(1), e.height || 12, Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, 'center');\n            break;\n        }\n        case 'INSERT': {\n            const block = doc.blocks[e.block];\n            if (!block)\n                break;\n            const base = block.base || { x: 0, y: 0 }, rows = Math.min(1000, e.rows || 1), cols = Math.min(1000, e.columns || 1);\n            if (rows * cols > 10000)\n                break;\n            // MINSERT spacing belongs to the rotated placement grid, not the scaled block.\n            const placement = matrix({ x: e.x || 0, y: e.y || 0, rotation: e.rotation || 0 });\n            const shape = compose(matrix({ sx: e.sx ?? 1, sy: e.sy ?? e.sx ?? 1 }), matrix({ x: -base.x, y: -base.y }));\n            const gridRotation = matrix({ rotation: e.rotation || 0 }), locations = new Set();\n            for (let row = 0; row < rows; row++)\n                for (let col = 0; col < cols; col++) {\n                    const offset = { x: col * (e.columnSpacing || 0), y: row * (e.rowSpacing || 0) };\n                    const key = offset.x + ':' + offset.y;\n                    if (locations.has(key))\n                        continue;\n                    locations.add(key);\n                    const mm = compose(m, compose(placement, compose(matrix(offset), shape)));\n                    const attributeOffset = transform(offset, gridRotation);\n                    for (const attribute of e.attributes || []) {\n                        if (attribute.invisible)\n                            continue;\n                        const g = entityGeometry(attribute, doc, { ...options, matrix: compose(m, matrix(attributeOffset)), depth: depth + 1 });\n                        for (const t of g.texts)\n                            texts.push({ ...t, entityId: e.id });\n                    }\n                    for (const child of block.entities || []) {\n                        if (child.type === 'ATTDEF' || child.hidden)\n                            continue;\n                        const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);\n                        if (cl?.visible === false)\n                            continue;\n                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl });\n                        for (const p of g.paths)\n                            paths.push({ ...p, entityId: e.id });\n                        for (const t of g.texts)\n                            texts.push({ ...t, entityId: e.id });\n                    }\n                }\n            if (e.tag && block.symbol) {\n                const p = { x: e.x || 0, y: (e.y || 0) - Math.abs((e.sy ?? e.sx ?? 1) * (block.symbol.labelOffset || 55)) };\n                label(p, e.tag, e.tagHeight || 12, 0, 'center');\n            }\n            break;\n        }\n    }\n    if (e.connector && e.points?.length > 1) {\n        const ps = e.points;\n        const b = ps.at(-1), a = ps.at(-2), u = normalize(sub(a, b)), n = { x: -u.y, y: u.x };\n        if (e.connector.arrow !== 'none')\n            path([add(b, add(mul(u, 9), mul(n, 4))), b, add(b, add(mul(u, 9), mul(n, -4)))]);\n        if (e.label) {\n            const mid = ps[Math.floor((ps.length - 1) / 2)], next = ps[Math.min(ps.length - 1, Math.floor((ps.length - 1) / 2) + 1)];\n            label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');\n        }\n    }\n    return { paths, texts };\n}\nfunction entityBounds(e, doc) {\n    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.points);\n    for (const t of g.texts) {\n        const w = t.text.split('\\n').reduce((a, s) => Math.max(a, s.length), 0) * t.height * .62, h = t.height * t.text.split('\\n').length;\n        const tm = matrix({ x: t.p.x, y: t.p.y, rotation: t.rotation }), x = t.align === 'center' ? -w / 2 : t.align === 'right' ? -w : 0;\n        pts.push(...[{ x, y: 0 }, { x: x + w, y: 0 }, { x: x + w, y: h }, { x, y: h }].map(p => transform(p, tm)));\n    }\n    if (!pts.length && e.type === 'INSERT')\n        pts.push({ x: e.x, y: e.y });\n    return bounds(pts);\n}\nfunction documentBounds(doc) {\n    let b = emptyBounds();\n    for (const e of doc.entities)\n        if (isVisible(e, doc))\n            b = union(b, entityBounds(e, doc));\n    return validBounds(b) ? b : { minX: -100, minY: -100, maxX: 100, maxY: 100 };\n}\nfunction ports(e, doc) {\n    if (e.type !== 'INSERT')\n        return [];\n    const block = doc.blocks[e.block], base = block?.base || { x: 0, y: 0 };\n    const m = compose(matrix(e), matrix({ x: -base.x, y: -base.y }));\n    return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });\n}\nfunction moveEntity(e, dx, dy) {\n    const mv = p => {\n        if (p) {\n            p.x += dx;\n            p.y += dy;\n        }\n    };\n    for (const key of ['a', 'b', 'c', 'p'])\n        mv(e[key]);\n    for (const key of ['points', 'controlPoints', 'fitPoints'])\n        for (const p of e[key] || [])\n            mv(p);\n    for (const l of e.loops || [])\n        for (const p of l.points || [])\n            mv(p);\n    if (e.type === 'INSERT') {\n        e.x += dx;\n        e.y += dy;\n        for (const a of e.attributes || [])\n            moveEntity(a, dx, dy);\n    }\n    e.dirty = true;\n}\nfunction transformEntity(e, m) {\n    const apply = p => {\n        if (p)\n            Object.assign(p, transform(p, m));\n    };\n    for (const key of ['a', 'b', 'c', 'p'])\n        apply(e[key]);\n    for (const key of ['points', 'controlPoints', 'fitPoints'])\n        for (const p of e[key] || [])\n            apply(p);\n    for (const l of e.loops || [])\n        for (const p of l.points || [])\n            apply(p);\n    const scale = Math.hypot(m[0], m[1]), rot = Math.atan2(m[1], m[0]) * 180 / Math.PI;\n    if (e.r)\n        e.r *= scale;\n    if (e.height)\n        e.height *= scale;\n    if (e.type === 'ARC') {\n        e.start += rot * Math.PI / 180;\n        e.end += rot * Math.PI / 180;\n        if (m[0] * m[3] - m[1] * m[2] < 0) {\n            e.start = -e.start;\n            e.end = -e.end;\n            e.clockwise = !e.clockwise;\n        }\n    }\n    if (e.type === 'INSERT') {\n        const p = transform({ x: e.x, y: e.y }, m);\n        e.x = p.x;\n        e.y = p.y;\n        e.sx = (e.sx ?? 1) * scale;\n        e.sy = (e.sy ?? 1) * scale;\n        e.rotation = (e.rotation || 0) + rot;\n    }\n    if (['TEXT', 'MTEXT'].includes(e.type))\n        e.rotation = (e.rotation || 0) + rot;\n    e.dirty = true;\n}\nfunction explodeEntity(e, doc) { const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }\nfunction detachReferences(doc, deleted) {\n    for (const e of doc.entities) {\n        const c = e.connector;\n        if (!c)\n            continue;\n        for (const end of ['from', 'to'])\n            if (c[end] && deleted.has(c[end].entityId))\n                c[end] = null;\n    }\n    doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));\n}\n\nreturn {uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences};\n})();\n// packages/dxf/src/index.js\n__modules[\"packages/dxf/src/index.js\"]=(()=>{\nconst {createDocument, entity, uid, cleanText, clone, entityGeometry} = __modules[\"packages/model/src/index.js\"];\nconst {TAU, arcPoints} = __modules[\"packages/geometry/src/index.js\"];\nconst NUMBER_CODES = c => (c >= 10 && c <= 59) || (c >= 110 && c <= 149) || (c >= 210 && c <= 239) || (c >= 460 && c <= 469) || (c >= 1010 && c <= 1059);\nconst INT16_CODES = c => (c >= 60 && c <= 79) || (c >= 170 && c <= 179) || (c >= 270 && c <= 289) || (c >= 370 && c <= 389) || (c >= 400 && c <= 409) || (c >= 1060 && c <= 1070);\nconst INT32_CODES = c => (c >= 90 && c <= 99) || (c >= 420 && c <= 429) || (c >= 440 && c <= 459) || c === 1071;\nconst INT64_CODES = c => c >= 160 && c <= 169;\nconst BINARY_CODES = c => (c >= 310 && c <= 319) || c === 1004;\n// Default ACI modelspace palette, verified against ezdxf 1.4.4.\n// ACI 7 follows this application's light canvas. Palette data attribution: THIRD_PARTY_NOTICES.md.\nconst ACI_PALETTE = [0, 16711680, 16776960, 65280, 65535, 255, 16711935, 16777215, 8421504, 12632256, 16711680, 16744319, 10813440, 10834514, 8323072, 8339263, 4980736, 4990502, 2490368, 2495251, 16727808, 16752511, 10823936, 10839890, 8331008, 8343359, 4985600, 4992806, 2492672, 2496275, 16744192, 16760703, 10834432, 10845266, 8339200, 8347455, 4990464, 4995366, 2495232, 2497555, 16760576, 16768895, 10845184, 10850642, 8347392, 8351551, 4995328, 4997670, 2497536, 2498835, 16776960, 16777087, 10855680, 10855762, 8355584, 8355647, 5000192, 5000230, 2500096, 2500115, 12582656, 14679935, 8168704, 9545042, 6258432, 7307071, 3755008, 4344870, 1844736, 2172435, 8388352, 12582783, 5416192, 8168786, 4161280, 6258495, 2509824, 3755046, 1254912, 1844755, 4194048, 10485631, 2729216, 6792530, 2064128, 5209919, 1264640, 3099686, 599552, 1517075, 65280, 8388479, 42240, 5416274, 32512, 4161343, 19456, 2509862, 9728, 1254931, 65343, 8388511, 42281, 5416295, 32543, 4161359, 19475, 2509871, 9737, 1267735, 65407, 8388543, 42322, 5416316, 32575, 4161375, 19494, 2509881, 9747, 1267740, 65471, 8388575, 42364, 5416337, 32607, 4161391, 19513, 2509890, 9756, 1267800, 65535, 8388607, 42405, 5416357, 32639, 4161407, 19532, 2509900, 9766, 1267800, 49151, 8380415, 31909, 5411237, 24447, 4157311, 14668, 2507390, 7206, 1267800, 32767, 8372223, 21157, 5405861, 16255, 4153215, 9804, 2505086, 4902, 1252440, 16383, 8364031, 10661, 5400485, 8063, 4149119, 4940, 2502526, 2342, 1251160, 255, 8355839, 165, 5395109, 127, 4145023, 76, 2500222, 38, 1250136, 4129023, 10452991, 2687141, 6771365, 2031743, 5193599, 1245260, 3090046, 589862, 1512280, 8323327, 12550143, 5374117, 8147621, 4128895, 6242175, 2490444, 3745406, 1245222, 1839960, 12517631, 14647295, 8126629, 9523877, 6226047, 7290751, 3735628, 4335180, 1835046, 5772120, 16711935, 16744447, 10813605, 10834597, 8323199, 8339327, 4980812, 4990540, 2490406, 5772120, 16711871, 16744415, 10813564, 10834577, 8323167, 8339311, 4980793, 4990530, 2490396, 5772120, 16711807, 16744383, 10813522, 10834556, 8323135, 8339295, 4980774, 4990521, 2490387, 5772060, 16711743, 16744351, 10813481, 10834535, 8323103, 8339279, 4980755, 4990511, 2490377, 5772055, 0, 6645093, 6710886, 10066329, 13421772, 16777215];\nfunction aciColor(index) {\n    index = Math.abs(Math.trunc(index));\n    if (index === 7)\n        return '#000000';\n    return '#' + (ACI_PALETTE[index] ?? 0).toString(16).padStart(6, '0');\n}\nfunction parseAsciiPairs(source, { maxPairs = 8000000 } = {}) {\n    const lines = source.replace(/^\\uFEFF/, '').split(/\\r\\n|\\n|\\r/), pairs = [];\n    for (let i = 0; i + 1 < lines.length; i += 2) {\n        if (pairs.length >= maxPairs)\n            throw new Error('DXF group-code safety limit exceeded');\n        const code = Number(lines[i].trim());\n        if (!Number.isInteger(code) || code < 0 || code > 1071)\n            throw new Error(`Invalid DXF group code at line ${i + 1}`);\n        const raw = lines[i + 1], value = INT64_CODES(code) ? raw.trim() : (NUMBER_CODES(code) || INT16_CODES(code) || INT32_CODES(code) || INT64_CODES(code) || (code >= 290 && code <= 299)) ? Number(raw.trim()) : raw;\n        if (INT64_CODES(code) && !/^[-+]?\\d+$/.test(value))\n            throw new Error('Invalid DXF int64 value');\n        if (typeof value === 'number' && !Number.isFinite(value))\n            throw new Error(`Invalid DXF numeric value at line ${i + 2}`);\n        pairs.push([code, value]);\n    }\n    if (!pairs.some(([c, v]) => c === 0 && String(v).trim() === 'EOF'))\n        throw new Error('DXF EOF marker missing (file may be truncated)');\n    return pairs;\n}\nfunction parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {\n    const u = input instanceof Uint8Array ? input : new Uint8Array(input), v = new DataView(u.buffer, u.byteOffset, u.byteLength);\n    let pos = 22;\n    const pairs = [], decoder = new TextDecoder('windows-1252');\n    const r12 = u[23] !== 0;\n    const need = n => {\n        if (pos + n > u.length)\n            throw new Error('Truncated binary DXF');\n    };\n    while (pos < u.length) {\n        if (pairs.length >= maxPairs)\n            throw new Error('DXF safety limit exceeded');\n        need(r12 ? 1 : 2);\n        let code;\n        if (r12) {\n            code = u[pos++];\n            if (code === 255) {\n                need(2);\n                code = v.getUint16(pos, true);\n                pos += 2;\n            }\n        }\n        else {\n            code = v.getUint16(pos, true);\n            pos += 2;\n        }\n        let value;\n        if (NUMBER_CODES(code)) {\n            need(8);\n            value = v.getFloat64(pos, true);\n            pos += 8;\n        }\n        else if (INT16_CODES(code)) {\n            need(2);\n            value = v.getInt16(pos, true);\n            pos += 2;\n        }\n        else if (INT32_CODES(code)) {\n            need(4);\n            value = v.getInt32(pos, true);\n            pos += 4;\n        }\n        else if (INT64_CODES(code)) {\n            need(8);\n            const n = v.getBigInt64(pos, true);\n            value = n.toString();\n            pos += 8;\n        }\n        else if (code >= 290 && code <= 299) {\n            need(1);\n            value = u[pos++];\n        }\n        else if (BINARY_CODES(code)) {\n            need(1);\n            const count = u[pos++];\n            need(count);\n            value = Array.from(u.subarray(pos, pos + count), n => n.toString(16).padStart(2, '0')).join('');\n            pos += count;\n        }\n        else {\n            const start = pos;\n            while (pos < u.length && u[pos] !== 0)\n                pos++;\n            need(1);\n            value = decoder.decode(u.subarray(start, pos));\n            pos++;\n        }\n        if (typeof value === 'number' && !Number.isFinite(value))\n            throw new Error('Non-finite binary DXF value');\n        pairs.push([code, value]);\n        if (code === 0 && value === 'EOF')\n            break;\n    }\n    if (!pairs.some(([c, v]) => c === 0 && v === 'EOF'))\n        throw new Error('Binary DXF EOF marker missing');\n    return pairs;\n}\nconst get = (r, c, d = undefined) => r.find(x => x[0] === c)?.[1] ?? d;\nconst all = (r, c) => r.filter(x => x[0] === c).map(x => x[1]);\nconst pt = (r, c = 10) => ({ x: Number(get(r, c, 0)), y: Number(get(r, c + 10, 0)), z: Number(get(r, c + 20, 0)) });\nconst points = (r, c = 10) => {\n    const p = [];\n    let current;\n    for (const [code, v] of r) {\n        if (code === c) {\n            current = { x: Number(v), y: 0 };\n            p.push(current);\n        }\n        else if (current && code === c + 10)\n            current.y = Number(v);\n        else if (current && code === c + 20)\n            current.z = Number(v);\n        else if (current && code === 42 && c === 10)\n            current.bulge = Number(v);\n    }\n    return p;\n};\nconst records = pairs => {\n    const result = [];\n    let r = [];\n    for (const pair of pairs) {\n        if (pair[0] === 0 && r.length) {\n            result.push(r);\n            r = [];\n        }\n        r.push(pair);\n    }\n    if (r.length)\n        result.push(r);\n    return result;\n};\nfunction metadata(raw) {\n    let active = false, s = '';\n    for (const [c, v] of raw) {\n        if (c === 1001)\n            active = v === 'CONDUITCAD';\n        else if (active && c === 1000)\n            s += v;\n    }\n    if (!s)\n        return {};\n    try {\n        const data = JSON.parse(s);\n        return data && typeof data === 'object' ? data : {};\n    }\n    catch {\n        return {};\n    }\n}\nfunction parseHatch(raw) {\n    const loops = [];\n    let i = raw.findIndex(([c]) => c === 91) + 1;\n    while (i > 0 && i < raw.length) {\n        if (raw[i][0] !== 92) {\n            i++;\n            continue;\n        }\n        const flags = Number(raw[i++][1]), loop = { points: [], closed: true, flags };\n        if (flags & 2) {\n            let n = 0;\n            while (i < raw.length && raw[i][0] !== 93)\n                i++;\n            if (i < raw.length)\n                n = Number(raw[i++][1]);\n            for (let j = 0; j < n && i < raw.length; j++) {\n                if (raw[i][0] !== 10)\n                    break;\n                const p = { x: Number(raw[i++][1]), y: 0 };\n                if (raw[i]?.[0] === 20)\n                    p.y = Number(raw[i++][1]);\n                if (raw[i]?.[0] === 42)\n                    p.bulge = Number(raw[i++][1]);\n                loop.points.push(p);\n            }\n        }\n        else {\n            while (i < raw.length && raw[i][0] !== 93)\n                i++;\n            const n = Number(raw[i++]?.[1] || 0);\n            for (let j = 0; j < n && i < raw.length; j++) {\n                if (raw[i][0] !== 72)\n                    break;\n                const type = Number(raw[i++][1]), edge = [];\n                while (i < raw.length && ![72, 92, 97, 75, 76, 98].includes(raw[i][0]))\n                    edge.push(raw[i++]);\n                if (type === 1)\n                    loop.points.push(pt(edge, 10), pt(edge, 11));\n                else if (type === 2) {\n                    const c = pt(edge), r = Number(get(edge, 40, 1)), s = Number(get(edge, 50, 0)) * Math.PI / 180, e = Number(get(edge, 51, 360)) * Math.PI / 180;\n                    loop.points.push(...arcPoints(c, r, s, e, .2, !get(edge, 73, 1)));\n                }\n            }\n        }\n        if (loop.points.length)\n            loops.push(loop);\n    }\n    return loops;\n}\nfunction parseEntity(raw, diagnostics) {\n    const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw, handle: get(raw, 5) }, dirty: false };\n    const aci = Number(get(raw, 62, 256)), trueColor = get(raw, 420);\n    if (trueColor !== undefined)\n        e.color = '#' + Number(trueColor).toString(16).padStart(6, '0');\n    else if (aci === 0)\n        e.color = 'BYBLOCK';\n    else if (aci !== 256)\n        e.color = aciColor(aci);\n    e.lineweight = Number(get(raw, 370, -1));\n    e.linetype = get(raw, 6, 'BYLAYER');\n    if (get(raw, 60, 0))\n        e.hidden = true;\n    switch (type) {\n        case 'LINE':\n            e.a = pt(raw);\n            e.b = pt(raw, 11);\n            break;\n        case 'LWPOLYLINE':\n            e.points = points(raw);\n            e.closed = !!(get(raw, 70, 0) & 1);\n            e.constantWidth = get(raw, 43, 0);\n            break;\n        case 'POLYLINE':\n            e.points = [];\n            e.closed = !!(get(raw, 70, 0) & 1);\n            e.flags = get(raw, 70, 0);\n            break;\n        case 'CIRCLE':\n        case 'ARC':\n            e.c = pt(raw);\n            e.r = Number(get(raw, 40, 1));\n            if (type === 'ARC') {\n                e.start = Number(get(raw, 50, 0)) * Math.PI / 180;\n                e.end = Number(get(raw, 51, 360)) * Math.PI / 180;\n            }\n            break;\n        case 'ELLIPSE':\n            e.c = pt(raw);\n            e.major = pt(raw, 11);\n            e.ratio = Number(get(raw, 40, 1));\n            e.start = Number(get(raw, 41, 0));\n            e.end = Number(get(raw, 42, TAU));\n            break;\n        case 'SPLINE':\n            e.degree = Number(get(raw, 71, 3));\n            e.controlPoints = points(raw);\n            e.fitPoints = points(raw, 11);\n            e.knots = all(raw, 40).map(Number);\n            e.weights = all(raw, 41).map(Number);\n            e.closed = !!(get(raw, 70, 0) & 1);\n            break;\n        case 'POINT':\n            e.p = pt(raw);\n            break;\n        case 'TEXT':\n        case 'MTEXT':\n        case 'ATTRIB':\n        case 'ATTDEF':\n            e.p = pt(raw);\n            e.text = type === 'MTEXT' ? all(raw, 3).join('') + get(raw, 1, '') : get(raw, 1, '');\n            e.height = Number(get(raw, 40, 12));\n            e.rotation = Number(get(raw, 50, 0));\n            e.align = get(raw, 72, 0) === 1 ? 'center' : get(raw, 72, 0) === 2 ? 'right' : 'left';\n            if (type === 'MTEXT') {\n                const a = Number(get(raw, 71, 1));\n                e.align = [2, 5, 8].includes(a) ? 'center' : [3, 6, 9].includes(a) ? 'right' : 'left';\n                if (get(raw, 11) !== undefined)\n                    e.rotation = Math.atan2(get(raw, 21, 0), get(raw, 11, 1)) * 180 / Math.PI;\n                e.mtextWidth = get(raw, 41, 0);\n            }\n            if (['ATTRIB', 'ATTDEF'].includes(type)) {\n                e.attributeTag = get(raw, 2, '');\n                e.invisible = !!(get(raw, 70, 0) & 1);\n            }\n            e.widthFactor = Number(get(raw, 41, 1));\n            break;\n        case 'INSERT':\n            e.block = get(raw, 2, '');\n            e.x = get(raw, 10, 0);\n            e.y = get(raw, 20, 0);\n            e.z = get(raw, 30, 0);\n            e.sx = get(raw, 41, 1);\n            e.sy = get(raw, 42, 1);\n            e.sz = get(raw, 43, 1);\n            e.rotation = get(raw, 50, 0);\n            e.columns = get(raw, 70, 1);\n            e.rows = get(raw, 71, 1);\n            e.columnSpacing = get(raw, 44, 0);\n            e.rowSpacing = get(raw, 45, 0);\n            e.attributes = [];\n            break;\n        case 'SOLID':\n        case 'TRACE':\n        case '3DFACE':\n            e.points = [pt(raw, 10), pt(raw, 11), pt(raw, 13), pt(raw, 12)];\n            break;\n        case 'HATCH':\n            e.loops = parseHatch(raw);\n            e.solid = !!get(raw, 70, 0);\n            e.pattern = get(raw, 2, 'SOLID');\n            diagnostics.push({ severity: 'warning', type, message: `HATCH ${e.solid ? 'solid boundary' : 'pattern'} is displayed as boundary geometry; island/pattern fidelity is not complete.` });\n            break;\n        case 'DIMENSION':\n            e.block = get(raw, 2);\n            e.a = pt(raw, 13);\n            e.b = pt(raw, 14);\n            e.text = get(raw, 1, '<>');\n            break;\n        case 'VERTEX':\n            e.p = pt(raw);\n            e.p.bulge = get(raw, 42, 0);\n            break;\n        case 'SEQEND': break;\n        default:\n            e.unsupported = true;\n            diagnostics.push({ severity: 'warning', type, message: `${type}: retained in original source; no editable display implementation.` });\n    }\n    const meta = metadata(raw);\n    if (typeof meta.id === 'string' && meta.id.length <= 160)\n        e.id = meta.id;\n    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])\n        if (k in meta)\n            e[k] = meta[k];\n    if (get(raw, 210, 0) !== 0 || get(raw, 220, 0) !== 0 || get(raw, 230, 1) !== 1)\n        diagnostics.push({ severity: 'warning', type, message: `${type}: non-default extrusion/OCS is not fully projected; original records retained.` });\n    return e;\n}\nfunction base64(bytes) {\n    let s = '';\n    for (let i = 0; i < bytes.length; i += 8192)\n        s += String.fromCharCode(...bytes.subarray(i, i + 8192));\n    return typeof btoa === 'function' ? btoa(s) : Buffer.from(bytes).toString('base64');\n}\nfunction parseDXF(input, options = {}) {\n    let rawText = '', pairs, source;\n    const bytes = typeof input === 'string' ? null : input instanceof Uint8Array ? input : new Uint8Array(input);\n    if (bytes && bytes.byteLength > 128 * 1024 * 1024)\n        throw new Error('File exceeds the 128 MiB import safety limit');\n    const binary = bytes && new TextDecoder().decode(bytes.subarray(0, 18)) === 'AutoCAD Binary DXF';\n    if (binary) {\n        pairs = parseBinaryPairs(bytes, options);\n        source = { format: 'binary', base64: base64(bytes) };\n    }\n    else {\n        if (bytes) {\n            let enc = options.encoding;\n            const prefix = new TextDecoder('windows-1252').decode(bytes.subarray(0, 65536));\n            if (!enc) {\n                const ver = prefix.match(/\\$ACADVER\\s*\\r?\\n\\s*1\\s*\\r?\\n\\s*(AC\\d+)/)?.[1];\n                const cp = prefix.match(/ANSI_(\\d+)/)?.[1];\n                enc = ver && Number(ver.slice(2)) >= 1021 ? 'utf-8' : cp === '1250' ? 'windows-1250' : cp === '1251' ? 'windows-1251' : cp === '932' ? 'shift_jis' : 'windows-1252';\n            }\n            rawText = new TextDecoder(enc).decode(bytes);\n        }\n        else\n            rawText = String(input);\n        pairs = parseAsciiPairs(rawText, options);\n        source = bytes ? { format: 'ascii', base64: base64(bytes) } : { format: 'ascii', text: rawText };\n    }\n    const doc = createDocument(options.name || 'Imported DXF');\n    doc.layers = [];\n    doc.source = source;\n    doc.rawSections = {};\n    doc.importDiagnostics = [];\n    let section = '', current = [], sections = {};\n    for (let i = 0; i < pairs.length; i++) {\n        const [c, v] = pairs[i];\n        if (c === 0 && v === 'SECTION') {\n            section = String(pairs[++i]?.[1] || '');\n            current = [];\n        }\n        else if (c === 0 && v === 'ENDSEC') {\n            sections[section] = current;\n            section = '';\n        }\n        else if (section)\n            current.push(pairs[i]);\n    }\n    if (!sections.ENTITIES && !sections.BLOCKS)\n        throw new Error('DXF contains neither ENTITIES nor BLOCKS sections');\n    const header = sections.HEADER || [];\n    let key = '';\n    for (const [c, v] of header) {\n        if (c === 9)\n            key = String(v);\n        else if (key === '$INSUNITS' && c === 70)\n            doc.units = ({ 0: 'unitless', 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm' })[v] || 'unitless';\n        else if (key === '$ACADVER')\n            doc.importVersion = v;\n    }\n    let table = '';\n    for (const r of records(sections.TABLES || [])) {\n        const t = get(r, 0);\n        if (t === 'TABLE')\n            table = get(r, 2);\n        else if (t === 'ENDTAB')\n            table = '';\n        else if (table === 'LAYER' && t === 'LAYER') {\n            const n = get(r, 2, '0'), aci = Number(get(r, 62, 7));\n            doc.layers.push({ name: n, color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS') });\n        }\n        else if (table === 'LTYPE' && t === 'LTYPE')\n            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(v => Math.abs(Number(v)));\n    }\n    if (!doc.layers.length)\n        doc.layers.push({ name: '0', color: '#344755', visible: true, locked: false });\n    const parseList = rs => {\n        const es = [];\n        let poly = null, insert = null;\n        for (const raw of rs) {\n            const e = parseEntity(raw, doc.importDiagnostics);\n            if (e.type === 'VERTEX' && poly) {\n                poly.points.push(e.p);\n                continue;\n            }\n            if (e.type === 'ATTRIB' && insert) {\n                insert.attributes.push(e);\n                continue;\n            }\n            if (e.type === 'SEQEND') {\n                poly = null;\n                insert = null;\n                continue;\n            }\n            poly = e.type === 'POLYLINE' ? e : null;\n            insert = e.type === 'INSERT' ? e : null;\n            es.push(e);\n        }\n        for (const e of es)\n            if (e.type === 'INSERT' && e.tag)\n                e.attributes = e.attributes.filter(a => !(a.attributeTag === 'TAG' && a.text === e.tag));\n        return es;\n    };\n    let block = null, blockRecords = [];\n    for (const raw of records(sections.BLOCKS || [])) {\n        const t = get(raw, 0);\n        if (t === 'BLOCK') {\n            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], ...metadata(raw) };\n            blockRecords = [];\n        }\n        else if (t === 'ENDBLK') {\n            if (block) {\n                block.entities = parseList(blockRecords);\n                doc.blocks[block.name] = block;\n            }\n            block = null;\n        }\n        else if (block)\n            blockRecords.push(raw);\n    }\n    doc.entities = parseList(records(sections.ENTITIES || []));\n    const seen = new Set();\n    for (const e of doc.entities) {\n        if (seen.has(e.id))\n            e.id = uid();\n        seen.add(e.id);\n        if (!doc.layers.some(l => l.name === e.layer))\n            doc.layers.push({ name: e.layer, color: '#344755', visible: true, locked: false });\n        if (!doc.layouts.includes(e.layout))\n            doc.layouts.push(e.layout);\n    }\n    const metaComments = all(header, 999).filter(s => String(s).startsWith('CONDUIT:')).map(s => String(s).slice(8)).join('');\n    if (metaComments) {\n        try {\n            const m = JSON.parse(metaComments);\n            doc.parameters = m.parameters || doc.parameters;\n            doc.constraints = m.constraints || [];\n            doc.metadata = m.metadata || doc.metadata;\n        }\n        catch {\n            doc.importDiagnostics.push({ severity: 'warning', message: 'Conduit header metadata could not be decoded.' });\n        }\n    }\n    const unsupported = doc.entities.filter(e => e.unsupported).length;\n    doc.importDiagnostics.unshift({ severity: 'info', message: `${doc.entities.length} model/layout entities, ${Object.keys(doc.blocks).length} blocks, ${doc.layers.length} layers; ${unsupported} unsupported entities.` });\n    for (const [name, p] of Object.entries(sections))\n        if (!['HEADER', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(name))\n            doc.rawSections[name] = p;\n    doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; arbitrary objects, dictionaries and ownership graphs are not losslessly rewritten.' });\n    return doc;\n}\nfunction asciiJson(data) { return JSON.stringify(data).replace(/[\\u007f-\\uffff]/g, c => '\\\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')); }\n/** Normalized AC1024 / R2010 ASCII DXF. The project format preserves full app semantics. */\nfunction writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {\n    if (!['AC1015', 'AC1018', 'AC1021', 'AC1024', 'AC1027', 'AC1032'].includes(version))\n        throw new Error('Supported export versions: R2000–R2018');\n    const out = [];\n    let handle = 0x100;\n    const used = new Set();\n    for (const e of doc.entities) {\n        if (e._dxf?.handle) {\n            used.add(e._dxf.handle.toUpperCase());\n            handle = Math.max(handle, parseInt(e._dxf.handle, 16) + 1 || 0x100);\n        }\n    }\n    const next = () => {\n        while (used.has(handle.toString(16).toUpperCase()))\n            handle++;\n        return (handle++).toString(16).toUpperCase();\n    };\n    const pair = (c, v) => {\n        if (typeof v === 'number' && !Number.isFinite(v))\n            throw new Error(`Nonfinite DXF value for code ${c}`);\n        let s = typeof v === 'number' ? Number(v.toPrecision(14)).toString() : String(v ?? '');\n        s = s.replace(/\\r?\\n/g, '\\\\P');\n        if (Number(version.slice(2)) < 1021)\n            s = s.replace(/[\\u007f-\\uffff]/g, c => '\\\\U+' + c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0'));\n        out.push(String(c), s);\n    };\n    const pp = (c, p) => { pair(c, p?.x || 0); pair(c + 10, p?.y || 0); pair(c + 20, p?.z || 0); };\n    const meta = data => {\n        if (!includeMetadata || !Object.keys(data).length)\n            return;\n        pair(1001, 'CONDUITCAD');\n        const s = asciiJson(data);\n        for (let i = 0; i < s.length; i += 200)\n            pair(1000, s.slice(i, i + 200));\n    };\n    const section = name => { pair(0, 'SECTION'); pair(2, name); };\n    const end = () => pair(0, 'ENDSEC');\n    section('HEADER');\n    pair(9, '$ACADVER');\n    pair(1, version);\n    pair(9, '$INSUNITS');\n    pair(70, ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4);\n    pair(9, '$MEASUREMENT');\n    pair(70, doc.units === 'in' || doc.units === 'ft' ? 0 : 1);\n    if (includeMetadata) {\n        const s = asciiJson({ parameters: doc.parameters, constraints: doc.constraints, metadata: doc.metadata });\n        for (let i = 0; i < s.length; i += 180)\n            pair(999, 'CONDUIT:' + s.slice(i, i + 180));\n    }\n    end();\n    section('TABLES');\n    pair(0, 'TABLE');\n    pair(2, 'LTYPE');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, 1);\n    pair(0, 'LTYPE');\n    pair(5, next());\n    pair(100, 'AcDbSymbolTableRecord');\n    pair(100, 'AcDbLinetypeTableRecord');\n    pair(2, 'CONTINUOUS');\n    pair(70, 0);\n    pair(3, 'Solid line');\n    pair(72, 65);\n    pair(73, 0);\n    pair(40, 0);\n    const types = { ...doc.linetypes };\n    for (const e of doc.entities)\n        if (e.dash?.length)\n            types['CC_DASH_' + e.dash.join('_')] = e.dash;\n    for (const [name, pattern] of Object.entries(types)) {\n        if (name === 'CONTINUOUS' || !pattern.length)\n            continue;\n        pair(0, 'LTYPE');\n        pair(5, next());\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbLinetypeTableRecord');\n        pair(2, name);\n        pair(70, 0);\n        pair(3, name);\n        pair(72, 65);\n        pair(73, pattern.length);\n        pair(40, pattern.reduce((a, b) => a + Math.abs(b), 0));\n        pattern.forEach((v, i) => { pair(49, Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });\n    }\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'LAYER');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, doc.layers.length);\n    for (const l of doc.layers) {\n        pair(0, 'LAYER');\n        pair(5, next());\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbLayerTableRecord');\n        pair(2, l.name);\n        pair(70, l.locked ? 4 : 0);\n        pair(62, l.visible === false ? -7 : 7);\n        pair(420, parseInt((l.color || '#344755').slice(1), 16));\n        pair(6, l.linetype || 'CONTINUOUS');\n    }\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'STYLE');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, 1);\n    pair(0, 'STYLE');\n    pair(5, next());\n    pair(100, 'AcDbSymbolTableRecord');\n    pair(100, 'AcDbTextStyleTableRecord');\n    pair(2, 'STANDARD');\n    pair(70, 0);\n    pair(40, 0);\n    pair(41, 1);\n    pair(50, 0);\n    pair(71, 0);\n    pair(42, 2.5);\n    pair(3, 'txt');\n    pair(4, '');\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'APPID');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, 1);\n    pair(0, 'APPID');\n    pair(5, next());\n    pair(100, 'AcDbSymbolTableRecord');\n    pair(100, 'AcDbRegAppTableRecord');\n    pair(2, 'CONDUITCAD');\n    pair(70, 0);\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'BLOCK_RECORD');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, Object.keys(doc.blocks).length + 2);\n    const blockRecords = {};\n    for (const name of ['*Model_Space', '*Paper_Space', ...Object.keys(doc.blocks).filter(n => !['*Model_Space', '*Paper_Space'].includes(n))]) {\n        blockRecords[name] = next();\n        pair(0, 'BLOCK_RECORD');\n        pair(5, blockRecords[name]);\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbBlockTableRecord');\n        pair(2, name);\n    }\n    pair(0, 'ENDTAB');\n    end();\n    const header = (e, t = e.type, owner) => {\n        pair(0, t);\n        pair(5, next());\n        if (owner)\n            pair(330, owner);\n        pair(100, 'AcDbEntity');\n        pair(8, e.layer || '0');\n        if (e.layout && e.layout !== 'Model') {\n            pair(67, 1);\n            pair(410, e.layout);\n        }\n        if (e.color === 'BYBLOCK')\n            pair(62, 0);\n        else if (e.color && e.color !== 'BYLAYER') {\n            pair(62, 7);\n            pair(420, parseInt(e.color.slice(1), 16));\n        }\n        if (e.hidden)\n            pair(60, 1);\n        if (e.lineweight > 0)\n            pair(370, e.lineweight);\n        if (e.dash?.length)\n            pair(6, 'CC_DASH_' + e.dash.join('_'));\n        else if (e.linetype && e.linetype !== 'BYLAYER')\n            pair(6, e.linetype);\n    };\n    const emit = (e, owner) => {\n        if (e.unsupported) {\n            return;\n        } // The original-source download is the lossless preservation path.\n        if (e.type === 'DIMENSION' && !e.block) {\n            const g = entityGeometry(e, doc);\n            for (const p of g.paths)\n                emit({ type: 'LWPOLYLINE', points: p.points, closed: p.closed, layer: e.layer, color: p.color }, owner);\n            for (const t of g.texts)\n                emit({ type: 'TEXT', ...t, layer: e.layer }, owner);\n            return;\n        }\n        if (e.type === 'HATCH') {\n            for (const l of e.loops || [])\n                emit({ type: 'LWPOLYLINE', points: l.points, closed: true, layer: e.layer, color: e.color }, owner);\n            return;\n        }\n        const type = e.type === 'POLYLINE' ? 'LWPOLYLINE' : e.type;\n        header(e, type, owner);\n        switch (type) {\n            case 'LINE':\n                pair(100, 'AcDbLine');\n                pp(10, e.a);\n                pp(11, e.b);\n                break;\n            case 'LWPOLYLINE':\n                pair(100, 'AcDbPolyline');\n                pair(90, e.points.length);\n                pair(70, e.closed ? 1 : 0);\n                if (e.constantWidth)\n                    pair(43, e.constantWidth);\n                for (const p of e.points) {\n                    pair(10, p.x);\n                    pair(20, p.y);\n                    if (p.bulge)\n                        pair(42, p.bulge);\n                }\n                break;\n            case 'CIRCLE':\n            case 'ARC':\n                pair(100, 'AcDbCircle');\n                pp(10, e.c);\n                pair(40, e.r);\n                if (type === 'ARC') {\n                    pair(100, 'AcDbArc');\n                    pair(50, (e.clockwise ? e.end : e.start) * 180 / Math.PI);\n                    pair(51, (e.clockwise ? e.start : e.end) * 180 / Math.PI);\n                }\n                break;\n            case 'ELLIPSE':\n                pair(100, 'AcDbEllipse');\n                pp(10, e.c);\n                pp(11, e.major);\n                pair(40, e.ratio);\n                pair(41, e.start || 0);\n                pair(42, e.end ?? TAU);\n                break;\n            case 'SPLINE':\n                pair(100, 'AcDbSpline');\n                pair(70, (e.closed ? 1 : 0) | (e.weights?.length ? 4 : 0) | 8);\n                pair(71, e.degree);\n                pair(72, e.knots.length);\n                pair(73, e.controlPoints.length);\n                pair(74, e.fitPoints?.length || 0);\n                for (const v of e.knots)\n                    pair(40, v);\n                for (const v of e.weights || [])\n                    pair(41, v);\n                for (const p of e.controlPoints)\n                    pp(10, p);\n                for (const p of e.fitPoints || [])\n                    pp(11, p);\n                break;\n            case 'TEXT':\n            case 'ATTRIB':\n            case 'ATTDEF':\n                pair(100, 'AcDbText');\n                pp(10, e.p);\n                pair(40, e.height || 12);\n                pair(1, e.text || '');\n                pair(50, e.rotation || 0);\n                pair(41, e.widthFactor || 1);\n                pair(7, 'STANDARD');\n                if (e.align && e.align !== 'left') {\n                    pair(72, e.align === 'center' ? 1 : 2);\n                    pp(11, e.p);\n                }\n                if (type === 'TEXT')\n                    pair(100, 'AcDbText');\n                else {\n                    pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');\n                    pair(2, e.attributeTag || 'TAG');\n                    if (type === 'ATTDEF')\n                        pair(3, 'Equipment tag');\n                    pair(70, e.invisible ? 1 : 0);\n                }\n                break;\n            case 'MTEXT':\n                pair(100, 'AcDbMText');\n                pp(10, e.p);\n                pair(40, e.height || 12);\n                pair(41, e.mtextWidth || 200);\n                pair(71, e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1);\n                pair(1, e.text || '');\n                pair(50, e.rotation || 0);\n                break;\n            case 'POINT':\n                pair(100, 'AcDbPoint');\n                pp(10, e.p);\n                break;\n            case 'SOLID':\n            case 'TRACE':\n            case '3DFACE':\n                pair(100, type === '3DFACE' ? 'AcDbFace' : 'AcDbTrace');\n                for (const [i, j] of [[0, 0], [1, 1], [2, 3], [3, 2]])\n                    pp(10 + i, e.points[j] || e.points.at(-1));\n                break;\n            case 'DIMENSION':\n                pair(100, 'AcDbDimension');\n                pair(2, e.block);\n                pp(10, e.a);\n                pair(70, 32);\n                pair(1, e.text || '<>');\n                pair(100, 'AcDbAlignedDimension');\n                pp(13, e.a);\n                pp(14, e.b);\n                break;\n            case 'INSERT': {\n                pair(100, 'AcDbBlockReference');\n                pair(2, e.block);\n                pp(10, { x: e.x, y: e.y, z: e.z });\n                pair(41, e.sx ?? 1);\n                pair(42, e.sy ?? 1);\n                pair(43, e.sz ?? 1);\n                pair(50, e.rotation || 0);\n                if (e.columns > 1) {\n                    pair(70, e.columns);\n                    pair(44, e.columnSpacing || 0);\n                }\n                if (e.rows > 1) {\n                    pair(71, e.rows);\n                    pair(45, e.rowSpacing || 0);\n                }\n                if (e.attributes?.length || e.tag)\n                    pair(66, 1);\n                break;\n            }\n        }\n        const m = {};\n        if (e.id)\n            m.id = e.id;\n        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked'])\n            if (e[k] !== undefined)\n                m[k] = e[k];\n        meta(m);\n        if (type === 'INSERT' && (e.attributes?.length || e.tag)) {\n            for (const a of e.attributes || [])\n                emit(a, owner);\n            if (e.tag) {\n                const block = doc.blocks[e.block], offset = block?.symbol?.labelOffset || 55;\n                emit({ type: 'ATTRIB', p: { x: e.x, y: e.y - Math.abs((e.sy ?? 1) * offset) }, text: e.tag, height: e.tagHeight || 12, align: 'center', attributeTag: 'TAG', layer: e.layer }, owner);\n            }\n            pair(0, 'SEQEND');\n            pair(5, next());\n            pair(100, 'AcDbEntity');\n            pair(8, e.layer || '0');\n        }\n    };\n    section('BLOCKS');\n    for (const name of Object.keys(blockRecords)) {\n        const b = doc.blocks[name] || { base: { x: 0, y: 0 }, entities: [] };\n        pair(0, 'BLOCK');\n        pair(5, next());\n        pair(330, blockRecords[name]);\n        pair(100, 'AcDbEntity');\n        pair(8, '0');\n        pair(100, 'AcDbBlockBegin');\n        pair(2, name);\n        pair(70, 0);\n        pp(10, b.base);\n        pair(3, name);\n        pair(1, '');\n        meta({ ports: b.ports || [], symbol: b.symbol });\n        for (const e of b.entities)\n            emit(e, blockRecords[name]);\n        pair(0, 'ENDBLK');\n        pair(5, next());\n        pair(330, blockRecords[name]);\n        pair(100, 'AcDbEntity');\n        pair(8, '0');\n        pair(100, 'AcDbBlockEnd');\n    }\n    end();\n    section('ENTITIES');\n    for (const e of doc.entities)\n        emit(e, blockRecords[e.layout && e.layout !== 'Model' ? '*Paper_Space' : '*Model_Space']);\n    end();\n    pair(0, 'EOF');\n    return out.join('\\r\\n') + '\\r\\n';\n}\nfunction exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.length ? [`${hatches.length} hatches exported as boundaries; fills/patterns are not retained.`] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }\n\nreturn {aciColor,parseAsciiPairs,parseBinaryPairs,parseDXF,writeDXF,exportReport};\n})();\n// apps/studio/dxf-worker.js\n__modules[\"apps/studio/dxf-worker.js\"]=(()=>{\nconst {parseDXF} = __modules[\"packages/dxf/src/index.js\"];\nself.onmessage = event => {\n    try {\n        const { buffer, name, encoding } = event.data;\n        self.postMessage({ document: parseDXF(buffer, { name, encoding }) });\n    }\n    catch (error) {\n        self.postMessage({ error: error.message || String(error) });\n    }\n};\n\nreturn {};\n})();\n})();\n";
+globalThis.__CONDUIT_DXF_WORKER__="'use strict';\n(()=>{\nconst __modules=Object.create(null);\n// packages/dxf/src/fidelity.js\n__modules[\"packages/dxf/src/fidelity.js\"]=(()=>{\n/** DXF entity fidelity helpers. Native values remain native: OCS coordinates,\n * signed linetype elements and hatch edge records are not flattened on import.\n * Autodesk DXF reference links and explicit limitations: docs/DXF_COMPATIBILITY.md.\n */\nconst get = (r, c, fallback = 0) => r.find(p => p[0] === c)?.[1] ?? fallback;\nconst point = (r, c = 10) => ({ x: +get(r, c), y: +get(r, c + 10), z: +get(r, c + 20) });\nconst all = (r, c) => r.filter(p => p[0] === c).map(p => p[1]);\nconst rad = d => d * Math.PI / 180;\nfunction count(n, limit = 100000) {\n    if (!Number.isSafeInteger(n) || n < 0 || n > limit) throw new Error('Invalid DXF collection length: ' + n);\n    return n;\n}\nfunction parseHatchData(raw) {\n    let i = raw.findIndex(p => p[0] === 91);\n    if (i < 0) return { loops: [], patternLines: [] };\n    const read = (code, fallback) => {\n        if (raw[i]?.[0] === code) return raw[i++][1];\n        if (fallback !== undefined) return fallback;\n        throw new Error(`Malformed HATCH: expected group ${code}, got ${raw[i]?.[0]}`);\n    };\n    const p2 = (c = 10) => ({ x: +read(c), y: +read(c + 10) });\n    const loops = [], n = count(+read(91));\n    for (let k = 0; k < n; k++) {\n        const flags = +read(92), loop = { flags, closed: true, points: [], edges: [] };\n        if (flags & 2) {\n            const bulge = +read(72); loop.closed = !!read(73);\n            const vertices = count(+read(93));\n            for (let j = 0; j < vertices; j++) {\n                const p = p2(); if (bulge || raw[i]?.[0] === 42) p.bulge = +read(42, 0);\n                loop.points.push(p);\n            }\n        } else {\n            const edges = count(+read(93));\n            for (let j = 0; j < edges; j++) {\n                const type = +read(72); let edge;\n                if (type === 1) edge = { type, a: p2(), b: p2(11) };\n                else if (type === 2 || type === 3) {\n                    edge = { type, c: p2() };\n                    if (type === 3) edge.major = p2(11);\n                    edge[type === 2 ? 'r' : 'ratio'] = +read(40);\n                    edge.start = rad(+read(50)); edge.end = rad(+read(51)); edge.ccw = !!read(73);\n                    if (!edge.ccw) { edge.start = 2*Math.PI-edge.start; edge.end = 2*Math.PI-edge.end; }\n                } else if (type === 4) {\n                    edge = { type, degree: +read(94), rational: !!read(73), periodic: !!read(74) };\n                    const knots = count(+read(95)), controls = count(+read(96));\n                    edge.knots = Array.from({ length: knots }, () => +read(40));\n                    edge.controlPoints = []; edge.weights = [];\n                    for (let q = 0; q < controls; q++) {\n                        edge.controlPoints.push(p2());\n                        if (edge.rational) edge.weights.push(+read(42, 1));\n                    }\n                    // Group 97 here is spline fit data; the later 97 belongs to the path.\n                    const fits = count(+read(97, 0));\n                    edge.fitPoints = Array.from({ length: fits }, () => p2(11));\n                    if (raw[i]?.[0] === 12) edge.startTangent = p2(12);\n                    if (raw[i]?.[0] === 13) edge.endTangent = p2(13);\n                } else throw new Error('Unsupported HATCH edge type ' + type);\n                loop.edges.push(edge);\n            }\n        }\n        const refs = count(+read(97, 0));\n        loop.sourceHandles = Array.from({ length: refs }, () => String(read(330)));\n        loops.push(loop);\n    }\n    const tail = raw.slice(i), patternLines = [];\n    const hatchStyle = +get(tail, 75), patternType = +get(tail, 76, 1);\n    const pstart = tail.findIndex(p => p[0] === 78);\n    if (pstart >= 0) {\n        i += pstart;\n        const lines = count(+read(78), 1024);\n        for (let k = 0; k < lines; k++) {\n            const angle = rad(+read(53)), base = { x: +read(43), y: +read(44) }, offset = { x: +read(45), y: +read(46) };\n            const n = count(+read(79), 1024);\n            patternLines.push({ angle, base, offset, dashes: Array.from({ length: n }, () => +read(49)) });\n        }\n    }\n    return { loops, hatchStyle, patternType, patternAngle: +get(tail, 52), patternScale: +get(tail, 41, 1), patternDouble: !!get(tail, 77),\n        elevation: +get(raw, 30), associative: !!get(raw, 71), patternLines,\n        gradient: +get(tail, 450) ? tail.slice(tail.findIndex(p => p[0] === 450)).filter(p => p[0] < 1000) : null };\n}\nfunction readEntityFidelity(e, raw, diagnostics, options = {}) {\n    e.extrusion = { x: +get(raw, 210), y: +get(raw, 220), z: +get(raw, 230, 1) };\n    e.thickness = +get(raw, 39); e.linetypeScale = +get(raw, 48, 1);\n    e.transparency = get(raw, 440, null);\n    if (e.transparency !== null && (e.transparency & 0x02000000)) e.opacity = (e.transparency & 255) / 255;\n    if (e.type === 'LWPOLYLINE' || e.type === 'VERTEX') {\n        e.elevation = +get(raw, 38); let p = -1;\n        for (const [c, v] of raw) {\n            if (c === 10) p++;\n            if ((c === 40 || c === 41) && p >= 0) {\n                const q = e.points?.[p] || e.p;\n                if (q) q[c === 40 ? 'startWidth' : 'endWidth'] = +v;\n            }\n        }\n    }\n    if (e.type === 'POLYLINE') { e.elevation = +get(raw, 30); e.startWidth = +get(raw, 40); e.endWidth = +get(raw, 41); }\n    if (['TEXT', 'MTEXT', 'ATTRIB', 'ATTDEF'].includes(e.type)) {\n        e.styleName = String(get(raw, 7, 'STANDARD')); e.oblique = +get(raw, 51);\n        e.textFlags = e.type === 'MTEXT' ? 0 : +get(raw, 71);\n        if (e.type === 'MTEXT') {\n            e.widthFactor = 1; // Group 41 is the reference box width, never an X-scale.\n            e.attachment = +get(raw, 71, 1); e.lineSpacing = +get(raw, 44, 1); e.lineSpacingStyle = +get(raw, 73, 1);\n            e.backgroundFill = +get(raw, 90); e.backgroundScale = +get(raw, 45, 1.5);\n            const start = raw.findIndex(p => p[0] === 100 && p[1] === 'AcDbMText');\n            const common = start >= 0 ? raw.slice(0, start) : raw, content = start >= 0 ? raw.slice(start) : [];\n            const bg = get(content, 421, get(content, 420, null));\n            e.backgroundColor = bg === null ? '#ffffff' : '#' + (Number(bg) & 0xffffff).toString(16).padStart(6, '0');\n            const fg = get(common, 420, null);\n            if (fg === null && bg !== null && +get(common, 62, 256) === 256) delete e.color;\n            const directionIndex = raw.findIndex(p => p[0] === 11), angleIndex = raw.findIndex(p => p[0] === 50);\n            // Wire DXF angle groups are degrees; callers can explicitly opt into the APP-radians convention.\n            if (angleIndex > directionIndex && !get(raw, 75)) e.rotation = +raw[angleIndex][1] * (options.mtextRotationUnit === 'radians' ? 180 / Math.PI : 1);\n            if (+get(raw, 75) || +get(raw, 72) === 3) diagnostics.push({ severity: 'warning', type: e.type, message: 'MTEXT columns/vertical flow preserved in source; displayed as a single horizontal text box.' });\n        } else {\n            e.halign = +get(raw, 72); e.valign = +get(raw, e.type === 'TEXT' ? 73 : 74);\n            if (raw.some(p => p[0] === 11)) e.alignPoint = point(raw, 11);\n        }\n    }\n    if (e.type === 'HATCH') {\n        Object.assign(e, parseHatchData(raw));\n        if (e.gradient) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'Gradient records retained; preview uses the entity color, not a gradient shader.' });\n    }\n    if (e.type === '3DFACE') { e.points = [point(raw), point(raw, 11), point(raw, 12), point(raw, 13)]; e.edgeFlags = +get(raw, 70); }\n    if (e.type === 'LEADER') {\n        e.points = []; let p;\n        for (const [c, v] of raw) { if (c === 10) { p = { x: +v, y: 0, z: 0 }; e.points.push(p); } else if (p && c === 20) p.y = +v; else if (p && c === 30) p.z = +v; }\n        e.arrow = !!get(raw, 71, 1); e.spline = !!get(raw, 72); e.dimstyle = get(raw, 3, 'STANDARD');\n        if (e.spline) diagnostics.push({ severity: 'warning', type: e.type, message: 'Spline leader retained; displayed using its control polygon.' });\n    }\n    if (e.type === 'RAY' || e.type === 'XLINE') { e.p = point(raw); e.direction = point(raw, 11); }\n}\nfunction writeHatchData(e, pair) {\n    const p2 = (c, p) => { pair(c, p.x); pair(c + 10, p.y); };\n    pair(100, 'AcDbHatch'); pair(10, 0); pair(20, 0); pair(30, e.elevation || 0);\n    pair(210, e.extrusion?.x || 0); pair(220, e.extrusion?.y || 0); pair(230, e.extrusion?.z ?? 1);\n    pair(2, e.pattern || (e.solid ? 'SOLID' : 'USER')); pair(70, e.solid ? 1 : 0); pair(71, 0);\n    pair(91, e.loops?.length || 0);\n    for (const loop of e.loops || []) {\n        const native = !!loop.edges?.length;\n        pair(92, native ? (loop.flags || 0) & ~2 : (loop.flags || 0) | 2);\n        if (native) {\n            pair(93, loop.edges.length);\n            for (const edge of loop.edges) {\n                pair(72, edge.type);\n                if (edge.type === 1) { p2(10, edge.a); p2(11, edge.b); }\n                else if (edge.type === 2 || edge.type === 3) {\n                    p2(10, edge.c); if (edge.type === 3) p2(11, edge.major);\n                    pair(40, edge.type === 2 ? edge.r : edge.ratio); pair(50, (edge.ccw === false ? 2*Math.PI-edge.start : edge.start) * 180 / Math.PI); pair(51, (edge.ccw === false ? 2*Math.PI-edge.end : edge.end) * 180 / Math.PI); pair(73, edge.ccw === false ? 0 : 1);\n                } else if (edge.type === 4) {\n                    pair(94, edge.degree); pair(73, edge.rational ? 1 : 0); pair(74, edge.periodic ? 1 : 0);\n                    pair(95, edge.knots.length); pair(96, edge.controlPoints.length);\n                    edge.knots.forEach(v => pair(40, v));\n                    edge.controlPoints.forEach((p, j) => { p2(10, p); if (edge.rational) pair(42, edge.weights?.[j] ?? 1); });\n                    pair(97, edge.fitPoints?.length || 0); (edge.fitPoints || []).forEach(p => p2(11, p));\n                    if (edge.startTangent) p2(12, edge.startTangent); if (edge.endTangent) p2(13, edge.endTangent);\n                } else throw new Error('Unsupported HATCH edge export ' + edge.type);\n            }\n        } else {\n            const points = loop.points || [], bulges = points.some(p => p.bulge);\n            pair(72, bulges ? 1 : 0); pair(73, loop.closed === false ? 0 : 1); pair(93, points.length);\n            for (const p of points) { p2(10, p); if (bulges) pair(42, p.bulge || 0); }\n        }\n        pair(97, 0); // Detached boundary references cannot safely reference regenerated handles.\n    }\n    pair(75, e.hatchStyle || 0); pair(76, e.patternType ?? 1);\n    if (!e.solid) {\n        pair(52, e.patternAngle || 0); pair(41, e.patternScale || 1); pair(77, e.patternDouble ? 1 : 0);\n        pair(78, e.patternLines?.length || 0);\n        for (const line of e.patternLines || []) {\n            pair(53, line.angle * 180 / Math.PI); pair(43, line.base.x); pair(44, line.base.y); pair(45, line.offset.x); pair(46, line.offset.y);\n            pair(79, line.dashes?.length || 0); for (const d of line.dashes || []) pair(49, d);\n        }\n    }\n    pair(98, 0); for (const p of e.gradient || []) pair(...p);\n}\n\nreturn {parseHatchData,readEntityFidelity,writeHatchData};\n})();\n// packages/geometry/src/index.js\n__modules[\"packages/geometry/src/index.js\"]=(()=>{\n/** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */\nconst EPS = 1e-9;\nconst TAU = Math.PI * 2;\nconst clamp = (v, a, b) => Math.min(b, Math.max(a, v));\nconst point = (x = 0, y = 0) => ({ x, y });\nconst add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });\nconst sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });\nconst mul = (a, s) => ({ x: a.x * s, y: a.y * s });\nconst dot = (a, b) => a.x * b.x + a.y * b.y;\nconst cross = (a, b) => a.x * b.y - a.y * b.x;\nconst length = a => Math.hypot(a.x, a.y);\nconst distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);\nconst normalize = a => mul(a, 1 / (length(a) || 1));\nconst lerp = (a, b, t) => add(a, mul(sub(b, a), t));\nconst almost = (a, b, tolerance = EPS) => Math.abs(a - b) <= tolerance;\nconst equalPoint = (a, b, tolerance = EPS) => distance(a, b) <= tolerance;\nconst identity = () => [1, 0, 0, 1, 0, 0];\nconst transform = (p, m) => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });\nfunction matrix({ x = 0, y = 0, rotation = 0, sx = 1, sy = sx } = {}) { const a = rotation * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [c * sx, s * sx, -s * sy, c * sy, x, y]; }\nfunction compose(a, b) { return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]]; }\nfunction inverse(m) {\n    const d = m[0] * m[3] - m[1] * m[2];\n    if (Math.abs(d) < EPS)\n        throw new Error('Singular transform');\n    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d, (m[2] * m[5] - m[3] * m[4]) / d, (m[1] * m[4] - m[0] * m[5]) / d];\n}\nfunction bounds(points) {\n    const b = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };\n    for (const p of points) {\n        if (!Number.isFinite(p.x) || !Number.isFinite(p.y))\n            continue;\n        b.minX = Math.min(b.minX, p.x);\n        b.minY = Math.min(b.minY, p.y);\n        b.maxX = Math.max(b.maxX, p.x);\n        b.maxY = Math.max(b.maxY, p.y);\n    }\n    return b;\n}\nconst emptyBounds = () => bounds([]);\nconst validBounds = b => Number.isFinite(b.minX) && b.minX <= b.maxX && b.minY <= b.maxY;\nconst inflate = (b, n) => ({ minX: b.minX - n, minY: b.minY - n, maxX: b.maxX + n, maxY: b.maxY + n });\nconst intersects = (a, b) => a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY;\nconst contains = (b, p) => p.x >= b.minX && p.x <= b.maxX && p.y >= b.minY && p.y <= b.maxY;\nconst union = (a, b) => ({ minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) });\nconst center = b => ({ x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 });\nfunction projectPoint(p, a, b, segment = true) { const v = sub(b, a), n = dot(v, v); const t = n < EPS * EPS ? 0 : dot(sub(p, a), v) / n; return lerp(a, b, segment ? clamp(t, 0, 1) : t); }\nconst distanceToSegment = (p, a, b) => distance(p, projectPoint(p, a, b));\nfunction lineIntersection(a, b, c, d, segments = true) {\n    const r = sub(b, a), s = sub(d, c), det = cross(r, s);\n    if (Math.abs(det) <= EPS * Math.max(1, length(r) * length(s)))\n        return null;\n    const q = sub(c, a), t = cross(q, s) / det, u = cross(q, r) / det;\n    if (segments && (t < -EPS || t > 1 + EPS || u < -EPS || u > 1 + EPS))\n        return null;\n    return { ...lerp(a, b, t), t, u };\n}\nfunction segmentIntersectsBox(a, b, box) {\n    if (contains(box, a) || contains(box, b))\n        return true;\n    const p = [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.minY }, { x: box.maxX, y: box.maxY }, { x: box.minX, y: box.maxY }];\n    return p.some((v, i) => lineIntersection(a, b, v, p[(i + 1) % 4]));\n}\nfunction polygonContains(p, points) {\n    let inside = false;\n    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {\n        const a = points[i], b = points[j];\n        if (distanceToSegment(p, a, b) < EPS)\n            return true;\n        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)\n            inside = !inside;\n    }\n    return inside;\n}\nfunction polygonArea(points) {\n    let n = 0;\n    for (let i = 0; i < points.length; i++)\n        n += cross(points[i], points[(i + 1) % points.length]);\n    return n / 2;\n}\nfunction polylineLength(points, closed = false) {\n    let n = 0;\n    for (let i = 1; i < points.length; i++)\n        n += distance(points[i - 1], points[i]);\n    if (closed && points.length > 1)\n        n += distance(points.at(-1), points[0]);\n    return n;\n}\nfunction simplifyOrthogonal(points) {\n    const r = [];\n    for (const p of points) {\n        if (r.length && equalPoint(r.at(-1), p))\n            continue;\n        if (r.length > 1) {\n            const a = r.at(-2), b = r.at(-1);\n            if (Math.abs(cross(sub(b, a), sub(p, b))) < EPS && dot(sub(b, a), sub(p, b)) >= 0)\n                r.pop();\n        }\n        r.push({ ...p });\n    }\n    return r;\n}\nfunction arcPoints(c, r, start = 0, end = TAU, tolerance = .2, clockwise = false) {\n    if (!Number.isFinite(r) || r <= 0)\n        return [c];\n    let sweep = end - start;\n    if (clockwise) {\n        while (sweep > 0)\n            sweep -= TAU;\n    }\n    else {\n        while (sweep < 0)\n            sweep += TAU;\n    }\n    if (Math.abs(sweep) < EPS)\n        sweep = clockwise ? -TAU : TAU;\n    const step = 2 * Math.acos(clamp(1 - Math.max(tolerance, 1e-7) / r, -1, 1));\n    const n = clamp(Math.ceil(Math.abs(sweep) / Math.max(step, .0005)), 2, 8192);\n    return Array.from({ length: n + 1 }, (_, i) => ({ x: c.x + r * Math.cos(start + sweep * i / n), y: c.y + r * Math.sin(start + sweep * i / n) }));\n}\nfunction bulgeArc(a, b, bulge) {\n    if (Math.abs(bulge) < EPS || distance(a, b) < EPS)\n        return null;\n    const chord = sub(b, a), mid = lerp(a, b, .5), c = add(mid, mul({ x: -chord.y, y: chord.x }, (1 - bulge * bulge) / (4 * bulge)));\n    return { c, r: distance(a, c), start: Math.atan2(a.y - c.y, a.x - c.x), sweep: 4 * Math.atan(bulge), clockwise: bulge < 0 };\n}\nfunction tessellatePolyline(points, closed = false, tolerance = .2) {\n    if (!points.length)\n        return [];\n    const out = [];\n    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {\n        const a = points[i], b = points[(i + 1) % points.length], arc = bulgeArc(a, b, a.bulge || 0);\n        if (arc)\n            out.push(...arcPoints(arc.c, arc.r, arc.start, arc.start + arc.sweep, tolerance, arc.clockwise).slice(0, -1));\n        else\n            out.push(a);\n    }\n    out.push(closed ? points[0] : points.at(-1));\n    return out;\n}\n/** Rational de Boor evaluation; input is never mutated. */\nfunction nurbsPoint(control, degree, knots, t, weights = []) {\n    const n = control.length - 1, p = Math.min(degree, n);\n    if (n < 0)\n        return point();\n    if (p < 1)\n        return { ...control[0] };\n    if (knots.length < n + p + 2)\n        throw new Error('Invalid NURBS knot vector');\n    const lo = knots[p], hi = knots[n + 1];\n    t = clamp(t, lo, hi);\n    let k = n;\n    if (t < hi) {\n        k = p;\n        while (k < n && !(t >= knots[k] && t < knots[k + 1]))\n            k++;\n    }\n    const d = [];\n    for (let j = 0; j <= p; j++) {\n        const i = k - p + j, w = weights[i] ?? 1;\n        d.push([control[i].x * w, control[i].y * w, w]);\n    }\n    for (let r = 1; r <= p; r++)\n        for (let j = p; j >= r; j--) {\n            const i = k - p + j, den = knots[i + p - r + 1] - knots[i], a = Math.abs(den) < EPS ? 0 : (t - knots[i]) / den;\n            d[j] = d[j].map((v, q) => (1 - a) * d[j - 1][q] + a * v);\n        }\n    const w = d[p][2];\n    return Math.abs(w) > EPS ? { x: d[p][0] / w, y: d[p][1] / w } : { ...control[Math.min(n, k)] };\n}\nfunction splinePoints(e, tolerance = .2) {\n    const cp = e.controlPoints || [];\n    if (cp.length < 2)\n        return cp;\n    const p = Math.min(e.degree || 3, cp.length - 1), n = cp.length;\n    let knots = e.knots;\n    if (!knots || knots.length < n + p + 1) {\n        knots = [];\n        for (let i = 0; i < n + p + 1; i++)\n            knots.push(i <= p ? 0 : i >= n ? 1 : (i - p) / (n - p));\n    }\n    const start = knots[p], end = knots[n], out = [nurbsPoint(cp, p, knots, start, e.weights)];\n    function split(t0, a, t1, b, depth) {\n        const tm = (t0 + t1) / 2, m = nurbsPoint(cp, p, knots, tm, e.weights), q1 = nurbsPoint(cp, p, knots, (t0 + tm) / 2, e.weights), q3 = nurbsPoint(cp, p, knots, (tm + t1) / 2, e.weights);\n        if (depth < 12 && Math.max(distanceToSegment(m, a, b), distanceToSegment(q1, a, b), distanceToSegment(q3, a, b)) > tolerance) {\n            split(t0, a, tm, m, depth + 1);\n            split(tm, m, t1, b, depth + 1);\n        }\n        else\n            out.push(b);\n    }\n    for (let i = p; i < n; i++) {\n        if (knots[i + 1] > knots[i])\n            split(knots[i], out.at(-1), knots[i + 1], nurbsPoint(cp, p, knots, knots[i + 1], e.weights), 0);\n    }\n    return out;\n}\n/** Planar polyline offset with bounded miters; not a polygon Boolean engine. */\nfunction offsetPolyline(points, amount, closed = false, miterLimit = 6) {\n    if (points.length < 2)\n        throw new Error('Offset requires two vertices');\n    const seg = [];\n    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {\n        const a = points[i], b = points[(i + 1) % points.length], v = normalize(sub(b, a)), o = mul({ x: -v.y, y: v.x }, amount);\n        seg.push([add(a, o), add(b, o)]);\n    }\n    const out = [];\n    for (let i = 0; i < points.length; i++) {\n        if (!closed && i === 0) {\n            out.push(seg[0][0]);\n            continue;\n        }\n        if (!closed && i === points.length - 1) {\n            out.push(seg.at(-1)[1]);\n            continue;\n        }\n        const prev = seg[(i - 1 + seg.length) % seg.length], next = seg[i % seg.length], hit = lineIntersection(...prev, ...next, false);\n        if (hit && distance(hit, points[i]) <= Math.abs(amount) * miterLimit + EPS)\n            out.push({ x: hit.x, y: hit.y });\n        else\n            out.push(prev[1], next[0]);\n    }\n    return out;\n}\nfunction filletLines(a, b, c, d, radius) {\n    const hit = lineIntersection(a, b, c, d, false);\n    if (!hit || radius <= 0)\n        throw new Error('Fillet needs intersecting nonparallel lines and positive radius');\n    const u = normalize(sub(distance(a, hit) > distance(b, hit) ? a : b, hit)), v = normalize(sub(distance(c, hit) > distance(d, hit) ? c : d, hit)), theta = Math.acos(clamp(dot(u, v), -1, 1));\n    if (theta < EPS || Math.abs(theta - Math.PI) < EPS)\n        throw new Error('Degenerate fillet');\n    const t = radius / Math.tan(theta / 2), p = add(hit, mul(u, t)), q = add(hit, mul(v, t)), cen = add(hit, mul(normalize(add(u, v)), radius / Math.sin(theta / 2)));\n    return { p, q, c: cen, r: radius, start: Math.atan2(p.y - cen.y, p.x - cen.x), end: Math.atan2(q.y - cen.y, q.x - cen.x), clockwise: cross(sub(p, cen), sub(q, cen)) < 0 };\n}\nfunction snapCandidates(entity) {\n    switch (entity.type) {\n        case 'LINE': return [{ ...entity.a, kind: 'endpoint' }, { ...entity.b, kind: 'endpoint' }, { ...lerp(entity.a, entity.b, .5), kind: 'midpoint' }];\n        case 'CIRCLE':\n        case 'ARC': {\n            const onArc = a => {\n                if (entity.type === 'CIRCLE')\n                    return true;\n                const norm = x => ((x % TAU) + TAU) % TAU;\n                return entity.clockwise ? norm(entity.start - a) <= norm(entity.start - entity.end) + EPS : norm(a - entity.start) <= norm(entity.end - entity.start) + EPS;\n            };\n            const at = a => ({ x: entity.c.x + entity.r * Math.cos(a), y: entity.c.y + entity.r * Math.sin(a) });\n            return [{ ...entity.c, kind: 'center' }, ...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].filter(onArc).map(a => ({ ...at(a), kind: 'quadrant' })), ...(entity.type === 'ARC' ? [{ ...at(entity.start), kind: 'endpoint' }, { ...at(entity.end), kind: 'endpoint' }] : [])];\n        }\n        case 'LWPOLYLINE': return entity.points.flatMap((p, i) => [{ ...p, kind: 'endpoint' }, ...(i < entity.points.length - 1 || entity.closed ? [{ ...lerp(p, entity.points[(i + 1) % entity.points.length], .5), kind: 'midpoint' }] : [])]);\n        case 'INSERT': return [{ x: entity.x, y: entity.y, kind: 'insertion' }];\n        default: return [];\n    }\n}\n\nreturn {EPS,TAU,clamp,point,add,sub,mul,dot,cross,length,distance,normalize,lerp,almost,equalPoint,identity,transform,matrix,compose,inverse,bounds,emptyBounds,validBounds,inflate,intersects,contains,union,center,projectPoint,distanceToSegment,lineIntersection,segmentIntersectsBox,polygonContains,polygonArea,polylineLength,simplifyOrthogonal,arcPoints,bulgeArc,tessellatePolyline,nurbsPoint,splinePoints,offsetPolyline,filletLines,snapCandidates};\n})();\n// packages/model/src/fidelity.js\n__modules[\"packages/model/src/fidelity.js\"]=(()=>{\nconst {arcPoints, tessellatePolyline, splinePoints, bounds, distance, TAU} = __modules[\"packages/geometry/src/index.js\"];\nconst EPS = 1e-9;\n/** XY projection of Autodesk's arbitrary-axis OCS basis. */\nfunction ocsTransform(normal = { x: 0, y: 0, z: 1 }, elevation = 0) {\n    const length = Math.hypot(normal.x || 0, normal.y || 0, normal.z ?? 1);\n    if (length < EPS) throw new Error('Invalid zero-length DXF extrusion normal');\n    const n = { x: (normal.x || 0) / length, y: (normal.y || 0) / length, z: (normal.z ?? 1) / length };\n    const a = Math.abs(n.x) < 1 / 64 && Math.abs(n.y) < 1 / 64 ? { x: n.z, y: 0, z: -n.x } : { x: -n.y, y: n.x, z: 0 };\n    const l = Math.hypot(a.x, a.y, a.z); a.x /= l; a.y /= l; a.z /= l;\n    const b = { x: n.y * a.z - n.z * a.y, y: n.z * a.x - n.x * a.z };\n    return [a.x, a.y, b.x, b.y, n.x * elevation, n.y * elevation];\n}\nfunction ellipseEdgePoints(edge, tolerance = .25) {\n    const a = edge.major, ratio = edge.ratio ?? 1;\n    let start = edge.start ?? 0, end = edge.end ?? TAU;\n    // Hatch ellipse group 50/51 use geometric angles, unlike ELLIPSE parameters.\n    if (edge.type === 3) {\n        const convert = v => Math.atan2(Math.sin(v) / Math.max(Math.abs(ratio), EPS), Math.cos(v));\n        start = convert(start); end = convert(end);\n    }\n    let sweep = end - start;\n    if (edge.ccw === false) { while (sweep >= 0) sweep -= TAU; }\n    else { while (sweep <= 0) sweep += TAU; }\n    const n = Math.min(8192, Math.max(8, Math.ceil(Math.abs(sweep) * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(tolerance, 1e-8)))));\n    return Array.from({ length: n + 1 }, (_, i) => {\n        const t = start + sweep * i / n;\n        return { x: edge.c.x + a.x * Math.cos(t) - a.y * ratio * Math.sin(t), y: edge.c.y + a.y * Math.cos(t) + a.x * ratio * Math.sin(t) };\n    });\n}\nfunction hatchContours(e, tolerance = .25) {\n    return (e.loops || []).map(loop => {\n        if (!loop.edges?.length) return tessellatePolyline(loop.points || [], true, tolerance);\n        const result = [];\n        for (const edge of loop.edges) {\n            let points = [];\n            if (edge.type === 1) points = [edge.a, edge.b];\n            if (edge.type === 2) points = arcPoints(edge.c, edge.r, edge.start, edge.end, tolerance, edge.ccw === false);\n            if (edge.type === 3) points = ellipseEdgePoints(edge, tolerance);\n            if (edge.type === 4) points = splinePoints(edge, tolerance);\n            if (result.length && points.length && distance(result.at(-1), points[0]) < EPS) points = points.slice(1);\n            result.push(...points);\n        }\n        return result;\n    }).filter(p => p.length >= 3);\n}\nfunction inPolygon(p, polygon) {\n    let inside = false;\n    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {\n        const a = polygon[i], b = polygon[j];\n        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;\n    }\n    return inside;\n}\nfunction hatchRegionContours(e, tolerance) {\n    const contours = hatchContours(e, tolerance);\n    if (!e.hatchStyle) return contours;\n    return contours.filter((p, i) => {\n        const depth = contours.reduce((n, q, j) => n + (i !== j && inPolygon(p[0], q) ? 1 : 0), 0);\n        return e.hatchStyle === 2 ? depth === 0 : depth <= 1;\n    });\n}\n/** Scanline hatch clipping with half-open crossings and parity across islands.\n * Definitions are already transformed by the DXF producer: do not apply scale twice.\n */\nfunction hatchPatternSegments(e, contours, { maxLines = 20000, maxSegments = 100000 } = {}) {\n    const segments = [], vertices = contours.flat(), bb = bounds(vertices);\n    if (!vertices.length) return { segments, limited: false };\n    let lines = 0;\n    for (const definition of e.patternLines || []) {\n        const u = { x: Math.cos(definition.angle), y: Math.sin(definition.angle) }, n = { x: -u.y, y: u.x }, base = definition.base, offset = definition.offset;\n        const step = offset.x * n.x + offset.y * n.y, origin = base.x * n.x + base.y * n.y;\n        if (Math.abs(step) < EPS) continue;\n        const corners = [{ x: bb.minX, y: bb.minY }, { x: bb.maxX, y: bb.minY }, { x: bb.minX, y: bb.maxY }, { x: bb.maxX, y: bb.maxY }];\n        const projections = corners.map(p => (p.x * n.x + p.y * n.y - origin) / step);\n        const first = Math.ceil(Math.min(...projections) - EPS), last = Math.floor(Math.max(...projections) + EPS);\n        if (!Number.isSafeInteger(first) || last - first + lines > maxLines) return { segments: [], limited: true };\n        for (let k = first; k <= last; k++) {\n            lines++;\n            const b = { x: base.x + k * offset.x, y: base.y + k * offset.y }, hits = [];\n            for (const polygon of contours) for (let i = 0; i < polygon.length; i++) {\n                const a = polygon[i], z = polygon[(i + 1) % polygon.length];\n                const da = (a.x - b.x) * n.x + (a.y - b.y) * n.y, dz = (z.x - b.x) * n.x + (z.y - b.y) * n.y;\n                if ((da > 0) === (dz > 0)) continue;\n                const t = da / (da - dz), x = a.x + (z.x - a.x) * t - b.x, y = a.y + (z.y - a.y) * t - b.y;\n                hits.push(x * u.x + y * u.y);\n            }\n            hits.sort((a, b) => a - b);\n            for (let i = 0; i + 1 < hits.length; i += 2) {\n                const lo = hits[i], hi = hits[i + 1];\n                if (hi - lo <= EPS) continue;\n                const emit = (a, z) => segments.push([{ x: b.x + a * u.x, y: b.y + a * u.y }, { x: b.x + z * u.x, y: b.y + z * u.y }]);\n                const dashes = definition.dashes || [], cycle = dashes.reduce((a, d) => a + Math.abs(d), 0);\n                if (cycle < EPS) emit(lo, hi);\n                else {\n                    if ((hi - lo) / cycle * dashes.length > maxSegments) return { segments: [], limited: true };\n                    for (let c = Math.floor(lo / cycle) * cycle; c < hi; c += cycle) {\n                        let p = c;\n                        for (const dash of dashes) {\n                            if (dash >= 0 && p + dash >= lo && p <= hi) emit(Math.max(lo, p), Math.min(hi, p + Math.max(dash, EPS)));\n                            p += Math.abs(dash);\n                        }\n                        if (segments.length > maxSegments) return { segments: [], limited: true };\n                    }\n                }\n                if (segments.length > maxSegments) return { segments: [], limited: true };\n            }\n        }\n    }\n    return { segments, limited: false };\n}\n/** Variable width arc/polyline ribbons, retaining original analytic model data. */\nfunction widePolylineContours(e, tolerance = .25) {\n    const result = [], points = e.points || [], n = points.length - (e.closed ? 0 : 1);\n    for (let i = 0; i < n; i++) {\n        const a = points[i], b = points[(i + 1) % points.length];\n        const w0 = e.constantWidth || (a.startWidth ?? e.startWidth ?? 0), w1 = e.constantWidth || (a.endWidth ?? e.endWidth ?? w0);\n        if (!(w0 > 0 || w1 > 0)) continue;\n        const center = tessellatePolyline([a, b], false, tolerance), left = [], right = [];\n        for (let j = 0; j < center.length; j++) {\n            const prev = center[Math.max(0, j - 1)], next = center[Math.min(center.length - 1, j + 1)], len = Math.hypot(next.x - prev.x, next.y - prev.y);\n            if (len < EPS) continue;\n            const w = (w0 + (w1 - w0) * j / (center.length - 1)) / 2, nx = -(next.y - prev.y) / len * w, ny = (next.x - prev.x) / len * w;\n            left.push({ x: center[j].x + nx, y: center[j].y + ny }); right.push({ x: center[j].x - nx, y: center[j].y - ny });\n        }\n        if (left.length >= 2) result.push([...left, ...right.reverse()]);\n    }\n    return result;\n}\nfunction signedDashPattern(pattern = []) {\n    if (!pattern.length) return [];\n    const result = []; let ink = true;\n    for (const value of pattern) {\n        const nextInk = value >= 0, size = Math.abs(value);\n        if (nextInk !== ink) { if (!result.length) result.push(0); ink = nextInk; result.push(size); }\n        else if (!result.length) result.push(size); else result[result.length - 1] += size;\n    }\n    if (result.length % 2) result.push(0);\n    return result;\n}\nconst plainText = s => String(s).replace(/\\\\U\\+([\\da-f]{4})/gi, (_, v) => String.fromCharCode(parseInt(v, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀');\n/** Bounded, no-eval MTEXT formatting lexer with group-local formatting state. */\nfunction cadTextRuns(value, initial = {}) {\n    const source = plainText(value), result = [], stack = [];\n    let style = { scale: 1, width: 1, underline: false, overline: false, ...initial }, text = '';\n    const flush = () => { if (text) result.push({ text, ...style }); text = ''; };\n    for (let i = 0; i < source.length; i++) {\n        const ch = source[i];\n        if (ch === '{') { flush(); if (stack.length < 64) stack.push({ ...style }); continue; }\n        if (ch === '}') { flush(); style = stack.pop() || style; continue; }\n        if (ch !== '\\\\') { text += ch; continue; }\n        const command = source[++i];\n        if (command === undefined) break;\n        if (['\\\\', '{', '}'].includes(command)) { text += command; continue; }\n        if (command === 'P' || command === 'X') { text += '\\n'; continue; }\n        if (command === '~') { text += '\\u00a0'; continue; }\n        if ('LlOoKk'.includes(command)) { flush(); const key = /[Ll]/.test(command) ? 'underline' : /[Oo]/.test(command) ? 'overline' : 'strike'; style[key] = command === command.toUpperCase(); continue; }\n        if ('ACcFfHhQqTtWwSs'.includes(command)) {\n            const end = source.indexOf(';', i + 1); if (end < 0) { text += '\\\\' + command; continue; }\n            const arg = source.slice(i + 1, end); i = end; flush(); const num = parseFloat(arg);\n            if (/[Hh]/.test(command) && num > 0 && Number.isFinite(num)) style.scale = /x$/i.test(arg) ? num : num / (initial.height || 1);\n            else if (/[Ww]/.test(command) && num > 0 && Number.isFinite(num)) style.width = num;\n            else if (/[Qq]/.test(command) && Number.isFinite(num)) style.oblique = Math.max(-85, Math.min(85, num));\n            else if (/[Ff]/.test(command)) { style.font = arg.split('|')[0]; style.bold = /\\|b1/i.test(arg); style.italic = /\\|i1/i.test(arg); }\n            else if (command === 'c' && Number.isFinite(num)) style.color = '#' + (num & 0xffffff).toString(16).padStart(6, '0');\n            else if (command === 'C' && num >= 1 && num <= 7) style.color = ['','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#000000'][num];\n            else if (/[Ss]/.test(command)) result.push({ text: arg.replace(/[\\/#^]/g, '/'), ...style, scale: style.scale * .8 });\n            continue;\n        }\n        text += '\\\\' + command;\n    }\n    flush(); return result;\n}\n/** Deterministic text layout; canvas may supply measured glyph advances. */\nfunction layoutCadText(t, measure) {\n    const h = t.nominalHeight || t.height || 12, multiline = !!t.mtext;\n    const runs = multiline ? cadTextRuns(t.rawText ?? t.text, { height: h }) : [{ text: plainText(t.text), scale: 1, width: 1 }];\n    const width = multiline && t.mtextWidth > 0 ? t.mtextWidth : Infinity;\n    const lines = [{ runs: [], width: 0, height: h }];\n    let line = lines[0];\n    const add = (text, style) => {\n        if (!text) return;\n        const height = h * style.scale, w = (measure ? measure(text, height, style) : [...text].reduce((n, c) => n + (/\\s/.test(c) ? .33 : /[ilI.,'!:;]/.test(c) ? .28 : /[MW@%]/.test(c) ? .9 : .6), 0) * height) * style.width;\n        if (w > width && Number.isFinite(width) && [...text].length > 1) {\n            for (const ch of text) add(ch, style);\n            return;\n        }\n        if (line.width > 0 && line.width + w > width && !/^\\s+$/.test(text)) { line = { runs: [], width: 0, height: h }; lines.push(line); }\n        line.runs.push({ ...style, text, x: line.width, width: w, height }); line.width += w; line.height = Math.max(line.height, height);\n    };\n    for (const run of runs) for (const token of run.text.split(/(\\n|[ \\t]+)/)) {\n        if (token === '\\n') { line = { runs: [], width: 0, height: h }; lines.push(line); }\n        else add(token, run);\n    }\n    const lineFactor = multiline ? (5 / 3) * Math.max(.25, Math.min(4, t.lineSpacing || 1)) : 1.3;\n    let y = 0;\n    for (const line of lines) { line.y = y; y += (t.lineSpacingStyle === 2 ? h : line.height) * lineFactor; }\n    const height = lines.at(-1).y + lines.at(-1).height, w = lines.reduce((n, l) => Math.max(n, l.width), 0);\n    const vertical = multiline ? Math.floor(((t.attachment || 1) - 1) / 3) : t.valign === 3 ? 0 : t.valign === 2 ? 1 : t.valign === 1 ? 2 : -1;\n    const baseline = vertical === 0 ? h * .8 : vertical === 1 ? h * .8 - height / 2 : vertical === 2 ? h * .8 - height : 0;\n    const boxWidth = Number.isFinite(width) ? width : w;\n    const align = t.align || 'left', offsetX = align === 'center' ? -boxWidth / 2 : align === 'right' ? -boxWidth : 0;\n    for (const line of lines) {\n        const start = offsetX + (align === 'center' ? (boxWidth - line.width) / 2 : align === 'right' ? boxWidth - line.width : 0);\n        for (const r of line.runs) { r.x += start; r.y = baseline + line.y; }\n    }\n    return { lines, width: boxWidth, height, minX: offsetX, minY: baseline - h * .8, maxX: offsetX + boxWidth, maxY: baseline + height - h * .8 };\n}\n\nreturn {ocsTransform,ellipseEdgePoints,hatchContours,inPolygon,hatchRegionContours,hatchPatternSegments,widePolylineContours,signedDashPattern,cadTextRuns,layoutCadText};\n})();\n// packages/model/src/index.js\n__modules[\"packages/model/src/index.js\"]=(()=>{\nconst {ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText} = __modules[\"packages/model/src/fidelity.js\"];\nconst {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules[\"packages/geometry/src/index.js\"];\nfunction textLayout(text, measure) { return layoutCadText(text, measure); }\nfunction objectCoordinateTransform(normal, elevation) { return ocsTransform(normal, elevation); }\nlet sequence = 0;\nconst uid = (prefix = 'e') => `${prefix}-${Date.now().toString(36)}-${(++sequence).toString(36)}`;\nconst clone = value => JSON.parse(JSON.stringify(value));\nfunction createDocument(name = 'Untitled drawing') { return { schema: 'conduitcad/1', name, units: 'mm', version: 0, entities: [], blocks: {}, layers: [{ name: '0', color: '#344755', visible: true, locked: false }, { name: 'Equipment', color: '#355463', visible: true, locked: false }, { name: 'Process', color: '#147c77', visible: true, locked: false }, { name: 'Instruments', color: '#9b7246', visible: true, locked: false, dash: [5, 4] }, { name: 'Electrical', color: '#6477ba', visible: true, locked: false }, { name: 'Annotations', color: '#71808a', visible: true, locked: false }], linetypes: { CONTINUOUS: [], DASHED: [8, 4], CENTER: [12, 3, 2, 3], HIDDEN: [4, 3] }, parameters: { grid: '10', pipeWidth: '2', valveSize: '64' }, constraints: [], metadata: { author: '', description: '' }, activeLayout: 'Model', layouts: ['Model'], importDiagnostics: [] }; }\nfunction validateDocument(doc) {\n    if (!doc || doc.schema !== 'conduitcad/1' || !Array.isArray(doc.entities) || !doc.blocks || !Array.isArray(doc.layers))\n        throw new Error('Not a Conduit CAD project');\n    if (doc.entities.length > 1000000)\n        throw new Error('Entity safety limit exceeded');\n    const ids = new Set();\n    for (const e of doc.entities) {\n        if (!e.id || ids.has(e.id))\n            throw new Error('Missing or duplicate entity ID');\n        ids.add(e.id);\n        if (!e.type)\n            throw new Error('Missing entity type');\n    }\n    return doc;\n}\nfunction entity(type, props = {}) { return { id: uid(), type, layer: '0', ...props }; }\nconst line = (a, b, props = {}) => entity('LINE', { a: { ...a }, b: { ...b }, ...props });\nconst polyline = (points, closed = false, props = {}) => entity('LWPOLYLINE', { points: points.map(p => ({ ...p })), closed, ...props });\nconst circle = (c, r, props = {}) => entity('CIRCLE', { c: { ...c }, r, ...props });\nconst text = (p, value, height = 14, props = {}) => entity('TEXT', { p: { ...p }, text: value, height, rotation: 0, ...props });\nconst rect = (x, y, w, h, props = {}) => polyline([{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }], true, props);\nfunction layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '0')) || doc.layers[0]; }\nfunction isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }\nfunction isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }\nfunction cleanText(value = '') { return String(value).replace(/\\\\P/g, '\\n').replace(/\\\\U\\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\\\[ACFHQTW][^;]*;/g, '').replace(/\\\\[LlOoKk]/g, '').replace(/\\\\S([^;]+);/g, (_, s) => s.replace(/[\\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\\\~/g, ' '); }\nfunction resolveStyle(e, doc, parentStyle = null, parentLayer = null) {\n    const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc);\n    const lineweight = e.lineweight === -2 ? parentStyle?.lineweight : e.lineweight == null || e.lineweight === -1 ? layer?.lineweight : e.lineweight;\n    const type = e.linetype === 'BYBLOCK' ? null : (!e.linetype || e.linetype === 'BYLAYER' ? layer?.linetype : e.linetype);\n    const raw = doc.linetypes?.[type];\n    const dash = e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? (raw ? (doc.signedLinetypes ? signedDashPattern(raw) : raw) : null) ?? layer?.dash ?? [];\n    const factor = (e.linetypeScale ?? 1) * (e.dash || e.linetype === 'BYBLOCK' ? 1 : doc.linetypeScale ?? 1);\n    return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color),\n        width: e.width ?? (lineweight >= 0 ? Math.max(.5, lineweight * 96 / 2540) : 1.5), lineweight,\n        dash: dash.map(v => Math.max(0, v * factor)), opacity: e.transparency === 0x01000000 ? parentStyle?.opacity ?? 1 : e.opacity ?? 1 };\n}\n/** Returns portable paths/text. Blocks retain their native definitions in the model. */\nfunction entityGeometry(e, doc, options = {}) {\n    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options;\n    let m = options.matrix || identity();\n    if (e.extrusion && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'ATTRIB', 'ATTDEF', 'SOLID', 'TRACE', 'HATCH', 'INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64))))\n        m = compose(m, ocsTransform(e.extrusion, e.elevation ?? e.c?.z ?? e.p?.z ?? e.z ?? 0));\n    if (depth > 24)\n        return { paths: [], texts: [] };\n    const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));\n    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];\n    const path = (pts, closed = false, fill = null, extra = {}) => {\n        if (pts.length > 1)\n            paths.push({ points: pts.map(p => transform(p, m)), closed, fill, ...style, ...extra, entityId: e.id });\n    };\n    const label = (p, value, height, rotation = 0, align = 'left') => {\n        const textStyle = doc.textStyles?.[e.styleName] || {}, q = transform(p, m), angle = rotation * Math.PI / 180;\n        const sx = (e.textFlags & 2) ? -1 : 1, sy = (e.textFlags & 4) ? -1 : 1;\n        const width = e.widthFactor ?? textStyle.widthFactor ?? 1, oblique = (e.oblique || textStyle.oblique || 0) * Math.PI / 180;\n        const local = compose(matrix({ rotation }), [sx * width, 0, Math.tan(oblique) * sy, sy, 0, 0]);\n        const affine = compose(m, local), frame = affine.slice(0, 4);\n        texts.push({ p: q, text: cleanText(value), rawText: value, height: height * Math.hypot(frame[2], frame[3]), nominalHeight: height,\n            rotation: Math.atan2(frame[1], frame[0]) * 180 / Math.PI, align, color: style.color, opacity: style.opacity, entityId: e.id,\n            font: e.font || textStyle.font || 'sans-serif', frame, widthFactor: width,\n            mtext: e.type === 'MTEXT', mtextWidth: e.mtextWidth, attachment: e.attachment, valign: e.valign,\n            lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });\n    };\n    switch (e.type) {\n        case 'LINE':\n            path([e.a, e.b]);\n            break;\n        case 'LWPOLYLINE':\n        case 'POLYLINE':\n            if(e.type==='POLYLINE' && (e.flags & 64)) {\n                for(const face of e.faces || []) for(let i=0;i<face.length;i++) { const a=e.points[Math.abs(face[i])-1], b=e.points[Math.abs(face[(i+1)%face.length])-1]; if(face[i]>0&&a&&b)path([a,b]); }\n                break;\n            }\n            if(e.type==='POLYLINE' && (e.flags & 16)) {\n                const mCount=e.mCount || 0,nCount=e.nCount || 0;\n                if(mCount*nCount===e.points.length)for(let m=0;m<mCount;m++)for(let n=0;n<nCount;n++) {\n                    const a=e.points[m*nCount+n];\n                    if(m+1<mCount || (e.flags&1))path([a,e.points[((m+1)%mCount)*nCount+n]]);\n                    if(n+1<nCount || (e.flags&32))path([a,e.points[m*nCount+(n+1)%nCount]]);\n                }\n                break;\n            }\n            { const ribbons = widePolylineContours(e, curveTolerance);\n              if (ribbons.length) { for (const ribbon of ribbons) path(ribbon, true, style.color, { stroke: false }); }\n              else path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill); }\n            break;\n        case 'CIRCLE':\n            path(arcPoints(e.c, e.r, 0, TAU, curveTolerance), true, e.fill);\n            break;\n        case 'ARC':\n            path(arcPoints(e.c, e.r, e.start, e.end, curveTolerance, !!e.clockwise));\n            break;\n        case 'ELLIPSE': {\n            const a = e.major || { x: e.rx || 1, y: 0 }, r = e.ratio ?? 1, s = e.start ?? 0;\n            const normal=e.extrusion || {x:0,y:0,z:1}, minor={x:(normal.y || 0)*(a.z || 0)-(normal.z ?? 1)*a.y,y:(normal.z ?? 1)*a.x-(normal.x || 0)*(a.z || 0),z:(normal.x || 0)*a.y-(normal.y || 0)*a.x};\n            const factor=Math.hypot(a.x,a.y,a.z || 0)*r/(Math.hypot(minor.x,minor.y,minor.z) || 1); minor.x*=factor;minor.y*=factor;\n            let sweep = (e.end ?? TAU) - s;\n            while (sweep <= 0)\n                sweep += TAU;\n            const n = Math.min(4096, Math.max(24, Math.ceil(sweep * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(curveTolerance, .0000001)))));\n            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) + minor.x * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + minor.y * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);\n            break;\n        }\n        case 'SPLINE':\n            path(splinePoints(e, curveTolerance), !!e.closed);\n            break;\n        case 'TEXT':\n        case 'MTEXT':\n        case 'ATTRIB':\n        case 'ATTDEF':\n            if (!e.invisible) {\n                let p = ((e.halign || e.valign) && e.alignPoint) ? e.alignPoint : e.p, height = e.height || doc.textStyles?.[e.styleName]?.height || 12, rotation = e.rotation || 0;\n                let value = e.text || '', alignment = e.halign === 4 ? 'center' : e.align || 'left';\n                if ([3, 5].includes(e.halign) && e.alignPoint) {\n                    const target = distance(e.p, e.alignPoint), measured = layoutCadText({ text: cleanText(value), height }).width || 1;\n                    rotation = Math.atan2(e.alignPoint.y - e.p.y, e.alignPoint.x - e.p.x) * 180 / Math.PI;\n                    p = e.p; alignment = 'left';\n                    label(p, value, height, rotation, alignment);\n                    const t = texts.at(-1), factor = target / measured; t.frame[0] *= factor; t.frame[1] *= factor;\n                    if (e.halign === 3) { t.frame[2] *= factor; t.frame[3] *= factor; t.height *= factor; }\n                } else label(p, value, height, rotation, alignment);\n            }\n            break;\n        case 'POINT': {\n            const r = 1.5;\n            path([{ x: e.p.x - r, y: e.p.y }, { x: e.p.x + r, y: e.p.y }]);\n            path([{ x: e.p.x, y: e.p.y - r }, { x: e.p.x, y: e.p.y + r }]);\n            break;\n        }\n        case 'SOLID':\n        case 'TRACE':\n            path(e.points || [], true, style.color, { stroke: false });\n            break;\n        case '3DFACE':\n            for (let i = 0; i < (e.points?.length || 0); i++) if (!(e.edgeFlags & (1 << i))) path([e.points[i], e.points[(i + 1) % e.points.length]]);\n            break;\n        case 'HATCH': {\n            const contours = hatchRegionContours(e, curveTolerance);\n            if (e.solid || e.gradient) {\n                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd' });\n            } else {\n                const pattern = hatchPatternSegments(e, contours);\n                if (pattern.limited || !e.patternLines?.length) {\n                    for (const contour of contours) path(contour, true);\n                    warnings.push({ entityId: e.id, message: pattern.limited ? 'Hatch density exceeds bounded tessellation budget; showing boundaries.' : 'Hatch has no pattern line definitions; showing boundaries.' });\n                } else for (const points of pattern.segments) path(points, false, null, { dash: [] });\n            }\n            break;\n        }\n        case 'LEADER': {\n            path(e.points || []);\n            if (e.arrow !== false && e.points?.length > 1) {\n                const tip = e.points[0], d = normalize(sub(e.points[1], tip)), n = { x: -d.y, y: d.x }, length = e.arrowSize || 6;\n                path([tip, add(tip, add(mul(d, length), mul(n, length / 3))), add(tip, add(mul(d, length), mul(n, -length / 3)))], true, style.color, { stroke: false });\n            }\n            break;\n        }\n        case 'RAY':\n        case 'XLINE': {\n            const p = transform(e.p, m), q = transform(add(e.p, e.direction), m), d = sub(q, p), v = options.view || { minX: p.x - 10000, maxX: p.x + 10000, minY: p.y - 10000, maxY: p.y + 10000 };\n            let lo = e.type === 'RAY' ? 0 : -Infinity, hi = Infinity;\n            for (const axis of ['x', 'y']) {\n                const min = v[axis === 'x' ? 'minX' : 'minY'], max = v[axis === 'x' ? 'maxX' : 'maxY'];\n                if (Math.abs(d[axis]) < 1e-12) { if (p[axis] < min || p[axis] > max) hi = -Infinity; }\n                else { const a = (min - p[axis]) / d[axis], b = (max - p[axis]) / d[axis]; lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b)); }\n            }\n            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, entityId: e.id });\n            break;\n        }\n        case 'DIMENSION': {\n            if (e.block && doc.blocks[e.block]) {\n                const g = entityGeometry({ ...e, type: 'INSERT', x: 0, y: 0 }, doc, { ...options, depth: depth + 1 });\n                for (const p of g.paths)\n                    paths.push(p);\n                for (const t of g.texts)\n                    texts.push(t);\n                break;\n            }\n            const a = e.a, b = e.b;\n            if (!a || !b)\n                break;\n            const n = normalize({ x: -(b.y - a.y), y: b.x - a.x }), off = e.offset ?? 30, p = add(a, mul(n, off)), q = add(b, mul(n, off));\n            path([a, add(p, mul(n, 6))]);\n            path([b, add(q, mul(n, 6))]);\n            path([p, q]);\n            const u = normalize(sub(q, p));\n            for (const [v, dir] of [[p, 1], [q, -1]]) {\n                path([add(v, add(mul(u, dir * 7), mul(n, 3))), v, add(v, add(mul(u, dir * 7), mul(n, -3)))]);\n            }\n            label(add(lerp(p, q, .5), mul(n, 5)), e.text && e.text !== '<>' ? e.text : distance(a, b).toFixed(1), e.height || 12, Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, 'center');\n            break;\n        }\n        case 'INSERT': {\n            const block = doc.blocks[e.block];\n            if (!block)\n                break;\n            const base = block.base || { x: 0, y: 0 }, rows = Math.min(1000, e.rows || 1), cols = Math.min(1000, e.columns || 1);\n            if (rows * cols > 10000)\n                break;\n            // MINSERT spacing belongs to the rotated placement grid, not the scaled block.\n            const placement = matrix({ x: e.x || 0, y: e.y || 0, rotation: e.rotation || 0 });\n            const shape = compose(matrix({ sx: e.sx ?? 1, sy: e.sy ?? e.sx ?? 1 }), matrix({ x: -base.x, y: -base.y }));\n            const gridRotation = matrix({ rotation: e.rotation || 0 }), locations = new Set();\n            for (let row = 0; row < rows; row++)\n                for (let col = 0; col < cols; col++) {\n                    const offset = { x: col * (e.columnSpacing || 0), y: row * (e.rowSpacing || 0) };\n                    const key = offset.x + ':' + offset.y;\n                    if (locations.has(key))\n                        continue;\n                    locations.add(key);\n                    const mm = compose(m, compose(placement, compose(matrix(offset), shape)));\n                    const attributeOffset = transform(offset, gridRotation);\n                    for (const attribute of e.attributes || []) {\n                        if (attribute.invisible)\n                            continue;\n                        const g = entityGeometry(attribute, doc, { ...options, matrix: compose(m, matrix(attributeOffset)), depth: depth + 1 });\n                        for (const t of g.texts)\n                            texts.push({ ...t, entityId: e.id });\n                    }\n                    for (const child of block.entities || []) {\n                        if (child.type === 'ATTDEF' || child.hidden)\n                            continue;\n                        const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);\n                        if (cl?.visible === false)\n                            continue;\n                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl, view: options.view });\n                        warnings.push(...(g.warnings || []));\n                        for (const p of g.paths)\n                            paths.push({ ...p, entityId: e.id });\n                        for (const t of g.texts)\n                            texts.push({ ...t, entityId: e.id });\n                    }\n                }\n            if (e.tag && block.symbol) {\n                const p = { x: e.x || 0, y: (e.y || 0) - Math.abs((e.sy ?? e.sx ?? 1) * (block.symbol.labelOffset || 55)) };\n                label(p, e.tag, e.tagHeight || 12, 0, 'center');\n            }\n            break;\n        }\n    }\n    if (e.connector && e.points?.length > 1) {\n        const ps = e.points;\n        const b = ps.at(-1), a = ps.at(-2), u = normalize(sub(a, b)), n = { x: -u.y, y: u.x };\n        if (e.connector.arrow !== 'none')\n            path([add(b, add(mul(u, 9), mul(n, 4))), b, add(b, add(mul(u, 9), mul(n, -4)))]);\n        if (e.label) {\n            const mid = ps[Math.floor((ps.length - 1) / 2)], next = ps[Math.min(ps.length - 1, Math.floor((ps.length - 1) / 2) + 1)];\n            label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');\n        }\n    }\n    return warnings.length ? { paths, texts, warnings } : { paths, texts };\n}\nfunction entityBounds(e, doc) {\n    if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);\n    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);\n    for (const t of g.texts) {\n        const layout = layoutCadText(t), frame = t.frame || matrix({ rotation: t.rotation }).slice(0, 4), tm = [...frame, t.p.x, t.p.y];\n        // Layout coordinates are font coordinates (Y down); model coordinates are Y up.\n        for (const x of [layout.minX, layout.maxX]) for (const y of [layout.minY, layout.maxY]) pts.push(transform({ x, y: -y }, tm));\n    }\n    if (!pts.length && e.type === 'INSERT') pts.push({ x: e.x, y: e.y });\n    return bounds(pts);\n}\nfunction documentBounds(doc) {\n    let b = emptyBounds();\n    for (const e of doc.entities)\n        if (isVisible(e, doc))\n            b = union(b, entityBounds(e, doc));\n    return validBounds(b) ? b : { minX: -100, minY: -100, maxX: 100, maxY: 100 };\n}\nfunction ports(e, doc) {\n    if (e.type !== 'INSERT')\n        return [];\n    const block = doc.blocks[e.block], base = block?.base || { x: 0, y: 0 };\n    const m = compose(matrix(e), matrix({ x: -base.x, y: -base.y }));\n    return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });\n}\nfunction moveEntity(e, dx, dy) {\n    const worldDX = dx, worldDY = dy;\n    if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {\n        const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];\n        if (Math.abs(det) < 1e-10) throw new Error('Cannot drag an edge-on OCS plane in the top view.');\n        dx = (m[3]*worldDX-m[2]*worldDY)/det; dy = (-m[1]*worldDX+m[0]*worldDY)/det;\n    }\n    const mv = p => {\n        if (p) {\n            p.x += dx;\n            p.y += dy;\n        }\n    };\n    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])\n        mv(e[key]);\n    for (const key of ['points', 'controlPoints', 'fitPoints'])\n        for (const p of e[key] || [])\n            mv(p);\n    for (const l of e.loops || [])\n        for (const p of l.points || [])\n            mv(p);\n    for (const loop of e.loops || []) for (const edge of loop.edges || []) {\n        for (const key of ['a', 'b', 'c']) mv(edge[key]);\n        for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);\n    }\n    for (const definition of e.patternLines || []) mv(definition.base);\n    if (e.type === 'INSERT') {\n        e.x += dx;\n        e.y += dy;\n        for (const a of e.attributes || [])\n            moveEntity(a, worldDX, worldDY);\n    }\n    e.dirty = true;\n}\nfunction transformEntity(e, m) {\n    const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];\n    if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');\n    if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))\n        throw new Error('Rotation of non-default OCS geometry requires a 3D transform; coordinates were not modified.');\n    if (['HATCH','CIRCLE','ARC','INSERT'].includes(e.type) && (Math.abs(sx-sy) > 1e-8*Math.max(sx,sy) || Math.abs(m[0]*m[2]+m[1]*m[3]) > 1e-8*sx*sy))\n        throw new Error('This entity requires a similarity transform; nonuniform scale would change its native type.');\n    if (e.type === 'HATCH' && determinant < 0) throw new Error('Mirroring native hatch edge paths is not supported; coordinates were not modified.');\n    const vector = p => ({x:m[0]*p.x+m[2]*p.y,y:m[1]*p.x+m[3]*p.y});\n    if (e.direction) Object.assign(e.direction, vector(e.direction));\n    if (e.major) Object.assign(e.major, vector(e.major));\n    for (const loop of e.loops || []) for (const edge of loop.edges || []) {\n        for (const key of ['a','b','c']) if (edge[key]) Object.assign(edge[key], transform(edge[key], m));\n        for (const key of ['controlPoints','fitPoints']) for (const p of edge[key] || []) Object.assign(p, transform(p, m));\n        for (const key of ['major','startTangent','endTangent']) if (edge[key]) Object.assign(edge[key], vector(edge[key]));\n        if (edge.r) edge.r *= sx;\n        if (edge.type === 2) { const angle = Math.atan2(m[1],m[0]); edge.start += angle; edge.end += angle; }\n    }\n    for (const definition of e.patternLines || []) {\n        Object.assign(definition.base, transform(definition.base, m)); Object.assign(definition.offset, vector(definition.offset));\n        definition.angle += Math.atan2(m[1],m[0]); definition.dashes = (definition.dashes || []).map(v=>v*sx);\n    }\n    if (e.type === 'HATCH') { e.patternScale = (e.patternScale || 1)*sx; e.patternAngle = (e.patternAngle || 0) + Math.atan2(m[1],m[0])*180/Math.PI; }\n    for (const p of e.points || []) { if (p.bulge && determinant < 0) p.bulge *= -1; for (const k of ['startWidth','endWidth']) if (p[k]) p[k] *= sx; }\n    for (const k of ['constantWidth','startWidth','endWidth','mtextWidth']) if (e[k]) e[k] *= sx;\n    const apply = p => {\n        if (p)\n            Object.assign(p, transform(p, m));\n    };\n    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])\n        apply(e[key]);\n    for (const key of ['points', 'controlPoints', 'fitPoints'])\n        for (const p of e[key] || [])\n            apply(p);\n    for (const l of e.loops || [])\n        for (const p of l.points || [])\n            apply(p);\n    const scale = Math.hypot(m[0], m[1]), rot = Math.atan2(m[1], m[0]) * 180 / Math.PI;\n    if (e.r)\n        e.r *= scale;\n    if (e.height)\n        e.height *= scale;\n    if (e.type === 'ARC') {\n        const angle = a => { const v=vector({x:Math.cos(a),y:Math.sin(a)}); return Math.atan2(v.y,v.x); };\n        e.start = angle(e.start); e.end = angle(e.end);\n        if (determinant < 0) e.clockwise = !e.clockwise;\n    }\n    if (e.type === 'INSERT') {\n        const p = transform({ x: e.x, y: e.y }, m);\n        e.x = p.x;\n        e.y = p.y;\n        e.sx = (e.sx ?? 1) * scale;\n        e.sy = (e.sy ?? 1) * scale;\n        e.rotation = (e.rotation || 0) + rot;\n    }\n    if (['TEXT', 'MTEXT'].includes(e.type))\n        e.rotation = (e.rotation || 0) + rot;\n    e.dirty = true;\n}\nfunction explodeEntity(e, doc) { const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }\nfunction detachReferences(doc, deleted) {\n    for (const e of doc.entities) {\n        const c = e.connector;\n        if (!c)\n            continue;\n        for (const end of ['from', 'to'])\n            if (c[end] && deleted.has(c[end].entityId))\n                c[end] = null;\n    }\n    doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));\n}\n\nreturn {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences};\n})();\n// packages/dxf/src/index.js\n__modules[\"packages/dxf/src/index.js\"]=(()=>{\nconst {readEntityFidelity, writeHatchData} = __modules[\"packages/dxf/src/fidelity.js\"];\nconst {createDocument, entity, uid, cleanText, clone, entityGeometry} = __modules[\"packages/model/src/index.js\"];\nconst {TAU, arcPoints} = __modules[\"packages/geometry/src/index.js\"];\nconst NUMBER_CODES = c => (c >= 10 && c <= 59) || (c >= 110 && c <= 149) || (c >= 210 && c <= 239) || (c >= 460 && c <= 469) || (c >= 1010 && c <= 1059);\nconst INT16_CODES = c => (c >= 60 && c <= 79) || (c >= 170 && c <= 179) || (c >= 270 && c <= 289) || (c >= 370 && c <= 389) || (c >= 400 && c <= 409) || (c >= 1060 && c <= 1070);\nconst INT32_CODES = c => (c >= 90 && c <= 99) || (c >= 420 && c <= 429) || (c >= 440 && c <= 459) || c === 1071;\nconst INT64_CODES = c => c >= 160 && c <= 169;\nconst BINARY_CODES = c => (c >= 310 && c <= 319) || c === 1004;\n// Default ACI modelspace palette, verified against ezdxf 1.4.4.\n// ACI 7 follows this application's light canvas. Palette data attribution: THIRD_PARTY_NOTICES.md.\nconst ACI_PALETTE = [0, 16711680, 16776960, 65280, 65535, 255, 16711935, 16777215, 8421504, 12632256, 16711680, 16744319, 10813440, 10834514, 8323072, 8339263, 4980736, 4990502, 2490368, 2495251, 16727808, 16752511, 10823936, 10839890, 8331008, 8343359, 4985600, 4992806, 2492672, 2496275, 16744192, 16760703, 10834432, 10845266, 8339200, 8347455, 4990464, 4995366, 2495232, 2497555, 16760576, 16768895, 10845184, 10850642, 8347392, 8351551, 4995328, 4997670, 2497536, 2498835, 16776960, 16777087, 10855680, 10855762, 8355584, 8355647, 5000192, 5000230, 2500096, 2500115, 12582656, 14679935, 8168704, 9545042, 6258432, 7307071, 3755008, 4344870, 1844736, 2172435, 8388352, 12582783, 5416192, 8168786, 4161280, 6258495, 2509824, 3755046, 1254912, 1844755, 4194048, 10485631, 2729216, 6792530, 2064128, 5209919, 1264640, 3099686, 599552, 1517075, 65280, 8388479, 42240, 5416274, 32512, 4161343, 19456, 2509862, 9728, 1254931, 65343, 8388511, 42281, 5416295, 32543, 4161359, 19475, 2509871, 9737, 1267735, 65407, 8388543, 42322, 5416316, 32575, 4161375, 19494, 2509881, 9747, 1267740, 65471, 8388575, 42364, 5416337, 32607, 4161391, 19513, 2509890, 9756, 1267800, 65535, 8388607, 42405, 5416357, 32639, 4161407, 19532, 2509900, 9766, 1267800, 49151, 8380415, 31909, 5411237, 24447, 4157311, 14668, 2507390, 7206, 1267800, 32767, 8372223, 21157, 5405861, 16255, 4153215, 9804, 2505086, 4902, 1252440, 16383, 8364031, 10661, 5400485, 8063, 4149119, 4940, 2502526, 2342, 1251160, 255, 8355839, 165, 5395109, 127, 4145023, 76, 2500222, 38, 1250136, 4129023, 10452991, 2687141, 6771365, 2031743, 5193599, 1245260, 3090046, 589862, 1512280, 8323327, 12550143, 5374117, 8147621, 4128895, 6242175, 2490444, 3745406, 1245222, 1839960, 12517631, 14647295, 8126629, 9523877, 6226047, 7290751, 3735628, 4335180, 1835046, 5772120, 16711935, 16744447, 10813605, 10834597, 8323199, 8339327, 4980812, 4990540, 2490406, 5772120, 16711871, 16744415, 10813564, 10834577, 8323167, 8339311, 4980793, 4990530, 2490396, 5772120, 16711807, 16744383, 10813522, 10834556, 8323135, 8339295, 4980774, 4990521, 2490387, 5772060, 16711743, 16744351, 10813481, 10834535, 8323103, 8339279, 4980755, 4990511, 2490377, 5772055, 0, 6645093, 6710886, 10066329, 13421772, 16777215];\nfunction aciColor(index) {\n    index = Math.abs(Math.trunc(index));\n    if (index === 7)\n        return '#000000';\n    return '#' + (ACI_PALETTE[index] ?? 0).toString(16).padStart(6, '0');\n}\nfunction parseAsciiPairs(source, { maxPairs = 8000000 } = {}) {\n    const lines = source.replace(/^\\uFEFF/, '').split(/\\r\\n|\\n|\\r/), pairs = [];\n    for (let i = 0; i + 1 < lines.length; i += 2) {\n        if (pairs.length >= maxPairs)\n            throw new Error('DXF group-code safety limit exceeded');\n        const code = Number(lines[i].trim());\n        if (!Number.isInteger(code) || code < 0 || code > 1071)\n            throw new Error(`Invalid DXF group code at line ${i + 1}`);\n        const raw = lines[i + 1], value = INT64_CODES(code) ? raw.trim() : (NUMBER_CODES(code) || INT16_CODES(code) || INT32_CODES(code) || INT64_CODES(code) || (code >= 290 && code <= 299)) ? Number(raw.trim()) : raw;\n        if (INT64_CODES(code) && !/^[-+]?\\d+$/.test(value))\n            throw new Error('Invalid DXF int64 value');\n        if (typeof value === 'number' && !Number.isFinite(value))\n            throw new Error(`Invalid DXF numeric value at line ${i + 2}`);\n        pairs.push([code, value]);\n    }\n    if (!pairs.some(([c, v]) => c === 0 && String(v).trim() === 'EOF'))\n        throw new Error('DXF EOF marker missing (file may be truncated)');\n    return pairs;\n}\nfunction parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {\n    const u = input instanceof Uint8Array ? input : new Uint8Array(input), v = new DataView(u.buffer, u.byteOffset, u.byteLength);\n    let pos = 22;\n    const pairs = []; let decoder = new TextDecoder('windows-1252'), headerKey = ''; \n    const r12 = u[23] !== 0;\n    const need = n => {\n        if (pos + n > u.length)\n            throw new Error('Truncated binary DXF');\n    };\n    while (pos < u.length) {\n        if (pairs.length >= maxPairs)\n            throw new Error('DXF safety limit exceeded');\n        need(r12 ? 1 : 2);\n        let code;\n        if (r12) {\n            code = u[pos++];\n            if (code === 255) {\n                need(2);\n                code = v.getUint16(pos, true);\n                pos += 2;\n            }\n        }\n        else {\n            code = v.getUint16(pos, true);\n            pos += 2;\n        }\n        let value;\n        if (NUMBER_CODES(code)) {\n            need(8);\n            value = v.getFloat64(pos, true);\n            pos += 8;\n        }\n        else if (INT16_CODES(code)) {\n            need(2);\n            value = v.getInt16(pos, true);\n            pos += 2;\n        }\n        else if (INT32_CODES(code)) {\n            need(4);\n            value = v.getInt32(pos, true);\n            pos += 4;\n        }\n        else if (INT64_CODES(code)) {\n            need(8);\n            const n = v.getBigInt64(pos, true);\n            value = n.toString();\n            pos += 8;\n        }\n        else if (code >= 290 && code <= 299) {\n            need(1);\n            value = u[pos++];\n        }\n        else if (BINARY_CODES(code)) {\n            need(1);\n            const count = u[pos++];\n            need(count);\n            value = Array.from(u.subarray(pos, pos + count), n => n.toString(16).padStart(2, '0')).join('');\n            pos += count;\n        }\n        else {\n            const start = pos;\n            while (pos < u.length && u[pos] !== 0)\n                pos++;\n            need(1);\n            value = decoder.decode(u.subarray(start, pos));\n            pos++;\n        }\n        if (typeof value === 'number' && !Number.isFinite(value))\n            throw new Error('Non-finite binary DXF value');\n        pairs.push([code, value]);\n        if (code === 9) headerKey = value;\n        else if (headerKey === '$ACADVER' && code === 1 && /^AC\\d+$/.test(value) && +value.slice(2) >= 1021) decoder = new TextDecoder('utf-8');\n        else if (headerKey === '$DWGCODEPAGE' && code === 3 && decoder.encoding !== 'utf-8') { try { decoder = new TextDecoder(({ ANSI_1250: 'windows-1250', ANSI_1251: 'windows-1251', ANSI_932: 'shift_jis', ANSI_936: 'gbk', ANSI_950: 'big5' })[value] || 'windows-1252'); } catch {} }\n        if (code === 0 && value === 'EOF')\n            break;\n    }\n    if (!pairs.some(([c, v]) => c === 0 && v === 'EOF'))\n        throw new Error('Binary DXF EOF marker missing');\n    return pairs;\n}\nconst get = (r, c, d = undefined) => r.find(x => x[0] === c)?.[1] ?? d;\nconst all = (r, c) => r.filter(x => x[0] === c).map(x => x[1]);\nconst pt = (r, c = 10) => ({ x: Number(get(r, c, 0)), y: Number(get(r, c + 10, 0)), z: Number(get(r, c + 20, 0)) });\nconst points = (r, c = 10) => {\n    const p = [];\n    let current;\n    for (const [code, v] of r) {\n        if (code === c) {\n            current = { x: Number(v), y: 0 };\n            p.push(current);\n        }\n        else if (current && code === c + 10)\n            current.y = Number(v);\n        else if (current && code === c + 20)\n            current.z = Number(v);\n        else if (current && code === 42 && c === 10)\n            current.bulge = Number(v);\n    }\n    return p;\n};\nconst records = pairs => {\n    const result = [];\n    let r = [];\n    for (const pair of pairs) {\n        if (pair[0] === 0 && r.length) {\n            result.push(r);\n            r = [];\n        }\n        r.push(pair);\n    }\n    if (r.length)\n        result.push(r);\n    return result;\n};\nfunction metadata(raw) {\n    let active = false, s = '';\n    for (const [c, v] of raw) {\n        if (c === 1001)\n            active = v === 'CONDUITCAD';\n        else if (active && c === 1000)\n            s += v;\n    }\n    if (!s)\n        return {};\n    try {\n        const data = JSON.parse(s);\n        return data && typeof data === 'object' ? data : {};\n    }\n    catch {\n        return {};\n    }\n}\nfunction parseEntity(raw, diagnostics, options = {}) {\n    const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw, handle: get(raw, 5) }, dirty: false };\n    const aci = Number(get(raw, 62, 256)), trueColor = get(raw, 420);\n    e.colorIndex = aci; e.colorMode = trueColor === undefined ? 'aci' : 'truecolor';\n    if (trueColor !== undefined)\n        e.color = '#' + Number(trueColor).toString(16).padStart(6, '0');\n    else if (aci === 0)\n        e.color = 'BYBLOCK';\n    else if (aci !== 256)\n        e.color = aciColor(aci);\n    e.lineweight = Number(get(raw, 370, -1));\n    e.linetype = get(raw, 6, 'BYLAYER');\n    if (get(raw, 60, 0))\n        e.hidden = true;\n    switch (type) {\n        case 'LINE':\n            e.a = pt(raw);\n            e.b = pt(raw, 11);\n            break;\n        case 'LWPOLYLINE':\n            e.points = points(raw);\n            e.closed = !!(get(raw, 70, 0) & 1);\n            e.constantWidth = get(raw, 43, 0);\n            break;\n        case 'POLYLINE':\n            e.points = [];\n            e.closed = !!(get(raw, 70, 0) & 1);\n            e.flags = get(raw, 70, 0); e.mCount = +get(raw,71,0); e.nCount = +get(raw,72,0);\n            break;\n        case 'CIRCLE':\n        case 'ARC':\n            e.c = pt(raw);\n            e.r = Number(get(raw, 40, 1));\n            if (type === 'ARC') {\n                e.start = Number(get(raw, 50, 0)) * Math.PI / 180;\n                e.end = Number(get(raw, 51, 360)) * Math.PI / 180;\n            }\n            break;\n        case 'ELLIPSE':\n            e.c = pt(raw);\n            e.major = pt(raw, 11);\n            e.ratio = Number(get(raw, 40, 1));\n            e.start = Number(get(raw, 41, 0));\n            e.end = Number(get(raw, 42, TAU));\n            break;\n        case 'SPLINE':\n            e.degree = Number(get(raw, 71, 3));\n            e.controlPoints = points(raw);\n            e.fitPoints = points(raw, 11);\n            e.knots = all(raw, 40).map(Number);\n            e.weights = all(raw, 41).map(Number);\n            e.closed = !!(get(raw, 70, 0) & 1);\n            break;\n        case 'POINT':\n            e.p = pt(raw);\n            break;\n        case 'TEXT':\n        case 'MTEXT':\n        case 'ATTRIB':\n        case 'ATTDEF':\n            e.p = pt(raw);\n            e.text = type === 'MTEXT' ? all(raw, 3).join('') + get(raw, 1, '') : get(raw, 1, '');\n            e.height = Number(get(raw, 40, 12));\n            e.rotation = Number(get(raw, 50, 0));\n            e.align = get(raw, 72, 0) === 1 ? 'center' : get(raw, 72, 0) === 2 ? 'right' : 'left';\n            if (type === 'MTEXT') {\n                const a = Number(get(raw, 71, 1));\n                e.align = [2, 5, 8].includes(a) ? 'center' : [3, 6, 9].includes(a) ? 'right' : 'left';\n                if (get(raw, 11) !== undefined)\n                    e.rotation = Math.atan2(get(raw, 21, 0), get(raw, 11, 1)) * 180 / Math.PI;\n                e.mtextWidth = get(raw, 41, 0);\n            }\n            if (['ATTRIB', 'ATTDEF'].includes(type)) {\n                e.attributeTag = get(raw, 2, '');\n                e.invisible = !!(get(raw, 70, 0) & 1);\n            }\n            e.widthFactor = Number(get(raw, 41, 1));\n            break;\n        case 'INSERT':\n            e.block = get(raw, 2, '');\n            e.x = get(raw, 10, 0);\n            e.y = get(raw, 20, 0);\n            e.z = get(raw, 30, 0);\n            e.sx = get(raw, 41, 1);\n            e.sy = get(raw, 42, 1);\n            e.sz = get(raw, 43, 1);\n            e.rotation = get(raw, 50, 0);\n            e.columns = get(raw, 70, 1);\n            e.rows = get(raw, 71, 1);\n            e.columnSpacing = get(raw, 44, 0);\n            e.rowSpacing = get(raw, 45, 0);\n            e.attributes = [];\n            break;\n        case 'SOLID':\n        case 'TRACE':\n        case '3DFACE':\n            e.points = [pt(raw, 10), pt(raw, 11), pt(raw, 13), pt(raw, 12)];\n            break;\n        case 'HATCH':\n            e.loops = [];\n            e.solid = !!get(raw, 70, 0);\n            e.pattern = get(raw, 2, 'SOLID');\n            break;\n        case 'DIMENSION':\n            e.block = get(raw, 2);\n            e.a = pt(raw, 13);\n            e.b = pt(raw, 14);\n            e.text = get(raw, 1, '<>');\n            break;\n        case 'VERTEX':\n            e.p = pt(raw);\n            e.p.bulge = get(raw, 42, 0);\n            e.p.startWidth = get(raw, 40, 0); e.p.endWidth = get(raw, 41, 0);\n            e.vertexFlags=+get(raw,70,0); e.faceIndices=[71,72,73,74].map(c=>+get(raw,c,0)).filter(Boolean);\n            break;\n        case 'LEADER':\n        case 'RAY':\n        case 'XLINE':\n        case 'SEQEND': break;\n        default:\n            e.unsupported = true;\n            diagnostics.push({ severity: 'warning', type, message: `${type}: retained in original source; no editable display implementation.` });\n    }\n    const meta = metadata(raw);\n    if (typeof meta.id === 'string' && meta.id.length <= 160)\n        e.id = meta.id;\n    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])\n        if (k in meta)\n            e[k] = meta[k];\n    readEntityFidelity(e, raw, diagnostics, options);\n    if(type === 'MTEXT') {\n        const pos=raw.findIndex(p=>p[0]===100&&p[1]==='AcDbMText');\n        if(pos>=0) { const common=raw.slice(0,pos), value=get(common,420), index=+get(common,62,256);\n            e.colorMode = value===undefined ? 'aci' : 'truecolor';\n            if(value!==undefined)e.color='#'+(+value&0xffffff).toString(16).padStart(6,'0');\n            else if(index===256)delete e.color; else e.color=index===0?'BYBLOCK':aciColor(index);\n        }\n    }\n    return e;\n}\nfunction base64(bytes) {\n    let s = '';\n    for (let i = 0; i < bytes.length; i += 8192)\n        s += String.fromCharCode(...bytes.subarray(i, i + 8192));\n    return typeof btoa === 'function' ? btoa(s) : Buffer.from(bytes).toString('base64');\n}\nfunction parseDXF(input, options = {}) {\n    let rawText = '', pairs, source;\n    const bytes = typeof input === 'string' ? null : input instanceof Uint8Array ? input : new Uint8Array(input);\n    if (bytes && bytes.byteLength > 128 * 1024 * 1024)\n        throw new Error('File exceeds the 128 MiB import safety limit');\n    const binary = bytes && new TextDecoder().decode(bytes.subarray(0, 18)) === 'AutoCAD Binary DXF';\n    if (binary) {\n        pairs = parseBinaryPairs(bytes, options);\n        source = { format: 'binary', base64: base64(bytes) };\n    }\n    else {\n        if (bytes) {\n            let enc = options.encoding;\n            const prefix = new TextDecoder('windows-1252').decode(bytes.subarray(0, 65536));\n            if (!enc) {\n                const ver = prefix.match(/\\$ACADVER\\s*\\r?\\n\\s*1\\s*\\r?\\n\\s*(AC\\d+)/)?.[1];\n                const cp = prefix.match(/ANSI_(\\d+)/)?.[1];\n                enc = ver && Number(ver.slice(2)) >= 1021 ? 'utf-8' : cp === '1250' ? 'windows-1250' : cp === '1251' ? 'windows-1251' : cp === '932' ? 'shift_jis' : 'windows-1252';\n            }\n            rawText = new TextDecoder(enc).decode(bytes);\n        }\n        else\n            rawText = String(input);\n        pairs = parseAsciiPairs(rawText, options);\n        source = bytes ? { format: 'ascii', base64: base64(bytes) } : { format: 'ascii', text: rawText };\n    }\n    const doc = createDocument(options.name || 'Imported DXF');\n    doc.layers = []; doc.textStyles = {}; doc.linetypes = { CONTINUOUS: [] }; doc.signedLinetypes = true;\n    doc.source = source;\n    doc.rawSections = {};\n    doc.importDiagnostics = [];\n    let section = '', current = [], sections = {};\n    for (let i = 0; i < pairs.length; i++) {\n        const [c, v] = pairs[i];\n        if (c === 0 && v === 'SECTION') {\n            section = String(pairs[++i]?.[1] || '');\n            current = [];\n        }\n        else if (c === 0 && v === 'ENDSEC') {\n            sections[section] = current;\n            section = '';\n        }\n        else if (section)\n            current.push(pairs[i]);\n    }\n    if (!sections.ENTITIES && !sections.BLOCKS)\n        throw new Error('DXF contains neither ENTITIES nor BLOCKS sections');\n    const header = sections.HEADER || [];\n    let key = '';\n    for (const [c, v] of header) {\n        if (c === 9)\n            key = String(v);\n        else if (key === '$INSUNITS' && c === 70)\n            doc.units = ({ 0: 'unitless', 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm' })[v] || 'unitless';\n        else if (key === '$LTSCALE' && c === 40) doc.linetypeScale = v;\n        else if (key === '$ACADVER')\n            doc.importVersion = v;\n    }\n    let table = '';\n    for (const r of records(sections.TABLES || [])) {\n        const t = get(r, 0);\n        if (t === 'TABLE')\n            table = get(r, 2);\n        else if (t === 'ENDTAB')\n            table = '';\n        else if (table === 'LAYER' && t === 'LAYER') {\n            const n = get(r, 2, '0'), aci = Number(get(r, 62, 7));\n            doc.layers.push({ name: n, colorIndex:Math.abs(aci), colorMode:get(r,420)===undefined?'aci':'truecolor', color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS'), lineweight: +get(r, 370, -3) });\n        }\n        else if (table === 'LTYPE' && t === 'LTYPE')\n            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(Number);\n        else if (table === 'STYLE' && t === 'STYLE')\n            doc.textStyles[get(r, 2, 'STANDARD')] = { font: get(r, 3, 'sans-serif'), bigFont: get(r, 4, ''), height: +get(r, 40, 0), widthFactor: +get(r, 41, 1), oblique: +get(r, 50, 0), flags: +get(r, 71, 0) };\n    }\n    if (!doc.layers.length)\n        doc.layers.push({ name: '0', color: '#344755', visible: true, locked: false });\n    const parseList = rs => {\n        const es = [];\n        let poly = null, insert = null;\n        for (const raw of rs) {\n            const e = parseEntity(raw, doc.importDiagnostics, options);\n            if (e.type === 'VERTEX' && poly) {\n                if ((poly.flags & 64) && e.faceIndices.length) { poly.faces ??= []; poly.faces.push(e.faceIndices); }\n                else poly.points.push(e.p);\n                continue;\n            }\n            if (e.type === 'ATTRIB' && insert) {\n                insert.attributes.push(e);\n                continue;\n            }\n            if (e.type === 'SEQEND') {\n                poly = null;\n                insert = null;\n                continue;\n            }\n            poly = e.type === 'POLYLINE' ? e : null;\n            insert = e.type === 'INSERT' ? e : null;\n            es.push(e);\n        }\n        for (const e of es)\n            if (e.type === 'INSERT' && e.tag)\n                e.attributes = e.attributes.filter(a => !(a.attributeTag === 'TAG' && a.text === e.tag));\n        return es;\n    };\n    let block = null, blockRecords = [];\n    for (const raw of records(sections.BLOCKS || [])) {\n        const t = get(raw, 0);\n        if (t === 'BLOCK') {\n            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], ...metadata(raw) };\n            blockRecords = [];\n        }\n        else if (t === 'ENDBLK') {\n            if (block) {\n                block.entities = parseList(blockRecords);\n                doc.blocks[block.name] = block;\n            }\n            block = null;\n        }\n        else if (block)\n            blockRecords.push(raw);\n    }\n    doc.entities = parseList(records(sections.ENTITIES || []));\n    const seen = new Set();\n    for (const e of doc.entities) {\n        if (seen.has(e.id))\n            e.id = uid();\n        seen.add(e.id);\n        if (!doc.layers.some(l => l.name === e.layer))\n            doc.layers.push({ name: e.layer, color: '#344755', visible: true, locked: false });\n        if (!doc.layouts.includes(e.layout))\n            doc.layouts.push(e.layout);\n    }\n    const metaComments = all(header, 999).filter(s => String(s).startsWith('CONDUIT:')).map(s => String(s).slice(8)).join('');\n    if (metaComments) {\n        try {\n            const m = JSON.parse(metaComments);\n            doc.parameters = m.parameters || doc.parameters;\n            doc.constraints = m.constraints || [];\n            doc.metadata = m.metadata || doc.metadata;\n        }\n        catch {\n            doc.importDiagnostics.push({ severity: 'warning', message: 'Conduit header metadata could not be decoded.' });\n        }\n    }\n    const unsupported = doc.entities.filter(e => e.unsupported).length;\n    doc.importDiagnostics.unshift({ severity: 'info', message: `${doc.entities.length} model/layout entities, ${Object.keys(doc.blocks).length} blocks, ${doc.layers.length} layers; ${unsupported} unsupported entities.` });\n    for (const [name, p] of Object.entries(sections))\n        if (!['HEADER', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(name))\n            doc.rawSections[name] = p;\n    doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; arbitrary objects, dictionaries and ownership graphs are not losslessly rewritten.' });\n    return doc;\n}\nfunction asciiJson(data) { return JSON.stringify(data).replace(/[\\u007f-\\uffff]/g, c => '\\\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')); }\n/** Normalized AC1024 / R2010 ASCII DXF. The project format preserves full app semantics. */\nfunction writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {\n    if (!['AC1015', 'AC1018', 'AC1021', 'AC1024', 'AC1027', 'AC1032'].includes(version))\n        throw new Error('Supported export versions: R2000–R2018');\n    const out = [];\n    let handle = 0x100;\n    const used = new Set();\n    for (const e of doc.entities) {\n        if (e._dxf?.handle) {\n            used.add(e._dxf.handle.toUpperCase());\n            handle = Math.max(handle, parseInt(e._dxf.handle, 16) + 1 || 0x100);\n        }\n    }\n    const next = () => {\n        while (used.has(handle.toString(16).toUpperCase()))\n            handle++;\n        return (handle++).toString(16).toUpperCase();\n    };\n    const pair = (c, v) => {\n        if (typeof v === 'number' && !Number.isFinite(v))\n            throw new Error(`Nonfinite DXF value for code ${c}`);\n        let s = typeof v === 'number' ? String(v) : String(v ?? '');\n        s = s.replace(/\\r?\\n/g, '\\\\P');\n        if (Number(version.slice(2)) < 1021)\n            s = s.replace(/[\\u007f-\\uffff]/g, c => '\\\\U+' + c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0'));\n        out.push(String(c), s);\n    };\n    const pp = (c, p) => { pair(c, p?.x || 0); pair(c + 10, p?.y || 0); pair(c + 20, p?.z || 0); };\n    const meta = data => {\n        if (!includeMetadata || !Object.keys(data).length)\n            return;\n        pair(1001, 'CONDUITCAD');\n        const s = asciiJson(data);\n        for (let i = 0; i < s.length; i += 200)\n            pair(1000, s.slice(i, i + 200));\n    };\n    const section = name => { pair(0, 'SECTION'); pair(2, name); };\n    const end = () => pair(0, 'ENDSEC');\n    section('HEADER');\n    pair(9, '$ACADVER');\n    pair(1, version);\n    pair(9, '$INSUNITS');\n    pair(70, ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4);\n    pair(9, '$LTSCALE'); pair(40, doc.linetypeScale || 1);\n    pair(9, '$MEASUREMENT');\n    pair(70, doc.units === 'in' || doc.units === 'ft' ? 0 : 1);\n    if (includeMetadata) {\n        const s = asciiJson({ parameters: doc.parameters, constraints: doc.constraints, metadata: doc.metadata });\n        for (let i = 0; i < s.length; i += 180)\n            pair(999, 'CONDUIT:' + s.slice(i, i + 180));\n    }\n    end();\n    section('TABLES');\n    pair(0, 'TABLE');\n    pair(2, 'LTYPE');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, 1);\n    pair(0, 'LTYPE');\n    pair(5, next());\n    pair(100, 'AcDbSymbolTableRecord');\n    pair(100, 'AcDbLinetypeTableRecord');\n    pair(2, 'CONTINUOUS');\n    pair(70, 0);\n    pair(3, 'Solid line');\n    pair(72, 65);\n    pair(73, 0);\n    pair(40, 0);\n    const types = { ...doc.linetypes };\n    for (const e of [...doc.entities, ...Object.values(doc.blocks).flatMap(b=>b.entities || [])])\n        if (e.dash?.length)\n            types['CC_DASH_' + e.dash.join('_')] = e.dash;\n    for (const [name, pattern] of Object.entries(types)) {\n        if (name === 'CONTINUOUS' || !pattern.length)\n            continue;\n        pair(0, 'LTYPE');\n        pair(5, next());\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbLinetypeTableRecord');\n        pair(2, name);\n        pair(70, 0);\n        pair(3, name);\n        pair(72, 65);\n        pair(73, pattern.length);\n        pair(40, pattern.reduce((a, b) => a + Math.abs(b), 0));\n        pattern.forEach((v, i) => { pair(49, doc.signedLinetypes && !name.startsWith('CC_DASH_') ? v : Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });\n    }\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'LAYER');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, doc.layers.length);\n    for (const l of doc.layers) {\n        pair(0, 'LAYER');\n        pair(5, next());\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbLayerTableRecord');\n        pair(2, l.name);\n        pair(70, l.locked ? 4 : 0);\n        const layerACI = l.colorMode === 'aci' && l.colorIndex > 0 && l.colorIndex < 256 && aciColor(l.colorIndex).toLowerCase() === l.color?.toLowerCase();\n        pair(62, (l.visible === false ? -1 : 1) * (layerACI ? l.colorIndex : 7));\n        if (!layerACI) pair(420, parseInt((l.color || '#344755').slice(1), 16));\n        pair(6, l.linetype || 'CONTINUOUS');\n        if (l.lineweight !== undefined) pair(370, l.lineweight);\n    }\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'STYLE');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    const textStyles = { STANDARD: { font: 'txt', widthFactor: 1 }, ...doc.textStyles };\n    pair(70, Object.keys(textStyles).length);\n    for (const [name, style] of Object.entries(textStyles)) {\n        pair(0, 'STYLE'); pair(5, next()); pair(100, 'AcDbSymbolTableRecord'); pair(100, 'AcDbTextStyleTableRecord');\n        pair(2, name); pair(70, 0); pair(40, style.height || 0); pair(41, style.widthFactor || 1);\n        pair(50, style.oblique || 0); pair(71, style.flags || 0); pair(42, 2.5); pair(3, style.font || 'txt'); pair(4, style.bigFont || '');\n    }\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'APPID');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, 1);\n    pair(0, 'APPID');\n    pair(5, next());\n    pair(100, 'AcDbSymbolTableRecord');\n    pair(100, 'AcDbRegAppTableRecord');\n    pair(2, 'CONDUITCAD');\n    pair(70, 0);\n    pair(0, 'ENDTAB');\n    pair(0, 'TABLE');\n    pair(2, 'BLOCK_RECORD');\n    pair(5, next());\n    pair(330, '0');\n    pair(100, 'AcDbSymbolTable');\n    pair(70, Object.keys(doc.blocks).length + 2);\n    const blockRecords = {};\n    for (const name of ['*Model_Space', '*Paper_Space', ...Object.keys(doc.blocks).filter(n => !['*Model_Space', '*Paper_Space'].includes(n))]) {\n        blockRecords[name] = next();\n        pair(0, 'BLOCK_RECORD');\n        pair(5, blockRecords[name]);\n        pair(100, 'AcDbSymbolTableRecord');\n        pair(100, 'AcDbBlockTableRecord');\n        pair(2, name);\n    }\n    pair(0, 'ENDTAB');\n    end();\n    const header = (e, t = e.type, owner) => {\n        pair(0, t);\n        const emittedHandle = next(); pair(5, emittedHandle);\n        if (owner)\n            pair(330, owner);\n        pair(100, 'AcDbEntity');\n        pair(8, e.layer || '0');\n        if (e.layout && e.layout !== 'Model') {\n            pair(67, 1);\n            pair(410, e.layout);\n        }\n        if (e.color === 'BYBLOCK')\n            pair(62, 0);\n        else if (e.color && e.color !== 'BYLAYER' && e.colorMode==='aci' && e.colorIndex>0 && e.colorIndex<256 && aciColor(e.colorIndex).toLowerCase()===e.color.toLowerCase()) pair(62,e.colorIndex);\n        else if (e.color && e.color !== 'BYLAYER') {\n            pair(62, 7);\n            pair(420, parseInt(e.color.slice(1), 16));\n        }\n        if (e.hidden)\n            pair(60, 1);\n        if (e.opacity !== undefined) pair(440, 0x02000000 | Math.round(255 * Math.max(0, Math.min(1, e.opacity))));\n        else if (e.transparency != null) pair(440, e.transparency);\n        if (e.linetypeScale !== undefined) pair(48, e.linetypeScale);\n        if (e.lineweight !== undefined)\n            pair(370, e.lineweight);\n        if (e.dash?.length)\n            pair(6, 'CC_DASH_' + e.dash.join('_'));\n        else if (e.linetype && e.linetype !== 'BYLAYER')\n            pair(6, e.linetype);\n        return emittedHandle;\n    };\n    const emit = (e, owner) => {\n        if (e.unsupported) {\n            return;\n        } // The original-source download is the lossless preservation path.\n        if (e.type === 'DIMENSION' && !e.block) {\n            const g = entityGeometry(e, doc);\n            for (const p of g.paths)\n                emit({ type: 'LWPOLYLINE', points: p.points, closed: p.closed, layer: e.layer, color: p.color }, owner);\n            for (const t of g.texts)\n                emit({ type: 'TEXT', ...t, layer: e.layer }, owner);\n            return;\n        }\n        const type = e.type === 'POLYLINE' && !(e.flags & (8|16|64)) ? 'LWPOLYLINE' : e.type;\n        const entityHandle = header(e, type, owner);\n        switch (type) {\n            case 'POLYLINE':\n                pair(100,(e.flags&64)?'AcDbPolyFaceMesh':(e.flags&16)?'AcDbPolygonMesh':'AcDb3dPolyline');\n                pair(66,1); pp(10,{x:0,y:0,z:e.elevation || 0}); pair(70,(e.flags || 8)|(e.closed?1:0));\n                if(e.flags&16){pair(71,e.mCount || 0);pair(72,e.nCount || 0);}\n                if(e.flags&64){pair(71,e.points.length);pair(72,e.faces?.length || 0);}\n                break;\n            case 'HATCH': writeHatchData(e, pair); break;\n            case 'LEADER':\n                pair(100, 'AcDbLeader'); pair(3, e.dimstyle || 'STANDARD'); pair(71, e.arrow === false ? 0 : 1); pair(72, e.spline ? 1 : 0); pair(73, 3); pair(74, 0); pair(75, 0); pair(76, e.points.length); for (const p of e.points) pp(10, p); break;\n            case 'RAY':\n            case 'XLINE': pair(100, type === 'RAY' ? 'AcDbRay' : 'AcDbXline'); pp(10, e.p); pp(11, e.direction); break;\n            case 'LINE':\n                pair(100, 'AcDbLine');\n                pp(10, e.a);\n                pp(11, e.b);\n                break;\n            case 'LWPOLYLINE':\n                pair(100, 'AcDbPolyline');\n                pair(90, e.points.length);\n                pair(70, e.closed ? 1 : 0);\n                if (e.elevation) pair(38, e.elevation);\n                if (e.constantWidth)\n                    pair(43, e.constantWidth);\n                for (const p of e.points) {\n                    pair(10, p.x);\n                    pair(20, p.y);\n                    if (p.startWidth) pair(40, p.startWidth);\n                    if (p.endWidth) pair(41, p.endWidth);\n                    if (p.bulge)\n                        pair(42, p.bulge);\n                }\n                break;\n            case 'CIRCLE':\n            case 'ARC':\n                pair(100, 'AcDbCircle');\n                pp(10, e.c);\n                pair(40, e.r);\n                if (type === 'ARC') {\n                    pair(100, 'AcDbArc');\n                    pair(50, (e.clockwise ? e.end : e.start) * 180 / Math.PI);\n                    pair(51, (e.clockwise ? e.start : e.end) * 180 / Math.PI);\n                }\n                break;\n            case 'ELLIPSE':\n                pair(100, 'AcDbEllipse');\n                pp(10, e.c);\n                pp(11, e.major);\n                pair(40, e.ratio);\n                pair(41, e.start || 0);\n                pair(42, e.end ?? TAU);\n                break;\n            case 'SPLINE':\n                pair(100, 'AcDbSpline');\n                pair(70, (e.closed ? 1 : 0) | (e.weights?.length ? 4 : 0) | 8);\n                pair(71, e.degree);\n                pair(72, e.knots.length);\n                pair(73, e.controlPoints.length);\n                pair(74, e.fitPoints?.length || 0);\n                for (const v of e.knots)\n                    pair(40, v);\n                for (const v of e.weights || [])\n                    pair(41, v);\n                for (const p of e.controlPoints)\n                    pp(10, p);\n                for (const p of e.fitPoints || [])\n                    pp(11, p);\n                break;\n            case 'TEXT':\n            case 'ATTRIB':\n            case 'ATTDEF':\n                pair(100, 'AcDbText');\n                pp(10, e.p);\n                pair(40, e.height || 12);\n                pair(1, e.text || '');\n                pair(50, e.rotation || 0);\n                pair(41, e.widthFactor || 1);\n                pair(7, e.styleName || 'STANDARD');\n                if (e.oblique) pair(51, e.oblique); if (e.textFlags) pair(71, e.textFlags);\n                if (e.halign || e.valign || (e.align && e.align !== 'left')) {\n                    pair(72, e.halign ?? (e.align === 'center' ? 1 : e.align === 'right' ? 2 : 0));\n                    pp(11, e.alignPoint || e.p);\n                }\n                if (type === 'TEXT') { pair(100, 'AcDbText'); pair(73, e.valign || 0); }\n                else {\n                    pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');\n                    pair(2, e.attributeTag || 'TAG');\n                    if (type === 'ATTDEF')\n                        pair(3, 'Equipment tag');\n                    pair(70, e.invisible ? 1 : 0); pair(74, e.valign || 0);\n                }\n                break;\n            case 'MTEXT': {\n                pair(100, 'AcDbMText'); pp(10, e.p); pair(40, e.height || 12); pair(41, e.mtextWidth || 0);\n                pair(71, e.attachment || (e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1)); pair(7, e.styleName || 'STANDARD');\n                const value = String(e.text || '').replace(/\\r?\\n/g, '\\\\P');\n                for (let i = 0; i < value.length - 250; i += 250) pair(3, value.slice(i, i + 250));\n                pair(1, value.slice(Math.max(0, Math.ceil((value.length - 250) / 250)) * 250));\n                const a = (e.rotation || 0) * Math.PI / 180; pp(11, { x: Math.cos(a), y: Math.sin(a) });\n                pair(73, e.lineSpacingStyle || 1); pair(44, e.lineSpacing || 1);\n                if (e.backgroundFill) { pair(90, e.backgroundFill); pair(45, e.backgroundScale || 1.5); pair(63, 7); if (e.backgroundColor) pair(421, parseInt(e.backgroundColor.slice(1), 16)); }\n                break;\n            }\n            case 'POINT':\n                pair(100, 'AcDbPoint');\n                pp(10, e.p);\n                break;\n            case 'SOLID':\n            case 'TRACE':\n            case '3DFACE':\n                pair(100, type === '3DFACE' ? 'AcDbFace' : 'AcDbTrace');\n                if (type === '3DFACE') pair(70, e.edgeFlags || 0);\n                for (const [i, j] of (type === '3DFACE' ? [[0, 0], [1, 1], [2, 2], [3, 3]] : [[0, 0], [1, 1], [2, 3], [3, 2]]))\n                    pp(10 + i, e.points[j] || e.points.at(-1));\n                break;\n            case 'DIMENSION':\n                pair(100, 'AcDbDimension');\n                pair(2, e.block);\n                pp(10, e.a);\n                pair(70, 32);\n                pair(1, e.text || '<>');\n                pair(100, 'AcDbAlignedDimension');\n                pp(13, e.a);\n                pp(14, e.b);\n                break;\n            case 'INSERT': {\n                pair(100, 'AcDbBlockReference');\n                pair(2, e.block);\n                pp(10, { x: e.x, y: e.y, z: e.z });\n                pair(41, e.sx ?? 1);\n                pair(42, e.sy ?? 1);\n                pair(43, e.sz ?? 1);\n                pair(50, e.rotation || 0);\n                if (e.columns > 1) {\n                    pair(70, e.columns);\n                    pair(44, e.columnSpacing || 0);\n                }\n                if (e.rows > 1) {\n                    pair(71, e.rows);\n                    pair(45, e.rowSpacing || 0);\n                }\n                if (e.attributes?.length || e.tag)\n                    pair(66, 1);\n                break;\n            }\n        }\n        if (e.type !== 'HATCH' && e.extrusion) pp(210, e.extrusion);\n        if (e.thickness) pair(39, e.thickness);\n        const m = {};\n        if (e.id)\n            m.id = e.id;\n        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked'])\n            if (e[k] !== undefined)\n                m[k] = e[k];\n        meta(m);\n        if (type === 'POLYLINE') {\n            for (const p of e.points || []) {\n                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbVertex');\n                pair(100,(e.flags&64)?'AcDbPolyFaceMeshVertex':(e.flags&16)?'AcDbPolygonMeshVertex':'AcDb3dPolylineVertex');\n                pp(10,p);pair(70,(e.flags&64)?192:(e.flags&16)?64:32);\n            }\n            for (const face of e.faces || []) {\n                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbFaceRecord');pp(10,{x:0,y:0,z:0});pair(70,128);\n                face.forEach((n,i)=>pair(71+i,n));\n            }\n            header({layer:e.layer},'SEQEND',entityHandle);\n        }\n        if (type === 'INSERT' && (e.attributes?.length || e.tag)) {\n            for (const a of e.attributes || [])\n                emit(a, owner);\n            if (e.tag) {\n                const block = doc.blocks[e.block], offset = block?.symbol?.labelOffset || 55;\n                emit({ type: 'ATTRIB', p: { x: e.x, y: e.y - Math.abs((e.sy ?? 1) * offset) }, text: e.tag, height: e.tagHeight || 12, align: 'center', attributeTag: 'TAG', layer: e.layer }, owner);\n            }\n            pair(0, 'SEQEND');\n            pair(5, next());\n            pair(100, 'AcDbEntity');\n            pair(8, e.layer || '0');\n        }\n    };\n    section('BLOCKS');\n    for (const name of Object.keys(blockRecords)) {\n        const b = doc.blocks[name] || { base: { x: 0, y: 0 }, entities: [] };\n        pair(0, 'BLOCK');\n        pair(5, next());\n        pair(330, blockRecords[name]);\n        pair(100, 'AcDbEntity');\n        pair(8, '0');\n        pair(100, 'AcDbBlockBegin');\n        pair(2, name);\n        pair(70, 0);\n        pp(10, b.base);\n        pair(3, name);\n        pair(1, '');\n        meta({ ports: b.ports || [], symbol: b.symbol });\n        for (const e of b.entities)\n            emit(e, blockRecords[name]);\n        pair(0, 'ENDBLK');\n        pair(5, next());\n        pair(330, blockRecords[name]);\n        pair(100, 'AcDbEntity');\n        pair(8, '0');\n        pair(100, 'AcDbBlockEnd');\n    }\n    end();\n    section('ENTITIES');\n    for (const e of doc.entities)\n        emit(e, blockRecords[e.layout && e.layout !== 'Model' ? '*Paper_Space' : '*Model_Space']);\n    end();\n    pair(0, 'EOF');\n    return out.join('\\r\\n') + '\\r\\n';\n}\nfunction exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.some(e => e.associative) ? ['Hatch boundaries exported natively, but associativity is detached to avoid dangling handles.'] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }\n\nreturn {aciColor,parseAsciiPairs,parseBinaryPairs,parseDXF,writeDXF,exportReport};\n})();\n// apps/studio/dxf-worker.js\n__modules[\"apps/studio/dxf-worker.js\"]=(()=>{\nconst {parseDXF} = __modules[\"packages/dxf/src/index.js\"];\nself.onmessage = event => {\n    try {\n        const { buffer, name, encoding } = event.data;\n        self.postMessage({ document: parseDXF(buffer, { name, encoding }) });\n    }\n    catch (error) {\n        self.postMessage({ error: error.message || String(error) });\n    }\n};\n\nreturn {};\n})();\n})();\n";
 'use strict';
 (()=>{
 const __modules=Object.create(null);
@@ -259,9 +259,224 @@ function snapCandidates(entity) {
 
 return {EPS,TAU,clamp,point,add,sub,mul,dot,cross,length,distance,normalize,lerp,almost,equalPoint,identity,transform,matrix,compose,inverse,bounds,emptyBounds,validBounds,inflate,intersects,contains,union,center,projectPoint,distanceToSegment,lineIntersection,segmentIntersectsBox,polygonContains,polygonArea,polylineLength,simplifyOrthogonal,arcPoints,bulgeArc,tessellatePolyline,nurbsPoint,splinePoints,offsetPolyline,filletLines,snapCandidates};
 })();
+// packages/model/src/fidelity.js
+__modules["packages/model/src/fidelity.js"]=(()=>{
+const {arcPoints, tessellatePolyline, splinePoints, bounds, distance, TAU} = __modules["packages/geometry/src/index.js"];
+const EPS = 1e-9;
+/** XY projection of Autodesk's arbitrary-axis OCS basis. */
+function ocsTransform(normal = { x: 0, y: 0, z: 1 }, elevation = 0) {
+    const length = Math.hypot(normal.x || 0, normal.y || 0, normal.z ?? 1);
+    if (length < EPS) throw new Error('Invalid zero-length DXF extrusion normal');
+    const n = { x: (normal.x || 0) / length, y: (normal.y || 0) / length, z: (normal.z ?? 1) / length };
+    const a = Math.abs(n.x) < 1 / 64 && Math.abs(n.y) < 1 / 64 ? { x: n.z, y: 0, z: -n.x } : { x: -n.y, y: n.x, z: 0 };
+    const l = Math.hypot(a.x, a.y, a.z); a.x /= l; a.y /= l; a.z /= l;
+    const b = { x: n.y * a.z - n.z * a.y, y: n.z * a.x - n.x * a.z };
+    return [a.x, a.y, b.x, b.y, n.x * elevation, n.y * elevation];
+}
+function ellipseEdgePoints(edge, tolerance = .25) {
+    const a = edge.major, ratio = edge.ratio ?? 1;
+    let start = edge.start ?? 0, end = edge.end ?? TAU;
+    // Hatch ellipse group 50/51 use geometric angles, unlike ELLIPSE parameters.
+    if (edge.type === 3) {
+        const convert = v => Math.atan2(Math.sin(v) / Math.max(Math.abs(ratio), EPS), Math.cos(v));
+        start = convert(start); end = convert(end);
+    }
+    let sweep = end - start;
+    if (edge.ccw === false) { while (sweep >= 0) sweep -= TAU; }
+    else { while (sweep <= 0) sweep += TAU; }
+    const n = Math.min(8192, Math.max(8, Math.ceil(Math.abs(sweep) * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(tolerance, 1e-8)))));
+    return Array.from({ length: n + 1 }, (_, i) => {
+        const t = start + sweep * i / n;
+        return { x: edge.c.x + a.x * Math.cos(t) - a.y * ratio * Math.sin(t), y: edge.c.y + a.y * Math.cos(t) + a.x * ratio * Math.sin(t) };
+    });
+}
+function hatchContours(e, tolerance = .25) {
+    return (e.loops || []).map(loop => {
+        if (!loop.edges?.length) return tessellatePolyline(loop.points || [], true, tolerance);
+        const result = [];
+        for (const edge of loop.edges) {
+            let points = [];
+            if (edge.type === 1) points = [edge.a, edge.b];
+            if (edge.type === 2) points = arcPoints(edge.c, edge.r, edge.start, edge.end, tolerance, edge.ccw === false);
+            if (edge.type === 3) points = ellipseEdgePoints(edge, tolerance);
+            if (edge.type === 4) points = splinePoints(edge, tolerance);
+            if (result.length && points.length && distance(result.at(-1), points[0]) < EPS) points = points.slice(1);
+            result.push(...points);
+        }
+        return result;
+    }).filter(p => p.length >= 3);
+}
+function inPolygon(p, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const a = polygon[i], b = polygon[j];
+        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+    }
+    return inside;
+}
+function hatchRegionContours(e, tolerance) {
+    const contours = hatchContours(e, tolerance);
+    if (!e.hatchStyle) return contours;
+    return contours.filter((p, i) => {
+        const depth = contours.reduce((n, q, j) => n + (i !== j && inPolygon(p[0], q) ? 1 : 0), 0);
+        return e.hatchStyle === 2 ? depth === 0 : depth <= 1;
+    });
+}
+/** Scanline hatch clipping with half-open crossings and parity across islands.
+ * Definitions are already transformed by the DXF producer: do not apply scale twice.
+ */
+function hatchPatternSegments(e, contours, { maxLines = 20000, maxSegments = 100000 } = {}) {
+    const segments = [], vertices = contours.flat(), bb = bounds(vertices);
+    if (!vertices.length) return { segments, limited: false };
+    let lines = 0;
+    for (const definition of e.patternLines || []) {
+        const u = { x: Math.cos(definition.angle), y: Math.sin(definition.angle) }, n = { x: -u.y, y: u.x }, base = definition.base, offset = definition.offset;
+        const step = offset.x * n.x + offset.y * n.y, origin = base.x * n.x + base.y * n.y;
+        if (Math.abs(step) < EPS) continue;
+        const corners = [{ x: bb.minX, y: bb.minY }, { x: bb.maxX, y: bb.minY }, { x: bb.minX, y: bb.maxY }, { x: bb.maxX, y: bb.maxY }];
+        const projections = corners.map(p => (p.x * n.x + p.y * n.y - origin) / step);
+        const first = Math.ceil(Math.min(...projections) - EPS), last = Math.floor(Math.max(...projections) + EPS);
+        if (!Number.isSafeInteger(first) || last - first + lines > maxLines) return { segments: [], limited: true };
+        for (let k = first; k <= last; k++) {
+            lines++;
+            const b = { x: base.x + k * offset.x, y: base.y + k * offset.y }, hits = [];
+            for (const polygon of contours) for (let i = 0; i < polygon.length; i++) {
+                const a = polygon[i], z = polygon[(i + 1) % polygon.length];
+                const da = (a.x - b.x) * n.x + (a.y - b.y) * n.y, dz = (z.x - b.x) * n.x + (z.y - b.y) * n.y;
+                if ((da > 0) === (dz > 0)) continue;
+                const t = da / (da - dz), x = a.x + (z.x - a.x) * t - b.x, y = a.y + (z.y - a.y) * t - b.y;
+                hits.push(x * u.x + y * u.y);
+            }
+            hits.sort((a, b) => a - b);
+            for (let i = 0; i + 1 < hits.length; i += 2) {
+                const lo = hits[i], hi = hits[i + 1];
+                if (hi - lo <= EPS) continue;
+                const emit = (a, z) => segments.push([{ x: b.x + a * u.x, y: b.y + a * u.y }, { x: b.x + z * u.x, y: b.y + z * u.y }]);
+                const dashes = definition.dashes || [], cycle = dashes.reduce((a, d) => a + Math.abs(d), 0);
+                if (cycle < EPS) emit(lo, hi);
+                else {
+                    if ((hi - lo) / cycle * dashes.length > maxSegments) return { segments: [], limited: true };
+                    for (let c = Math.floor(lo / cycle) * cycle; c < hi; c += cycle) {
+                        let p = c;
+                        for (const dash of dashes) {
+                            if (dash >= 0 && p + dash >= lo && p <= hi) emit(Math.max(lo, p), Math.min(hi, p + Math.max(dash, EPS)));
+                            p += Math.abs(dash);
+                        }
+                        if (segments.length > maxSegments) return { segments: [], limited: true };
+                    }
+                }
+                if (segments.length > maxSegments) return { segments: [], limited: true };
+            }
+        }
+    }
+    return { segments, limited: false };
+}
+/** Variable width arc/polyline ribbons, retaining original analytic model data. */
+function widePolylineContours(e, tolerance = .25) {
+    const result = [], points = e.points || [], n = points.length - (e.closed ? 0 : 1);
+    for (let i = 0; i < n; i++) {
+        const a = points[i], b = points[(i + 1) % points.length];
+        const w0 = e.constantWidth || (a.startWidth ?? e.startWidth ?? 0), w1 = e.constantWidth || (a.endWidth ?? e.endWidth ?? w0);
+        if (!(w0 > 0 || w1 > 0)) continue;
+        const center = tessellatePolyline([a, b], false, tolerance), left = [], right = [];
+        for (let j = 0; j < center.length; j++) {
+            const prev = center[Math.max(0, j - 1)], next = center[Math.min(center.length - 1, j + 1)], len = Math.hypot(next.x - prev.x, next.y - prev.y);
+            if (len < EPS) continue;
+            const w = (w0 + (w1 - w0) * j / (center.length - 1)) / 2, nx = -(next.y - prev.y) / len * w, ny = (next.x - prev.x) / len * w;
+            left.push({ x: center[j].x + nx, y: center[j].y + ny }); right.push({ x: center[j].x - nx, y: center[j].y - ny });
+        }
+        if (left.length >= 2) result.push([...left, ...right.reverse()]);
+    }
+    return result;
+}
+function signedDashPattern(pattern = []) {
+    if (!pattern.length) return [];
+    const result = []; let ink = true;
+    for (const value of pattern) {
+        const nextInk = value >= 0, size = Math.abs(value);
+        if (nextInk !== ink) { if (!result.length) result.push(0); ink = nextInk; result.push(size); }
+        else if (!result.length) result.push(size); else result[result.length - 1] += size;
+    }
+    if (result.length % 2) result.push(0);
+    return result;
+}
+const plainText = s => String(s).replace(/\\U\+([\da-f]{4})/gi, (_, v) => String.fromCharCode(parseInt(v, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀');
+/** Bounded, no-eval MTEXT formatting lexer with group-local formatting state. */
+function cadTextRuns(value, initial = {}) {
+    const source = plainText(value), result = [], stack = [];
+    let style = { scale: 1, width: 1, underline: false, overline: false, ...initial }, text = '';
+    const flush = () => { if (text) result.push({ text, ...style }); text = ''; };
+    for (let i = 0; i < source.length; i++) {
+        const ch = source[i];
+        if (ch === '{') { flush(); if (stack.length < 64) stack.push({ ...style }); continue; }
+        if (ch === '}') { flush(); style = stack.pop() || style; continue; }
+        if (ch !== '\\') { text += ch; continue; }
+        const command = source[++i];
+        if (command === undefined) break;
+        if (['\\', '{', '}'].includes(command)) { text += command; continue; }
+        if (command === 'P' || command === 'X') { text += '\n'; continue; }
+        if (command === '~') { text += '\u00a0'; continue; }
+        if ('LlOoKk'.includes(command)) { flush(); const key = /[Ll]/.test(command) ? 'underline' : /[Oo]/.test(command) ? 'overline' : 'strike'; style[key] = command === command.toUpperCase(); continue; }
+        if ('ACcFfHhQqTtWwSs'.includes(command)) {
+            const end = source.indexOf(';', i + 1); if (end < 0) { text += '\\' + command; continue; }
+            const arg = source.slice(i + 1, end); i = end; flush(); const num = parseFloat(arg);
+            if (/[Hh]/.test(command) && num > 0 && Number.isFinite(num)) style.scale = /x$/i.test(arg) ? num : num / (initial.height || 1);
+            else if (/[Ww]/.test(command) && num > 0 && Number.isFinite(num)) style.width = num;
+            else if (/[Qq]/.test(command) && Number.isFinite(num)) style.oblique = Math.max(-85, Math.min(85, num));
+            else if (/[Ff]/.test(command)) { style.font = arg.split('|')[0]; style.bold = /\|b1/i.test(arg); style.italic = /\|i1/i.test(arg); }
+            else if (command === 'c' && Number.isFinite(num)) style.color = '#' + (num & 0xffffff).toString(16).padStart(6, '0');
+            else if (command === 'C' && num >= 1 && num <= 7) style.color = ['','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#000000'][num];
+            else if (/[Ss]/.test(command)) result.push({ text: arg.replace(/[\/#^]/g, '/'), ...style, scale: style.scale * .8 });
+            continue;
+        }
+        text += '\\' + command;
+    }
+    flush(); return result;
+}
+/** Deterministic text layout; canvas may supply measured glyph advances. */
+function layoutCadText(t, measure) {
+    const h = t.nominalHeight || t.height || 12, multiline = !!t.mtext;
+    const runs = multiline ? cadTextRuns(t.rawText ?? t.text, { height: h }) : [{ text: plainText(t.text), scale: 1, width: 1 }];
+    const width = multiline && t.mtextWidth > 0 ? t.mtextWidth : Infinity;
+    const lines = [{ runs: [], width: 0, height: h }];
+    let line = lines[0];
+    const add = (text, style) => {
+        if (!text) return;
+        const height = h * style.scale, w = (measure ? measure(text, height, style) : [...text].reduce((n, c) => n + (/\s/.test(c) ? .33 : /[ilI.,'!:;]/.test(c) ? .28 : /[MW@%]/.test(c) ? .9 : .6), 0) * height) * style.width;
+        if (w > width && Number.isFinite(width) && [...text].length > 1) {
+            for (const ch of text) add(ch, style);
+            return;
+        }
+        if (line.width > 0 && line.width + w > width && !/^\s+$/.test(text)) { line = { runs: [], width: 0, height: h }; lines.push(line); }
+        line.runs.push({ ...style, text, x: line.width, width: w, height }); line.width += w; line.height = Math.max(line.height, height);
+    };
+    for (const run of runs) for (const token of run.text.split(/(\n|[ \t]+)/)) {
+        if (token === '\n') { line = { runs: [], width: 0, height: h }; lines.push(line); }
+        else add(token, run);
+    }
+    const lineFactor = multiline ? (5 / 3) * Math.max(.25, Math.min(4, t.lineSpacing || 1)) : 1.3;
+    let y = 0;
+    for (const line of lines) { line.y = y; y += (t.lineSpacingStyle === 2 ? h : line.height) * lineFactor; }
+    const height = lines.at(-1).y + lines.at(-1).height, w = lines.reduce((n, l) => Math.max(n, l.width), 0);
+    const vertical = multiline ? Math.floor(((t.attachment || 1) - 1) / 3) : t.valign === 3 ? 0 : t.valign === 2 ? 1 : t.valign === 1 ? 2 : -1;
+    const baseline = vertical === 0 ? h * .8 : vertical === 1 ? h * .8 - height / 2 : vertical === 2 ? h * .8 - height : 0;
+    const boxWidth = Number.isFinite(width) ? width : w;
+    const align = t.align || 'left', offsetX = align === 'center' ? -boxWidth / 2 : align === 'right' ? -boxWidth : 0;
+    for (const line of lines) {
+        const start = offsetX + (align === 'center' ? (boxWidth - line.width) / 2 : align === 'right' ? boxWidth - line.width : 0);
+        for (const r of line.runs) { r.x += start; r.y = baseline + line.y; }
+    }
+    return { lines, width: boxWidth, height, minX: offsetX, minY: baseline - h * .8, maxX: offsetX + boxWidth, maxY: baseline + height - h * .8 };
+}
+
+return {ocsTransform,ellipseEdgePoints,hatchContours,inPolygon,hatchRegionContours,hatchPatternSegments,widePolylineContours,signedDashPattern,cadTextRuns,layoutCadText};
+})();
 // packages/model/src/index.js
 __modules["packages/model/src/index.js"]=(()=>{
+const {ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText} = __modules["packages/model/src/fidelity.js"];
 const {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules["packages/geometry/src/index.js"];
+function textLayout(text, measure) { return layoutCadText(text, measure); }
+function objectCoordinateTransform(normal, elevation) { return ocsTransform(normal, elevation); }
 let sequence = 0;
 const uid = (prefix = 'e') => `${prefix}-${Date.now().toString(36)}-${(++sequence).toString(36)}`;
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -291,26 +506,65 @@ function layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '
 function isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }
 function isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }
 function cleanText(value = '') { return String(value).replace(/\\P/g, '\n').replace(/\\U\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\[ACFHQTW][^;]*;/g, '').replace(/\\[LlOoKk]/g, '').replace(/\\S([^;]+);/g, (_, s) => s.replace(/[\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\~/g, ' '); }
-function resolveStyle(e, doc, parentStyle = null, parentLayer = null) { const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc); return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color), width: e.width ?? (e.lineweight > 0 ? Math.max(1, e.lineweight / 35) : 1.5), dash: e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? doc.linetypes?.[e.linetype] ?? doc.linetypes?.[layer?.linetype] ?? layer?.dash ?? [], opacity: e.opacity ?? 1 }; }
+function resolveStyle(e, doc, parentStyle = null, parentLayer = null) {
+    const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc);
+    const lineweight = e.lineweight === -2 ? parentStyle?.lineweight : e.lineweight == null || e.lineweight === -1 ? layer?.lineweight : e.lineweight;
+    const type = e.linetype === 'BYBLOCK' ? null : (!e.linetype || e.linetype === 'BYLAYER' ? layer?.linetype : e.linetype);
+    const raw = doc.linetypes?.[type];
+    const dash = e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? (raw ? (doc.signedLinetypes ? signedDashPattern(raw) : raw) : null) ?? layer?.dash ?? [];
+    const factor = (e.linetypeScale ?? 1) * (e.dash || e.linetype === 'BYBLOCK' ? 1 : doc.linetypeScale ?? 1);
+    return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color),
+        width: e.width ?? (lineweight >= 0 ? Math.max(.5, lineweight * 96 / 2540) : 1.5), lineweight,
+        dash: dash.map(v => Math.max(0, v * factor)), opacity: e.transparency === 0x01000000 ? parentStyle?.opacity ?? 1 : e.opacity ?? 1 };
+}
 /** Returns portable paths/text. Blocks retain their native definitions in the model. */
 function entityGeometry(e, doc, options = {}) {
-    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options, m = options.matrix || identity();
+    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options;
+    let m = options.matrix || identity();
+    if (e.extrusion && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'ATTRIB', 'ATTDEF', 'SOLID', 'TRACE', 'HATCH', 'INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64))))
+        m = compose(m, ocsTransform(e.extrusion, e.elevation ?? e.c?.z ?? e.p?.z ?? e.z ?? 0));
     if (depth > 24)
         return { paths: [], texts: [] };
     const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));
-    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [];
-    const path = (pts, closed = false, fill = null) => {
+    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];
+    const path = (pts, closed = false, fill = null, extra = {}) => {
         if (pts.length > 1)
-            paths.push({ points: pts.map(p => transform(p, m)), closed, fill, ...style, entityId: e.id });
+            paths.push({ points: pts.map(p => transform(p, m)), closed, fill, ...style, ...extra, entityId: e.id });
     };
-    const label = (p, value, height, rotation = 0, align = 'left') => { const q = transform(p, m), sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]); texts.push({ p: q, text: cleanText(value), height: height * sy, rotation: rotation + Math.atan2(m[1], m[0]) * 180 / Math.PI, align, color: style.color, entityId: e.id, font: e.font || 'sans-serif', widthFactor: (e.widthFactor || 1) * sx / (sy || 1) }); };
+    const label = (p, value, height, rotation = 0, align = 'left') => {
+        const textStyle = doc.textStyles?.[e.styleName] || {}, q = transform(p, m), angle = rotation * Math.PI / 180;
+        const sx = (e.textFlags & 2) ? -1 : 1, sy = (e.textFlags & 4) ? -1 : 1;
+        const width = e.widthFactor ?? textStyle.widthFactor ?? 1, oblique = (e.oblique || textStyle.oblique || 0) * Math.PI / 180;
+        const local = compose(matrix({ rotation }), [sx * width, 0, Math.tan(oblique) * sy, sy, 0, 0]);
+        const affine = compose(m, local), frame = affine.slice(0, 4);
+        texts.push({ p: q, text: cleanText(value), rawText: value, height: height * Math.hypot(frame[2], frame[3]), nominalHeight: height,
+            rotation: Math.atan2(frame[1], frame[0]) * 180 / Math.PI, align, color: style.color, opacity: style.opacity, entityId: e.id,
+            font: e.font || textStyle.font || 'sans-serif', frame, widthFactor: width,
+            mtext: e.type === 'MTEXT', mtextWidth: e.mtextWidth, attachment: e.attachment, valign: e.valign,
+            lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });
+    };
     switch (e.type) {
         case 'LINE':
             path([e.a, e.b]);
             break;
         case 'LWPOLYLINE':
         case 'POLYLINE':
-            path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill);
+            if(e.type==='POLYLINE' && (e.flags & 64)) {
+                for(const face of e.faces || []) for(let i=0;i<face.length;i++) { const a=e.points[Math.abs(face[i])-1], b=e.points[Math.abs(face[(i+1)%face.length])-1]; if(face[i]>0&&a&&b)path([a,b]); }
+                break;
+            }
+            if(e.type==='POLYLINE' && (e.flags & 16)) {
+                const mCount=e.mCount || 0,nCount=e.nCount || 0;
+                if(mCount*nCount===e.points.length)for(let m=0;m<mCount;m++)for(let n=0;n<nCount;n++) {
+                    const a=e.points[m*nCount+n];
+                    if(m+1<mCount || (e.flags&1))path([a,e.points[((m+1)%mCount)*nCount+n]]);
+                    if(n+1<nCount || (e.flags&32))path([a,e.points[m*nCount+(n+1)%nCount]]);
+                }
+                break;
+            }
+            { const ribbons = widePolylineContours(e, curveTolerance);
+              if (ribbons.length) { for (const ribbon of ribbons) path(ribbon, true, style.color, { stroke: false }); }
+              else path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill); }
             break;
         case 'CIRCLE':
             path(arcPoints(e.c, e.r, 0, TAU, curveTolerance), true, e.fill);
@@ -320,11 +574,13 @@ function entityGeometry(e, doc, options = {}) {
             break;
         case 'ELLIPSE': {
             const a = e.major || { x: e.rx || 1, y: 0 }, r = e.ratio ?? 1, s = e.start ?? 0;
+            const normal=e.extrusion || {x:0,y:0,z:1}, minor={x:(normal.y || 0)*(a.z || 0)-(normal.z ?? 1)*a.y,y:(normal.z ?? 1)*a.x-(normal.x || 0)*(a.z || 0),z:(normal.x || 0)*a.y-(normal.y || 0)*a.x};
+            const factor=Math.hypot(a.x,a.y,a.z || 0)*r/(Math.hypot(minor.x,minor.y,minor.z) || 1); minor.x*=factor;minor.y*=factor;
             let sweep = (e.end ?? TAU) - s;
             while (sweep <= 0)
                 sweep += TAU;
             const n = Math.min(4096, Math.max(24, Math.ceil(sweep * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(curveTolerance, .0000001)))));
-            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) - a.y * r * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + a.x * r * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);
+            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) + minor.x * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + minor.y * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);
             break;
         }
         case 'SPLINE':
@@ -334,8 +590,18 @@ function entityGeometry(e, doc, options = {}) {
         case 'MTEXT':
         case 'ATTRIB':
         case 'ATTDEF':
-            if (!e.invisible)
-                label(e.p, e.text || '', e.height || 12, e.rotation || 0, e.align || 'left');
+            if (!e.invisible) {
+                let p = ((e.halign || e.valign) && e.alignPoint) ? e.alignPoint : e.p, height = e.height || doc.textStyles?.[e.styleName]?.height || 12, rotation = e.rotation || 0;
+                let value = e.text || '', alignment = e.halign === 4 ? 'center' : e.align || 'left';
+                if ([3, 5].includes(e.halign) && e.alignPoint) {
+                    const target = distance(e.p, e.alignPoint), measured = layoutCadText({ text: cleanText(value), height }).width || 1;
+                    rotation = Math.atan2(e.alignPoint.y - e.p.y, e.alignPoint.x - e.p.x) * 180 / Math.PI;
+                    p = e.p; alignment = 'left';
+                    label(p, value, height, rotation, alignment);
+                    const t = texts.at(-1), factor = target / measured; t.frame[0] *= factor; t.frame[1] *= factor;
+                    if (e.halign === 3) { t.frame[2] *= factor; t.frame[3] *= factor; t.height *= factor; }
+                } else label(p, value, height, rotation, alignment);
+            }
             break;
         case 'POINT': {
             const r = 1.5;
@@ -345,13 +611,44 @@ function entityGeometry(e, doc, options = {}) {
         }
         case 'SOLID':
         case 'TRACE':
+            path(e.points || [], true, style.color, { stroke: false });
+            break;
         case '3DFACE':
-            path(e.points || [], true, e.type === '3DFACE' ? null : style.color);
+            for (let i = 0; i < (e.points?.length || 0); i++) if (!(e.edgeFlags & (1 << i))) path([e.points[i], e.points[(i + 1) % e.points.length]]);
             break;
-        case 'HATCH':
-            for (const loop of e.loops || [])
-                path(tessellatePolyline(loop.points || [], true, curveTolerance), true, e.solid ? style.color : null);
+        case 'HATCH': {
+            const contours = hatchRegionContours(e, curveTolerance);
+            if (e.solid || e.gradient) {
+                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd' });
+            } else {
+                const pattern = hatchPatternSegments(e, contours);
+                if (pattern.limited || !e.patternLines?.length) {
+                    for (const contour of contours) path(contour, true);
+                    warnings.push({ entityId: e.id, message: pattern.limited ? 'Hatch density exceeds bounded tessellation budget; showing boundaries.' : 'Hatch has no pattern line definitions; showing boundaries.' });
+                } else for (const points of pattern.segments) path(points, false, null, { dash: [] });
+            }
             break;
+        }
+        case 'LEADER': {
+            path(e.points || []);
+            if (e.arrow !== false && e.points?.length > 1) {
+                const tip = e.points[0], d = normalize(sub(e.points[1], tip)), n = { x: -d.y, y: d.x }, length = e.arrowSize || 6;
+                path([tip, add(tip, add(mul(d, length), mul(n, length / 3))), add(tip, add(mul(d, length), mul(n, -length / 3)))], true, style.color, { stroke: false });
+            }
+            break;
+        }
+        case 'RAY':
+        case 'XLINE': {
+            const p = transform(e.p, m), q = transform(add(e.p, e.direction), m), d = sub(q, p), v = options.view || { minX: p.x - 10000, maxX: p.x + 10000, minY: p.y - 10000, maxY: p.y + 10000 };
+            let lo = e.type === 'RAY' ? 0 : -Infinity, hi = Infinity;
+            for (const axis of ['x', 'y']) {
+                const min = v[axis === 'x' ? 'minX' : 'minY'], max = v[axis === 'x' ? 'maxX' : 'maxY'];
+                if (Math.abs(d[axis]) < 1e-12) { if (p[axis] < min || p[axis] > max) hi = -Infinity; }
+                else { const a = (min - p[axis]) / d[axis], b = (max - p[axis]) / d[axis]; lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b)); }
+            }
+            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, entityId: e.id });
+            break;
+        }
         case 'DIMENSION': {
             if (e.block && doc.blocks[e.block]) {
                 const g = entityGeometry({ ...e, type: 'INSERT', x: 0, y: 0 }, doc, { ...options, depth: depth + 1 });
@@ -408,7 +705,8 @@ function entityGeometry(e, doc, options = {}) {
                         const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);
                         if (cl?.visible === false)
                             continue;
-                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl });
+                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl, view: options.view });
+                        warnings.push(...(g.warnings || []));
                         for (const p of g.paths)
                             paths.push({ ...p, entityId: e.id });
                         for (const t of g.texts)
@@ -432,17 +730,17 @@ function entityGeometry(e, doc, options = {}) {
             label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');
         }
     }
-    return { paths, texts };
+    return warnings.length ? { paths, texts, warnings } : { paths, texts };
 }
 function entityBounds(e, doc) {
-    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.points);
+    if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
+    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
     for (const t of g.texts) {
-        const w = t.text.split('\n').reduce((a, s) => Math.max(a, s.length), 0) * t.height * .62, h = t.height * t.text.split('\n').length;
-        const tm = matrix({ x: t.p.x, y: t.p.y, rotation: t.rotation }), x = t.align === 'center' ? -w / 2 : t.align === 'right' ? -w : 0;
-        pts.push(...[{ x, y: 0 }, { x: x + w, y: 0 }, { x: x + w, y: h }, { x, y: h }].map(p => transform(p, tm)));
+        const layout = layoutCadText(t), frame = t.frame || matrix({ rotation: t.rotation }).slice(0, 4), tm = [...frame, t.p.x, t.p.y];
+        // Layout coordinates are font coordinates (Y down); model coordinates are Y up.
+        for (const x of [layout.minX, layout.maxX]) for (const y of [layout.minY, layout.maxY]) pts.push(transform({ x, y: -y }, tm));
     }
-    if (!pts.length && e.type === 'INSERT')
-        pts.push({ x: e.x, y: e.y });
+    if (!pts.length && e.type === 'INSERT') pts.push({ x: e.x, y: e.y });
     return bounds(pts);
 }
 function documentBounds(doc) {
@@ -460,13 +758,19 @@ function ports(e, doc) {
     return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
 }
 function moveEntity(e, dx, dy) {
+    const worldDX = dx, worldDY = dy;
+    if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
+        const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
+        if (Math.abs(det) < 1e-10) throw new Error('Cannot drag an edge-on OCS plane in the top view.');
+        dx = (m[3]*worldDX-m[2]*worldDY)/det; dy = (-m[1]*worldDX+m[0]*worldDY)/det;
+    }
     const mv = p => {
         if (p) {
             p.x += dx;
             p.y += dy;
         }
     };
-    for (const key of ['a', 'b', 'c', 'p'])
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
         mv(e[key]);
     for (const key of ['points', 'controlPoints', 'fitPoints'])
         for (const p of e[key] || [])
@@ -474,20 +778,49 @@ function moveEntity(e, dx, dy) {
     for (const l of e.loops || [])
         for (const p of l.points || [])
             mv(p);
+    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
+        for (const key of ['a', 'b', 'c']) mv(edge[key]);
+        for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);
+    }
+    for (const definition of e.patternLines || []) mv(definition.base);
     if (e.type === 'INSERT') {
         e.x += dx;
         e.y += dy;
         for (const a of e.attributes || [])
-            moveEntity(a, dx, dy);
+            moveEntity(a, worldDX, worldDY);
     }
     e.dirty = true;
 }
 function transformEntity(e, m) {
+    const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
+    if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
+    if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
+        throw new Error('Rotation of non-default OCS geometry requires a 3D transform; coordinates were not modified.');
+    if (['HATCH','CIRCLE','ARC','INSERT'].includes(e.type) && (Math.abs(sx-sy) > 1e-8*Math.max(sx,sy) || Math.abs(m[0]*m[2]+m[1]*m[3]) > 1e-8*sx*sy))
+        throw new Error('This entity requires a similarity transform; nonuniform scale would change its native type.');
+    if (e.type === 'HATCH' && determinant < 0) throw new Error('Mirroring native hatch edge paths is not supported; coordinates were not modified.');
+    const vector = p => ({x:m[0]*p.x+m[2]*p.y,y:m[1]*p.x+m[3]*p.y});
+    if (e.direction) Object.assign(e.direction, vector(e.direction));
+    if (e.major) Object.assign(e.major, vector(e.major));
+    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
+        for (const key of ['a','b','c']) if (edge[key]) Object.assign(edge[key], transform(edge[key], m));
+        for (const key of ['controlPoints','fitPoints']) for (const p of edge[key] || []) Object.assign(p, transform(p, m));
+        for (const key of ['major','startTangent','endTangent']) if (edge[key]) Object.assign(edge[key], vector(edge[key]));
+        if (edge.r) edge.r *= sx;
+        if (edge.type === 2) { const angle = Math.atan2(m[1],m[0]); edge.start += angle; edge.end += angle; }
+    }
+    for (const definition of e.patternLines || []) {
+        Object.assign(definition.base, transform(definition.base, m)); Object.assign(definition.offset, vector(definition.offset));
+        definition.angle += Math.atan2(m[1],m[0]); definition.dashes = (definition.dashes || []).map(v=>v*sx);
+    }
+    if (e.type === 'HATCH') { e.patternScale = (e.patternScale || 1)*sx; e.patternAngle = (e.patternAngle || 0) + Math.atan2(m[1],m[0])*180/Math.PI; }
+    for (const p of e.points || []) { if (p.bulge && determinant < 0) p.bulge *= -1; for (const k of ['startWidth','endWidth']) if (p[k]) p[k] *= sx; }
+    for (const k of ['constantWidth','startWidth','endWidth','mtextWidth']) if (e[k]) e[k] *= sx;
     const apply = p => {
         if (p)
             Object.assign(p, transform(p, m));
     };
-    for (const key of ['a', 'b', 'c', 'p'])
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
         apply(e[key]);
     for (const key of ['points', 'controlPoints', 'fitPoints'])
         for (const p of e[key] || [])
@@ -501,13 +834,9 @@ function transformEntity(e, m) {
     if (e.height)
         e.height *= scale;
     if (e.type === 'ARC') {
-        e.start += rot * Math.PI / 180;
-        e.end += rot * Math.PI / 180;
-        if (m[0] * m[3] - m[1] * m[2] < 0) {
-            e.start = -e.start;
-            e.end = -e.end;
-            e.clockwise = !e.clockwise;
-        }
+        const angle = a => { const v=vector({x:Math.cos(a),y:Math.sin(a)}); return Math.atan2(v.y,v.x); };
+        e.start = angle(e.start); e.end = angle(e.end);
+        if (determinant < 0) e.clockwise = !e.clockwise;
     }
     if (e.type === 'INSERT') {
         const p = transform({ x: e.x, y: e.y }, m);
@@ -534,7 +863,7 @@ function detachReferences(doc, deleted) {
     doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));
 }
 
-return {uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences};
+return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences};
 })();
 // packages/history/src/index.js
 __modules["packages/history/src/index.js"]=(()=>{
@@ -1075,9 +1404,9 @@ const p = (x, y) => ({ x, y }), L = (x1, y1, x2, y2) => line(p(x1, y1), p(x2, y2
 const horizontal = [{ name: 'in', x: -45, y: 0, dx: -1, dy: 0 }, { name: 'out', x: 45, y: 0, dx: 1, dy: 0 }];
 const four = [...horizontal, { name: 'top', x: 0, y: 45, dx: 0, dy: 1 }, { name: 'bottom', x: 0, y: -45, dx: 0, dy: -1 }];
 const lead = [L(-45, 0, -25, 0), L(25, 0, 45, 0)];
-const valve = [...lead, P([[-25, -18], [25, 18], [25, -18], [-25, 18]], true)];
+const valve = [...lead, P([[-25,-18],[0,0],[-25,18]],true), P([[25,-18],[0,0],[25,18]],true)];
 const symbols = [];
-function def(id, name, category, geometry, ports = horizontal, extra = {}) { const symbol = { id, name, category, block: `CC_${id.toUpperCase().replace(/-/g, '_')}`, entities: geometry, ports, base: p(0, 0), symbol: { name, category, labelOffset: 57, ...extra } }; symbols.push(symbol); return symbol; }
+function def(id, name, category, geometry, ports = horizontal, extra = {}) { const symbol = { id, name, category, block: `CC_${id.toUpperCase().replace(/-/g, '_')}`, entities: geometry, ports, base: p(0, 0), symbol: { name, category, labelOffset: 57, geometryRevision: 2, convention: category === 'Electrical' ? 'IEC/ANSI functional drafting conventions' : category === 'P&ID' ? 'Process and instrumentation drafting conventions' : 'Flowchart conventions', conformity: 'Original master; not standards-certified', ...extra } }; symbols.push(symbol); return symbol; }
 def('gate-valve', 'Gate valve', 'P&ID', valve);
 def('ball-valve', 'Ball valve', 'P&ID', [...lead, C(0, 0, 21), L(-15, -15, 15, 15)]);
 def('globe-valve', 'Globe valve', 'P&ID', [...valve, C(0, 0, 7)]);
@@ -1136,6 +1465,38 @@ def('preparation', 'Preparation', 'Flow', [P([[-40, -35], [40, -35], [60, 0], [4
 def('delay', 'Delay', 'Flow', [P([[-50, -35], [5, -35], ...Array.from({ length: 31 }, (_, i) => { const t = -Math.PI / 2 + Math.PI * i / 30; return [5 + 35 * Math.cos(t), 35 * Math.sin(t)]; }), [-50, 35]], true), T(-5, -5, 'Delay', 14)], flowPorts);
 def('junction', 'Junction', 'Flow', [C(0, 0, 16)], [{ name: 'in', x: 0, y: 16, dx: 0, dy: 1 }, { name: 'out', x: 0, y: -16, dx: 0, dy: -1 }, { name: 'left', x: -16, y: 0, dx: -1, dy: 0 }, { name: 'right', x: 16, y: 0, dx: 1, dy: 0 }]);
 def('note', 'Annotation', 'Flow', [P([[45, 35], [-45, 35], [-45, -35], [45, -35]]), T(0, -5, 'Note', 14)], flowPorts);
+// Explicit terminal geometry: every port terminates on a contour or a lead.
+const roundLeads = (radius, vertical = false) => [L(-45,0,-radius,0),L(radius,0,45,0),...(vertical ? [L(0,radius,0,45),L(0,-radius,0,-45)] : [])];
+const revise = (id, geometry, newPorts) => { const s=symbols.find(s=>s.id===id); if(geometry)s.entities=geometry; if(newPorts)s.ports=newPorts; };
+revise('ball-valve',[...roundLeads(21),C(0,0,21),L(-15,-15,15,15)]);
+revise('butterfly-valve',[...roundLeads(23),C(0,0,23),L(-16,-16,16,16),C(0,0,3)]);
+revise('check-valve',[L(-45,0,-24,0),L(24,0,45,0),L(-24,-20,-24,20),L(-24,20,24,-16),C(-24,20,3),L(0,2,0,18)]);
+for(const [id,radius,vertical] of [['pump',27,true],['gear-pump',28,true],['compressor',29,true],['fan',29,false],['heat-exchanger',33,false],['motor',29,true],['generator',29,true],['lamp',24,false]]) {
+    const master=symbols.find(s=>s.id===id); master.entities=[...roundLeads(radius,vertical),...master.entities.slice(2)];
+}
+revise('filter',[...lead,R(-25,-28,50,56),L(-25,-28,25,28),L(-25,28,25,-28),L(0,28,0,45),L(0,-28,0,-45)]);
+const diodeBody=[L(-45,0,-22,0),P([[-22,-22],[22,0],[-22,22]],true),L(22,-24,22,24),L(22,0,45,0)];
+revise('diode',diodeBody);
+revise('led',[...diodeBody,L(4,27,24,47),P([[15,45],[24,47],[22,38]]),L(18,22,38,42),P([[29,40],[38,42],[36,33]])]);
+revise('offpage',[P([[-40,-17],[24,-17],[44,0],[24,17],[-40,17]],true),L(-45,0,-40,0),L(44,0,45,0),T(-4,-5,'PW',13)]);
+const cardinal = (top,bottom,left,right) => [{name:'in',x:0,y:top,dx:0,dy:1},{name:'out',x:0,y:bottom,dx:0,dy:-1},{name:'left',x:left,y:0,dx:-1,dy:0},{name:'right',x:right,y:0,dx:1,dy:0}];
+revise('data',null,cardinal(35,-35,-53.5,53.5));
+revise('document',null,cardinal(35,-25,-55,55));
+revise('database',null,cardinal(40,-40,-45,45));
+revise('manual',null,cardinal(32,-35,-55,55));
+revise('preparation',null,cardinal(35,-35,-60,60));
+revise('delay',null,cardinal(35,-35,-50,40));
+revise('note',null,[{name:'left',x:-45,y:0,dx:-1,dy:0},{name:'top',x:0,y:35,dx:0,dy:1},{name:'bottom',x:0,y:-35,dx:0,dy:-1}]);
+// Original function/location variants; exact normative symbol identifiers are intentionally not asserted.
+const sensePort=[{name:'sense',x:0,y:-45,dx:0,dy:-1}];
+def('pressure-panel','Pressure indicator · panel','P&ID',[C(0,0,26),L(-26,0,26,0),T(0,7,'PI',12),L(0,-26,0,-45)],sensePort,{instrumentLocation:'primary accessible panel'});
+def('pressure-rear','Pressure indicator · rear panel','P&ID',[C(0,0,26),line(p(-26,0),p(26,0),{dash:[4,3]}),T(0,7,'PI',12),L(0,-26,0,-45)],sensePort,{instrumentLocation:'normally inaccessible'});
+def('capacitor-polarized','Capacitor · polarized','Electrical',[L(-45,0,-7,0),L(0,0,45,0),L(-7,-25,-7,25),P(arcPoints(p(52,0),52,Math.PI-.46,Math.PI+.46,.1).map(p=>[p.x,p.y])),L(-28,20,-16,20),L(-22,14,-22,26)]);
+def('signal-ground','Signal reference','Electrical',[L(0,40,0,10),P([[-24,10],[24,10],[0,-22]],true)],[{name:'terminal',x:0,y:40,dx:0,dy:1}]);
+def('chassis','Chassis connection','Electrical',[L(0,40,0,8),L(-24,8,24,8),L(-24,8,-35,-8),L(0,8,-11,-8),L(24,8,13,-8)],[{name:'terminal',x:0,y:40,dx:0,dy:1}]);
+def('contact-no','Contact · normally open','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23)]);
+def('contact-nc','Contact · normally closed','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23),L(-19,-28,19,28)]);
+def('potentiometer','Potentiometer','Electrical',[...lead,R(-25,-11,50,22),L(0,45,0,12),P([[-6,22],[0,12],[6,22]])],[...horizontal,{name:'wiper',x:0,y:45,dx:0,dy:1}]);
 const SYMBOLS = symbols;
 const LINE_STYLES = [
     { id: 'process', name: 'Process pipe', layer: 'Process', color: '#147c77', width: 2, dash: [], arrow: 'end' },
@@ -1240,8 +1601,189 @@ SYMBOLS.find(s => s.id === 'check-valve').ports = [...horizontal, { name: 'top',
 
 return {SYMBOLS,LINE_STYLES,installSymbols,insertSymbol,createDemo};
 })();
+// packages/dxf/src/fidelity.js
+__modules["packages/dxf/src/fidelity.js"]=(()=>{
+/** DXF entity fidelity helpers. Native values remain native: OCS coordinates,
+ * signed linetype elements and hatch edge records are not flattened on import.
+ * Autodesk DXF reference links and explicit limitations: docs/DXF_COMPATIBILITY.md.
+ */
+const get = (r, c, fallback = 0) => r.find(p => p[0] === c)?.[1] ?? fallback;
+const point = (r, c = 10) => ({ x: +get(r, c), y: +get(r, c + 10), z: +get(r, c + 20) });
+const all = (r, c) => r.filter(p => p[0] === c).map(p => p[1]);
+const rad = d => d * Math.PI / 180;
+function count(n, limit = 100000) {
+    if (!Number.isSafeInteger(n) || n < 0 || n > limit) throw new Error('Invalid DXF collection length: ' + n);
+    return n;
+}
+function parseHatchData(raw) {
+    let i = raw.findIndex(p => p[0] === 91);
+    if (i < 0) return { loops: [], patternLines: [] };
+    const read = (code, fallback) => {
+        if (raw[i]?.[0] === code) return raw[i++][1];
+        if (fallback !== undefined) return fallback;
+        throw new Error(`Malformed HATCH: expected group ${code}, got ${raw[i]?.[0]}`);
+    };
+    const p2 = (c = 10) => ({ x: +read(c), y: +read(c + 10) });
+    const loops = [], n = count(+read(91));
+    for (let k = 0; k < n; k++) {
+        const flags = +read(92), loop = { flags, closed: true, points: [], edges: [] };
+        if (flags & 2) {
+            const bulge = +read(72); loop.closed = !!read(73);
+            const vertices = count(+read(93));
+            for (let j = 0; j < vertices; j++) {
+                const p = p2(); if (bulge || raw[i]?.[0] === 42) p.bulge = +read(42, 0);
+                loop.points.push(p);
+            }
+        } else {
+            const edges = count(+read(93));
+            for (let j = 0; j < edges; j++) {
+                const type = +read(72); let edge;
+                if (type === 1) edge = { type, a: p2(), b: p2(11) };
+                else if (type === 2 || type === 3) {
+                    edge = { type, c: p2() };
+                    if (type === 3) edge.major = p2(11);
+                    edge[type === 2 ? 'r' : 'ratio'] = +read(40);
+                    edge.start = rad(+read(50)); edge.end = rad(+read(51)); edge.ccw = !!read(73);
+                    if (!edge.ccw) { edge.start = 2*Math.PI-edge.start; edge.end = 2*Math.PI-edge.end; }
+                } else if (type === 4) {
+                    edge = { type, degree: +read(94), rational: !!read(73), periodic: !!read(74) };
+                    const knots = count(+read(95)), controls = count(+read(96));
+                    edge.knots = Array.from({ length: knots }, () => +read(40));
+                    edge.controlPoints = []; edge.weights = [];
+                    for (let q = 0; q < controls; q++) {
+                        edge.controlPoints.push(p2());
+                        if (edge.rational) edge.weights.push(+read(42, 1));
+                    }
+                    // Group 97 here is spline fit data; the later 97 belongs to the path.
+                    const fits = count(+read(97, 0));
+                    edge.fitPoints = Array.from({ length: fits }, () => p2(11));
+                    if (raw[i]?.[0] === 12) edge.startTangent = p2(12);
+                    if (raw[i]?.[0] === 13) edge.endTangent = p2(13);
+                } else throw new Error('Unsupported HATCH edge type ' + type);
+                loop.edges.push(edge);
+            }
+        }
+        const refs = count(+read(97, 0));
+        loop.sourceHandles = Array.from({ length: refs }, () => String(read(330)));
+        loops.push(loop);
+    }
+    const tail = raw.slice(i), patternLines = [];
+    const hatchStyle = +get(tail, 75), patternType = +get(tail, 76, 1);
+    const pstart = tail.findIndex(p => p[0] === 78);
+    if (pstart >= 0) {
+        i += pstart;
+        const lines = count(+read(78), 1024);
+        for (let k = 0; k < lines; k++) {
+            const angle = rad(+read(53)), base = { x: +read(43), y: +read(44) }, offset = { x: +read(45), y: +read(46) };
+            const n = count(+read(79), 1024);
+            patternLines.push({ angle, base, offset, dashes: Array.from({ length: n }, () => +read(49)) });
+        }
+    }
+    return { loops, hatchStyle, patternType, patternAngle: +get(tail, 52), patternScale: +get(tail, 41, 1), patternDouble: !!get(tail, 77),
+        elevation: +get(raw, 30), associative: !!get(raw, 71), patternLines,
+        gradient: +get(tail, 450) ? tail.slice(tail.findIndex(p => p[0] === 450)).filter(p => p[0] < 1000) : null };
+}
+function readEntityFidelity(e, raw, diagnostics, options = {}) {
+    e.extrusion = { x: +get(raw, 210), y: +get(raw, 220), z: +get(raw, 230, 1) };
+    e.thickness = +get(raw, 39); e.linetypeScale = +get(raw, 48, 1);
+    e.transparency = get(raw, 440, null);
+    if (e.transparency !== null && (e.transparency & 0x02000000)) e.opacity = (e.transparency & 255) / 255;
+    if (e.type === 'LWPOLYLINE' || e.type === 'VERTEX') {
+        e.elevation = +get(raw, 38); let p = -1;
+        for (const [c, v] of raw) {
+            if (c === 10) p++;
+            if ((c === 40 || c === 41) && p >= 0) {
+                const q = e.points?.[p] || e.p;
+                if (q) q[c === 40 ? 'startWidth' : 'endWidth'] = +v;
+            }
+        }
+    }
+    if (e.type === 'POLYLINE') { e.elevation = +get(raw, 30); e.startWidth = +get(raw, 40); e.endWidth = +get(raw, 41); }
+    if (['TEXT', 'MTEXT', 'ATTRIB', 'ATTDEF'].includes(e.type)) {
+        e.styleName = String(get(raw, 7, 'STANDARD')); e.oblique = +get(raw, 51);
+        e.textFlags = e.type === 'MTEXT' ? 0 : +get(raw, 71);
+        if (e.type === 'MTEXT') {
+            e.widthFactor = 1; // Group 41 is the reference box width, never an X-scale.
+            e.attachment = +get(raw, 71, 1); e.lineSpacing = +get(raw, 44, 1); e.lineSpacingStyle = +get(raw, 73, 1);
+            e.backgroundFill = +get(raw, 90); e.backgroundScale = +get(raw, 45, 1.5);
+            const start = raw.findIndex(p => p[0] === 100 && p[1] === 'AcDbMText');
+            const common = start >= 0 ? raw.slice(0, start) : raw, content = start >= 0 ? raw.slice(start) : [];
+            const bg = get(content, 421, get(content, 420, null));
+            e.backgroundColor = bg === null ? '#ffffff' : '#' + (Number(bg) & 0xffffff).toString(16).padStart(6, '0');
+            const fg = get(common, 420, null);
+            if (fg === null && bg !== null && +get(common, 62, 256) === 256) delete e.color;
+            const directionIndex = raw.findIndex(p => p[0] === 11), angleIndex = raw.findIndex(p => p[0] === 50);
+            // Wire DXF angle groups are degrees; callers can explicitly opt into the APP-radians convention.
+            if (angleIndex > directionIndex && !get(raw, 75)) e.rotation = +raw[angleIndex][1] * (options.mtextRotationUnit === 'radians' ? 180 / Math.PI : 1);
+            if (+get(raw, 75) || +get(raw, 72) === 3) diagnostics.push({ severity: 'warning', type: e.type, message: 'MTEXT columns/vertical flow preserved in source; displayed as a single horizontal text box.' });
+        } else {
+            e.halign = +get(raw, 72); e.valign = +get(raw, e.type === 'TEXT' ? 73 : 74);
+            if (raw.some(p => p[0] === 11)) e.alignPoint = point(raw, 11);
+        }
+    }
+    if (e.type === 'HATCH') {
+        Object.assign(e, parseHatchData(raw));
+        if (e.gradient) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'Gradient records retained; preview uses the entity color, not a gradient shader.' });
+    }
+    if (e.type === '3DFACE') { e.points = [point(raw), point(raw, 11), point(raw, 12), point(raw, 13)]; e.edgeFlags = +get(raw, 70); }
+    if (e.type === 'LEADER') {
+        e.points = []; let p;
+        for (const [c, v] of raw) { if (c === 10) { p = { x: +v, y: 0, z: 0 }; e.points.push(p); } else if (p && c === 20) p.y = +v; else if (p && c === 30) p.z = +v; }
+        e.arrow = !!get(raw, 71, 1); e.spline = !!get(raw, 72); e.dimstyle = get(raw, 3, 'STANDARD');
+        if (e.spline) diagnostics.push({ severity: 'warning', type: e.type, message: 'Spline leader retained; displayed using its control polygon.' });
+    }
+    if (e.type === 'RAY' || e.type === 'XLINE') { e.p = point(raw); e.direction = point(raw, 11); }
+}
+function writeHatchData(e, pair) {
+    const p2 = (c, p) => { pair(c, p.x); pair(c + 10, p.y); };
+    pair(100, 'AcDbHatch'); pair(10, 0); pair(20, 0); pair(30, e.elevation || 0);
+    pair(210, e.extrusion?.x || 0); pair(220, e.extrusion?.y || 0); pair(230, e.extrusion?.z ?? 1);
+    pair(2, e.pattern || (e.solid ? 'SOLID' : 'USER')); pair(70, e.solid ? 1 : 0); pair(71, 0);
+    pair(91, e.loops?.length || 0);
+    for (const loop of e.loops || []) {
+        const native = !!loop.edges?.length;
+        pair(92, native ? (loop.flags || 0) & ~2 : (loop.flags || 0) | 2);
+        if (native) {
+            pair(93, loop.edges.length);
+            for (const edge of loop.edges) {
+                pair(72, edge.type);
+                if (edge.type === 1) { p2(10, edge.a); p2(11, edge.b); }
+                else if (edge.type === 2 || edge.type === 3) {
+                    p2(10, edge.c); if (edge.type === 3) p2(11, edge.major);
+                    pair(40, edge.type === 2 ? edge.r : edge.ratio); pair(50, (edge.ccw === false ? 2*Math.PI-edge.start : edge.start) * 180 / Math.PI); pair(51, (edge.ccw === false ? 2*Math.PI-edge.end : edge.end) * 180 / Math.PI); pair(73, edge.ccw === false ? 0 : 1);
+                } else if (edge.type === 4) {
+                    pair(94, edge.degree); pair(73, edge.rational ? 1 : 0); pair(74, edge.periodic ? 1 : 0);
+                    pair(95, edge.knots.length); pair(96, edge.controlPoints.length);
+                    edge.knots.forEach(v => pair(40, v));
+                    edge.controlPoints.forEach((p, j) => { p2(10, p); if (edge.rational) pair(42, edge.weights?.[j] ?? 1); });
+                    pair(97, edge.fitPoints?.length || 0); (edge.fitPoints || []).forEach(p => p2(11, p));
+                    if (edge.startTangent) p2(12, edge.startTangent); if (edge.endTangent) p2(13, edge.endTangent);
+                } else throw new Error('Unsupported HATCH edge export ' + edge.type);
+            }
+        } else {
+            const points = loop.points || [], bulges = points.some(p => p.bulge);
+            pair(72, bulges ? 1 : 0); pair(73, loop.closed === false ? 0 : 1); pair(93, points.length);
+            for (const p of points) { p2(10, p); if (bulges) pair(42, p.bulge || 0); }
+        }
+        pair(97, 0); // Detached boundary references cannot safely reference regenerated handles.
+    }
+    pair(75, e.hatchStyle || 0); pair(76, e.patternType ?? 1);
+    if (!e.solid) {
+        pair(52, e.patternAngle || 0); pair(41, e.patternScale || 1); pair(77, e.patternDouble ? 1 : 0);
+        pair(78, e.patternLines?.length || 0);
+        for (const line of e.patternLines || []) {
+            pair(53, line.angle * 180 / Math.PI); pair(43, line.base.x); pair(44, line.base.y); pair(45, line.offset.x); pair(46, line.offset.y);
+            pair(79, line.dashes?.length || 0); for (const d of line.dashes || []) pair(49, d);
+        }
+    }
+    pair(98, 0); for (const p of e.gradient || []) pair(...p);
+}
+
+return {parseHatchData,readEntityFidelity,writeHatchData};
+})();
 // packages/dxf/src/index.js
 __modules["packages/dxf/src/index.js"]=(()=>{
+const {readEntityFidelity, writeHatchData} = __modules["packages/dxf/src/fidelity.js"];
 const {createDocument, entity, uid, cleanText, clone, entityGeometry} = __modules["packages/model/src/index.js"];
 const {TAU, arcPoints} = __modules["packages/geometry/src/index.js"];
 const NUMBER_CODES = c => (c >= 10 && c <= 59) || (c >= 110 && c <= 149) || (c >= 210 && c <= 239) || (c >= 460 && c <= 469) || (c >= 1010 && c <= 1059);
@@ -1280,7 +1822,7 @@ function parseAsciiPairs(source, { maxPairs = 8000000 } = {}) {
 function parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {
     const u = input instanceof Uint8Array ? input : new Uint8Array(input), v = new DataView(u.buffer, u.byteOffset, u.byteLength);
     let pos = 22;
-    const pairs = [], decoder = new TextDecoder('windows-1252');
+    const pairs = []; let decoder = new TextDecoder('windows-1252'), headerKey = ''; 
     const r12 = u[23] !== 0;
     const need = n => {
         if (pos + n > u.length)
@@ -1347,6 +1889,9 @@ function parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {
         if (typeof value === 'number' && !Number.isFinite(value))
             throw new Error('Non-finite binary DXF value');
         pairs.push([code, value]);
+        if (code === 9) headerKey = value;
+        else if (headerKey === '$ACADVER' && code === 1 && /^AC\d+$/.test(value) && +value.slice(2) >= 1021) decoder = new TextDecoder('utf-8');
+        else if (headerKey === '$DWGCODEPAGE' && code === 3 && decoder.encoding !== 'utf-8') { try { decoder = new TextDecoder(({ ANSI_1250: 'windows-1250', ANSI_1251: 'windows-1251', ANSI_932: 'shift_jis', ANSI_936: 'gbk', ANSI_950: 'big5' })[value] || 'windows-1252'); } catch {} }
         if (code === 0 && value === 'EOF')
             break;
     }
@@ -1406,58 +1951,10 @@ function metadata(raw) {
         return {};
     }
 }
-function parseHatch(raw) {
-    const loops = [];
-    let i = raw.findIndex(([c]) => c === 91) + 1;
-    while (i > 0 && i < raw.length) {
-        if (raw[i][0] !== 92) {
-            i++;
-            continue;
-        }
-        const flags = Number(raw[i++][1]), loop = { points: [], closed: true, flags };
-        if (flags & 2) {
-            let n = 0;
-            while (i < raw.length && raw[i][0] !== 93)
-                i++;
-            if (i < raw.length)
-                n = Number(raw[i++][1]);
-            for (let j = 0; j < n && i < raw.length; j++) {
-                if (raw[i][0] !== 10)
-                    break;
-                const p = { x: Number(raw[i++][1]), y: 0 };
-                if (raw[i]?.[0] === 20)
-                    p.y = Number(raw[i++][1]);
-                if (raw[i]?.[0] === 42)
-                    p.bulge = Number(raw[i++][1]);
-                loop.points.push(p);
-            }
-        }
-        else {
-            while (i < raw.length && raw[i][0] !== 93)
-                i++;
-            const n = Number(raw[i++]?.[1] || 0);
-            for (let j = 0; j < n && i < raw.length; j++) {
-                if (raw[i][0] !== 72)
-                    break;
-                const type = Number(raw[i++][1]), edge = [];
-                while (i < raw.length && ![72, 92, 97, 75, 76, 98].includes(raw[i][0]))
-                    edge.push(raw[i++]);
-                if (type === 1)
-                    loop.points.push(pt(edge, 10), pt(edge, 11));
-                else if (type === 2) {
-                    const c = pt(edge), r = Number(get(edge, 40, 1)), s = Number(get(edge, 50, 0)) * Math.PI / 180, e = Number(get(edge, 51, 360)) * Math.PI / 180;
-                    loop.points.push(...arcPoints(c, r, s, e, .2, !get(edge, 73, 1)));
-                }
-            }
-        }
-        if (loop.points.length)
-            loops.push(loop);
-    }
-    return loops;
-}
-function parseEntity(raw, diagnostics) {
+function parseEntity(raw, diagnostics, options = {}) {
     const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw, handle: get(raw, 5) }, dirty: false };
     const aci = Number(get(raw, 62, 256)), trueColor = get(raw, 420);
+    e.colorIndex = aci; e.colorMode = trueColor === undefined ? 'aci' : 'truecolor';
     if (trueColor !== undefined)
         e.color = '#' + Number(trueColor).toString(16).padStart(6, '0');
     else if (aci === 0)
@@ -1481,7 +1978,7 @@ function parseEntity(raw, diagnostics) {
         case 'POLYLINE':
             e.points = [];
             e.closed = !!(get(raw, 70, 0) & 1);
-            e.flags = get(raw, 70, 0);
+            e.flags = get(raw, 70, 0); e.mCount = +get(raw,71,0); e.nCount = +get(raw,72,0);
             break;
         case 'CIRCLE':
         case 'ARC':
@@ -1553,10 +2050,9 @@ function parseEntity(raw, diagnostics) {
             e.points = [pt(raw, 10), pt(raw, 11), pt(raw, 13), pt(raw, 12)];
             break;
         case 'HATCH':
-            e.loops = parseHatch(raw);
+            e.loops = [];
             e.solid = !!get(raw, 70, 0);
             e.pattern = get(raw, 2, 'SOLID');
-            diagnostics.push({ severity: 'warning', type, message: `HATCH ${e.solid ? 'solid boundary' : 'pattern'} is displayed as boundary geometry; island/pattern fidelity is not complete.` });
             break;
         case 'DIMENSION':
             e.block = get(raw, 2);
@@ -1567,7 +2063,12 @@ function parseEntity(raw, diagnostics) {
         case 'VERTEX':
             e.p = pt(raw);
             e.p.bulge = get(raw, 42, 0);
+            e.p.startWidth = get(raw, 40, 0); e.p.endWidth = get(raw, 41, 0);
+            e.vertexFlags=+get(raw,70,0); e.faceIndices=[71,72,73,74].map(c=>+get(raw,c,0)).filter(Boolean);
             break;
+        case 'LEADER':
+        case 'RAY':
+        case 'XLINE':
         case 'SEQEND': break;
         default:
             e.unsupported = true;
@@ -1579,8 +2080,15 @@ function parseEntity(raw, diagnostics) {
     for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])
         if (k in meta)
             e[k] = meta[k];
-    if (get(raw, 210, 0) !== 0 || get(raw, 220, 0) !== 0 || get(raw, 230, 1) !== 1)
-        diagnostics.push({ severity: 'warning', type, message: `${type}: non-default extrusion/OCS is not fully projected; original records retained.` });
+    readEntityFidelity(e, raw, diagnostics, options);
+    if(type === 'MTEXT') {
+        const pos=raw.findIndex(p=>p[0]===100&&p[1]==='AcDbMText');
+        if(pos>=0) { const common=raw.slice(0,pos), value=get(common,420), index=+get(common,62,256);
+            e.colorMode = value===undefined ? 'aci' : 'truecolor';
+            if(value!==undefined)e.color='#'+(+value&0xffffff).toString(16).padStart(6,'0');
+            else if(index===256)delete e.color; else e.color=index===0?'BYBLOCK':aciColor(index);
+        }
+    }
     return e;
 }
 function base64(bytes) {
@@ -1616,7 +2124,7 @@ function parseDXF(input, options = {}) {
         source = bytes ? { format: 'ascii', base64: base64(bytes) } : { format: 'ascii', text: rawText };
     }
     const doc = createDocument(options.name || 'Imported DXF');
-    doc.layers = [];
+    doc.layers = []; doc.textStyles = {}; doc.linetypes = { CONTINUOUS: [] }; doc.signedLinetypes = true;
     doc.source = source;
     doc.rawSections = {};
     doc.importDiagnostics = [];
@@ -1643,6 +2151,7 @@ function parseDXF(input, options = {}) {
             key = String(v);
         else if (key === '$INSUNITS' && c === 70)
             doc.units = ({ 0: 'unitless', 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm' })[v] || 'unitless';
+        else if (key === '$LTSCALE' && c === 40) doc.linetypeScale = v;
         else if (key === '$ACADVER')
             doc.importVersion = v;
     }
@@ -1655,10 +2164,12 @@ function parseDXF(input, options = {}) {
             table = '';
         else if (table === 'LAYER' && t === 'LAYER') {
             const n = get(r, 2, '0'), aci = Number(get(r, 62, 7));
-            doc.layers.push({ name: n, color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS') });
+            doc.layers.push({ name: n, colorIndex:Math.abs(aci), colorMode:get(r,420)===undefined?'aci':'truecolor', color: get(r, 420) !== undefined ? '#' + Number(get(r, 420)).toString(16).padStart(6, '0') : aciColor(Math.abs(aci)), visible: aci >= 0 && !(get(r, 70, 0) & 1), locked: !!(get(r, 70, 0) & 4), linetype: get(r, 6, 'CONTINUOUS'), lineweight: +get(r, 370, -3) });
         }
         else if (table === 'LTYPE' && t === 'LTYPE')
-            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(v => Math.abs(Number(v)));
+            doc.linetypes[get(r, 2, 'CONTINUOUS')] = all(r, 49).map(Number);
+        else if (table === 'STYLE' && t === 'STYLE')
+            doc.textStyles[get(r, 2, 'STANDARD')] = { font: get(r, 3, 'sans-serif'), bigFont: get(r, 4, ''), height: +get(r, 40, 0), widthFactor: +get(r, 41, 1), oblique: +get(r, 50, 0), flags: +get(r, 71, 0) };
     }
     if (!doc.layers.length)
         doc.layers.push({ name: '0', color: '#344755', visible: true, locked: false });
@@ -1666,9 +2177,10 @@ function parseDXF(input, options = {}) {
         const es = [];
         let poly = null, insert = null;
         for (const raw of rs) {
-            const e = parseEntity(raw, doc.importDiagnostics);
+            const e = parseEntity(raw, doc.importDiagnostics, options);
             if (e.type === 'VERTEX' && poly) {
-                poly.points.push(e.p);
+                if ((poly.flags & 64) && e.faceIndices.length) { poly.faces ??= []; poly.faces.push(e.faceIndices); }
+                else poly.points.push(e.p);
                 continue;
             }
             if (e.type === 'ATTRIB' && insert) {
@@ -1759,7 +2271,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     const pair = (c, v) => {
         if (typeof v === 'number' && !Number.isFinite(v))
             throw new Error(`Nonfinite DXF value for code ${c}`);
-        let s = typeof v === 'number' ? Number(v.toPrecision(14)).toString() : String(v ?? '');
+        let s = typeof v === 'number' ? String(v) : String(v ?? '');
         s = s.replace(/\r?\n/g, '\\P');
         if (Number(version.slice(2)) < 1021)
             s = s.replace(/[\u007f-\uffff]/g, c => '\\U+' + c.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0'));
@@ -1781,6 +2293,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(1, version);
     pair(9, '$INSUNITS');
     pair(70, ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4);
+    pair(9, '$LTSCALE'); pair(40, doc.linetypeScale || 1);
     pair(9, '$MEASUREMENT');
     pair(70, doc.units === 'in' || doc.units === 'ft' ? 0 : 1);
     if (includeMetadata) {
@@ -1807,7 +2320,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(73, 0);
     pair(40, 0);
     const types = { ...doc.linetypes };
-    for (const e of doc.entities)
+    for (const e of [...doc.entities, ...Object.values(doc.blocks).flatMap(b=>b.entities || [])])
         if (e.dash?.length)
             types['CC_DASH_' + e.dash.join('_')] = e.dash;
     for (const [name, pattern] of Object.entries(types)) {
@@ -1823,7 +2336,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         pair(72, 65);
         pair(73, pattern.length);
         pair(40, pattern.reduce((a, b) => a + Math.abs(b), 0));
-        pattern.forEach((v, i) => { pair(49, Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });
+        pattern.forEach((v, i) => { pair(49, doc.signedLinetypes && !name.startsWith('CC_DASH_') ? v : Math.abs(v) * (i % 2 ? -1 : 1)); pair(74, 0); });
     }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
@@ -1839,9 +2352,11 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         pair(100, 'AcDbLayerTableRecord');
         pair(2, l.name);
         pair(70, l.locked ? 4 : 0);
-        pair(62, l.visible === false ? -7 : 7);
-        pair(420, parseInt((l.color || '#344755').slice(1), 16));
+        const layerACI = l.colorMode === 'aci' && l.colorIndex > 0 && l.colorIndex < 256 && aciColor(l.colorIndex).toLowerCase() === l.color?.toLowerCase();
+        pair(62, (l.visible === false ? -1 : 1) * (layerACI ? l.colorIndex : 7));
+        if (!layerACI) pair(420, parseInt((l.color || '#344755').slice(1), 16));
         pair(6, l.linetype || 'CONTINUOUS');
+        if (l.lineweight !== undefined) pair(370, l.lineweight);
     }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
@@ -1849,20 +2364,13 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(5, next());
     pair(330, '0');
     pair(100, 'AcDbSymbolTable');
-    pair(70, 1);
-    pair(0, 'STYLE');
-    pair(5, next());
-    pair(100, 'AcDbSymbolTableRecord');
-    pair(100, 'AcDbTextStyleTableRecord');
-    pair(2, 'STANDARD');
-    pair(70, 0);
-    pair(40, 0);
-    pair(41, 1);
-    pair(50, 0);
-    pair(71, 0);
-    pair(42, 2.5);
-    pair(3, 'txt');
-    pair(4, '');
+    const textStyles = { STANDARD: { font: 'txt', widthFactor: 1 }, ...doc.textStyles };
+    pair(70, Object.keys(textStyles).length);
+    for (const [name, style] of Object.entries(textStyles)) {
+        pair(0, 'STYLE'); pair(5, next()); pair(100, 'AcDbSymbolTableRecord'); pair(100, 'AcDbTextStyleTableRecord');
+        pair(2, name); pair(70, 0); pair(40, style.height || 0); pair(41, style.widthFactor || 1);
+        pair(50, style.oblique || 0); pair(71, style.flags || 0); pair(42, 2.5); pair(3, style.font || 'txt'); pair(4, style.bigFont || '');
+    }
     pair(0, 'ENDTAB');
     pair(0, 'TABLE');
     pair(2, 'APPID');
@@ -1896,7 +2404,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     end();
     const header = (e, t = e.type, owner) => {
         pair(0, t);
-        pair(5, next());
+        const emittedHandle = next(); pair(5, emittedHandle);
         if (owner)
             pair(330, owner);
         pair(100, 'AcDbEntity');
@@ -1907,18 +2415,23 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         }
         if (e.color === 'BYBLOCK')
             pair(62, 0);
+        else if (e.color && e.color !== 'BYLAYER' && e.colorMode==='aci' && e.colorIndex>0 && e.colorIndex<256 && aciColor(e.colorIndex).toLowerCase()===e.color.toLowerCase()) pair(62,e.colorIndex);
         else if (e.color && e.color !== 'BYLAYER') {
             pair(62, 7);
             pair(420, parseInt(e.color.slice(1), 16));
         }
         if (e.hidden)
             pair(60, 1);
-        if (e.lineweight > 0)
+        if (e.opacity !== undefined) pair(440, 0x02000000 | Math.round(255 * Math.max(0, Math.min(1, e.opacity))));
+        else if (e.transparency != null) pair(440, e.transparency);
+        if (e.linetypeScale !== undefined) pair(48, e.linetypeScale);
+        if (e.lineweight !== undefined)
             pair(370, e.lineweight);
         if (e.dash?.length)
             pair(6, 'CC_DASH_' + e.dash.join('_'));
         else if (e.linetype && e.linetype !== 'BYLAYER')
             pair(6, e.linetype);
+        return emittedHandle;
     };
     const emit = (e, owner) => {
         if (e.unsupported) {
@@ -1932,14 +2445,20 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 emit({ type: 'TEXT', ...t, layer: e.layer }, owner);
             return;
         }
-        if (e.type === 'HATCH') {
-            for (const l of e.loops || [])
-                emit({ type: 'LWPOLYLINE', points: l.points, closed: true, layer: e.layer, color: e.color }, owner);
-            return;
-        }
-        const type = e.type === 'POLYLINE' ? 'LWPOLYLINE' : e.type;
-        header(e, type, owner);
+        const type = e.type === 'POLYLINE' && !(e.flags & (8|16|64)) ? 'LWPOLYLINE' : e.type;
+        const entityHandle = header(e, type, owner);
         switch (type) {
+            case 'POLYLINE':
+                pair(100,(e.flags&64)?'AcDbPolyFaceMesh':(e.flags&16)?'AcDbPolygonMesh':'AcDb3dPolyline');
+                pair(66,1); pp(10,{x:0,y:0,z:e.elevation || 0}); pair(70,(e.flags || 8)|(e.closed?1:0));
+                if(e.flags&16){pair(71,e.mCount || 0);pair(72,e.nCount || 0);}
+                if(e.flags&64){pair(71,e.points.length);pair(72,e.faces?.length || 0);}
+                break;
+            case 'HATCH': writeHatchData(e, pair); break;
+            case 'LEADER':
+                pair(100, 'AcDbLeader'); pair(3, e.dimstyle || 'STANDARD'); pair(71, e.arrow === false ? 0 : 1); pair(72, e.spline ? 1 : 0); pair(73, 3); pair(74, 0); pair(75, 0); pair(76, e.points.length); for (const p of e.points) pp(10, p); break;
+            case 'RAY':
+            case 'XLINE': pair(100, type === 'RAY' ? 'AcDbRay' : 'AcDbXline'); pp(10, e.p); pp(11, e.direction); break;
             case 'LINE':
                 pair(100, 'AcDbLine');
                 pp(10, e.a);
@@ -1949,11 +2468,14 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 pair(100, 'AcDbPolyline');
                 pair(90, e.points.length);
                 pair(70, e.closed ? 1 : 0);
+                if (e.elevation) pair(38, e.elevation);
                 if (e.constantWidth)
                     pair(43, e.constantWidth);
                 for (const p of e.points) {
                     pair(10, p.x);
                     pair(20, p.y);
+                    if (p.startWidth) pair(40, p.startWidth);
+                    if (p.endWidth) pair(41, p.endWidth);
                     if (p.bulge)
                         pair(42, p.bulge);
                 }
@@ -2002,30 +2524,32 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 pair(1, e.text || '');
                 pair(50, e.rotation || 0);
                 pair(41, e.widthFactor || 1);
-                pair(7, 'STANDARD');
-                if (e.align && e.align !== 'left') {
-                    pair(72, e.align === 'center' ? 1 : 2);
-                    pp(11, e.p);
+                pair(7, e.styleName || 'STANDARD');
+                if (e.oblique) pair(51, e.oblique); if (e.textFlags) pair(71, e.textFlags);
+                if (e.halign || e.valign || (e.align && e.align !== 'left')) {
+                    pair(72, e.halign ?? (e.align === 'center' ? 1 : e.align === 'right' ? 2 : 0));
+                    pp(11, e.alignPoint || e.p);
                 }
-                if (type === 'TEXT')
-                    pair(100, 'AcDbText');
+                if (type === 'TEXT') { pair(100, 'AcDbText'); pair(73, e.valign || 0); }
                 else {
                     pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');
                     pair(2, e.attributeTag || 'TAG');
                     if (type === 'ATTDEF')
                         pair(3, 'Equipment tag');
-                    pair(70, e.invisible ? 1 : 0);
+                    pair(70, e.invisible ? 1 : 0); pair(74, e.valign || 0);
                 }
                 break;
-            case 'MTEXT':
-                pair(100, 'AcDbMText');
-                pp(10, e.p);
-                pair(40, e.height || 12);
-                pair(41, e.mtextWidth || 200);
-                pair(71, e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1);
-                pair(1, e.text || '');
-                pair(50, e.rotation || 0);
+            case 'MTEXT': {
+                pair(100, 'AcDbMText'); pp(10, e.p); pair(40, e.height || 12); pair(41, e.mtextWidth || 0);
+                pair(71, e.attachment || (e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1)); pair(7, e.styleName || 'STANDARD');
+                const value = String(e.text || '').replace(/\r?\n/g, '\\P');
+                for (let i = 0; i < value.length - 250; i += 250) pair(3, value.slice(i, i + 250));
+                pair(1, value.slice(Math.max(0, Math.ceil((value.length - 250) / 250)) * 250));
+                const a = (e.rotation || 0) * Math.PI / 180; pp(11, { x: Math.cos(a), y: Math.sin(a) });
+                pair(73, e.lineSpacingStyle || 1); pair(44, e.lineSpacing || 1);
+                if (e.backgroundFill) { pair(90, e.backgroundFill); pair(45, e.backgroundScale || 1.5); pair(63, 7); if (e.backgroundColor) pair(421, parseInt(e.backgroundColor.slice(1), 16)); }
                 break;
+            }
             case 'POINT':
                 pair(100, 'AcDbPoint');
                 pp(10, e.p);
@@ -2034,7 +2558,8 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
             case 'TRACE':
             case '3DFACE':
                 pair(100, type === '3DFACE' ? 'AcDbFace' : 'AcDbTrace');
-                for (const [i, j] of [[0, 0], [1, 1], [2, 3], [3, 2]])
+                if (type === '3DFACE') pair(70, e.edgeFlags || 0);
+                for (const [i, j] of (type === '3DFACE' ? [[0, 0], [1, 1], [2, 2], [3, 3]] : [[0, 0], [1, 1], [2, 3], [3, 2]]))
                     pp(10 + i, e.points[j] || e.points.at(-1));
                 break;
             case 'DIMENSION':
@@ -2068,6 +2593,8 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 break;
             }
         }
+        if (e.type !== 'HATCH' && e.extrusion) pp(210, e.extrusion);
+        if (e.thickness) pair(39, e.thickness);
         const m = {};
         if (e.id)
             m.id = e.id;
@@ -2075,6 +2602,18 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
             if (e[k] !== undefined)
                 m[k] = e[k];
         meta(m);
+        if (type === 'POLYLINE') {
+            for (const p of e.points || []) {
+                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbVertex');
+                pair(100,(e.flags&64)?'AcDbPolyFaceMeshVertex':(e.flags&16)?'AcDbPolygonMeshVertex':'AcDb3dPolylineVertex');
+                pp(10,p);pair(70,(e.flags&64)?192:(e.flags&16)?64:32);
+            }
+            for (const face of e.faces || []) {
+                header({layer:e.layer},'VERTEX',entityHandle);pair(100,'AcDbFaceRecord');pp(10,{x:0,y:0,z:0});pair(70,128);
+                face.forEach((n,i)=>pair(71+i,n));
+            }
+            header({layer:e.layer},'SEQEND',entityHandle);
+        }
         if (type === 'INSERT' && (e.attributes?.length || e.tag)) {
             for (const a of e.attributes || [])
                 emit(a, owner);
@@ -2120,14 +2659,14 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(0, 'EOF');
     return out.join('\r\n') + '\r\n';
 }
-function exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.length ? [`${hatches.length} hatches exported as boundaries; fills/patterns are not retained.`] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }
+function exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.some(e => e.associative) ? ['Hatch boundaries exported natively, but associativity is detached to avoid dangling handles.'] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }
 
 return {aciColor,parseAsciiPairs,parseBinaryPairs,parseDXF,writeDXF,exportReport};
 })();
 // packages/renderer/src/index.js
 __modules["packages/renderer/src/index.js"]=(()=>{
 const {bounds, union, emptyBounds, intersects, distance, validBounds, center, clamp} = __modules["packages/geometry/src/index.js"];
-const {entityGeometry, entityBounds, isVisible, documentBounds} = __modules["packages/model/src/index.js"];
+const {entityGeometry, entityBounds, isVisible, documentBounds, textLayout} = __modules["packages/model/src/index.js"];
 const {SpatialIndex} = __modules["packages/spatial/src/index.js"];
 class Camera {
     constructor() { this.x = 560; this.y = 340; this.scale = 1; this.width = 1000; this.height = 700; }
@@ -2150,12 +2689,12 @@ function colorRGBA(hex, alpha = 1) {
         hex = '#344755';
     return [parseInt(hex.slice(1, 3), 16) / 255, parseInt(hex.slice(3, 5), 16) / 255, parseInt(hex.slice(5, 7), 16) / 255, alpha];
 }
-function segmentCount(path) { return path.points.length - 1 + (path.closed && distance(path.points[0], path.points.at(-1)) > 1e-7 ? 1 : 0); }
+function segmentCount(path) { if (path.stroke === false || path.points.length < 2) return 0; return path.points.length - 1 + (path.closed && distance(path.points[0], path.points.at(-1)) > 1e-7 ? 1 : 0); }
 function writeStrokeData(data, paths, origin, offset = 0) {
     let k = offset * 16;
     for (const p of paths) {
         const rgba = colorRGBA(p.color, p.opacity), pts = p.points;
-        let phase = 0;
+        let phase = p.dashPhase || 0;
         const n = segmentCount(p);
         for (let i = 0; i < n; i++) {
             const a = pts[i], z = pts[(i + 1) % pts.length];
@@ -2165,14 +2704,15 @@ function writeStrokeData(data, paths, origin, offset = 0) {
         }
     }
 }
-function buildScene(doc, { tolerance = .25, origin = null } = {}) {
-    const paths = [], texts = [], items = [], spans = new Map(), entities = new Map();
+function buildScene(doc, { tolerance = .25, origin = null, view = null } = {}) {
+    const paths = [], texts = [], items = [], diagnostics = [], spans = new Map(), entities = new Map();
     let b = emptyBounds(), count = 0;
     const started = performance.now();
     for (const e of doc.entities) {
         if (!isVisible(e, doc))
             continue;
-        const g = entityGeometry(e, doc, { tolerance }), span = { pathStart: paths.length, pathCount: g.paths.length, textStart: texts.length, textCount: g.texts.length, offset: count, count: 0, itemIndex: -1 };
+        const g = entityGeometry(e, doc, { tolerance, view }), span = { pathStart: paths.length, pathCount: g.paths.length, textStart: texts.length, textCount: g.texts.length, offset: count, count: 0, itemIndex: -1 };
+        diagnostics.push(...(g.warnings || []));
         for (const path of g.paths) {
             paths.push(path);
             count += segmentCount(path);
@@ -2192,7 +2732,7 @@ function buildScene(doc, { tolerance = .25, origin = null } = {}) {
     origin = origin || (validBounds(b) ? center(b) : { x: 0, y: 0 });
     const data = new Float32Array(count * 16);
     writeStrokeData(data, paths, origin);
-    return { paths, texts, items, spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
+    return { paths, texts, items, diagnostics, hasInfinite: doc.entities.some(e => ['RAY', 'XLINE'].includes(e.type)), spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
 }
 /** Patch equal-topology edits in place. A null result requests a full rebuild. */
 function updateSceneEntities(scene, doc, ids, { tolerance = .25 } = {}) {
@@ -2256,7 +2796,7 @@ const LINE_SHADER = WGSL_COMMON + `
 struct Out { @builtin(position) position:vec4f, @location(0) local:vec2f, @location(1) @interpolate(flat) metrics:vec2f, @location(2) @interpolate(flat) color:vec4f, @location(3) @interpolate(flat) style:vec4f, @location(4) @interpolate(flat) dash:vec4f };
 @vertex fn vs(@builtin(vertex_index) vertex:u32,@builtin(instance_index) instance:u32)->Out {
  let s=segments[indices[instance]];let a=(s.ab.xy-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;
- let b=(s.ab.zw-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;let delta=b-a;let len=max(length(delta),0.0001);let dir=delta/len;let normal=vec2f(-dir.y,dir.x);
+ let b=(s.ab.zw-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;let delta=b-a;let len=max(length(delta),0.0001);let dir=select(vec2f(1,0),delta/len,len>0.0001);let normal=vec2f(-dir.y,dir.x);
  let halfWidth=max(s.style.x*.5,.5);let pad=halfWidth+1.0;
  let corners=array<vec2f,6>(vec2f(0,-1),vec2f(1,-1),vec2f(1,1),vec2f(0,-1),vec2f(1,1),vec2f(0,1));let corner=corners[vertex];let local=vec2f(mix(-pad,len+pad,corner.x),corner.y*pad);let pixel=a+dir*local.x+normal*local.y;
  var o:Out;o.position=vec4f(pixel/view.viewport*vec2f(2,-2)+vec2f(-1,1),0,1);o.local=local;o.metrics=vec2f(len,halfWidth);o.color=s.color;o.style=s.style;o.dash=s.dash;return o;
@@ -2264,7 +2804,7 @@ struct Out { @builtin(position) position:vec4f, @location(0) local:vec2f, @locat
 @fragment fn fs(o:Out)->@location(0) vec4f {
  let outside=length(vec2f(max(max(-o.local.x,o.local.x-o.metrics.x),0.0),o.local.y))-o.metrics.y;
  let alpha=1.0-smoothstep(-.55,.55,outside);
- if(o.style.y>0.0){let pattern=array<f32,6>(o.style.y,o.style.z,o.dash.x,o.dash.y,o.dash.z,o.dash.w);let cycle=o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w;var d=(max(o.local.x,0.0)/view.scale+o.style.w)%cycle;for(var i=0u;i<6u;i++){if(d<pattern[i]){if(i%2u==1u){discard;}break;}d-=pattern[i];}}
+ if(o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w>0.0){let pattern=array<f32,6>(o.style.y,o.style.z,o.dash.x,o.dash.y,o.dash.z,o.dash.w);let cycle=o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w;var d=(max(o.local.x,0.0)/view.scale+o.style.w)%cycle;for(var i=0u;i<6u;i++){if(d<pattern[i]){if(i%2u==1u){discard;}break;}d-=pattern[i];}}
  return vec4f(o.color.rgb,o.color.a*alpha);
 }`;
 class GPUBackend {
@@ -2337,6 +2877,7 @@ class GPUBackend {
             pass.end();
         }
         const pass = encoder.beginRenderPass({ colorAttachments: [{ view: this.context.getCurrentTexture().createView(), clearValue: { r: 0, g: 0, b: 0, a: 0 }, loadOp: 'clear', storeOp: 'store' }] });
+        if (camera.clipInset > 0) { const x = Math.min(this.canvas.width - 1, Math.ceil(camera.clipInset * ratio)), y = Math.min(this.canvas.height - 1, Math.ceil(camera.clipInset * ratio)); pass.setScissorRect(x, y, this.canvas.width - x, this.canvas.height - y); }
         pass.setPipeline(this.render);
         for (const b of this.batches) {
             pass.setBindGroup(0, b.renderGroup);
@@ -2358,10 +2899,10 @@ precision highp float;
 layout(location=0) in vec4 ab;layout(location=1) in vec4 color;layout(location=2) in vec4 style;layout(location=3) in vec4 dash;
 uniform vec2 camera;uniform vec2 viewport;uniform float scale;
 out vec2 local;flat out vec2 metrics;flat out vec4 col;flat out vec4 sty;flat out vec4 dsh;
-void main(){vec2 a=(ab.xy-camera)*vec2(scale,-scale)+viewport*.5,b=(ab.zw-camera)*vec2(scale,-scale)+viewport*.5;vec2 delta=b-a;float len=max(length(delta),.0001);vec2 dir=delta/len,n=vec2(-dir.y,dir.x);float halfWidth=max(style.x*.5,.5),pad=halfWidth+1.;vec2 corners[6]=vec2[6](vec2(0,-1),vec2(1,-1),vec2(1,1),vec2(0,-1),vec2(1,1),vec2(0,1));vec2 corner=corners[gl_VertexID];local=vec2(mix(-pad,len+pad,corner.x),corner.y*pad);vec2 pixel=a+dir*local.x+n*local.y;gl_Position=vec4(pixel/viewport*vec2(2,-2)+vec2(-1,1),0,1);metrics=vec2(len,halfWidth);col=color;sty=style;dsh=dash;}`;
+void main(){vec2 a=(ab.xy-camera)*vec2(scale,-scale)+viewport*.5,b=(ab.zw-camera)*vec2(scale,-scale)+viewport*.5;vec2 delta=b-a;float len=max(length(delta),.0001);vec2 dir=len>.0001?delta/len:vec2(1,0),n=vec2(-dir.y,dir.x);float halfWidth=max(style.x*.5,.5),pad=halfWidth+1.;vec2 corners[6]=vec2[6](vec2(0,-1),vec2(1,-1),vec2(1,1),vec2(0,-1),vec2(1,1),vec2(0,1));vec2 corner=corners[gl_VertexID];local=vec2(mix(-pad,len+pad,corner.x),corner.y*pad);vec2 pixel=a+dir*local.x+n*local.y;gl_Position=vec4(pixel/viewport*vec2(2,-2)+vec2(-1,1),0,1);metrics=vec2(len,halfWidth);col=color;sty=style;dsh=dash;}`;
 const GLSL_FRAGMENT = `#version 300 es
 precision highp float;in vec2 local;flat in vec2 metrics;flat in vec4 col;flat in vec4 sty;flat in vec4 dsh;uniform float scale;out vec4 frag;
-void main(){float outside=length(vec2(max(max(-local.x,local.x-metrics.x),0.),local.y))-metrics.y;float alpha=1.-smoothstep(-.55,.55,outside);if(sty.y>0.){float pattern[6]=float[6](sty.y,sty.z,dsh.x,dsh.y,dsh.z,dsh.w);float cycle=sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w;float pos=mod(max(local.x,0.)/scale+sty.w,cycle);for(int i=0;i<6;i++){if(pos<pattern[i]){if(i%2==1)discard;break;}pos-=pattern[i];}}frag=vec4(col.rgb,col.a*alpha);}`;
+void main(){float outside=length(vec2(max(max(-local.x,local.x-metrics.x),0.),local.y))-metrics.y;float alpha=1.-smoothstep(-.55,.55,outside);if(sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w>0.){float pattern[6]=float[6](sty.y,sty.z,dsh.x,dsh.y,dsh.z,dsh.w);float cycle=sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w;float pos=mod(max(local.x,0.)/scale+sty.w,cycle);for(int i=0;i<6;i++){if(pos<pattern[i]){if(i%2==1)discard;break;}pos-=pattern[i];}}frag=vec4(col.rgb,col.a*alpha);}`;
 class GLBackend {
     constructor(canvas, onLost) { this.canvas = canvas; this.name = 'WebGL2'; this.onLost = onLost; }
     async init() {
@@ -2431,6 +2972,7 @@ class CanvasBackend {
 }
 function drawPath(ctx, path, camera, override = {}) {
     const points = path.points;
+    if (path.stroke === false && !override.color) return;
     if (!points.length)
         return;
     ctx.beginPath();
@@ -2447,25 +2989,49 @@ function drawPath(ctx, path, camera, override = {}) {
     ctx.lineWidth = override.width || path.width || 1.5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.setLineDash((override.dash || path.dash || []).map(v => v * camera.scale));
+    ctx.setLineDash((override.dash || path.dash || []).map(v => Math.max(0, v * camera.scale)));
+    ctx.lineDashOffset = -(path.dashPhase || 0) * camera.scale;
     ctx.globalAlpha = path.opacity ?? 1;
     ctx.stroke();
     ctx.globalAlpha = 1;
-    ctx.setLineDash([]);
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+}
+function drawFill(ctx, path, camera) {
+    if (!path.fill) return;
+    ctx.save(); ctx.beginPath();
+    for (const contour of path.contours || [path.points]) {
+        contour.forEach((p, i) => { const q = camera.screen(p); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.closePath();
+    }
+    ctx.fillStyle = path.fill; ctx.globalAlpha = path.opacity ?? 1; ctx.fill(path.fillRule || 'evenodd'); ctx.restore();
+}
+function cadFont(name) {
+    const clean = String(name || '').replace(/["'\\;{}]/g, '').replace(/\.(ttf|otf)$/i, '');
+    return !clean || /\.shx$|^(txt|standard)$/i.test(clean) ? 'ui-sans-serif, system-ui, sans-serif' : `"${clean}", ui-sans-serif, system-ui, sans-serif`;
 }
 function drawText(ctx, t, camera) {
-    const s = camera.screen(t.p), h = t.height * camera.scale;
-    if (h < 2 || h > 2000)
-        return;
-    ctx.save();
-    ctx.translate(s.x, s.y);
-    ctx.rotate(-(t.rotation || 0) * Math.PI / 180);
-    ctx.scale(t.widthFactor || 1, 1);
-    ctx.fillStyle = t.color || '#344755';
-    ctx.textAlign = t.align || 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = `${h}px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    String(t.text).split('\n').forEach((line, i) => ctx.fillText(line, 0, i * h * 1.3));
+    const s = camera.screen(t.p), h = t.nominalHeight || t.height;
+    if (!(h > 0) || !Number.isFinite(h)) return;
+    ctx.save(); ctx.translate(s.x, s.y);
+    if (t.frame) { const [a, b, c, d] = t.frame, z = camera.scale; ctx.transform(a * z, -b * z, -c * z, d * z, 0, 0); }
+    else { ctx.rotate(-(t.rotation || 0) * Math.PI / 180); ctx.scale((t.widthFactor || 1) * camera.scale, camera.scale); }
+    const setFont = (height, style) => ctx.font = `${style.italic ? 'italic ' : ''}${style.bold ? 'bold ' : ''}${height}px ${cadFont(style.font || t.font)}`;
+    const layout = textLayout(t, (text, height, style) => { setFont(height, style); return ctx.measureText(text).width; });
+    ctx.globalAlpha = t.opacity ?? 1; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    if (t.backgroundFill) {
+        const pad = Math.max(0, (t.backgroundScale || 1.5) - 1) * h;
+        ctx.fillStyle = (t.backgroundFill & 2) ? '#fbfcfb' : t.backgroundColor || '#ffffff';
+        ctx.fillRect(layout.minX - pad, layout.minY - pad, layout.width + 2 * pad, layout.height + 2 * pad);
+    }
+    for (const line of layout.lines) for (const run of line.runs) {
+        ctx.save(); ctx.translate(run.x, run.y); ctx.scale(run.width ? run.width / Math.max(1e-12, (setFont(run.height, run), ctx.measureText(run.text).width)) : 1, 1);
+        if (run.oblique) ctx.transform(1, 0, -Math.tan(run.oblique * Math.PI / 180), 1, 0, 0);
+        ctx.fillStyle = run.color || t.color || '#344755'; ctx.fillText(run.text, 0, 0);
+        ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = Math.max(.25, run.height / 18);
+        for (const [enabled, y] of [[run.underline, run.height * .12], [run.overline, -run.height * .85], [run.strike, -run.height * .35]]) if (enabled) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(ctx.measureText(run.text).width, y); ctx.stroke();
+        }
+        ctx.restore();
+    }
     ctx.restore();
 }
 /** Retained CAD renderer. Geometry uploads only after document/tessellation changes. */
@@ -2477,7 +3043,7 @@ class CadRenderer {
         this.onStatus = onStatus;
         this.dpr = Math.min(globalThis.devicePixelRatio || 1, 3);
         this.grid = true;
-        this.rulers = true;
+        this.rulers = true; this.camera.clipInset = 22;
         this.disposed = false;
         this.stats = { backend: 'Initializing', frameMs: 0, buildMs: 0, segments: 0, entities: 0, draws: 0 };
         this.background = document.createElement('canvas');
@@ -2541,6 +3107,7 @@ class CadRenderer {
         this.initialize(true, backend === 'WebGL2').finally(() => this.recovering = false);
     }
     resize() {
+        this.dpr = Math.min(globalThis.devicePixelRatio || 1, 3);
         const r = this.host.getBoundingClientRect();
         this.camera.width = Math.max(1, r.width);
         this.camera.height = Math.max(1, r.height);
@@ -2566,9 +3133,16 @@ class CadRenderer {
             requestAnimationFrame(() => { this.pending = false; this.render(); });
         }
     }
+    containsPoint(p) { const inset = this.rulers ? 22 : 0; return p.x >= inset && p.y >= inset && p.x < this.camera.width && p.y < this.camera.height; }
     render() {
         if (!this.doc || !this.engine || this.disposed)
             return;
+        this.camera.clipInset = this.rulers ? 22 : 0;
+        const clip = `inset(${this.camera.clipInset}px 0px 0px ${this.camera.clipInset}px)`;
+        this.canvas.style.clipPath = clip; this.overlay.style.clipPath = clip;
+        const viewKey = [this.camera.x, this.camera.y, this.camera.scale, this.camera.width, this.camera.height].join(':');
+        if (this.scene?.hasInfinite && this.viewKey !== viewKey) this.sceneDirty = true;
+        this.viewKey = viewKey;
         const start = performance.now(), lod = Math.floor(Math.log2(this.camera.scale || 1));
         if (this.pendingEntities?.size && !this.sceneDirty && this.scene && Math.abs(lod - (this.lod ?? lod)) < 2) {
             const t = performance.now(), ranges = updateSceneEntities(this.scene, this.doc, this.pendingEntities, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3) });
@@ -2589,7 +3163,7 @@ class CadRenderer {
         }
         if (this.sceneDirty || !this.scene || Math.abs(lod - (this.lod ?? lod)) >= 2) {
             this.lod = lod;
-            this.scene = buildScene(this.doc, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3) });
+            this.scene = buildScene(this.doc, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3), view: this.camera.viewport });
             try {
                 this.engine.upload(this.scene);
             }
@@ -2603,9 +3177,14 @@ class CadRenderer {
             this.stats.segments = this.scene.count;
             this.stats.entities = this.scene.items.length;
         }
+        // Hardware strokes have six dash slots. Preserve long patterns and zero-length ink dots through the ordered fidelity compositor.
+        const ordered = this.scene.paths.some(p => p.fill || p.dash?.length > 6 || p.dash?.some((v, i) => i % 2 === 0 && v === 0)) || this.scene.texts.some(t => t.backgroundFill);
+        this.orderedComposite = ordered;
+        this.canvas.style.visibility = ordered ? 'hidden' : 'visible';
+        this.stats.compositor = ordered ? 'Canvas 2D fidelity composite' : this.engine.name;
         this.drawBackground();
         try {
-            this.engine.draw(this.camera, this.dpr);
+            if (!ordered) this.engine.draw(this.camera, this.dpr);
         }
         catch (e) {
             this.recover(e.message, this.engine.name);
@@ -2614,13 +3193,21 @@ class CadRenderer {
         const ctx = this.ctx;
         ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
         ctx.clearRect(0, 0, this.camera.width, this.camera.height);
+        ctx.save(); ctx.beginPath(); ctx.rect(this.camera.clipInset, this.camera.clipInset, this.camera.width, this.camera.height); ctx.clip();
         const view = this.camera.viewport;
-        for (const t of this.scene.texts) {
-            const pad = t.text.length * t.height;
-            if (t.p.x + pad >= view.minX && t.p.x - pad <= view.maxX && t.p.y + t.height >= view.minY && t.p.y - t.height <= view.maxY)
-                drawText(ctx, t, this.camera);
+        if (ordered) {
+            const visible = new Set(this.scene.index.search(view).map(item=>item.id));
+            for (const [id, span] of this.scene.spans) {
+                if (!visible.has(id) && !['RAY','XLINE'].includes(this.scene.entities.get(id)?.type)) continue;
+                for (let i=span.pathStart; i<span.pathStart+span.pathCount; i++) { const p=this.scene.paths[i]; drawFill(ctx,p,this.camera); drawPath(ctx,p,this.camera); }
+                for (let i=span.textStart; i<span.textStart+span.textCount; i++) drawText(ctx,this.scene.texts[i],this.camera);
+            }
+        } else for (const t of this.scene.texts) {
+            const layout = textLayout(t), pad = Math.max(layout.width, layout.height) * Math.max(1, ...(t.frame || [1]).map(Math.abs));
+            if (t.p.x + pad >= view.minX && t.p.x - pad <= view.maxX && t.p.y + pad >= view.minY && t.p.y - pad <= view.maxY) drawText(ctx, t, this.camera);
         }
         this.drawOverlay?.(ctx, this.camera);
+        ctx.restore();
         this.stats.frameMs = performance.now() - start;
         this.stats.draws++;
         this.onFrame?.(this.stats);
@@ -2631,17 +3218,6 @@ class CadRenderer {
         c.clearRect(0, 0, cam.width, cam.height);
         c.fillStyle = '#fbfcfb';
         c.fillRect(0, 0, cam.width, cam.height);
-        // Solid fills are rendered behind batched GPU strokes; no painter-order claim is made.
-        for (const p of this.scene.paths)
-            if (p.fill && intersects(bounds(p.points), cam.viewport)) {
-                c.beginPath();
-                p.points.forEach((v, i) => { const s = cam.screen(v); i ? c.lineTo(s.x, s.y) : c.moveTo(s.x, s.y); });
-                c.closePath();
-                c.fillStyle = p.fill;
-                c.globalAlpha = .15;
-                c.fill('evenodd');
-                c.globalAlpha = 1;
-            }
         if (this.grid) {
             let step = 10;
             while (step * cam.scale < 18)
@@ -2659,6 +3235,9 @@ class CadRenderer {
                     c.fill();
                 }
         }
+        c.save(); c.beginPath(); c.rect(cam.clipInset || 0, cam.clipInset || 0, cam.width, cam.height); c.clip();
+        for (const p of this.scene.paths) if (!this.orderedComposite && p.fill && intersects(bounds(p.contours ? p.contours.flat() : p.points), cam.viewport)) drawFill(c, p, cam);
+        c.restore();
         if (this.rulers) {
             c.fillStyle = '#f3f6f4';
             c.fillRect(0, 0, cam.width, 22);
@@ -2718,7 +3297,7 @@ class CadRenderer {
     }
 }
 
-return {Camera,colorRGBA,buildScene,updateSceneEntities,CULL_SHADER,LINE_SHADER,drawPath,drawText,CadRenderer};
+return {Camera,colorRGBA,buildScene,updateSceneEntities,CULL_SHADER,LINE_SHADER,drawPath,drawFill,drawText,CadRenderer};
 })();
 // packages/input/src/index.js
 __modules["packages/input/src/index.js"]=(()=>{
@@ -2883,18 +3462,31 @@ return {ProjectStore,downloadFile};
 })();
 // packages/exchange/src/index.js
 __modules["packages/exchange/src/index.js"]=(()=>{
-const {documentBounds} = __modules["packages/model/src/index.js"];
-const {buildScene, Camera, drawPath, drawText} = __modules["packages/renderer/src/index.js"];
+const {documentBounds, textLayout} = __modules["packages/model/src/index.js"];
+const {buildScene, Camera, drawPath, drawText, drawFill} = __modules["packages/renderer/src/index.js"];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 function writeSVG(doc, { padding = 24, background = '#ffffff' } = {}) {
     const scene = buildScene(doc, { tolerance: .08 }), b = documentBounds(doc), x = b.minX - padding, y = b.minY - padding, w = b.maxX - b.minX + padding * 2, h = b.maxY - b.minY + padding * 2, parts = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${-y - h} ${w} ${h}"><title>${esc(doc.name)}</title><rect x="${x}" y="${-y - h}" width="${w}" height="${h}" fill="${esc(background)}"/>`];
-    for (const p of scene.paths) {
-        const d = p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(4)} ${(-p.y).toFixed(4)}`).join(' ') + (p.closed ? ' Z' : '');
-        parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" ${p.fill ? 'fill-opacity="0.15"' : ''} stroke="${esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
-    }
-    for (const t of scene.texts) {
-        const anchor = t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start';
-        parts.push(`<text transform="translate(${t.p.x} ${-t.p.y}) rotate(${-t.rotation}) scale(${t.widthFactor || 1} 1)" fill="${esc(t.color)}" font-family="system-ui,sans-serif" font-size="${t.height}" text-anchor="${anchor}">${String(t.text).split('\n').map((line, i) => `<tspan x="0" dy="${i ? t.height * 1.3 : 0}">${esc(line)}</tspan>`).join('')}</text>`);
+    for (const span of scene.spans.values()) {
+        for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) {
+            const d = (p.contours || [p.points]).map(points => points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(6)} ${(-p.y).toFixed(6)}`).join(' ') + (p.closed || p.contours ? ' Z' : '')).join(' ');
+            parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" fill-rule="evenodd" opacity="${p.opacity ?? 1}" stroke="${p.stroke === false ? 'none' : esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
+        }
+        for (const t of scene.texts.slice(span.textStart, span.textStart + span.textCount)) {
+            const angle = (t.rotation || 0) * Math.PI / 180;
+            const [a,b,c,d] = t.frame || [Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle)];
+            const layout = textLayout(t);
+            parts.push(`<g transform="matrix(${a} ${-b} ${-c} ${d} ${t.p.x} ${-t.p.y})" opacity="${t.opacity ?? 1}">`);
+            if (t.backgroundFill) {
+                const pad = Math.max(0,(t.backgroundScale || 1.5)-1)*(t.nominalHeight || t.height);
+                parts.push(`<rect x="${layout.minX-pad}" y="${layout.minY-pad}" width="${layout.width+2*pad}" height="${layout.height+2*pad}" fill="${esc(t.backgroundColor || '#ffffff')}"/>`);
+            }
+            for (const line of layout.lines) for (const run of line.runs) {
+                const font = /\.shx$|^txt$/i.test(run.font || t.font || '') ? 'sans-serif' : run.font || t.font || 'sans-serif';
+                parts.push(`<text x="${run.x}" y="${run.y}" font-family="${esc(font)}" font-size="${run.height}" fill="${esc(run.color || t.color)}" font-weight="${run.bold ? 'bold' : 'normal'}" font-style="${run.italic ? 'italic' : 'normal'}" textLength="${run.width}" lengthAdjust="spacingAndGlyphs" xml:space="preserve" text-decoration="${[run.underline ? 'underline' : '',run.overline ? 'overline' : '',run.strike ? 'line-through' : ''].filter(Boolean).join(' ') || 'none'}">${esc(run.text)}</text>`);
+            }
+            parts.push('</g>');
+        }
     }
     parts.push('</svg>');
     return parts.join('\n');
@@ -2909,20 +3501,10 @@ async function renderPNG(doc, { width = 2400, padding = 40, background = '#fffff
     camera.fit(b, padding);
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for (const p of scene.paths) {
-        if (p.fill) {
-            ctx.beginPath();
-            p.points.forEach((p, i) => { const s = camera.screen(p); i ? ctx.lineTo(s.x, s.y) : ctx.moveTo(s.x, s.y); });
-            ctx.closePath();
-            ctx.fillStyle = p.fill;
-            ctx.globalAlpha = .15;
-            ctx.fill('evenodd');
-            ctx.globalAlpha = 1;
-        }
-        drawPath(ctx, p, camera);
+    for (const span of scene.spans.values()) {
+        for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) { drawFill(ctx,p,camera); drawPath(ctx,p,camera); }
+        for (const t of scene.texts.slice(span.textStart,span.textStart+span.textCount)) drawText(ctx,t,camera);
     }
-    for (const t of scene.texts)
-        drawText(ctx, t, camera);
     return new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('PNG export failed')), 'image/png'));
 }
 function writeBOM(doc) {
@@ -2977,6 +3559,7 @@ const E = escapeHTML;
 const TOOL_INFO = { select: ['Select', 'Tap an object to select · drag to move'], pan: ['Pan', 'Drag the drawing · pinch to zoom'], line: ['Line', 'Tap two endpoints, or drag to draw a line'], polyline: ['Polyline', 'Tap vertices · Finish to complete the path'], rect: ['Rectangle', 'Tap opposite corners, or drag a rectangle'], circle: ['Circle', 'Tap the center, then set the radius'], connect: ['Connect', 'Tap a port, then a destination · routes avoid equipment'], text: ['Text', 'Tap the drawing to place editable text'], dimension: ['Dimension', 'Pick two points for an aligned dimension'], insert: ['Place symbol', 'Tap to place · Escape cancels'] };
 const btn = (action, label, ic, cls = '', title = label) => `<button type="button" data-action="${action}" class="${cls}" title="${E(title)}" aria-label="${E(label)}">${ic ? icon(ic) : ''}<span>${E(label)}</span></button>`;
 const iconButton = (action, ic, label, cls = '') => `<button type="button" data-action="${action}" class="icon-btn ${cls}" title="${E(label)}" aria-label="${E(label)}">${icon(ic)}</button>`;
+const filledContains = (p, contours) => { let inside=false; for (const poly of contours) for(let i=0,j=poly.length-1;i<poly.length;j=i++) {const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;} return inside; };
 const format = n => Number.isFinite(n) ? Number(n.toFixed(3)).toString() : '0';
 function symbolSVG(block, doc, extra = '') {
     if (!block)
@@ -2985,7 +3568,7 @@ function symbolSVG(block, doc, extra = '') {
     if (!validBounds(b))
         return icon('symbols');
     const pad = 8, view = `${b.minX - pad} ${-b.maxY - pad} ${b.maxX - b.minX + pad * 2} ${b.maxY - b.minY + pad * 2}`;
-    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" stroke="currentColor" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
+    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" fill="${p.fill ? 'currentColor' : 'none'}" fill-rule="evenodd" stroke="${p.stroke === false ? 'none' : 'currentColor'}" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
 }
 class Workbench {
     constructor(root, options = {}) {
@@ -3381,6 +3964,9 @@ class Workbench {
         }
     }
     updateFrame(stats) {
+        const badge = this.$('.backend-name');
+        if (badge) badge.textContent = this.renderer.orderedComposite ? 'Canvas 2D · fidelity' : stats.backend;
+        this.$('.render-badge')?.setAttribute('title', `${stats.compositor || stats.backend}. Stroke engine: ${stats.backend}. ${this.rendererMessage || ''}`);
         this.$('.zoom-value').textContent = Math.round(this.camera.scale * 100) + '%';
         this.$('.stats').textContent = `${stats.segments.toLocaleString()} segments · ${stats.frameMs.toFixed(1)} ms CPU`;
         if (this.cursor)
@@ -3488,7 +4074,7 @@ class Workbench {
             let group = this.category === 'P&ID' && !query ? (s.id.includes('valve') ? 'Valves & actuators' : ['pressure-indicator', 'flow-transmitter', 'temperature', 'level-transmitter'].includes(s.id) ? 'Instruments' : s.id === 'reducer' || s.id === 'flange' || s.id === 'offpage' ? 'Fittings & connections' : 'Equipment') : query ? s.category : this.category === 'Custom' ? 'Your DXF blocks' : this.category === 'Electrical' ? 'Components' : 'Diagram shapes';
             (groups[group] ??= []).push(s);
         }
-        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${symbolSVG(this.doc.blocks[s.block], this.doc)}<span>${E(s.name)}</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
+        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${symbolSVG(this.doc.blocks[s.block], this.doc)}<span>${E(s.name)}</span><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">⠿</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
     }
     pickSymbol(id) {
         this.pendingSymbol = id;
@@ -3528,15 +4114,17 @@ class Workbench {
         const abort = new AbortController();
         const begin = () => {
             dragging = true;
+            try { this.$('.viewport').setPointerCapture(event.pointerId); } catch {}
             card.style.touchAction = 'none';
             this.pendingSymbol = id;
             this.previewSymbol = this.symbolAt(id, this.camera.x, this.camera.y, false);
             if (this.isMobile())
                 this.closePanels();
         };
-        if (type === 'touch')
-            timer = setTimeout(begin, 280);
+        if (type === 'touch' && event.target.closest('.symbol-drag-handle')) { event.preventDefault(); begin(); }
+        else if (type === 'touch') return;
         const move = e => {
+            if (e.pointerId !== event.pointerId) return;
             const dx = e.clientX - start.x, dy = e.clientY - start.y;
             if (!dragging && type !== 'touch' && Math.hypot(dx, dy) > 7)
                 begin();
@@ -3553,6 +4141,7 @@ class Workbench {
             this.renderer.invalidate();
         };
         const up = e => {
+            if (e.pointerId !== event.pointerId) return;
             clearTimeout(timer);
             abort.abort();
             card.style.touchAction = 'pan-y';
@@ -3560,7 +4149,7 @@ class Workbench {
                 this.suppressLibraryClick = true;
                 this.previewSymbol = null;
                 const r = this.$('.viewport').getBoundingClientRect();
-                if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+                if (this.renderer.containsPoint({x:e.clientX-r.left,y:e.clientY-r.top})) {
                     const p = this.snapPoint(this.camera.world({ x: e.clientX - r.left, y: e.clientY - r.top }), new Set());
                     this.placeSymbol(id, p);
                 }
@@ -3780,10 +4369,14 @@ class Workbench {
                 continue;
             const g = entityGeometry(e, this.doc, { tolerance: .5 / this.camera.scale });
             let d = Infinity;
-            for (const path of g.paths)
-                for (let i = 1; i < path.points.length; i++)
-                    d = Math.min(d, distanceToSegment(p, path.points[i - 1], path.points[i]));
-            if (['INSERT', 'TEXT', 'MTEXT', 'SOLID'].includes(e.type) && contains(item, p))
+            for (const path of g.paths) {
+                for (const contour of path.contours || [path.points]) {
+                    for (let i=1;i<contour.length;i++) d=Math.min(d,distanceToSegment(p,contour[i-1],contour[i]));
+                    if (path.closed && contour.length>1) d=Math.min(d,distanceToSegment(p,contour.at(-1),contour[0]));
+                }
+                if (path.fill && filledContains(p,path.contours || [path.points])) d=0;
+            }
+            if (['INSERT', 'TEXT', 'MTEXT'].includes(e.type) && contains(item, p))
                 d = Math.min(d, 3 / this.camera.scale);
             if (d <= best) {
                 best = d;
@@ -3908,6 +4501,9 @@ class Workbench {
         }
     }
     grips(e) {
+        // OCS points cannot be exposed as WCS grips. Projected body dragging is handled by moveEntity.
+        const n = e.extrusion;
+        if (n && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'INSERT', 'HATCH', 'SOLID', 'TRACE'].includes(e.type) && (Math.abs(n.x || 0) > 1e-12 || Math.abs(n.y || 0) > 1e-12 || Math.abs((n.z ?? 1) - 1) > 1e-12)) return [];
         if (e.type === 'LINE' || e.type === 'DIMENSION')
             return [{ ...e.a, key: 'a' }, { ...e.b, key: 'b' }];
         if (e.type === 'CIRCLE' || e.type === 'ARC')
@@ -3923,7 +4519,7 @@ class Workbench {
         return [];
     }
     pointerDown(p) {
-        if (this.modal)
+        if (this.modal || !this.renderer.containsPoint(p))
             return;
         this.hideContext();
         this.shift = p.shift;
@@ -4068,7 +4664,7 @@ class Workbench {
                     }
                 }
                 else {
-                    e.points[g.index] = { ...q };
+                    e.points[g.index] = { ...e.points[g.index], ...q };
                     if (e.connector) {
                         if (g.index === 0)
                             e.connector.from = this.connectionPoint(raw).ref;
@@ -4081,7 +4677,7 @@ class Workbench {
                 }
             }
             else
-                e[g.key] = { ...q };
+                e[g.key] = { ...e[g.key], ...q };
             this.doc.entities[i] = e;
             e.dirty = true;
             this.cursor = q;
@@ -5018,7 +5614,7 @@ class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.1.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>56</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.backend)}</b><small>ACTIVE RENDERER</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Hold a library symbol briefly, then drag it onto the canvas; a simple tap arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, full 3D/OCS, ACIS solids, dynamic blocks, XREF resolution, complex hatch patterns, complete paper-layout behavior, font fidelity and industry certification remain outside this release.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.2.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>64</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, full paper-layout/XCLIP behavior, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

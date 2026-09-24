@@ -6,20 +6,22 @@
       "app": true,
       "stats": {
         "backend": "Canvas 2D",
-        "frameMs": 1.8000000000029104,
-        "buildMs": 1.9000000000087311,
-        "segments": 226,
+        "frameMs": 4.80000000000291,
+        "buildMs": 3.6999999999970896,
+        "segments": 243,
         "entities": 39,
-        "draws": 2
+        "draws": 2,
+        "compositor": "Canvas 2D"
       },
       "rendererMessage": "",
       "entities": 39,
       "canvas": {
         "x": 570.625,
-        "y": 361,
+        "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819
+        "height": 819,
+        "clipInset": 22
       },
       "scroll": 1440,
       "inner": 1440
@@ -32,20 +34,22 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 1.8999999999941792,
-        "buildMs": 2.1999999999970896,
-        "segments": 226,
+        "frameMs": 3.5,
+        "buildMs": 3.6999999999825377,
+        "segments": 243,
         "entities": 39,
-        "draws": 2
+        "draws": 2,
+        "compositor": "WebGL2"
       },
       "rendererMessage": "",
       "entities": 39,
       "canvas": {
         "x": 570.625,
-        "y": 361,
+        "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819
+        "height": 819,
+        "clipInset": 22
       },
       "scroll": 1440,
       "inner": 1440
@@ -58,20 +62,22 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 1.7000000000116415,
-        "buildMs": 2.3999999999941792,
-        "segments": 226,
+        "frameMs": 2.7999999999883585,
+        "buildMs": 3.3000000000174623,
+        "segments": 243,
         "entities": 39,
-        "draws": 2
+        "draws": 2,
+        "compositor": "WebGL2"
       },
       "rendererMessage": "GPUBackend: WebGPU API unavailable; ",
       "entities": 39,
       "canvas": {
         "x": 570.625,
-        "y": 361,
+        "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819
+        "height": 819,
+        "clipInset": 22
       },
       "scroll": 1440,
       "inner": 1440
@@ -83,11 +89,12 @@
     "overflow": false,
     "stats": {
       "backend": "Canvas 2D",
-      "frameMs": 1.3000000000029104,
-      "buildMs": 2.3999999999941792,
-      "segments": 214,
+      "frameMs": 2.7000000000116415,
+      "buildMs": 3.6999999999825377,
+      "segments": 230,
       "entities": 39,
-      "draws": 2
+      "draws": 2,
+      "compositor": "Canvas 2D"
     }
   }
 ]

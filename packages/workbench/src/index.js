@@ -14,6 +14,7 @@ const E = escapeHTML;
 const TOOL_INFO = { select: ['Select', 'Tap an object to select · drag to move'], pan: ['Pan', 'Drag the drawing · pinch to zoom'], line: ['Line', 'Tap two endpoints, or drag to draw a line'], polyline: ['Polyline', 'Tap vertices · Finish to complete the path'], rect: ['Rectangle', 'Tap opposite corners, or drag a rectangle'], circle: ['Circle', 'Tap the center, then set the radius'], connect: ['Connect', 'Tap a port, then a destination · routes avoid equipment'], text: ['Text', 'Tap the drawing to place editable text'], dimension: ['Dimension', 'Pick two points for an aligned dimension'], insert: ['Place symbol', 'Tap to place · Escape cancels'] };
 const btn = (action, label, ic, cls = '', title = label) => `<button type="button" data-action="${action}" class="${cls}" title="${E(title)}" aria-label="${E(label)}">${ic ? icon(ic) : ''}<span>${E(label)}</span></button>`;
 const iconButton = (action, ic, label, cls = '') => `<button type="button" data-action="${action}" class="icon-btn ${cls}" title="${E(label)}" aria-label="${E(label)}">${icon(ic)}</button>`;
+const filledContains = (p, contours) => { let inside=false; for (const poly of contours) for(let i=0,j=poly.length-1;i<poly.length;j=i++) {const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;} return inside; };
 const format = n => Number.isFinite(n) ? Number(n.toFixed(3)).toString() : '0';
 export function symbolSVG(block, doc, extra = '') {
     if (!block)
@@ -22,7 +23,7 @@ export function symbolSVG(block, doc, extra = '') {
     if (!validBounds(b))
         return icon('symbols');
     const pad = 8, view = `${b.minX - pad} ${-b.maxY - pad} ${b.maxX - b.minX + pad * 2} ${b.maxY - b.minY + pad * 2}`;
-    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" stroke="currentColor" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
+    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" fill="${p.fill ? 'currentColor' : 'none'}" fill-rule="evenodd" stroke="${p.stroke === false ? 'none' : 'currentColor'}" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
 }
 export class Workbench {
     constructor(root, options = {}) {
@@ -418,6 +419,9 @@ export class Workbench {
         }
     }
     updateFrame(stats) {
+        const badge = this.$('.backend-name');
+        if (badge) badge.textContent = this.renderer.orderedComposite ? 'Canvas 2D · fidelity' : stats.backend;
+        this.$('.render-badge')?.setAttribute('title', `${stats.compositor || stats.backend}. Stroke engine: ${stats.backend}. ${this.rendererMessage || ''}`);
         this.$('.zoom-value').textContent = Math.round(this.camera.scale * 100) + '%';
         this.$('.stats').textContent = `${stats.segments.toLocaleString()} segments · ${stats.frameMs.toFixed(1)} ms CPU`;
         if (this.cursor)
@@ -525,7 +529,7 @@ export class Workbench {
             let group = this.category === 'P&ID' && !query ? (s.id.includes('valve') ? 'Valves & actuators' : ['pressure-indicator', 'flow-transmitter', 'temperature', 'level-transmitter'].includes(s.id) ? 'Instruments' : s.id === 'reducer' || s.id === 'flange' || s.id === 'offpage' ? 'Fittings & connections' : 'Equipment') : query ? s.category : this.category === 'Custom' ? 'Your DXF blocks' : this.category === 'Electrical' ? 'Components' : 'Diagram shapes';
             (groups[group] ??= []).push(s);
         }
-        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${symbolSVG(this.doc.blocks[s.block], this.doc)}<span>${E(s.name)}</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
+        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${symbolSVG(this.doc.blocks[s.block], this.doc)}<span>${E(s.name)}</span><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">⠿</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
     }
     pickSymbol(id) {
         this.pendingSymbol = id;
@@ -565,15 +569,17 @@ export class Workbench {
         const abort = new AbortController();
         const begin = () => {
             dragging = true;
+            try { this.$('.viewport').setPointerCapture(event.pointerId); } catch {}
             card.style.touchAction = 'none';
             this.pendingSymbol = id;
             this.previewSymbol = this.symbolAt(id, this.camera.x, this.camera.y, false);
             if (this.isMobile())
                 this.closePanels();
         };
-        if (type === 'touch')
-            timer = setTimeout(begin, 280);
+        if (type === 'touch' && event.target.closest('.symbol-drag-handle')) { event.preventDefault(); begin(); }
+        else if (type === 'touch') return;
         const move = e => {
+            if (e.pointerId !== event.pointerId) return;
             const dx = e.clientX - start.x, dy = e.clientY - start.y;
             if (!dragging && type !== 'touch' && Math.hypot(dx, dy) > 7)
                 begin();
@@ -590,6 +596,7 @@ export class Workbench {
             this.renderer.invalidate();
         };
         const up = e => {
+            if (e.pointerId !== event.pointerId) return;
             clearTimeout(timer);
             abort.abort();
             card.style.touchAction = 'pan-y';
@@ -597,7 +604,7 @@ export class Workbench {
                 this.suppressLibraryClick = true;
                 this.previewSymbol = null;
                 const r = this.$('.viewport').getBoundingClientRect();
-                if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+                if (this.renderer.containsPoint({x:e.clientX-r.left,y:e.clientY-r.top})) {
                     const p = this.snapPoint(this.camera.world({ x: e.clientX - r.left, y: e.clientY - r.top }), new Set());
                     this.placeSymbol(id, p);
                 }
@@ -817,10 +824,14 @@ export class Workbench {
                 continue;
             const g = entityGeometry(e, this.doc, { tolerance: .5 / this.camera.scale });
             let d = Infinity;
-            for (const path of g.paths)
-                for (let i = 1; i < path.points.length; i++)
-                    d = Math.min(d, distanceToSegment(p, path.points[i - 1], path.points[i]));
-            if (['INSERT', 'TEXT', 'MTEXT', 'SOLID'].includes(e.type) && contains(item, p))
+            for (const path of g.paths) {
+                for (const contour of path.contours || [path.points]) {
+                    for (let i=1;i<contour.length;i++) d=Math.min(d,distanceToSegment(p,contour[i-1],contour[i]));
+                    if (path.closed && contour.length>1) d=Math.min(d,distanceToSegment(p,contour.at(-1),contour[0]));
+                }
+                if (path.fill && filledContains(p,path.contours || [path.points])) d=0;
+            }
+            if (['INSERT', 'TEXT', 'MTEXT'].includes(e.type) && contains(item, p))
                 d = Math.min(d, 3 / this.camera.scale);
             if (d <= best) {
                 best = d;
@@ -945,6 +956,9 @@ export class Workbench {
         }
     }
     grips(e) {
+        // OCS points cannot be exposed as WCS grips. Projected body dragging is handled by moveEntity.
+        const n = e.extrusion;
+        if (n && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'INSERT', 'HATCH', 'SOLID', 'TRACE'].includes(e.type) && (Math.abs(n.x || 0) > 1e-12 || Math.abs(n.y || 0) > 1e-12 || Math.abs((n.z ?? 1) - 1) > 1e-12)) return [];
         if (e.type === 'LINE' || e.type === 'DIMENSION')
             return [{ ...e.a, key: 'a' }, { ...e.b, key: 'b' }];
         if (e.type === 'CIRCLE' || e.type === 'ARC')
@@ -960,7 +974,7 @@ export class Workbench {
         return [];
     }
     pointerDown(p) {
-        if (this.modal)
+        if (this.modal || !this.renderer.containsPoint(p))
             return;
         this.hideContext();
         this.shift = p.shift;
@@ -1105,7 +1119,7 @@ export class Workbench {
                     }
                 }
                 else {
-                    e.points[g.index] = { ...q };
+                    e.points[g.index] = { ...e.points[g.index], ...q };
                     if (e.connector) {
                         if (g.index === 0)
                             e.connector.from = this.connectionPoint(raw).ref;
@@ -1118,7 +1132,7 @@ export class Workbench {
                 }
             }
             else
-                e[g.key] = { ...q };
+                e[g.key] = { ...e[g.key], ...q };
             this.doc.entities[i] = e;
             e.dirty = true;
             this.cursor = q;
@@ -2055,7 +2069,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.1.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>56</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.backend)}</b><small>ACTIVE RENDERER</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Hold a library symbol briefly, then drag it onto the canvas; a simple tap arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, full 3D/OCS, ACIS solids, dynamic blocks, XREF resolution, complex hatch patterns, complete paper-layout behavior, font fidelity and industry certification remain outside this release.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.2.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>64</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, full paper-layout/XCLIP behavior, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

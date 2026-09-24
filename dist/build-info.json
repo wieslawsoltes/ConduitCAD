@@ -1,7 +1,7 @@
 {
-  "version": "0.1.0",
-  "sha256": "03b4ea745854",
+  "version": "0.2.0",
+  "sha256": "30dc56a0a45f",
   "packages": 13,
-  "applicationBytes": 349280,
-  "standaloneBytes": 375517
+  "applicationBytes": 438755,
+  "standaloneBytes": 466506
 }

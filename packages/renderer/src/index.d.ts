@@ -1,5 +1,6 @@
 export function colorRGBA(hex: any, alpha?: number): number[];
-export function buildScene(doc: any, { tolerance, origin }?: {
+export function buildScene(doc: any, { tolerance, origin, view }?: {
+    view?: import("@conduitcad/geometry").Bounds;
     tolerance?: number;
     origin?: any;
 }): {
@@ -21,6 +22,8 @@ export function buildScene(doc: any, { tolerance, origin }?: {
     data: Float32Array;
     count: number;
     buildMs: number;
+    hasInfinite: boolean;
+    diagnostics: Array<{entityId?: string; message: string}>;
 };
 /** Patch equal-topology edits in place. A null result requests a full rebuild. */
 export function updateSceneEntities(scene: any, doc: any, ids: any, { tolerance }?: {
@@ -29,9 +32,11 @@ export function updateSceneEntities(scene: any, doc: any, ids: any, { tolerance 
     offset: any;
     count: any;
 }[] | null;
+export function drawFill(ctx: CanvasRenderingContext2D, path: import("@conduitcad/model").RenderPath, camera: Camera): void;
 export function drawPath(ctx: any, path: any, camera: any, override?: {}): void;
 export function drawText(ctx: any, t: any, camera: any): void;
 export class Camera {
+    clipInset?: number;
     x: number;
     y: number;
     scale: number;
@@ -78,11 +83,14 @@ export class CadRenderer {
         message: string;
     }) => void;
     dpr: number;
+    orderedComposite: boolean;
+    containsPoint(point: {x: number; y: number}): boolean;
     grid: boolean;
     rulers: boolean;
     disposed: boolean;
     stats: {
         backend: string;
+        compositor?: string;
         frameMs: number;
         buildMs: number;
         segments: number;

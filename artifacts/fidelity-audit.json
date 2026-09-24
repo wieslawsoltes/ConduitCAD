@@ -1,0 +1,157 @@
+{
+  "validator": "ezdxf 1.4.4",
+  "entities": 37,
+  "errors": [],
+  "repairs": [],
+  "checks": [
+    {
+      "entity": "0:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "1:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "2:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "3:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "4:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "5:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "6:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "7:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "8:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "9:HATCH",
+      "passed": true
+    },
+    {
+      "entity": "10:LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "entity": "11:POLYLINE",
+      "passed": true
+    },
+    {
+      "entity": "12:POLYLINE",
+      "passed": true
+    },
+    {
+      "entity": "13:POLYLINE",
+      "passed": true
+    },
+    {
+      "entity": "14:3DFACE",
+      "passed": true
+    },
+    {
+      "entity": "15:CIRCLE",
+      "passed": true
+    },
+    {
+      "entity": "16:CIRCLE",
+      "passed": true
+    },
+    {
+      "entity": "17:ELLIPSE",
+      "passed": true
+    },
+    {
+      "entity": "18:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "19:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "20:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "21:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "22:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "23:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "24:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "25:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "26:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "27:MTEXT",
+      "passed": true
+    },
+    {
+      "entity": "28:TEXT",
+      "passed": true
+    },
+    {
+      "entity": "29:TEXT",
+      "passed": true
+    },
+    {
+      "entity": "30:TEXT",
+      "passed": true
+    },
+    {
+      "entity": "31:TEXT",
+      "passed": true
+    },
+    {
+      "entity": "32:LINE",
+      "passed": true
+    },
+    {
+      "entity": "33:LINE",
+      "passed": true
+    },
+    {
+      "entity": "34:LEADER",
+      "passed": true
+    },
+    {
+      "entity": "35:RAY",
+      "passed": true
+    },
+    {
+      "entity": "36:XLINE",
+      "passed": true
+    }
+  ],
+  "scope": "Compared native hatch edges/patterns/gradients, text properties, meshes, wide polylines and opacity. Not an AutoCAD rendering certification."
+}

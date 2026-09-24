@@ -5,7 +5,7 @@
   "version": 0,
   "entities": [
     {
-      "id": "e-mufq3hqo-62",
+      "id": "e-mufzcxde-8m",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -18,7 +18,7 @@
       "color": "#6d9693"
     },
     {
-      "id": "e-mufq3hqo-63",
+      "id": "e-mufzcxde-8n",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -31,7 +31,7 @@
       "color": "#304c58"
     },
     {
-      "id": "e-mufq3hqo-64",
+      "id": "e-mufzcxde-8o",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -44,7 +44,7 @@
       "color": "#849298"
     },
     {
-      "id": "e-mufq3hqo-65",
+      "id": "e-mufzcxde-8p",
       "type": "LINE",
       "layer": "Annotations",
       "a": {
@@ -59,7 +59,7 @@
       "width": 1
     },
     {
-      "id": "e-mufq3hqo-66",
+      "id": "e-mufzcxde-8q",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_BATTERY",
@@ -71,7 +71,7 @@
       "tag": "24 VDC"
     },
     {
-      "id": "e-mufq3hqo-67",
+      "id": "e-mufzcxde-8r",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_FUSE",
@@ -83,7 +83,7 @@
       "tag": "F1"
     },
     {
-      "id": "e-mufq3hqo-68",
+      "id": "e-mufzcxde-8s",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_SWITCH",
@@ -95,7 +95,7 @@
       "tag": "S1"
     },
     {
-      "id": "e-mufq3hqo-69",
+      "id": "e-mufzcxde-8t",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_RELAY",
@@ -107,7 +107,7 @@
       "tag": "K1"
     },
     {
-      "id": "e-mufq3hqo-6a",
+      "id": "e-mufzcxde-8u",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_MOTOR",
@@ -119,7 +119,7 @@
       "tag": "M1"
     },
     {
-      "id": "e-mufq3hqo-6b",
+      "id": "e-mufzcxde-8v",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -129,7 +129,7 @@
           "y": 350,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-66"
+          "entityId": "e-mufzcxde-8q"
         },
         {
           "x": 265,
@@ -141,7 +141,7 @@
           "y": 350,
           "dx": -1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-67"
+          "entityId": "e-mufzcxde-8r"
         }
       ],
       "closed": false,
@@ -151,11 +151,11 @@
       "label": "L+",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-66",
+          "entityId": "e-mufzcxde-8q",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-67",
+          "entityId": "e-mufzcxde-8r",
           "port": "in"
         },
         "style": "electrical",
@@ -165,7 +165,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6c",
+      "id": "e-mufzcxde-8w",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -175,7 +175,7 @@
           "y": 350,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-67"
+          "entityId": "e-mufzcxde-8r"
         },
         {
           "x": 445,
@@ -187,7 +187,7 @@
           "y": 350,
           "dx": -1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-68"
+          "entityId": "e-mufzcxde-8s"
         }
       ],
       "closed": false,
@@ -197,11 +197,11 @@
       "label": "L+",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-67",
+          "entityId": "e-mufzcxde-8r",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-68",
+          "entityId": "e-mufzcxde-8s",
           "port": "in"
         },
         "style": "electrical",
@@ -211,7 +211,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6d",
+      "id": "e-mufzcxde-8x",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -221,7 +221,7 @@
           "y": 350,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-68"
+          "entityId": "e-mufzcxde-8s"
         },
         {
           "x": 655,
@@ -233,7 +233,7 @@
           "y": 350,
           "dx": -1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-69"
+          "entityId": "e-mufzcxde-8t"
         }
       ],
       "closed": false,
@@ -243,11 +243,11 @@
       "label": "L+",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-68",
+          "entityId": "e-mufzcxde-8s",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-69",
+          "entityId": "e-mufzcxde-8t",
           "port": "in"
         },
         "style": "electrical",
@@ -257,7 +257,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6e",
+      "id": "e-mufzcxde-8y",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -267,7 +267,7 @@
           "y": 350,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-69"
+          "entityId": "e-mufzcxde-8t"
         },
         {
           "x": 885,
@@ -279,7 +279,7 @@
           "y": 350,
           "dx": -1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-6a"
+          "entityId": "e-mufzcxde-8u"
         }
       ],
       "closed": false,
@@ -289,11 +289,11 @@
       "label": "L+",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-69",
+          "entityId": "e-mufzcxde-8t",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-6a",
+          "entityId": "e-mufzcxde-8u",
           "port": "in"
         },
         "style": "electrical",
@@ -303,7 +303,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6f",
+      "id": "e-mufzcxde-8z",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_GROUND",
@@ -315,7 +315,7 @@
       "tag": "PE"
     },
     {
-      "id": "e-mufq3hqo-6g",
+      "id": "e-mufzcxde-90",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -325,7 +325,7 @@
           "y": 305,
           "dx": 0,
           "dy": -1,
-          "entityId": "e-mufq3hqo-6a"
+          "entityId": "e-mufzcxde-8u"
         },
         {
           "x": 930,
@@ -337,7 +337,7 @@
           "y": 200,
           "dx": 0,
           "dy": 1,
-          "entityId": "e-mufq3hqo-6f"
+          "entityId": "e-mufzcxde-8z"
         }
       ],
       "closed": false,
@@ -347,11 +347,11 @@
       "label": "",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-6a",
+          "entityId": "e-mufzcxde-8u",
           "port": "bottom"
         },
         "to": {
-          "entityId": "e-mufq3hqo-6f",
+          "entityId": "e-mufzcxde-8z",
           "port": "terminal"
         },
         "style": "electrical",
@@ -361,7 +361,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6h",
+      "id": "e-mufzcxde-91",
       "type": "INSERT",
       "layer": "Electrical",
       "block": "CC_LAMP",
@@ -373,7 +373,7 @@
       "tag": "H1"
     },
     {
-      "id": "e-mufq3hqo-6i",
+      "id": "e-mufzcxde-92",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -383,7 +383,7 @@
           "y": 350,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-68"
+          "entityId": "e-mufzcxde-8s"
         },
         {
           "x": 560,
@@ -399,7 +399,7 @@
           "y": 200,
           "dx": -1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-6h"
+          "entityId": "e-mufzcxde-91"
         }
       ],
       "closed": false,
@@ -409,11 +409,11 @@
       "label": "",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-68",
+          "entityId": "e-mufzcxde-8s",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-6h",
+          "entityId": "e-mufzcxde-91",
           "port": "in"
         },
         "style": "electrical",
@@ -432,7 +432,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6j",
+      "id": "e-mufzcxde-93",
       "type": "LWPOLYLINE",
       "layer": "Electrical",
       "points": [
@@ -442,7 +442,7 @@
           "y": 200,
           "dx": 1,
           "dy": 0,
-          "entityId": "e-mufq3hqo-6h"
+          "entityId": "e-mufzcxde-91"
         },
         {
           "x": 930,
@@ -454,7 +454,7 @@
           "y": 305,
           "dx": 0,
           "dy": -1,
-          "entityId": "e-mufq3hqo-6a"
+          "entityId": "e-mufzcxde-8u"
         }
       ],
       "closed": false,
@@ -464,11 +464,11 @@
       "label": "",
       "connector": {
         "from": {
-          "entityId": "e-mufq3hqo-6h",
+          "entityId": "e-mufzcxde-91",
           "port": "out"
         },
         "to": {
-          "entityId": "e-mufq3hqo-6a",
+          "entityId": "e-mufzcxde-8u",
           "port": "bottom"
         },
         "style": "electrical",
@@ -483,7 +483,7 @@
       }
     },
     {
-      "id": "e-mufq3hqo-6k",
+      "id": "e-mufzcxde-94",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -496,7 +496,7 @@
       "color": "#849298"
     },
     {
-      "id": "e-mufq3hqo-6l",
+      "id": "e-mufzcxde-95",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -509,7 +509,7 @@
       "color": "#849298"
     },
     {
-      "id": "e-mufq3hqo-6m",
+      "id": "e-mufzcxde-96",
       "type": "LINE",
       "layer": "Annotations",
       "a": {
@@ -524,7 +524,7 @@
       "width": 1
     },
     {
-      "id": "e-mufq3hqo-6n",
+      "id": "e-mufzcxde-97",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -537,7 +537,7 @@
       "color": "#849298"
     },
     {
-      "id": "e-mufq3hqo-6o",
+      "id": "e-mufzcxde-98",
       "type": "TEXT",
       "layer": "Annotations",
       "p": {
@@ -559,7 +559,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -572,7 +572,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -585,7 +585,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -594,15 +594,31 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
+              "x": 0,
+              "y": 0
             },
+            {
+              "x": -25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
             {
               "x": 25,
               "y": -18
             },
             {
-              "x": -25,
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
               "y": 18
             }
           ],
@@ -628,7 +644,10 @@
       "symbol": {
         "name": "Gate valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_BALL_VALVE": {
@@ -639,7 +658,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-50",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -647,16 +666,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -21,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-51",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 21,
             "y": 0
           },
           "b": {
@@ -665,7 +684,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-4",
+          "id": "e-mufzcxcy-52",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -675,7 +694,7 @@
           "r": 21
         },
         {
-          "id": "e-mufq3hq0-5",
+          "id": "e-mufzcxcy-53",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -707,7 +726,10 @@
       "symbol": {
         "name": "Ball valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_GLOBE_VALVE": {
@@ -718,7 +740,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -731,7 +753,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -744,7 +766,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -753,12 +775,8 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
-            },
-            {
-              "x": 25,
-              "y": -18
+              "x": 0,
+              "y": 0
             },
             {
               "x": -25,
@@ -768,7 +786,27 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-6",
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-7",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -797,7 +835,10 @@
       "symbol": {
         "name": "Globe valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_BUTTERFLY_VALVE": {
@@ -808,7 +849,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-54",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -816,16 +857,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -23,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-55",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 23,
             "y": 0
           },
           "b": {
@@ -834,7 +875,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-7",
+          "id": "e-mufzcxcy-56",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -844,7 +885,7 @@
           "r": 23
         },
         {
-          "id": "e-mufq3hq0-8",
+          "id": "e-mufzcxcy-57",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -857,7 +898,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-9",
+          "id": "e-mufzcxcy-58",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -886,7 +927,10 @@
       "symbol": {
         "name": "Butterfly valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_CHECK_VALVE": {
@@ -897,7 +941,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-59",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -905,16 +949,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -24,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5a",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 24,
             "y": 0
           },
           "b": {
@@ -923,36 +967,52 @@
           }
         },
         {
-          "id": "e-mufq3hq0-a",
-          "type": "LWPOLYLINE",
-          "layer": "0",
-          "points": [
-            {
-              "x": -22,
-              "y": -18
-            },
-            {
-              "x": 18,
-              "y": 0
-            },
-            {
-              "x": -22,
-              "y": 18
-            }
-          ],
-          "closed": true
-        },
-        {
-          "id": "e-mufq3hq0-b",
+          "id": "e-mufzcxcy-5b",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 21,
-            "y": -22
+            "x": -24,
+            "y": -20
           },
           "b": {
-            "x": 21,
-            "y": 22
+            "x": -24,
+            "y": 20
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5c",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -24,
+            "y": 20
+          },
+          "b": {
+            "x": 24,
+            "y": -16
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5d",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": -24,
+            "y": 20
+          },
+          "r": 3
+        },
+        {
+          "id": "e-mufzcxcy-5e",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 2
+          },
+          "b": {
+            "x": 0,
+            "y": 18
           }
         }
       ],
@@ -982,7 +1042,10 @@
       "symbol": {
         "name": "Check valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_CONTROL_VALVE": {
@@ -993,7 +1056,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1006,7 +1069,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1019,7 +1082,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1028,12 +1091,8 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
-            },
-            {
-              "x": 25,
-              "y": -18
+              "x": 0,
+              "y": 0
             },
             {
               "x": -25,
@@ -1043,7 +1102,27 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-c",
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-d",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1056,7 +1135,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-d",
+          "id": "e-mufzcxcw-e",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1110,7 +1189,10 @@
       "symbol": {
         "name": "Control valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_SOLENOID_VALVE": {
@@ -1121,7 +1203,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1134,7 +1216,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1147,7 +1229,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1156,12 +1238,8 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
-            },
-            {
-              "x": 25,
-              "y": -18
+              "x": 0,
+              "y": 0
             },
             {
               "x": -25,
@@ -1171,7 +1249,27 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-e",
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-f",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1184,7 +1282,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-f",
+          "id": "e-mufzcxcw-g",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1208,7 +1306,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-g",
+          "id": "e-mufzcxcw-h",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -1240,7 +1338,10 @@
       "symbol": {
         "name": "Solenoid valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_RELIEF_VALVE": {
@@ -1251,7 +1352,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1264,7 +1365,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1277,7 +1378,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1286,12 +1387,8 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
-            },
-            {
-              "x": 25,
-              "y": -18
+              "x": 0,
+              "y": 0
             },
             {
               "x": -25,
@@ -1301,7 +1398,27 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-h",
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-i",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1314,7 +1431,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-i",
+          "id": "e-mufzcxcw-j",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1346,7 +1463,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-j",
+          "id": "e-mufzcxcw-k",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1378,7 +1495,10 @@
       "symbol": {
         "name": "Relief valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_THREE_WAY_VALVE": {
@@ -1389,7 +1509,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1402,7 +1522,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1415,7 +1535,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3",
+          "id": "e-mufzcxcw-3",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1424,12 +1544,8 @@
               "y": -18
             },
             {
-              "x": 25,
-              "y": 18
-            },
-            {
-              "x": 25,
-              "y": -18
+              "x": 0,
+              "y": 0
             },
             {
               "x": -25,
@@ -1439,7 +1555,27 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-k",
+          "id": "e-mufzcxcw-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcw-l",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1459,7 +1595,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-l",
+          "id": "e-mufzcxcw-m",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1498,7 +1634,10 @@
       "symbol": {
         "name": "Three-way valve",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_PUMP": {
@@ -1509,7 +1648,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5f",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1517,16 +1656,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -27,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5g",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 27,
             "y": 0
           },
           "b": {
@@ -1535,7 +1674,33 @@
           }
         },
         {
-          "id": "e-mufq3hq0-m",
+          "id": "e-mufzcxcy-5h",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 27
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5i",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -27
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        },
+        {
+          "id": "e-mufzcxcx-n",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1545,7 +1710,7 @@
           "r": 27
         },
         {
-          "id": "e-mufq3hq0-n",
+          "id": "e-mufzcxcx-o",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1565,7 +1730,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-o",
+          "id": "e-mufzcxcx-p",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1611,7 +1776,10 @@
       "symbol": {
         "name": "Centrifugal pump",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_GEAR_PUMP": {
@@ -1622,7 +1790,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5j",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1630,16 +1798,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -28,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5k",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 28,
             "y": 0
           },
           "b": {
@@ -1648,7 +1816,33 @@
           }
         },
         {
-          "id": "e-mufq3hq0-p",
+          "id": "e-mufzcxcy-5l",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 28
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5m",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -28
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        },
+        {
+          "id": "e-mufzcxcx-q",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1658,7 +1852,7 @@
           "r": 28
         },
         {
-          "id": "e-mufq3hq0-q",
+          "id": "e-mufzcxcx-r",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1668,7 +1862,7 @@
           "r": 11
         },
         {
-          "id": "e-mufq3hq0-r",
+          "id": "e-mufzcxcx-s",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1711,7 +1905,10 @@
       "symbol": {
         "name": "Gear pump",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_COMPRESSOR": {
@@ -1722,7 +1919,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5n",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1730,16 +1927,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -29,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5o",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 29,
             "y": 0
           },
           "b": {
@@ -1748,7 +1945,33 @@
           }
         },
         {
-          "id": "e-mufq3hq0-s",
+          "id": "e-mufzcxcy-5p",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 29
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5q",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -29
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        },
+        {
+          "id": "e-mufzcxcx-t",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1758,7 +1981,7 @@
           "r": 29
         },
         {
-          "id": "e-mufq3hq0-t",
+          "id": "e-mufzcxcx-u",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1815,7 +2038,10 @@
       "symbol": {
         "name": "Compressor",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_FAN": {
@@ -1826,7 +2052,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5r",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1834,16 +2060,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -29,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5s",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 29,
             "y": 0
           },
           "b": {
@@ -1852,7 +2078,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-u",
+          "id": "e-mufzcxcx-v",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1862,7 +2088,7 @@
           "r": 29
         },
         {
-          "id": "e-mufq3hq0-v",
+          "id": "e-mufzcxcx-w",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -1872,7 +2098,7 @@
           "r": 6
         },
         {
-          "id": "e-mufq3hq0-w",
+          "id": "e-mufzcxcx-x",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1896,7 +2122,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-x",
+          "id": "e-mufzcxcx-y",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1920,7 +2146,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-y",
+          "id": "e-mufzcxcx-z",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -1963,7 +2189,10 @@
       "symbol": {
         "name": "Fan / blower",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_STRAINER": {
@@ -1974,7 +2203,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -1987,7 +2216,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2000,7 +2229,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-z",
+          "id": "e-mufzcxcx-10",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2024,7 +2253,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-10",
+          "id": "e-mufzcxcx-11",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2037,7 +2266,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-11",
+          "id": "e-mufzcxcx-12",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2080,7 +2309,10 @@
       "symbol": {
         "name": "Y strainer",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_FILTER": {
@@ -2091,7 +2323,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2104,7 +2336,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2117,7 +2349,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-12",
+          "id": "e-mufzcxcy-65",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2141,7 +2373,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-13",
+          "id": "e-mufzcxcy-66",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2154,7 +2386,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-14",
+          "id": "e-mufzcxcy-67",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2164,6 +2396,32 @@
           "b": {
             "x": 25,
             "y": -28
+          }
+        },
+        {
+          "id": "e-mufzcxcy-68",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 28
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-69",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -28
+          },
+          "b": {
+            "x": 0,
+            "y": -45
           }
         }
       ],
@@ -2200,7 +2458,10 @@
       "symbol": {
         "name": "Inline filter",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_HEAT_EXCHANGER": {
@@ -2211,7 +2472,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5t",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2219,16 +2480,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -33,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5u",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 33,
             "y": 0
           },
           "b": {
@@ -2237,7 +2498,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-15",
+          "id": "e-mufzcxcx-16",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -2247,7 +2508,7 @@
           "r": 33
         },
         {
-          "id": "e-mufq3hq0-16",
+          "id": "e-mufzcxcx-17",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2279,7 +2540,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-17",
+          "id": "e-mufzcxcx-18",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2292,7 +2553,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-18",
+          "id": "e-mufzcxcx-19",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2338,7 +2599,10 @@
       "symbol": {
         "name": "Heat exchanger",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_TANK": {
@@ -2349,7 +2613,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-19",
+          "id": "e-mufzcxcx-1a",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2362,7 +2626,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1a",
+          "id": "e-mufzcxcx-1b",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2375,7 +2639,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1b",
+          "id": "e-mufzcxcx-1c",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2435,7 +2699,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-1c",
+          "id": "e-mufzcxcx-1d",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2495,7 +2759,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-1d",
+          "id": "e-mufzcxcx-1e",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2508,7 +2772,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1e",
+          "id": "e-mufzcxcx-1f",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2521,7 +2785,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1f",
+          "id": "e-mufzcxcx-1g",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2567,7 +2831,10 @@
       "symbol": {
         "name": "Storage tank",
         "category": "P&ID",
-        "labelOffset": 112
+        "labelOffset": 112,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_VESSEL": {
@@ -2578,7 +2845,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1g",
+          "id": "e-mufzcxcx-1h",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2602,7 +2869,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-1h",
+          "id": "e-mufzcxcx-1i",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2615,7 +2882,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1i",
+          "id": "e-mufzcxcx-1j",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2628,7 +2895,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1j",
+          "id": "e-mufzcxcx-1k",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2641,7 +2908,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1k",
+          "id": "e-mufzcxcx-1l",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2654,7 +2921,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1l",
+          "id": "e-mufzcxcx-1m",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2700,7 +2967,10 @@
       "symbol": {
         "name": "Pressure vessel",
         "category": "P&ID",
-        "labelOffset": 83
+        "labelOffset": 83,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_MIXER": {
@@ -2711,7 +2981,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1m",
+          "id": "e-mufzcxcx-1n",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2735,7 +3005,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-1n",
+          "id": "e-mufzcxcx-1o",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2748,7 +3018,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1o",
+          "id": "e-mufzcxcx-1p",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -2772,7 +3042,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-1p",
+          "id": "e-mufzcxcx-1q",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2785,7 +3055,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1q",
+          "id": "e-mufzcxcx-1r",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2798,7 +3068,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1r",
+          "id": "e-mufzcxcx-1s",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2811,7 +3081,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-1s",
+          "id": "e-mufzcxcx-1t",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2857,7 +3127,10 @@
       "symbol": {
         "name": "Agitated vessel",
         "category": "P&ID",
-        "labelOffset": 66
+        "labelOffset": 66,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_PRESSURE_INDICATOR": {
@@ -2868,7 +3141,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1t",
+          "id": "e-mufzcxcx-1u",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -2878,7 +3151,7 @@
           "r": 26
         },
         {
-          "id": "e-mufq3hq0-1u",
+          "id": "e-mufzcxcx-1v",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -2891,7 +3164,7 @@
           "align": "center"
         },
         {
-          "id": "e-mufq3hq0-1v",
+          "id": "e-mufzcxcx-1w",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2916,7 +3189,10 @@
       "symbol": {
         "name": "Pressure indicator",
         "category": "P&ID",
-        "labelOffset": 65
+        "labelOffset": 65,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_FLOW_TRANSMITTER": {
@@ -2927,7 +3203,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1w",
+          "id": "e-mufzcxcx-1x",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -2937,7 +3213,7 @@
           "r": 26
         },
         {
-          "id": "e-mufq3hq0-1x",
+          "id": "e-mufzcxcx-1y",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -2950,7 +3226,7 @@
           "align": "center"
         },
         {
-          "id": "e-mufq3hq0-1y",
+          "id": "e-mufzcxcx-1z",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -2975,7 +3251,10 @@
       "symbol": {
         "name": "Flow transmitter",
         "category": "P&ID",
-        "labelOffset": 65
+        "labelOffset": 65,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_TEMPERATURE": {
@@ -2986,7 +3265,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1z",
+          "id": "e-mufzcxcx-20",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -2996,7 +3275,7 @@
           "r": 26
         },
         {
-          "id": "e-mufq3hq0-20",
+          "id": "e-mufzcxcx-21",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -3009,7 +3288,7 @@
           "align": "center"
         },
         {
-          "id": "e-mufq3hq0-21",
+          "id": "e-mufzcxcx-22",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3034,7 +3313,10 @@
       "symbol": {
         "name": "Temperature sensor",
         "category": "P&ID",
-        "labelOffset": 65
+        "labelOffset": 65,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_LEVEL_TRANSMITTER": {
@@ -3045,7 +3327,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-22",
+          "id": "e-mufzcxcx-23",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -3055,7 +3337,7 @@
           "r": 26
         },
         {
-          "id": "e-mufq3hq0-23",
+          "id": "e-mufzcxcx-24",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -3068,7 +3350,7 @@
           "align": "center"
         },
         {
-          "id": "e-mufq3hq0-24",
+          "id": "e-mufzcxcx-25",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3093,7 +3375,10 @@
       "symbol": {
         "name": "Level transmitter",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_REDUCER": {
@@ -3104,7 +3389,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-25",
+          "id": "e-mufzcxcx-26",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3117,7 +3402,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-26",
+          "id": "e-mufzcxcx-27",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3141,7 +3426,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-27",
+          "id": "e-mufzcxcx-28",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3173,7 +3458,10 @@
       "symbol": {
         "name": "Concentric reducer",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_FLANGE": {
@@ -3184,7 +3472,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-28",
+          "id": "e-mufzcxcx-29",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3197,7 +3485,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-29",
+          "id": "e-mufzcxcx-2a",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3210,7 +3498,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2a",
+          "id": "e-mufzcxcx-2b",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3223,7 +3511,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2b",
+          "id": "e-mufzcxcx-2c",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3255,7 +3543,10 @@
       "symbol": {
         "name": "Flanged joint",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_OFFPAGE": {
@@ -3266,7 +3557,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-2c",
+          "id": "e-mufzcxcy-6i",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3294,7 +3585,33 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-2d",
+          "id": "e-mufzcxcy-6j",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -40,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6k",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 44,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6l",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -3326,7 +3643,10 @@
       "symbol": {
         "name": "Off-page connector",
         "category": "P&ID",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_RESISTOR": {
@@ -3337,7 +3657,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3350,7 +3670,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3363,7 +3683,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2e",
+          "id": "e-mufzcxcx-2f",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3418,7 +3738,10 @@
       "symbol": {
         "name": "Resistor",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_RESISTOR_IEC": {
@@ -3429,7 +3752,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3442,7 +3765,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3455,7 +3778,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2f",
+          "id": "e-mufzcxcx-2g",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3498,7 +3821,10 @@
       "symbol": {
         "name": "Resistor · rectangular",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_CAPACITOR": {
@@ -3509,7 +3835,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-2g",
+          "id": "e-mufzcxcx-2h",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3522,7 +3848,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2h",
+          "id": "e-mufzcxcx-2i",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3535,7 +3861,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2i",
+          "id": "e-mufzcxcx-2j",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3548,7 +3874,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2j",
+          "id": "e-mufzcxcx-2k",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3580,7 +3906,10 @@
       "symbol": {
         "name": "Capacitor",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_INDUCTOR": {
@@ -3591,7 +3920,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-2k",
+          "id": "e-mufzcxcx-2l",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3604,7 +3933,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2l",
+          "id": "e-mufzcxcx-2m",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3617,7 +3946,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2m",
+          "id": "e-mufzcxcx-2n",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3657,7 +3986,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-2n",
+          "id": "e-mufzcxcx-2o",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3697,7 +4026,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-2o",
+          "id": "e-mufzcxcx-2p",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3737,7 +4066,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-2p",
+          "id": "e-mufzcxcx-2q",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3796,7 +4125,10 @@
       "symbol": {
         "name": "Inductor",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DIODE": {
@@ -3807,7 +4139,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-6a",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3815,25 +4147,12 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -22,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
-          "type": "LINE",
-          "layer": "0",
-          "a": {
-            "x": 25,
-            "y": 0
-          },
-          "b": {
-            "x": 45,
-            "y": 0
-          }
-        },
-        {
-          "id": "e-mufq3hq0-2q",
+          "id": "e-mufzcxcy-6b",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3842,7 +4161,7 @@
               "y": -22
             },
             {
-              "x": 20,
+              "x": 22,
               "y": 0
             },
             {
@@ -3853,7 +4172,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-2r",
+          "id": "e-mufzcxcy-6c",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3863,6 +4182,19 @@
           "b": {
             "x": 22,
             "y": 24
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6d",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 22,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
           }
         }
       ],
@@ -3885,7 +4217,10 @@
       "symbol": {
         "name": "Diode",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_LED": {
@@ -3896,7 +4231,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-6a",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3904,25 +4239,12 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -22,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
-          "type": "LINE",
-          "layer": "0",
-          "a": {
-            "x": 25,
-            "y": 0
-          },
-          "b": {
-            "x": 45,
-            "y": 0
-          }
-        },
-        {
-          "id": "e-mufq3hq0-2s",
+          "id": "e-mufzcxcy-6b",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -3931,7 +4253,7 @@
               "y": -22
             },
             {
-              "x": 20,
+              "x": 22,
               "y": 0
             },
             {
@@ -3942,7 +4264,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-2t",
+          "id": "e-mufzcxcy-6c",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -3955,41 +4277,80 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2u",
+          "id": "e-mufzcxcy-6d",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 22,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6e",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 4,
+            "y": 27
+          },
+          "b": {
+            "x": 24,
+            "y": 47
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6f",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
             {
-              "x": 4,
-              "y": 27
+              "x": 15,
+              "y": 45
             },
             {
-              "x": 21,
-              "y": 44
+              "x": 24,
+              "y": 47
             },
             {
-              "x": 14,
-              "y": 42
+              "x": 22,
+              "y": 38
             }
           ],
           "closed": false
         },
         {
-          "id": "e-mufq3hq0-2v",
+          "id": "e-mufzcxcy-6g",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 18,
+            "y": 22
+          },
+          "b": {
+            "x": 38,
+            "y": 42
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6h",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
             {
-              "x": 18,
-              "y": 22
+              "x": 29,
+              "y": 40
             },
             {
-              "x": 35,
-              "y": 39
+              "x": 38,
+              "y": 42
             },
             {
-              "x": 28,
-              "y": 37
+              "x": 36,
+              "y": 33
             }
           ],
           "closed": false
@@ -4014,7 +4375,10 @@
       "symbol": {
         "name": "LED",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_SWITCH": {
@@ -4025,7 +4389,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-2w",
+          "id": "e-mufzcxcx-2x",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4038,7 +4402,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2x",
+          "id": "e-mufzcxcx-2y",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4051,7 +4415,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2y",
+          "id": "e-mufzcxcx-2z",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4061,7 +4425,7 @@
           "r": 3
         },
         {
-          "id": "e-mufq3hq0-2z",
+          "id": "e-mufzcxcx-30",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4071,7 +4435,7 @@
           "r": 3
         },
         {
-          "id": "e-mufq3hq0-30",
+          "id": "e-mufzcxcx-31",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4103,7 +4467,10 @@
       "symbol": {
         "name": "Switch · normally open",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_SWITCH_NC": {
@@ -4114,7 +4481,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-31",
+          "id": "e-mufzcxcx-32",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4127,7 +4494,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-32",
+          "id": "e-mufzcxcx-33",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4140,7 +4507,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-33",
+          "id": "e-mufzcxcx-34",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4150,7 +4517,7 @@
           "r": 3
         },
         {
-          "id": "e-mufq3hq0-34",
+          "id": "e-mufzcxcx-35",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4160,7 +4527,7 @@
           "r": 3
         },
         {
-          "id": "e-mufq3hq0-35",
+          "id": "e-mufzcxcx-36",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4173,7 +4540,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-36",
+          "id": "e-mufzcxcx-37",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4205,7 +4572,10 @@
       "symbol": {
         "name": "Switch · normally closed",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_FUSE": {
@@ -4216,7 +4586,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-37",
+          "id": "e-mufzcxcx-38",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4229,7 +4599,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-38",
+          "id": "e-mufzcxcx-39",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -4272,7 +4642,10 @@
       "symbol": {
         "name": "Fuse",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_RELAY": {
@@ -4283,7 +4656,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcw-1",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4296,7 +4669,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcw-2",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4309,7 +4682,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-39",
+          "id": "e-mufzcxcx-3a",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -4333,7 +4706,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-3a",
+          "id": "e-mufzcxcx-3b",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4365,7 +4738,10 @@
       "symbol": {
         "name": "Relay coil",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_MOTOR": {
@@ -4376,7 +4752,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5v",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4384,16 +4760,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -29,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-5w",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 29,
             "y": 0
           },
           "b": {
@@ -4402,7 +4778,33 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3b",
+          "id": "e-mufzcxcy-5x",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 29
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-5y",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -29
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        },
+        {
+          "id": "e-mufzcxcx-3c",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4412,7 +4814,7 @@
           "r": 29
         },
         {
-          "id": "e-mufq3hq0-3c",
+          "id": "e-mufzcxcx-3d",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -4458,7 +4860,10 @@
       "symbol": {
         "name": "Motor",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_GENERATOR": {
@@ -4469,7 +4874,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-5z",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4477,16 +4882,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -29,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-60",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 29,
             "y": 0
           },
           "b": {
@@ -4495,7 +4900,33 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3d",
+          "id": "e-mufzcxcy-61",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 29
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          }
+        },
+        {
+          "id": "e-mufzcxcy-62",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -29
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        },
+        {
+          "id": "e-mufzcxcx-3e",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4505,7 +4936,7 @@
           "r": 29
         },
         {
-          "id": "e-mufq3hq0-3e",
+          "id": "e-mufzcxcx-3f",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -4551,7 +4982,10 @@
       "symbol": {
         "name": "Generator",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_TRANSFORMER": {
@@ -4562,7 +4996,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-3f",
+          "id": "e-mufzcxcx-3g",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4575,7 +5009,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3g",
+          "id": "e-mufzcxcx-3h",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4588,7 +5022,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3h",
+          "id": "e-mufzcxcx-3i",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4598,7 +5032,7 @@
           "r": 18
         },
         {
-          "id": "e-mufq3hq0-3i",
+          "id": "e-mufzcxcx-3j",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4608,7 +5042,7 @@
           "r": 18
         },
         {
-          "id": "e-mufq3hq0-3j",
+          "id": "e-mufzcxcx-3k",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4621,7 +5055,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3k",
+          "id": "e-mufzcxcx-3l",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4653,7 +5087,10 @@
       "symbol": {
         "name": "Transformer",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_GROUND": {
@@ -4664,7 +5101,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-3l",
+          "id": "e-mufzcxcx-3m",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4677,7 +5114,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3m",
+          "id": "e-mufzcxcx-3n",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4690,7 +5127,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3n",
+          "id": "e-mufzcxcx-3o",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4703,7 +5140,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3o",
+          "id": "e-mufzcxcx-3p",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4728,7 +5165,10 @@
       "symbol": {
         "name": "Protective earth",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_BATTERY": {
@@ -4739,7 +5179,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-3p",
+          "id": "e-mufzcxcx-3q",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4752,7 +5192,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3q",
+          "id": "e-mufzcxcx-3r",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4765,7 +5205,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3r",
+          "id": "e-mufzcxcx-3s",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4778,7 +5218,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3s",
+          "id": "e-mufzcxcx-3t",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4791,7 +5231,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3t",
+          "id": "e-mufzcxcx-3u",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4804,7 +5244,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3u",
+          "id": "e-mufzcxcx-3v",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4836,7 +5276,10 @@
       "symbol": {
         "name": "Battery",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_TERMINAL": {
@@ -4847,7 +5290,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-3v",
+          "id": "e-mufzcxcx-3w",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4860,7 +5303,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-3w",
+          "id": "e-mufzcxcx-3x",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -4870,7 +5313,7 @@
           "r": 12
         },
         {
-          "id": "e-mufq3hq0-3x",
+          "id": "e-mufzcxcx-3y",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -4913,7 +5356,10 @@
       "symbol": {
         "name": "Terminal block",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_OP_AMP": {
@@ -4924,7 +5370,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-3y",
+          "id": "e-mufzcxcx-3z",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -4944,7 +5390,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-3z",
+          "id": "e-mufzcxcx-40",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4957,7 +5403,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-40",
+          "id": "e-mufzcxcx-41",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4970,7 +5416,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-41",
+          "id": "e-mufzcxcx-42",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -4983,7 +5429,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-42",
+          "id": "e-mufzcxcx-43",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -4996,7 +5442,7 @@
           "align": "center"
         },
         {
-          "id": "e-mufq3hq0-43",
+          "id": "e-mufzcxcx-44",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5035,7 +5481,10 @@
       "symbol": {
         "name": "Operational amplifier",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_LAMP": {
@@ -5046,7 +5495,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-1",
+          "id": "e-mufzcxcy-63",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5054,16 +5503,16 @@
             "y": 0
           },
           "b": {
-            "x": -25,
+            "x": -24,
             "y": 0
           }
         },
         {
-          "id": "e-mufq3hq0-2",
+          "id": "e-mufzcxcy-64",
           "type": "LINE",
           "layer": "0",
           "a": {
-            "x": 25,
+            "x": 24,
             "y": 0
           },
           "b": {
@@ -5072,7 +5521,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-44",
+          "id": "e-mufzcxcx-45",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -5082,7 +5531,7 @@
           "r": 24
         },
         {
-          "id": "e-mufq3hq0-45",
+          "id": "e-mufzcxcx-46",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5095,7 +5544,7 @@
           }
         },
         {
-          "id": "e-mufq3hq0-46",
+          "id": "e-mufzcxcx-47",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5127,7 +5576,10 @@
       "symbol": {
         "name": "Indicator lamp",
         "category": "Electrical",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_PROCESS": {
@@ -5138,7 +5590,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-47",
+          "id": "e-mufzcxcx-48",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5162,7 +5614,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-48",
+          "id": "e-mufzcxcx-49",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5208,7 +5660,10 @@
       "symbol": {
         "name": "Process",
         "category": "Flow",
-        "labelOffset": 55
+        "labelOffset": 55,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DECISION": {
@@ -5219,7 +5674,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq0-49",
+          "id": "e-mufzcxcx-4a",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5243,7 +5698,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq0-4a",
+          "id": "e-mufzcxcx-4b",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5289,7 +5744,10 @@
       "symbol": {
         "name": "Decision",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_TERMINATOR": {
@@ -5300,7 +5758,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4b",
+          "id": "e-mufzcxcx-4c",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5412,7 +5870,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4c",
+          "id": "e-mufzcxcx-4d",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5444,7 +5902,10 @@
       "symbol": {
         "name": "Start / end",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DATA": {
@@ -5455,7 +5916,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4d",
+          "id": "e-mufzcxcx-4e",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5479,7 +5940,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4e",
+          "id": "e-mufzcxcx-4f",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5509,14 +5970,14 @@
         },
         {
           "name": "left",
-          "x": -55,
+          "x": -53.5,
           "y": 0,
           "dx": -1,
           "dy": 0
         },
         {
           "name": "right",
-          "x": 55,
+          "x": 53.5,
           "y": 0,
           "dx": 1,
           "dy": 0
@@ -5525,7 +5986,10 @@
       "symbol": {
         "name": "Data / input",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DOCUMENT": {
@@ -5536,7 +6000,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4f",
+          "id": "e-mufzcxcx-4g",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5572,7 +6036,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4g",
+          "id": "e-mufzcxcx-4h",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5596,7 +6060,7 @@
         {
           "name": "out",
           "x": 0,
-          "y": -35,
+          "y": -25,
           "dx": 0,
           "dy": -1
         },
@@ -5618,7 +6082,10 @@
       "symbol": {
         "name": "Document",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DATABASE": {
@@ -5629,7 +6096,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4h",
+          "id": "e-mufzcxcx-4i",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5642,7 +6109,7 @@
           }
         },
         {
-          "id": "e-mufq3hq1-4i",
+          "id": "e-mufzcxcx-4j",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5655,7 +6122,7 @@
           }
         },
         {
-          "id": "e-mufq3hq1-4j",
+          "id": "e-mufzcxcx-4k",
           "type": "ELLIPSE",
           "layer": "0",
           "c": {
@@ -5669,7 +6136,7 @@
           "ratio": 0.3333333333333333
         },
         {
-          "id": "e-mufq3hq1-4k",
+          "id": "e-mufzcxcx-4l",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5801,7 +6268,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq1-4l",
+          "id": "e-mufzcxcx-4m",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5818,27 +6285,27 @@
         {
           "name": "in",
           "x": 0,
-          "y": 35,
+          "y": 40,
           "dx": 0,
           "dy": 1
         },
         {
           "name": "out",
           "x": 0,
-          "y": -35,
+          "y": -40,
           "dx": 0,
           "dy": -1
         },
         {
           "name": "left",
-          "x": -55,
+          "x": -45,
           "y": 0,
           "dx": -1,
           "dy": 0
         },
         {
           "name": "right",
-          "x": 55,
+          "x": 45,
           "y": 0,
           "dx": 1,
           "dy": 0
@@ -5847,7 +6314,10 @@
       "symbol": {
         "name": "Database",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_SUBPROCESS": {
@@ -5858,7 +6328,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4m",
+          "id": "e-mufzcxcx-4n",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5882,7 +6352,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4n",
+          "id": "e-mufzcxcx-4o",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5895,7 +6365,7 @@
           }
         },
         {
-          "id": "e-mufq3hq1-4o",
+          "id": "e-mufzcxcx-4p",
           "type": "LINE",
           "layer": "0",
           "a": {
@@ -5908,7 +6378,7 @@
           }
         },
         {
-          "id": "e-mufq3hq1-4p",
+          "id": "e-mufzcxcx-4q",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -5954,7 +6424,10 @@
       "symbol": {
         "name": "Subprocess",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_MANUAL": {
@@ -5965,7 +6438,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4q",
+          "id": "e-mufzcxcx-4r",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -5989,7 +6462,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4r",
+          "id": "e-mufzcxcx-4s",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -6006,7 +6479,7 @@
         {
           "name": "in",
           "x": 0,
-          "y": 35,
+          "y": 32,
           "dx": 0,
           "dy": 1
         },
@@ -6035,7 +6508,10 @@
       "symbol": {
         "name": "Manual input",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_PREPARATION": {
@@ -6046,7 +6522,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4s",
+          "id": "e-mufzcxcx-4t",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -6078,7 +6554,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4t",
+          "id": "e-mufzcxcx-4u",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -6108,14 +6584,14 @@
         },
         {
           "name": "left",
-          "x": -55,
+          "x": -60,
           "y": 0,
           "dx": -1,
           "dy": 0
         },
         {
           "name": "right",
-          "x": 55,
+          "x": 60,
           "y": 0,
           "dx": 1,
           "dy": 0
@@ -6124,7 +6600,10 @@
       "symbol": {
         "name": "Preparation",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_DELAY": {
@@ -6135,7 +6614,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4u",
+          "id": "e-mufzcxcy-4v",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -6279,7 +6758,7 @@
           "closed": true
         },
         {
-          "id": "e-mufq3hq1-4v",
+          "id": "e-mufzcxcy-4w",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -6309,14 +6788,14 @@
         },
         {
           "name": "left",
-          "x": -55,
+          "x": -50,
           "y": 0,
           "dx": -1,
           "dy": 0
         },
         {
           "name": "right",
-          "x": 55,
+          "x": 40,
           "y": 0,
           "dx": 1,
           "dy": 0
@@ -6325,7 +6804,10 @@
       "symbol": {
         "name": "Delay",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_JUNCTION": {
@@ -6336,7 +6818,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4w",
+          "id": "e-mufzcxcy-4x",
           "type": "CIRCLE",
           "layer": "0",
           "c": {
@@ -6379,7 +6861,10 @@
       "symbol": {
         "name": "Junction",
         "category": "Flow",
-        "labelOffset": 57
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
       }
     },
     "CC_NOTE": {
@@ -6390,7 +6875,7 @@
       },
       "entities": [
         {
-          "id": "e-mufq3hq1-4x",
+          "id": "e-mufzcxcy-4y",
           "type": "LWPOLYLINE",
           "layer": "0",
           "points": [
@@ -6414,7 +6899,7 @@
           "closed": false
         },
         {
-          "id": "e-mufq3hq1-4y",
+          "id": "e-mufzcxcy-4z",
           "type": "TEXT",
           "layer": "0",
           "p": {
@@ -6429,38 +6914,788 @@
       ],
       "ports": [
         {
-          "name": "in",
+          "name": "left",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0
+        },
+        {
+          "name": "top",
           "x": 0,
           "y": 35,
           "dx": 0,
           "dy": 1
         },
         {
-          "name": "out",
+          "name": "bottom",
           "x": 0,
           "y": -35,
           "dx": 0,
           "dy": -1
+        }
+      ],
+      "symbol": {
+        "name": "Annotation",
+        "category": "Flow",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Flowchart conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_PRESSURE_PANEL": {
+      "name": "CC_PRESSURE_PANEL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-6m",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26
         },
         {
-          "name": "left",
-          "x": -55,
+          "id": "e-mufzcxcy-6n",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -26,
+            "y": 0
+          },
+          "b": {
+            "x": 26,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6o",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 7
+          },
+          "text": "PI",
+          "height": 12,
+          "rotation": 0,
+          "align": "center"
+        },
+        {
+          "id": "e-mufzcxcy-6p",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -26
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "sense",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1
+        }
+      ],
+      "symbol": {
+        "name": "Pressure indicator · panel",
+        "category": "P&ID",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified",
+        "instrumentLocation": "primary accessible panel"
+      }
+    },
+    "CC_PRESSURE_REAR": {
+      "name": "CC_PRESSURE_REAR",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-6q",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26
+        },
+        {
+          "id": "e-mufzcxcy-6r",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -26,
+            "y": 0
+          },
+          "b": {
+            "x": 26,
+            "y": 0
+          },
+          "dash": [
+            4,
+            3
+          ]
+        },
+        {
+          "id": "e-mufzcxcy-6s",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 7
+          },
+          "text": "PI",
+          "height": 12,
+          "rotation": 0,
+          "align": "center"
+        },
+        {
+          "id": "e-mufzcxcy-6t",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -26
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "sense",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1
+        }
+      ],
+      "symbol": {
+        "name": "Pressure indicator · rear panel",
+        "category": "P&ID",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "Process and instrumentation drafting conventions",
+        "conformity": "Original master; not standards-certified",
+        "instrumentLocation": "normally inaccessible"
+      }
+    },
+    "CC_CAPACITOR_POLARIZED": {
+      "name": "CC_CAPACITOR_POLARIZED",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-6u",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -7,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6v",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6w",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -7,
+            "y": -25
+          },
+          "b": {
+            "x": -7,
+            "y": 25
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6x",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 5.40527012867269,
+              "y": 23.085301562207032
+            },
+            {
+              "x": 3.0640764644613228,
+              "y": 17.586227216885142
+            },
+            {
+              "x": 1.3693474597205153,
+              "y": 11.854831223829802
+            },
+            {
+              "x": 0.3434712156607773,
+              "y": 5.966827796470535
+            },
+            {
+              "x": 0,
+              "y": 6.368163355566236e-15
+            },
+            {
+              "x": 0.3434712156607773,
+              "y": -5.966827796470523
+            },
+            {
+              "x": 1.3693474597205082,
+              "y": -11.85483122382979
+            },
+            {
+              "x": 3.0640764644613157,
+              "y": -17.586227216885128
+            },
+            {
+              "x": 5.405270128672683,
+              "y": -23.08530156220702
+            }
+          ],
+          "closed": false
+        },
+        {
+          "id": "e-mufzcxcy-6y",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -28,
+            "y": 20
+          },
+          "b": {
+            "x": -16,
+            "y": 20
+          }
+        },
+        {
+          "id": "e-mufzcxcy-6z",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": 14
+          },
+          "b": {
+            "x": -22,
+            "y": 26
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
           "y": 0,
           "dx": -1,
           "dy": 0
         },
         {
-          "name": "right",
-          "x": 55,
+          "name": "out",
+          "x": 45,
           "y": 0,
           "dx": 1,
           "dy": 0
         }
       ],
       "symbol": {
-        "name": "Annotation",
-        "category": "Flow",
-        "labelOffset": 57
+        "name": "Capacitor · polarized",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_SIGNAL_GROUND": {
+      "name": "CC_SIGNAL_GROUND",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-70",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 40
+          },
+          "b": {
+            "x": 0,
+            "y": 10
+          }
+        },
+        {
+          "id": "e-mufzcxcy-71",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -24,
+              "y": 10
+            },
+            {
+              "x": 24,
+              "y": 10
+            },
+            {
+              "x": 0,
+              "y": -22
+            }
+          ],
+          "closed": true
+        }
+      ],
+      "ports": [
+        {
+          "name": "terminal",
+          "x": 0,
+          "y": 40,
+          "dx": 0,
+          "dy": 1
+        }
+      ],
+      "symbol": {
+        "name": "Signal reference",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_CHASSIS": {
+      "name": "CC_CHASSIS",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-72",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 40
+          },
+          "b": {
+            "x": 0,
+            "y": 8
+          }
+        },
+        {
+          "id": "e-mufzcxcy-73",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -24,
+            "y": 8
+          },
+          "b": {
+            "x": 24,
+            "y": 8
+          }
+        },
+        {
+          "id": "e-mufzcxcy-74",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -24,
+            "y": 8
+          },
+          "b": {
+            "x": -35,
+            "y": -8
+          }
+        },
+        {
+          "id": "e-mufzcxcy-75",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 8
+          },
+          "b": {
+            "x": -11,
+            "y": -8
+          }
+        },
+        {
+          "id": "e-mufzcxcy-76",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 24,
+            "y": 8
+          },
+          "b": {
+            "x": 13,
+            "y": -8
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "terminal",
+          "x": 0,
+          "y": 40,
+          "dx": 0,
+          "dy": 1
+        }
+      ],
+      "symbol": {
+        "name": "Chassis connection",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_CONTACT_NO": {
+      "name": "CC_CONTACT_NO",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-77",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -8,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-78",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 8,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-79",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -23
+          },
+          "b": {
+            "x": -8,
+            "y": 23
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7a",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 8,
+            "y": -23
+          },
+          "b": {
+            "x": 8,
+            "y": 23
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0
+        }
+      ],
+      "symbol": {
+        "name": "Contact · normally open",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_CONTACT_NC": {
+      "name": "CC_CONTACT_NC",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcy-7b",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -8,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7c",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 8,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7d",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -23
+          },
+          "b": {
+            "x": -8,
+            "y": 23
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7e",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 8,
+            "y": -23
+          },
+          "b": {
+            "x": 8,
+            "y": 23
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7f",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -19,
+            "y": -28
+          },
+          "b": {
+            "x": 19,
+            "y": 28
+          }
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0
+        }
+      ],
+      "symbol": {
+        "name": "Contact · normally closed",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
+      }
+    },
+    "CC_POTENTIOMETER": {
+      "name": "CC_POTENTIOMETER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "e-mufzcxcw-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcw-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7g",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -11
+            },
+            {
+              "x": 25,
+              "y": -11
+            },
+            {
+              "x": 25,
+              "y": 11
+            },
+            {
+              "x": -25,
+              "y": 11
+            }
+          ],
+          "closed": true
+        },
+        {
+          "id": "e-mufzcxcy-7h",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 45
+          },
+          "b": {
+            "x": 0,
+            "y": 12
+          }
+        },
+        {
+          "id": "e-mufzcxcy-7i",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -6,
+              "y": 22
+            },
+            {
+              "x": 0,
+              "y": 12
+            },
+            {
+              "x": 6,
+              "y": 22
+            }
+          ],
+          "closed": false
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0
+        },
+        {
+          "name": "wiper",
+          "x": 0,
+          "y": 45,
+          "dx": 0,
+          "dy": 1
+        }
+      ],
+      "symbol": {
+        "name": "Potentiometer",
+        "category": "Electrical",
+        "labelOffset": 57,
+        "geometryRevision": 2,
+        "convention": "IEC/ANSI functional drafting conventions",
+        "conformity": "Original master; not standards-certified"
       }
     }
   },

@@ -1,15 +1,28 @@
-import { documentBounds } from '@conduitcad/model';
-import { buildScene, Camera, drawPath, drawText } from '@conduitcad/renderer';
+import { documentBounds, textLayout } from '@conduitcad/model';
+import { buildScene, Camera, drawPath, drawText, drawFill } from '@conduitcad/renderer';
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 export function writeSVG(doc, { padding = 24, background = '#ffffff' } = {}) {
     const scene = buildScene(doc, { tolerance: .08 }), b = documentBounds(doc), x = b.minX - padding, y = b.minY - padding, w = b.maxX - b.minX + padding * 2, h = b.maxY - b.minY + padding * 2, parts = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${-y - h} ${w} ${h}"><title>${esc(doc.name)}</title><rect x="${x}" y="${-y - h}" width="${w}" height="${h}" fill="${esc(background)}"/>`];
-    for (const p of scene.paths) {
-        const d = p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(4)} ${(-p.y).toFixed(4)}`).join(' ') + (p.closed ? ' Z' : '');
-        parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" ${p.fill ? 'fill-opacity="0.15"' : ''} stroke="${esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
-    }
-    for (const t of scene.texts) {
-        const anchor = t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start';
-        parts.push(`<text transform="translate(${t.p.x} ${-t.p.y}) rotate(${-t.rotation}) scale(${t.widthFactor || 1} 1)" fill="${esc(t.color)}" font-family="system-ui,sans-serif" font-size="${t.height}" text-anchor="${anchor}">${String(t.text).split('\n').map((line, i) => `<tspan x="0" dy="${i ? t.height * 1.3 : 0}">${esc(line)}</tspan>`).join('')}</text>`);
+    for (const span of scene.spans.values()) {
+        for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) {
+            const d = (p.contours || [p.points]).map(points => points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(6)} ${(-p.y).toFixed(6)}`).join(' ') + (p.closed || p.contours ? ' Z' : '')).join(' ');
+            parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" fill-rule="evenodd" opacity="${p.opacity ?? 1}" stroke="${p.stroke === false ? 'none' : esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
+        }
+        for (const t of scene.texts.slice(span.textStart, span.textStart + span.textCount)) {
+            const angle = (t.rotation || 0) * Math.PI / 180;
+            const [a,b,c,d] = t.frame || [Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle)];
+            const layout = textLayout(t);
+            parts.push(`<g transform="matrix(${a} ${-b} ${-c} ${d} ${t.p.x} ${-t.p.y})" opacity="${t.opacity ?? 1}">`);
+            if (t.backgroundFill) {
+                const pad = Math.max(0,(t.backgroundScale || 1.5)-1)*(t.nominalHeight || t.height);
+                parts.push(`<rect x="${layout.minX-pad}" y="${layout.minY-pad}" width="${layout.width+2*pad}" height="${layout.height+2*pad}" fill="${esc(t.backgroundColor || '#ffffff')}"/>`);
+            }
+            for (const line of layout.lines) for (const run of line.runs) {
+                const font = /\.shx$|^txt$/i.test(run.font || t.font || '') ? 'sans-serif' : run.font || t.font || 'sans-serif';
+                parts.push(`<text x="${run.x}" y="${run.y}" font-family="${esc(font)}" font-size="${run.height}" fill="${esc(run.color || t.color)}" font-weight="${run.bold ? 'bold' : 'normal'}" font-style="${run.italic ? 'italic' : 'normal'}" textLength="${run.width}" lengthAdjust="spacingAndGlyphs" xml:space="preserve" text-decoration="${[run.underline ? 'underline' : '',run.overline ? 'overline' : '',run.strike ? 'line-through' : ''].filter(Boolean).join(' ') || 'none'}">${esc(run.text)}</text>`);
+            }
+            parts.push('</g>');
+        }
     }
     parts.push('</svg>');
     return parts.join('\n');
@@ -24,20 +37,10 @@ export async function renderPNG(doc, { width = 2400, padding = 40, background = 
     camera.fit(b, padding);
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for (const p of scene.paths) {
-        if (p.fill) {
-            ctx.beginPath();
-            p.points.forEach((p, i) => { const s = camera.screen(p); i ? ctx.lineTo(s.x, s.y) : ctx.moveTo(s.x, s.y); });
-            ctx.closePath();
-            ctx.fillStyle = p.fill;
-            ctx.globalAlpha = .15;
-            ctx.fill('evenodd');
-            ctx.globalAlpha = 1;
-        }
-        drawPath(ctx, p, camera);
+    for (const span of scene.spans.values()) {
+        for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) { drawFill(ctx,p,camera); drawPath(ctx,p,camera); }
+        for (const t of scene.texts.slice(span.textStart,span.textStart+span.textCount)) drawText(ctx,t,camera);
     }
-    for (const t of scene.texts)
-        drawText(ctx, t, camera);
     return new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('PNG export failed')), 'image/png'));
 }
 export function writeBOM(doc) {

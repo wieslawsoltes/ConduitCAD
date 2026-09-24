@@ -1,5 +1,5 @@
 /** Optional compile-only consumer check: tsc -p tests/tsconfig.json. */
-import {createDocument, line, circle, entity, moveEntity, type CadDocument} from '@conduitcad/model';
+import {createDocument, line, circle, entity, moveEntity, type CadDocument, type HatchEntity, textLayout, objectCoordinateTransform} from '@conduitcad/model';
 import {lineIntersection, offsetPolyline} from '@conduitcad/geometry';
 import {CadRenderer, Camera, buildScene, updateSceneEntities} from '@conduitcad/renderer';
 import {installSymbols, insertSymbol} from '@conduitcad/symbols';
@@ -33,3 +33,11 @@ renderer.setDocument(documentModel);
 renderer.updateEntities([e.id]);
 const app = mountWorkbench(host,{document:documentModel,backend:'canvas'});
 void [lineIntersection,offsetPolyline,entity,routePorts,SpatialIndex,PointerController,ProjectStore,svg,bom,value,app];
+
+const hatch: HatchEntity = {id: 'h', type: 'HATCH', layer: '0', solid: true, loops: [{flags: 3, closed: true, points: [{x: 0, y: 0}, {x: 10, y: 0}, {x: 10, y: 10}]}]};
+const native = parseDXF(output, {encoding: 'utf-8', mtextRotationUnit: 'degrees'});
+const layout = textLayout({text: 'TAG\\P101', mtext: true, mtextWidth: 100, attachment: 5, height: 12});
+const transform = objectCoordinateTransform({x: 0, y: 0, z: -1}, 8);
+const viewScene = buildScene(native, {view: {minX: 0, minY: 0, maxX: 100, maxY: 100}});
+const inside: boolean = renderer.containsPoint({x: 40, y: 40});
+void [hatch, layout.lines, transform, viewScene.diagnostics, inside, renderer.stats.compositor];

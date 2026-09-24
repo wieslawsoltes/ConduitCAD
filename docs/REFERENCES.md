@@ -22,3 +22,29 @@ not a claim of complete compliance or a substitute for executable validation.
 
 The delivered ACI numeric palette has an MIT notice in `THIRD_PARTY_NOTICES.md`.
 Other runtime code, UI icons and example geometry were implemented for Conduit.
+
+
+Additional 0.2.0 primary references:
+
+* Autodesk, HATCH group codes and native fill/pattern metadata:
+  https://help.autodesk.com/cloudhelp/2017/ENU/AutoCAD-DXF/files/GUID-C6C71CED-CE0F-4184-82A5-07AD6241F15B.htm
+* Autodesk, HATCH boundary paths and native edge records:
+  https://help.autodesk.com/cloudhelp/2017/ENU/AutoCAD-DXF/files/GUID-DC5215D6-E73F-4DFF-8BE9-01CA9610FAEE.htm
+* Autodesk, arbitrary-axis algorithm:
+  https://help.autodesk.com/cloudhelp/2017/ENU/AutoCAD-DXF/files/GUID-E19E5B42-0CC7-4EBA-B29F-5E1D595149EE.htm
+* Autodesk, TEXT alignment and generation data:
+  https://help.autodesk.com/cloudhelp/2017/ENU/AutoCAD-DXF/files/GUID-62E5383D-8A14-47B4-BFC4-35824CAE8363.htm
+* Autodesk, MTEXT properties:
+  https://help.autodesk.com/cloudhelp/2017/ENU/AutoCAD-DXF/files/GUID-5E5DB93B-F8D3-4433-ADF7-E92E250D2BAB.htm
+* Autodesk, group-code value types; wire angle groups are degrees:
+  https://help.autodesk.com/cloudhelp/2024/ENU/AutoCAD-DXF/files/GUID-3F0380A5-1C15-464D-BC66-2C5F094BCFB9.htm
+* ezdxf, MTEXT wire-field semantics and independent test authoring:
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/mtext.html
+* ezdxf, hatch edge paths and clockwise edge endpoint semantics:
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/hatch.html
+
+The MTEXT page's APP/API angle wording differs from the general wire-DXF group
+code convention. The reader defaults to wire degrees, supports an explicit known
+producer override, and the writer uses a direction vector. Independent ezdxf
+fixtures verify the chosen exchange behavior. Symbol reference scope and the
+absence of certification are documented separately in SYMBOLS.md.

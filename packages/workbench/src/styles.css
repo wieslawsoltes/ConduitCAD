@@ -17,3 +17,16 @@
  .canvas-head{right:68px;top:28px}.render-badge .stats-text{display:none}.tool-hint{display:none}
  .workbar .inspector-toggle{display:inline-flex!important}.statusbar .status-document{display:none}
 }
+
+/* Viewport isolation, accessible touch targets, and grab handles preserve native library scrolling. */
+.viewport{isolation:isolate;contain:layout paint;overscroll-behavior:none;touch-action:none}
+.canvas-area{min-width:0;min-height:0;overflow:hidden}
+.zoom-controls .separator{min-width:1px;width:1px;flex:0 0 1px;align-self:stretch;margin:8px 2px;background:var(--border,#d8e1df)}
+.symbol-card{position:relative}
+.symbol-drag-handle{position:absolute;right:0;top:0;width:44px;height:44px;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;opacity:.35;font-size:20px}
+.symbol-drag-handle:hover{opacity:1}
+.symbol-card>span:not(.symbol-drag-handle){pointer-events:none}
+.library-scroll,.inspector-content{overscroll-behavior:contain;scrollbar-gutter:stable;scroll-padding-bottom:24px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #13816f;outline-offset:2px}
+@media(pointer:coarse){.icon-btn,.zoom-controls button,.layer-row button{min-width:44px;min-height:44px}.symbol-drag-handle{opacity:.7}.field input,.field select{font-size:16px}.tool-dock button{min-width:44px;min-height:48px}}
+@media(max-width:900px){.zoom-controls{gap:0;max-width:calc(100% - 48px)}.zoom-controls .zoom-value{min-width:48px}.library-scroll{padding-bottom:max(28px,env(safe-area-inset-bottom))}.modal{max-height:calc(100dvh - 24px);overscroll-behavior:contain}.modal-body{min-height:0;overflow:auto;overscroll-behavior:contain}.tool-hint{max-width:calc(100% - 56px)}}

@@ -7,6 +7,9 @@ export interface Layer {
     locked: boolean;
     dash?: number[];
     linetype?: string;
+    lineweight?: number;
+    colorIndex?: number;
+    colorMode?: string;
 }
 export interface Port extends Point {
     name: string;
@@ -36,6 +39,12 @@ export interface CadEntity {
     linetype?: string;
     width?: number;
     lineweight?: number;
+    linetypeScale?: number;
+    opacity?: number;
+    transparency?: number | null;
+    extrusion?: Point3D;
+    colorIndex?: number;
+    colorMode?: string;
     dash?: number[];
     hidden?: boolean;
     locked?: boolean;
@@ -101,6 +110,9 @@ export interface CadDocument {
     blocks: Record<string, Block>;
     layers: Layer[];
     linetypes: Record<string, number[]>;
+    signedLinetypes?: boolean;
+    linetypeScale?: number;
+    textStyles?: Record<string, {font?: string; widthFactor?: number; oblique?: number; [key: string]: unknown}>;
     parameters: Parameters;
     constraints: Constraint[];
     metadata: Record<string, any>;
@@ -128,6 +140,10 @@ export interface RenderPath extends RenderStyle {
     points: Point[];
     closed: boolean;
     fill?: string | null;
+    contours?: Point[][];
+    fillRule?: CanvasFillRule;
+    stroke?: boolean;
+    dashPhase?: number;
     entityId: string;
 }
 export interface RenderText {
@@ -140,12 +156,27 @@ export interface RenderText {
     entityId: string;
     font: string;
     widthFactor: number;
+    frame?: [number, number, number, number];
+    rawText?: string;
+    nominalHeight?: number;
+    mtext?: boolean;
+    mtextWidth?: number;
+    attachment?: number;
+    valign?: number;
+    lineSpacing?: number;
+    lineSpacingStyle?: number;
+    backgroundFill?: number;
+    backgroundScale?: number;
+    backgroundColor?: string;
+    opacity?: number;
 }
 export interface EntityGeometry {
     paths: RenderPath[];
     texts: RenderText[];
+    warnings?: Array<{entityId?: string; message: string}>;
 }
 export interface GeometryOptions {
+    view?: Bounds;
     tolerance?: number;
     depth?: number;
     matrix?: Matrix2D;
@@ -176,3 +207,28 @@ export function moveEntity(e: CadEntity, dx: number, dy: number): void;
 export function transformEntity(e: CadEntity, m: Matrix2D): void;
 export function explodeEntity(e: CadEntity, doc: CadDocument): CadEntity[];
 export function detachReferences(doc: CadDocument, deleted: Set<string>): void;
+
+/** Native DXF coordinate values; viewing projects into the document XY plane. */
+export interface Point3D extends Point { z: number; }
+export interface HatchVertex extends Point { bulge?: number; }
+export type HatchEdge =
+    | {type: 1; a: Point; b: Point}
+    | {type: 2; c: Point; r: number; start: number; end: number; ccw: boolean}
+    | {type: 3; c: Point; major: Point; ratio: number; start: number; end: number; ccw: boolean}
+    | {type: 4; degree: number; rational?: boolean; periodic?: boolean; knots: number[]; controlPoints: Point[]; weights?: number[]; fitPoints?: Point[]; startTangent?: Point; endTangent?: Point};
+export interface HatchBoundary {flags?: number; closed?: boolean; points?: HatchVertex[]; edges?: HatchEdge[]; sourceHandles?: string[];}
+export interface HatchPatternLine {angle: number; base: Point; offset: Point; dashes: number[];}
+/** Edge angles and pattern-line angles use radians; patternAngle uses DXF degrees. */
+export interface HatchEntity extends CadEntity {
+    type: 'HATCH'; solid: boolean; loops: HatchBoundary[]; hatchStyle?: 0 | 1 | 2;
+    pattern?: string; patternType?: number; patternAngle?: number; patternScale?: number;
+    patternDouble?: boolean; patternLines?: HatchPatternLine[]; elevation?: number; associative?: boolean;
+    gradient?: Array<[number, number | string]> | null;
+}
+export interface TextRunStyle {scale: number; width: number; font?: string; color?: string; bold?: boolean; italic?: boolean; underline?: boolean; overline?: boolean; strike?: boolean; oblique?: number;}
+export interface TextLayoutRun extends TextRunStyle {text: string; x: number; y: number; height: number;}
+export interface CadTextLayout extends Bounds {width: number; height: number; lines: Array<{runs: TextLayoutRun[]; width: number; height: number; y: number}>;}
+export type TextLayoutInput = Partial<RenderText> & {text: string};
+/** Advances returned by measure exclude run width scaling; the layout applies it. */
+export function textLayout(text: TextLayoutInput, measure?: (text: string, height: number, style: TextRunStyle) => number): CadTextLayout;
+export function objectCoordinateTransform(normal?: Point3D, elevation?: number): Matrix2D;

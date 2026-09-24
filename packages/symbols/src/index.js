@@ -4,9 +4,9 @@ const p = (x, y) => ({ x, y }), L = (x1, y1, x2, y2) => line(p(x1, y1), p(x2, y2
 const horizontal = [{ name: 'in', x: -45, y: 0, dx: -1, dy: 0 }, { name: 'out', x: 45, y: 0, dx: 1, dy: 0 }];
 const four = [...horizontal, { name: 'top', x: 0, y: 45, dx: 0, dy: 1 }, { name: 'bottom', x: 0, y: -45, dx: 0, dy: -1 }];
 const lead = [L(-45, 0, -25, 0), L(25, 0, 45, 0)];
-const valve = [...lead, P([[-25, -18], [25, 18], [25, -18], [-25, 18]], true)];
+const valve = [...lead, P([[-25,-18],[0,0],[-25,18]],true), P([[25,-18],[0,0],[25,18]],true)];
 const symbols = [];
-function def(id, name, category, geometry, ports = horizontal, extra = {}) { const symbol = { id, name, category, block: `CC_${id.toUpperCase().replace(/-/g, '_')}`, entities: geometry, ports, base: p(0, 0), symbol: { name, category, labelOffset: 57, ...extra } }; symbols.push(symbol); return symbol; }
+function def(id, name, category, geometry, ports = horizontal, extra = {}) { const symbol = { id, name, category, block: `CC_${id.toUpperCase().replace(/-/g, '_')}`, entities: geometry, ports, base: p(0, 0), symbol: { name, category, labelOffset: 57, geometryRevision: 2, convention: category === 'Electrical' ? 'IEC/ANSI functional drafting conventions' : category === 'P&ID' ? 'Process and instrumentation drafting conventions' : 'Flowchart conventions', conformity: 'Original master; not standards-certified', ...extra } }; symbols.push(symbol); return symbol; }
 def('gate-valve', 'Gate valve', 'P&ID', valve);
 def('ball-valve', 'Ball valve', 'P&ID', [...lead, C(0, 0, 21), L(-15, -15, 15, 15)]);
 def('globe-valve', 'Globe valve', 'P&ID', [...valve, C(0, 0, 7)]);
@@ -65,6 +65,38 @@ def('preparation', 'Preparation', 'Flow', [P([[-40, -35], [40, -35], [60, 0], [4
 def('delay', 'Delay', 'Flow', [P([[-50, -35], [5, -35], ...Array.from({ length: 31 }, (_, i) => { const t = -Math.PI / 2 + Math.PI * i / 30; return [5 + 35 * Math.cos(t), 35 * Math.sin(t)]; }), [-50, 35]], true), T(-5, -5, 'Delay', 14)], flowPorts);
 def('junction', 'Junction', 'Flow', [C(0, 0, 16)], [{ name: 'in', x: 0, y: 16, dx: 0, dy: 1 }, { name: 'out', x: 0, y: -16, dx: 0, dy: -1 }, { name: 'left', x: -16, y: 0, dx: -1, dy: 0 }, { name: 'right', x: 16, y: 0, dx: 1, dy: 0 }]);
 def('note', 'Annotation', 'Flow', [P([[45, 35], [-45, 35], [-45, -35], [45, -35]]), T(0, -5, 'Note', 14)], flowPorts);
+// Explicit terminal geometry: every port terminates on a contour or a lead.
+const roundLeads = (radius, vertical = false) => [L(-45,0,-radius,0),L(radius,0,45,0),...(vertical ? [L(0,radius,0,45),L(0,-radius,0,-45)] : [])];
+const revise = (id, geometry, newPorts) => { const s=symbols.find(s=>s.id===id); if(geometry)s.entities=geometry; if(newPorts)s.ports=newPorts; };
+revise('ball-valve',[...roundLeads(21),C(0,0,21),L(-15,-15,15,15)]);
+revise('butterfly-valve',[...roundLeads(23),C(0,0,23),L(-16,-16,16,16),C(0,0,3)]);
+revise('check-valve',[L(-45,0,-24,0),L(24,0,45,0),L(-24,-20,-24,20),L(-24,20,24,-16),C(-24,20,3),L(0,2,0,18)]);
+for(const [id,radius,vertical] of [['pump',27,true],['gear-pump',28,true],['compressor',29,true],['fan',29,false],['heat-exchanger',33,false],['motor',29,true],['generator',29,true],['lamp',24,false]]) {
+    const master=symbols.find(s=>s.id===id); master.entities=[...roundLeads(radius,vertical),...master.entities.slice(2)];
+}
+revise('filter',[...lead,R(-25,-28,50,56),L(-25,-28,25,28),L(-25,28,25,-28),L(0,28,0,45),L(0,-28,0,-45)]);
+const diodeBody=[L(-45,0,-22,0),P([[-22,-22],[22,0],[-22,22]],true),L(22,-24,22,24),L(22,0,45,0)];
+revise('diode',diodeBody);
+revise('led',[...diodeBody,L(4,27,24,47),P([[15,45],[24,47],[22,38]]),L(18,22,38,42),P([[29,40],[38,42],[36,33]])]);
+revise('offpage',[P([[-40,-17],[24,-17],[44,0],[24,17],[-40,17]],true),L(-45,0,-40,0),L(44,0,45,0),T(-4,-5,'PW',13)]);
+const cardinal = (top,bottom,left,right) => [{name:'in',x:0,y:top,dx:0,dy:1},{name:'out',x:0,y:bottom,dx:0,dy:-1},{name:'left',x:left,y:0,dx:-1,dy:0},{name:'right',x:right,y:0,dx:1,dy:0}];
+revise('data',null,cardinal(35,-35,-53.5,53.5));
+revise('document',null,cardinal(35,-25,-55,55));
+revise('database',null,cardinal(40,-40,-45,45));
+revise('manual',null,cardinal(32,-35,-55,55));
+revise('preparation',null,cardinal(35,-35,-60,60));
+revise('delay',null,cardinal(35,-35,-50,40));
+revise('note',null,[{name:'left',x:-45,y:0,dx:-1,dy:0},{name:'top',x:0,y:35,dx:0,dy:1},{name:'bottom',x:0,y:-35,dx:0,dy:-1}]);
+// Original function/location variants; exact normative symbol identifiers are intentionally not asserted.
+const sensePort=[{name:'sense',x:0,y:-45,dx:0,dy:-1}];
+def('pressure-panel','Pressure indicator · panel','P&ID',[C(0,0,26),L(-26,0,26,0),T(0,7,'PI',12),L(0,-26,0,-45)],sensePort,{instrumentLocation:'primary accessible panel'});
+def('pressure-rear','Pressure indicator · rear panel','P&ID',[C(0,0,26),line(p(-26,0),p(26,0),{dash:[4,3]}),T(0,7,'PI',12),L(0,-26,0,-45)],sensePort,{instrumentLocation:'normally inaccessible'});
+def('capacitor-polarized','Capacitor · polarized','Electrical',[L(-45,0,-7,0),L(0,0,45,0),L(-7,-25,-7,25),P(arcPoints(p(52,0),52,Math.PI-.46,Math.PI+.46,.1).map(p=>[p.x,p.y])),L(-28,20,-16,20),L(-22,14,-22,26)]);
+def('signal-ground','Signal reference','Electrical',[L(0,40,0,10),P([[-24,10],[24,10],[0,-22]],true)],[{name:'terminal',x:0,y:40,dx:0,dy:1}]);
+def('chassis','Chassis connection','Electrical',[L(0,40,0,8),L(-24,8,24,8),L(-24,8,-35,-8),L(0,8,-11,-8),L(24,8,13,-8)],[{name:'terminal',x:0,y:40,dx:0,dy:1}]);
+def('contact-no','Contact · normally open','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23)]);
+def('contact-nc','Contact · normally closed','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23),L(-19,-28,19,28)]);
+def('potentiometer','Potentiometer','Electrical',[...lead,R(-25,-11,50,22),L(0,45,0,12),P([[-6,22],[0,12],[6,22]])],[...horizontal,{name:'wiper',x:0,y:45,dx:0,dy:1}]);
 export const SYMBOLS = symbols;
 export const LINE_STYLES = [
     { id: 'process', name: 'Process pipe', layer: 'Process', color: '#147c77', width: 2, dash: [], arrow: 'end' },

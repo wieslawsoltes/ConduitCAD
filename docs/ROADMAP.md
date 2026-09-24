@@ -11,9 +11,9 @@ DXF corpus beyond self-generated examples. Fuzz parser and project-model inputs.
 
 ## CAD interoperability
 
-Implement full OCS/UCS projection, exact per-entity conservative bounds, complete
+Extend projected OCS into complete UCS/grip editing, exact per-entity conservative bounds, complete
 text/style/font handling, comprehensive dimension styles and associativity,
-variable-width polylines and hatches, full complex linetypes, layouts/viewports
+all polyline join/cap variants, associative/gradient hatches, full complex SHX/text linetypes, layouts/viewports
 and plotting, XREF/underlay resources and unknown-object preservation strategies.
 Build explicit round-trip contracts before expanding entities. DWG and 3D solid
 modeling require separate, deliberately licensed/implemented subsystems.

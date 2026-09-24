@@ -1,530 +1,758 @@
 
-> conduit-cad-workspace@0.1.0 test
+> conduit-cad-workspace@0.2.0 test
 > node --test tests/*.test.mjs
 
 TAP version 13
-# Subtest: all 56 symbol masters have finite geometry and valid named ports
-ok 1 - all 56 symbol masters have finite geometry and valid named ports
+# Subtest: all 64 symbol masters have finite geometry and valid named ports
+ok 1 - all 64 symbol masters have finite geometry and valid named ports
   ---
-  duration_ms: 10.05649
+  duration_ms: 16.84793
   type: 'test'
   ...
 # Subtest: native block transform and port direction use base point, scale and rotation
 ok 2 - native block transform and port direction use base point, scale and rotation
   ---
-  duration_ms: 0.628336
+  duration_ms: 0.382894
   type: 'test'
   ...
 # Subtest: moving insert keeps imported attributes in world coordinates
 ok 3 - moving insert keeps imported attributes in world coordinates
   ---
-  duration_ms: 1.240802
+  duration_ms: 0.889362
   type: 'test'
   ...
 # Subtest: layer, by-layer and by-block dash inheritance
 ok 4 - layer, by-layer and by-block dash inheritance
   ---
-  duration_ms: 0.289421
+  duration_ms: 0.194927
   type: 'test'
   ...
 # Subtest: recursive blocks terminate at explicit recursion budget
 ok 5 - recursive blocks terminate at explicit recursion budget
   ---
-  duration_ms: 0.563184
+  duration_ms: 0.550321
   type: 'test'
   ...
 # Subtest: text cleanup handles Unicode, paragraphs and formatting without HTML execution
 ok 6 - text cleanup handles Unicode, paragraphs and formatting without HTML execution
   ---
-  duration_ms: 4.838385
+  duration_ms: 3.355168
   type: 'test'
   ...
 # Subtest: pid DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
 ok 7 - pid DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 55.825627
+  duration_ms: 80.550212
   type: 'test'
   ...
 # Subtest: electrical DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
 ok 8 - electrical DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 25.497438
+  duration_ms: 41.531957
   type: 'test'
   ...
 # Subtest: flow DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
 ok 9 - flow DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 30.522443
+  duration_ms: 28.65284
   type: 'test'
   ...
 # Subtest: DXF writer AC1015
 ok 10 - DXF writer AC1015
   ---
-  duration_ms: 1.654056
+  duration_ms: 1.393314
   type: 'test'
   ...
 # Subtest: DXF writer AC1018
 ok 11 - DXF writer AC1018
   ---
-  duration_ms: 1.047651
+  duration_ms: 0.726672
   type: 'test'
   ...
 # Subtest: DXF writer AC1021
 ok 12 - DXF writer AC1021
   ---
-  duration_ms: 0.79631
+  duration_ms: 2.323792
   type: 'test'
   ...
 # Subtest: DXF writer AC1024
 ok 13 - DXF writer AC1024
   ---
-  duration_ms: 0.755033
+  duration_ms: 0.554538
   type: 'test'
   ...
 # Subtest: DXF writer AC1027
 ok 14 - DXF writer AC1027
   ---
-  duration_ms: 0.722342
+  duration_ms: 0.506086
   type: 'test'
   ...
 # Subtest: DXF writer AC1032
 ok 15 - DXF writer AC1032
   ---
-  duration_ms: 0.757869
+  duration_ms: 2.545894
   type: 'test'
   ...
 # Subtest: bulges, splines, ellipses and text retain numeric data in normalized round trip
 ok 16 - bulges, splines, ellipses and text retain numeric data in normalized round trip
   ---
-  duration_ms: 4.892807
+  duration_ms: 8.988686
   type: 'test'
   ...
 # Subtest: legacy R2000 Unicode escapes render correctly
 ok 17 - legacy R2000 Unicode escapes render correctly
   ---
-  duration_ms: 0.904242
+  duration_ms: 0.862412
   type: 'test'
   ...
 # Subtest: original ASCII byte preservation includes code page bytes and line endings
 ok 18 - original ASCII byte preservation includes code page bytes and line endings
   ---
-  duration_ms: 3.170572
+  duration_ms: 1.502305
   type: 'test'
   ...
 # Subtest: unsupported DXF entity and opaque sections are retained and export is transparent
 ok 19 - unsupported DXF entity and opaque sections are retained and export is transparent
   ---
-  duration_ms: 0.947564
+  duration_ms: 1.697748
   type: 'test'
   ...
-# Subtest: non-default OCS has explicit fidelity diagnostic
-ok 20 - non-default OCS has explicit fidelity diagnostic
+# Subtest: non-default OCS projects an edge-on circle to the top view
+ok 20 - non-default OCS projects an edge-on circle to the top view
   ---
-  duration_ms: 0.26184
+  duration_ms: 0.643689
   type: 'test'
   ...
 # Subtest: old POLYLINE VERTEX and SEQEND import as one path
 ok 21 - old POLYLINE VERTEX and SEQEND import as one path
   ---
-  duration_ms: 0.242494
+  duration_ms: 0.326562
   type: 'test'
   ...
-# Subtest: HATCH normalization warns rather than silently claiming pattern support
-ok 22 - HATCH normalization warns rather than silently claiming pattern support
+# Subtest: native HATCH export retains loops and pattern definitions
+ok 22 - native HATCH export retains loops and pattern definitions
   ---
-  duration_ms: 1.923299
+  duration_ms: 2.369575
   type: 'test'
   ...
 # Subtest: authored dimension exports visible geometry with warning
 ok 23 - authored dimension exports visible geometry with warning
   ---
-  duration_ms: 1.26645
+  duration_ms: 3.330962
   type: 'test'
   ...
 # Subtest: malformed or truncated ASCII DXF is rejected
 ok 24 - malformed or truncated ASCII DXF is rejected
   ---
-  duration_ms: 0.729776
+  duration_ms: 0.64376
   type: 'test'
   ...
 # Subtest: binary DXF modern word codes imports and preserves exact source
 ok 25 - binary DXF modern word codes imports and preserves exact source
   ---
-  duration_ms: 1.762549
+  duration_ms: 1.473723
   type: 'test'
   ...
 # Subtest: binary DXF R12 byte codes imports and preserves exact source
 ok 26 - binary DXF R12 byte codes imports and preserves exact source
   ---
-  duration_ms: 0.552183
+  duration_ms: 0.541999
   type: 'test'
   ...
 # Subtest: scene compiles with Float64 source and rebased Float32 uploads
 ok 27 - scene compiles with Float64 source and rebased Float32 uploads
   ---
-  duration_ms: 0.465801
+  duration_ms: 0.42737
   type: 'test'
   ...
 # Subtest: hidden layers and layouts do not compile
 ok 28 - hidden layers and layouts do not compile
   ---
-  duration_ms: 0.386894
+  duration_ms: 0.340081
   type: 'test'
   ...
 # Subtest: camera zoom anchors and inverse transforms are exact
 ok 29 - camera zoom anchors and inverse transforms are exact
   ---
-  duration_ms: 9.749687
+  duration_ms: 6.362363
   type: 'test'
   ...
 # Subtest: WebGPU sources contain compute culling and instanced stroke entry points
 ok 30 - WebGPU sources contain compute culling and instanced stroke entry points
   ---
-  duration_ms: 0.168436
+  duration_ms: 0.277459
   type: 'test'
   ...
 # Subtest: BOM emits quoted tag and coordinate records
 ok 31 - BOM emits quoted tag and coordinate records
   ---
-  duration_ms: 3.850216
+  duration_ms: 2.118244
   type: 'test'
   ...
 # Subtest: symbol installs are isolated between documents and factory masters
 ok 32 - symbol installs are isolated between documents and factory masters
   ---
-  duration_ms: 2.386997
+  duration_ms: 3.336741
   type: 'test'
   ...
 # Subtest: DXF preserves int64 group values as decimal strings
 ok 33 - DXF preserves int64 group values as decimal strings
   ---
-  duration_ms: 0.211376
+  duration_ms: 0.207496
   type: 'test'
   ...
 # Subtest: ACI import retains standard red, cyan and green rather than theme substitutions
 ok 34 - ACI import retains standard red, cyan and green rather than theme substitutions
   ---
-  duration_ms: 0.359733
+  duration_ms: 0.370916
   type: 'test'
   ...
 # Subtest: MINSERT grid spacing rotates but is not scaled with block geometry
 ok 35 - MINSERT grid spacing rotates but is not scaled with block geometry
   ---
-  duration_ms: 0.501438
+  duration_ms: 0.482091
   type: 'test'
   ...
 # Subtest: MINSERT attributes repeat at rotated unscaled grid offsets
 ok 36 - MINSERT attributes repeat at rotated unscaled grid offsets
   ---
-  duration_ms: 0.382176
+  duration_ms: 0.358379
   type: 'test'
   ...
 # Subtest: MINSERT zero spacing does not emit duplicate occurrences
 ok 37 - MINSERT zero spacing does not emit duplicate occurrences
   ---
-  duration_ms: 0.333944
+  duration_ms: 0.235648
   type: 'test'
   ...
 # Subtest: expression 2+3*4
 ok 38 - expression 2+3*4
   ---
-  duration_ms: 4.172305
+  duration_ms: 4.006128
   type: 'test'
   ...
 # Subtest: expression (2+3)*4
 ok 39 - expression (2+3)*4
   ---
-  duration_ms: 0.40568
+  duration_ms: 0.286212
   type: 'test'
   ...
 # Subtest: expression 2^3^2
 ok 40 - expression 2^3^2
   ---
-  duration_ms: 0.236633
+  duration_ms: 0.215718
   type: 'test'
   ...
 # Subtest: expression -2^2
 ok 41 - expression -2^2
   ---
-  duration_ms: 0.155551
+  duration_ms: 0.141669
   type: 'test'
   ...
 # Subtest: expression 2^-2
 ok 42 - expression 2^-2
   ---
-  duration_ms: 0.167113
+  duration_ms: 1.175994
   type: 'test'
   ...
 # Subtest: expression (-2)^2
 ok 43 - expression (-2)^2
   ---
-  duration_ms: 0.145983
+  duration_ms: 0.149341
   type: 'test'
   ...
 # Subtest: expression 2e3 / .5
 ok 44 - expression 2e3 / .5
   ---
-  duration_ms: 0.13339
+  duration_ms: 0.119807
   type: 'test'
   ...
 # Subtest: expression pi*2
 ok 45 - expression pi*2
   ---
-  duration_ms: 0.16578
+  duration_ms: 0.135139
   type: 'test'
   ...
 # Subtest: parameter dependency resolution and cycle diagnostics
 ok 46 - parameter dependency resolution and cycle diagnostics
   ---
-  duration_ms: 1.964066
+  duration_ms: 2.42806
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: globalThis.x=1
 ok 47 - unsafe or invalid expression rejected: globalThis.x=1
   ---
-  duration_ms: 0.721891
+  duration_ms: 0.541459
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: constructor
 ok 48 - unsafe or invalid expression rejected: constructor
   ---
-  duration_ms: 0.296204
+  duration_ms: 0.232983
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 1/0
 ok 49 - unsafe or invalid expression rejected: 1/0
   ---
-  duration_ms: 0.166581
+  duration_ms: 0.117634
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: abc
 ok 50 - unsafe or invalid expression rejected: abc
   ---
-  duration_ms: 0.129753
+  duration_ms: 0.079448
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 1;2
 ok 51 - unsafe or invalid expression rejected: 1;2
   ---
-  duration_ms: 0.081112
+  duration_ms: 0.075481
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: Math.sin(2)
 ok 52 - unsafe or invalid expression rejected: Math.sin(2)
   ---
-  duration_ms: 0.071113
+  duration_ms: 0.07415
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 2 +
 ok 53 - unsafe or invalid expression rejected: 2 +
   ---
-  duration_ms: 0.081483
+  duration_ms: 0.085286
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: (2
 ok 54 - unsafe or invalid expression rejected: (2
   ---
-  duration_ms: 0.132308
+  duration_ms: 0.082151
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 2**3
 ok 55 - unsafe or invalid expression rejected: 2**3
   ---
-  duration_ms: 0.174727
+  duration_ms: 0.137303
   type: 'test'
   ...
 # Subtest: constraint horizontal and length solve together
 ok 56 - constraint horizontal and length solve together
   ---
-  duration_ms: 2.299314
+  duration_ms: 2.073979
   type: 'test'
   ...
 # Subtest: radius constraint uses named expressions
 ok 57 - radius constraint uses named expressions
   ---
-  duration_ms: 0.458859
+  duration_ms: 1.433364
   type: 'test'
   ...
 # Subtest: coincidence and perpendicular constraints
 ok 58 - coincidence and perpendicular constraints
   ---
-  duration_ms: 1.712224
+  duration_ms: 0.763245
   type: 'test'
   ...
 # Subtest: conflicting constraints roll back complete geometry
 ok 59 - conflicting constraints roll back complete geometry
   ---
-  duration_ms: 0.872783
+  duration_ms: 1.372885
   type: 'test'
   ...
 # Subtest: stale, incompatible and negative-size constraints fail explicitly
 ok 60 - stale, incompatible and negative-size constraints fail explicitly
   ---
-  duration_ms: 0.312575
+  duration_ms: 0.455672
   type: 'test'
   ...
 # Subtest: history atomically cancels exceptions and invalidates redo
 ok 61 - history atomically cancels exceptions and invalidates redo
   ---
-  duration_ms: 0.49122
+  duration_ms: 0.595509
   type: 'test'
   ...
 # Subtest: history suppresses no-op edits and enforces entry limit
 ok 62 - history suppresses no-op edits and enforces entry limit
   ---
-  duration_ms: 0.221474
+  duration_ms: 0.292602
   type: 'test'
   ...
 # Subtest: spatial queries agree with brute force over 10000 boxes
 ok 63 - spatial queries agree with brute force over 10000 boxes
   ---
-  duration_ms: 60.942754
+  duration_ms: 64.025653
   type: 'test'
   ...
 # Subtest: routing has no obstacle collisions and returns orthogonal segments
 ok 64 - routing has no obstacle collisions and returns orthogonal segments
   ---
-  duration_ms: 2.280758
+  duration_ms: 1.967972
   type: 'test'
   ...
 # Subtest: router reports blocked endpoints and safety limits, never claims successful fallback
 ok 65 - router reports blocked endpoints and safety limits, never claims successful fallback
   ---
-  duration_ms: 0.570738
+  duration_ms: 0.503232
   type: 'test'
   ...
 # Subtest: port leads and waypoints preserve exact endpoints
 ok 66 - port leads and waypoints preserve exact endpoints
   ---
-  duration_ms: 0.714918
+  duration_ms: 0.622899
   type: 'test'
   ...
 # Subtest: directed graph preserves port references
 ok 67 - directed graph preserves port references
   ---
-  duration_ms: 0.497842
+  duration_ms: 0.416234
   type: 'test'
   ...
 # Subtest: spatial updates remove stale hits and discover objects outside original tree bounds
 ok 68 - spatial updates remove stale hits and discover objects outside original tree bounds
   ---
-  duration_ms: 5.500233
+  duration_ms: 4.234725
+  type: 'test'
+  ...
+# Subtest: all independently generated entities import without unsupported entities or nonfinite geometry
+ok 69 - all independently generated entities import without unsupported entities or nonfinite geometry
+  ---
+  duration_ms: 12.247592
+  type: 'test'
+  ...
+# Subtest: native hatch arc-False agrees with independent analytic endpoints
+ok 70 - native hatch arc-False agrees with independent analytic endpoints
+  ---
+  duration_ms: 0.58311
+  type: 'test'
+  ...
+# Subtest: native hatch arc-True agrees with independent analytic endpoints
+ok 71 - native hatch arc-True agrees with independent analytic endpoints
+  ---
+  duration_ms: 0.236418
+  type: 'test'
+  ...
+# Subtest: native hatch ellipse-False agrees with independent analytic endpoints
+ok 72 - native hatch ellipse-False agrees with independent analytic endpoints
+  ---
+  duration_ms: 0.501049
+  type: 'test'
+  ...
+# Subtest: native hatch ellipse-True agrees with independent analytic endpoints
+ok 73 - native hatch ellipse-True agrees with independent analytic endpoints
+  ---
+  duration_ms: 0.640094
+  type: 'test'
+  ...
+# Subtest: normal, outer, and ignore hatch styles produce correct nested-island topology
+ok 74 - normal, outer, and ignore hatch styles produce correct nested-island topology
+  ---
+  duration_ms: 0.423595
+  type: 'test'
+  ...
+# Subtest: hatch pattern scanlines never bridge an island hole
+ok 75 - hatch pattern scanlines never bridge an island hole
+  ---
+  duration_ms: 1.503157
+  type: 'test'
+  ...
+# Subtest: pathological hatch spacing terminates at the configured safety budget
+ok 76 - pathological hatch spacing terminates at the configured safety budget
+  ---
+  duration_ms: 0.24426
+  type: 'test'
+  ...
+# Subtest: malformed hatch counts are rejected before allocation
+ok 77 - malformed hatch counts are rejected before allocation
+  ---
+  duration_ms: 0.802623
+  type: 'test'
+  ...
+# Subtest: rational spline hatch preserves native knots, controls, weights and edge topology
+ok 78 - rational spline hatch preserves native knots, controls, weights and edge topology
+  ---
+  duration_ms: 3.678304
+  type: 'test'
+  ...
+# Subtest: gradient DXF data survives native export while preview limitation remains explicit
+ok 79 - gradient DXF data survives native export while preview limitation remains explicit
+  ---
+  duration_ms: 0.532566
+  type: 'test'
+  ...
+# Subtest: variable-width bulge polyline emits a filled ribbon and retains per-vertex widths
+ok 80 - variable-width bulge polyline emits a filled ribbon and retains per-vertex widths
+  ---
+  duration_ms: 0.39267
+  type: 'test'
+  ...
+# Subtest: 3D POLYLINE retains Z, vertex ordering, native record type, and closure
+ok 81 - 3D POLYLINE retains Z, vertex ordering, native record type, and closure
+  ---
+  duration_ms: 0.394011
+  type: 'test'
+  ...
+# Subtest: polyface and polygon meshes remain native and render indexed edges
+ok 82 - polyface and polygon meshes remain native and render indexed edges
+  ---
+  duration_ms: 0.493958
+  type: 'test'
+  ...
+# Subtest: 3DFACE uses native vertex order and respects hidden edge bitmask
+ok 83 - 3DFACE uses native vertex order and respects hidden edge bitmask
+  ---
+  duration_ms: 0.233414
+  type: 'test'
+  ...
+# Subtest: WCS ellipse minor axis respects reversed extrusion normal
+ok 84 - WCS ellipse minor axis respects reversed extrusion normal
+  ---
+  duration_ms: 0.225803
+  type: 'test'
+  ...
+# Subtest: OCS arbitrary-axis basis normalizes vectors and includes projected elevation
+ok 85 - OCS arbitrary-axis basis normalizes vectors and includes projected elevation
+  ---
+  duration_ms: 0.197261
+  type: 'test'
+  ...
+# Subtest: dragging reflected OCS entities follows the world-space pointer delta
+ok 86 - dragging reflected OCS entities follows the world-space pointer delta
+  ---
+  duration_ms: 0.405007
+  type: 'test'
+  ...
+# Subtest: edge-on plane edits reject atomically instead of moving in the wrong coordinate frame
+ok 87 - edge-on plane edits reject atomically instead of moving in the wrong coordinate frame
+  ---
+  duration_ms: 0.220515
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 1 retains wrapping box, rotation and placement
+ok 88 - MTEXT attachment 1 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 1.080884
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 2 retains wrapping box, rotation and placement
+ok 89 - MTEXT attachment 2 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.520348
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 3 retains wrapping box, rotation and placement
+ok 90 - MTEXT attachment 3 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.381242
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 4 retains wrapping box, rotation and placement
+ok 91 - MTEXT attachment 4 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.471215
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 5 retains wrapping box, rotation and placement
+ok 92 - MTEXT attachment 5 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.552284
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 6 retains wrapping box, rotation and placement
+ok 93 - MTEXT attachment 6 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.591532
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 7 retains wrapping box, rotation and placement
+ok 94 - MTEXT attachment 7 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.25766
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 8 retains wrapping box, rotation and placement
+ok 95 - MTEXT attachment 8 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.222508
+  type: 'test'
+  ...
+# Subtest: MTEXT attachment 9 retains wrapping box, rotation and placement
+ok 96 - MTEXT attachment 9 retains wrapping box, rotation and placement
+  ---
+  duration_ms: 0.219084
+  type: 'test'
+  ...
+# Subtest: MTEXT background truecolor does not overwrite foreground ACI
+ok 97 - MTEXT background truecolor does not overwrite foreground ACI
+  ---
+  duration_ms: 0.249979
+  type: 'test'
+  ...
+# Subtest: MTEXT formatter scopes styles, decodes escapes, and wraps long unbroken identifiers
+ok 98 - MTEXT formatter scopes styles, decodes escapes, and wraps long unbroken identifiers
+  ---
+  duration_ms: 1.501013
+  type: 'test'
+  ...
+# Subtest: TEXT second alignment point, width factor, and style survive the native writer
+ok 99 - TEXT second alignment point, width factor, and style survive the native writer
+  ---
+  duration_ms: 0.595498
+  type: 'test'
+  ...
+# Subtest: signed linetypes preserve leading gaps and dots with global/entity scale
+ok 100 - signed linetypes preserve leading gaps and dots with global/entity scale
+  ---
+  duration_ms: 0.238602
+  type: 'test'
+  ...
+# Subtest: DXF transparency remains native rather than a synthetic hatch alpha
+ok 101 - DXF transparency remains native rather than a synthetic hatch alpha
+  ---
+  duration_ms: 0.228657
+  type: 'test'
+  ...
+# Subtest: rays and construction lines clip parametrically to the current view
+ok 102 - rays and construction lines clip parametrically to the current view
+  ---
+  duration_ms: 0.233885
+  type: 'test'
+  ...
+# Subtest: native leader keeps vertices and adds its arrow at the first vertex
+ok 103 - native leader keeps vertices and adds its arrow at the first vertex
+  ---
+  duration_ms: 1.08453
+  type: 'test'
+  ...
+# Subtest: native hatch similarity transformation updates analytic edges and pattern definitions
+ok 104 - native hatch similarity transformation updates analytic edges and pattern definitions
+  ---
+  duration_ms: 1.155604
+  type: 'test'
+  ...
+# Subtest: SVG exchange retains compound hole contours, opacity, and masked text
+ok 105 - SVG exchange retains compound hole contours, opacity, and masked text
+  ---
+  duration_ms: 18.694909
+  type: 'test'
+  ...
+# Subtest: all 64 original symbol masters have connection ports on actual terminal geometry
+ok 106 - all 64 original symbol masters have connection ports on actual terminal geometry
+  ---
+  duration_ms: 20.549124
   type: 'test'
   ...
 # Subtest: affine inverse and composition retain double precision
-ok 69 - affine inverse and composition retain double precision
+ok 107 - affine inverse and composition retain double precision
   ---
-  duration_ms: 1.332734
+  duration_ms: 1.720316
   type: 'test'
   ...
 # Subtest: singular transforms fail explicitly
-ok 70 - singular transforms fail explicitly
+ok 108 - singular transforms fail explicitly
   ---
-  duration_ms: 0.578672
+  duration_ms: 0.708685
   type: 'test'
   ...
 # Subtest: zoom-independent segment projection clamps endpoints
-ok 71 - zoom-independent segment projection clamps endpoints
+ok 109 - zoom-independent segment projection clamps endpoints
   ---
-  duration_ms: 0.441426
+  duration_ms: 0.426008
   type: 'test'
   ...
 # Subtest: segment intersection and infinite-line extension
-ok 72 - segment intersection and infinite-line extension
+ok 110 - segment intersection and infinite-line extension
   ---
-  duration_ms: 0.402413
+  duration_ms: 0.365119
   type: 'test'
   ...
 # Subtest: parallel and degenerate lines do not produce NaNs
-ok 73 - parallel and degenerate lines do not produce NaNs
+ok 111 - parallel and degenerate lines do not produce NaNs
   ---
-  duration_ms: 0.249457
+  duration_ms: 0.263889
   type: 'test'
   ...
 # Subtest: box intersection checks crossing, contained and distant segments
-ok 74 - box intersection checks crossing, contained and distant segments
+ok 112 - box intersection checks crossing, contained and distant segments
   ---
-  duration_ms: 0.249708
+  duration_ms: 0.330978
   type: 'test'
   ...
 # Subtest: polygon area and inclusive edge containment
-ok 75 - polygon area and inclusive edge containment
+ok 113 - polygon area and inclusive edge containment
   ---
-  duration_ms: 0.386263
+  duration_ms: 0.552024
   type: 'test'
   ...
 # Subtest: orthogonal simplification removes duplicates but keeps reversal
-ok 76 - orthogonal simplification removes duplicates but keeps reversal
+ok 114 - orthogonal simplification removes duplicates but keeps reversal
   ---
-  duration_ms: 1.094688
+  duration_ms: 1.007126
   type: 'test'
   ...
 # Subtest: arc tessellation follows adaptive chord error budget
-ok 77 - arc tessellation follows adaptive chord error budget
+ok 115 - arc tessellation follows adaptive chord error budget
   ---
-  duration_ms: 1.581169
+  duration_ms: 0.972494
   type: 'test'
   ...
 # Subtest: positive and negative bulges interpolate intended semicircles
-ok 78 - positive and negative bulges interpolate intended semicircles
+ok 116 - positive and negative bulges interpolate intended semicircles
   ---
-  duration_ms: 0.728543
+  duration_ms: 2.430615
   type: 'test'
   ...
 # Subtest: rational quadratic NURBS quarter circle
-ok 79 - rational quadratic NURBS quarter circle
+ok 117 - rational quadratic NURBS quarter circle
   ---
-  duration_ms: 1.740247
+  duration_ms: 2.329275
   type: 'test'
   ...
 # Subtest: spline evaluation rejects malformed explicit knot vectors
-ok 80 - spline evaluation rejects malformed explicit knot vectors
+ok 118 - spline evaluation rejects malformed explicit knot vectors
   ---
-  duration_ms: 0.209722
+  duration_ms: 0.208087
   type: 'test'
   ...
 # Subtest: open and closed offsets and tangent fillet
-ok 81 - open and closed offsets and tangent fillet
+ok 119 - open and closed offsets and tangent fillet
   ---
-  duration_ms: 1.223219
+  duration_ms: 0.700964
   type: 'test'
   ...
 # Subtest: circle quadrant snaps are exactly cardinal, arc snaps are restricted
-ok 82 - circle quadrant snaps are exactly cardinal, arc snaps are restricted
+ok 120 - circle quadrant snaps are exactly cardinal, arc snaps are restricted
   ---
-  duration_ms: 0.472615
+  duration_ms: 0.457294
   type: 'test'
   ...
 # Subtest: closed polyline provides closing-segment midpoint snap
-ok 83 - closed polyline provides closing-segment midpoint snap
+ok 121 - closed polyline provides closing-segment midpoint snap
   ---
-  duration_ms: 0.171731
+  duration_ms: 0.241056
   type: 'test'
   ...
 # Subtest: incremental entity update retains buffer identity and leaves unrelated geometry unchanged
-ok 84 - incremental entity update retains buffer identity and leaves unrelated geometry unchanged
+ok 122 - incremental entity update retains buffer identity and leaves unrelated geometry unchanged
   ---
-  duration_ms: 254.205828
+  duration_ms: 189.027985
   type: 'test'
   ...
 # Subtest: incremental update switches to rebuild atomically when topology changes
-ok 85 - incremental update switches to rebuild atomically when topology changes
+ok 123 - incremental update switches to rebuild atomically when topology changes
   ---
-  duration_ms: 0.924339
+  duration_ms: 0.839299
   type: 'test'
   ...
 # Subtest: incremental update relocates BVH hits after moving beyond previous scene bounds
-ok 86 - incremental update relocates BVH hits after moving beyond previous scene bounds
+ok 124 - incremental update relocates BVH hits after moving beyond previous scene bounds
   ---
-  duration_ms: 0.597869
+  duration_ms: 0.442394
   type: 'test'
   ...
-1..86
-# tests 86
+1..124
+# tests 124
 # suites 0
-# pass 86
+# pass 124
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 438.011095
+# duration_ms 530.63687

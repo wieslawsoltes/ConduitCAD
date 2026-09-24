@@ -8,11 +8,11 @@ import { writeSVG, writeBOM } from '@conduitcad/exchange';
 import { distance } from '@conduitcad/geometry';
 const near = (a, b, t = 1e-5) => assert.ok(Math.abs(a - b) < t, `${a} != ${b}`);
 const dxf = entities => '0\nSECTION\n2\nENTITIES\n' + entities + '0\nENDSEC\n0\nEOF\n';
-test('all 56 symbol masters have finite geometry and valid named ports', () => {
+test('all 64 symbol masters have finite geometry and valid named ports', () => {
     const d = installSymbols(createDocument());
-    assert.equal(SYMBOLS.length, 56);
+    assert.equal(SYMBOLS.length, 64);
     assert.equal(LINE_STYLES.length, 10);
-    assert.equal(new Set(SYMBOLS.map(s => s.id)).size, 56);
+    assert.equal(new Set(SYMBOLS.map(s => s.id)).size, 64);
     for (const s of SYMBOLS) {
         const e = insertSymbol(d, s.id, 200, 300), g = entityGeometry(e, d);
         assert.ok(g.paths.length + g.texts.length > 0, s.id);
@@ -55,9 +55,9 @@ test('bulges, splines, ellipses and text retain numeric data in normalized round
 test('legacy R2000 Unicode escapes render correctly', () => { const d = createDocument(); d.entities.push(text({ x: 0, y: 0 }, '温度 ΔP', 12)); const src = writeDXF(d, { version: 'AC1015' }); assert.ok(!src.includes('温')); assert.equal(entityGeometry(parseDXF(src).entities[0], d).texts[0].text, '温度 ΔP'); });
 test('original ASCII byte preservation includes code page bytes and line endings', () => { const src = dxf('0\nTEXT\n10\n0\n20\n0\n40\n10\n1\ncafé\n').replaceAll('\n', '\r\n'), bytes = Uint8Array.from(src, c => c.charCodeAt(0)), r = parseDXF(bytes, { encoding: 'windows-1252' }); assert.equal(r.entities[0].text, 'café'); assert.deepEqual(new Uint8Array(Buffer.from(r.source.base64, 'base64')), bytes); });
 test('unsupported DXF entity and opaque sections are retained and export is transparent', () => { const src = dxf('0\n3DSOLID\n5\nAB\n8\n0\n1\nopaque ACIS\n'), r = parseDXF(src), report = exportReport(r); assert.equal(r.entities[0].unsupported, true); assert.equal(r.source.text, src); assert.equal(report.unsupported.length, 1); assert.ok(report.warnings.some(x => x.includes('omitted'))); assert.equal(parseDXF(writeDXF(r)).entities.length, 0); });
-test('non-default OCS has explicit fidelity diagnostic', () => { const r = parseDXF(dxf('0\nCIRCLE\n10\n0\n20\n0\n40\n4\n210\n0\n220\n1\n230\n0\n')); assert.ok(r.importDiagnostics.some(d => d.message.includes('OCS'))); });
+test('non-default OCS projects an edge-on circle to the top view', () => { const r = parseDXF(dxf('0\nCIRCLE\n10\n0\n20\n0\n40\n4\n210\n0\n220\n1\n230\n0\n')); const g=entityGeometry(r.entities[0],r); assert.ok(g.paths[0].points.every(p=>Math.abs(p.y)<1e-8)); assert.deepEqual(parseDXF(writeDXF(r)).entities[0].extrusion,{x:0,y:1,z:0}); });
 test('old POLYLINE VERTEX and SEQEND import as one path', () => { const r = parseDXF(dxf('0\nPOLYLINE\n70\n1\n0\nVERTEX\n10\n0\n20\n0\n42\n1\n0\nVERTEX\n10\n20\n20\n0\n0\nSEQEND\n')); assert.equal(r.entities.length, 1); assert.equal(r.entities[0].points.length, 2); assert.equal(r.entities[0].closed, true); });
-test('HATCH normalization warns rather than silently claiming pattern support', () => { const d = createDocument(); d.entities.push(entity('HATCH', { solid: false, pattern: 'ANSI31', loops: [{ points: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 0, y: 10 }], closed: true }] })); assert.match(exportReport(d).warnings[0], /hatches/); assert.equal(parseDXF(writeDXF(d)).entities[0].type, 'LWPOLYLINE'); });
+test('native HATCH export retains loops and pattern definitions', () => { const d=createDocument(); d.entities.push(entity('HATCH',{solid:false,pattern:'USER',loops:[{points:[{x:0,y:0},{x:10,y:0},{x:0,y:10}],closed:true}],patternLines:[{angle:0,base:{x:0,y:0},offset:{x:0,y:2},dashes:[]}]})); const r=parseDXF(writeDXF(d)); assert.equal(r.entities[0].type,'HATCH'); assert.equal(r.entities[0].patternLines.length,1); assert.ok(entityGeometry(r.entities[0],r).paths.length>1); });
 test('authored dimension exports visible geometry with warning', () => { const d = createDocument(); d.entities.push(entity('DIMENSION', { a: { x: 0, y: 0 }, b: { x: 100, y: 0 }, offset: 20 })); assert.ok(exportReport(d).warnings.some(x => x.includes('dimensions'))); const r = parseDXF(writeDXF(d)); assert.ok(r.entities.some(e => e.type === 'TEXT')); assert.ok(r.entities.length > 3); });
 test('malformed or truncated ASCII DXF is rejected', () => {
     for (const src of ['not dxf', '0\nLINE\n10\nNaN\n0\nEOF\n', '-1\nTEST\n0\nEOF\n'])

@@ -111,8 +111,10 @@ an out-of-core or million-entity editing performance guarantee.
 
 WebGL2 uses instanced triangle strokes without the compute-culling pass.
 Canvas 2D provides the final fallback. Text, grid, selection UI and solid-fill
-backgrounds use Canvas 2D even when strokes use WebGPU. Fills are drawn behind
-batched strokes; arbitrary DXF painter order/transparency is not reproduced.
+backgrounds use Canvas 2D even when strokes use WebGPU. Scenes requiring fills, background masks, long dash arrays or zero-length ink
+dots use the ordered Canvas 2D fidelity compositor. Entity sequence, compound
+island holes and opacity are preserved instead of putting every fill below all
+strokes. Arbitrary SORTENTSTABLE and nested block draw ordering remain incomplete.
 Text uses browser fonts, not the original DXF SHX/TTF font machinery.
 
 Rendering is demand-driven through requestAnimationFrame, not an idle loop.
@@ -147,3 +149,23 @@ service worker and a single HTML file. The worker prevents parsing from blocking
 the interactive UI, but the complete file and parsed result are still retained
 in memory. Imports have a 128 MiB input ceiling, group-code/recursion limits and
 an application worker timeout. These limits are safeguards, not a security audit.
+
+
+## 0.2.0 native fidelity stages
+
+The DXF helper retains hatch boundary types, pattern lines and coordinate-system
+properties. Model tessellation projects native OCS values without replacing the
+source entity. Compound paths carry contours and fill rules; text carries an
+affine frame and layout metadata. SVG/PNG share this portable geometry and text
+layout. Meshes remain indexed native entities and display as planar wireframes.
+
+The canvas clip is a first-class drawing boundary: grid/rulers, geometry,
+selection and pointer acceptance share the same ruler exclusion. GPU scissor
+coordinates use device pixels; Canvas clips and pointer coordinates use CSS
+pixels. Infinite entities are clipped to the current view and rebuild when the
+view changes. Camera-only movement still retains ordinary finite stroke scenes.
+
+Hatch scan conversion is bounded, returns density-limit diagnostics, and computes
+holes by even-odd topology. Flat gradient preview is deliberate; native gradient
+data remains available for exchange. Signed linetypes preserve leading gaps and
+dots. Ordered compositing prioritizes fidelity over claiming all-GPU execution.

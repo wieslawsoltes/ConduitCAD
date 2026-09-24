@@ -1,5 +1,5 @@
 import { bounds, union, emptyBounds, intersects, distance, validBounds, center, clamp } from '@conduitcad/geometry';
-import { entityGeometry, entityBounds, isVisible, documentBounds } from '@conduitcad/model';
+import { entityGeometry, entityBounds, isVisible, documentBounds, textLayout } from '@conduitcad/model';
 import { SpatialIndex } from '@conduitcad/spatial';
 export class Camera {
     constructor() { this.x = 560; this.y = 340; this.scale = 1; this.width = 1000; this.height = 700; }
@@ -22,12 +22,12 @@ export function colorRGBA(hex, alpha = 1) {
         hex = '#344755';
     return [parseInt(hex.slice(1, 3), 16) / 255, parseInt(hex.slice(3, 5), 16) / 255, parseInt(hex.slice(5, 7), 16) / 255, alpha];
 }
-function segmentCount(path) { return path.points.length - 1 + (path.closed && distance(path.points[0], path.points.at(-1)) > 1e-7 ? 1 : 0); }
+function segmentCount(path) { if (path.stroke === false || path.points.length < 2) return 0; return path.points.length - 1 + (path.closed && distance(path.points[0], path.points.at(-1)) > 1e-7 ? 1 : 0); }
 function writeStrokeData(data, paths, origin, offset = 0) {
     let k = offset * 16;
     for (const p of paths) {
         const rgba = colorRGBA(p.color, p.opacity), pts = p.points;
-        let phase = 0;
+        let phase = p.dashPhase || 0;
         const n = segmentCount(p);
         for (let i = 0; i < n; i++) {
             const a = pts[i], z = pts[(i + 1) % pts.length];
@@ -37,14 +37,15 @@ function writeStrokeData(data, paths, origin, offset = 0) {
         }
     }
 }
-export function buildScene(doc, { tolerance = .25, origin = null } = {}) {
-    const paths = [], texts = [], items = [], spans = new Map(), entities = new Map();
+export function buildScene(doc, { tolerance = .25, origin = null, view = null } = {}) {
+    const paths = [], texts = [], items = [], diagnostics = [], spans = new Map(), entities = new Map();
     let b = emptyBounds(), count = 0;
     const started = performance.now();
     for (const e of doc.entities) {
         if (!isVisible(e, doc))
             continue;
-        const g = entityGeometry(e, doc, { tolerance }), span = { pathStart: paths.length, pathCount: g.paths.length, textStart: texts.length, textCount: g.texts.length, offset: count, count: 0, itemIndex: -1 };
+        const g = entityGeometry(e, doc, { tolerance, view }), span = { pathStart: paths.length, pathCount: g.paths.length, textStart: texts.length, textCount: g.texts.length, offset: count, count: 0, itemIndex: -1 };
+        diagnostics.push(...(g.warnings || []));
         for (const path of g.paths) {
             paths.push(path);
             count += segmentCount(path);
@@ -64,7 +65,7 @@ export function buildScene(doc, { tolerance = .25, origin = null } = {}) {
     origin = origin || (validBounds(b) ? center(b) : { x: 0, y: 0 });
     const data = new Float32Array(count * 16);
     writeStrokeData(data, paths, origin);
-    return { paths, texts, items, spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
+    return { paths, texts, items, diagnostics, hasInfinite: doc.entities.some(e => ['RAY', 'XLINE'].includes(e.type)), spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
 }
 /** Patch equal-topology edits in place. A null result requests a full rebuild. */
 export function updateSceneEntities(scene, doc, ids, { tolerance = .25 } = {}) {
@@ -128,7 +129,7 @@ export const LINE_SHADER = WGSL_COMMON + `
 struct Out { @builtin(position) position:vec4f, @location(0) local:vec2f, @location(1) @interpolate(flat) metrics:vec2f, @location(2) @interpolate(flat) color:vec4f, @location(3) @interpolate(flat) style:vec4f, @location(4) @interpolate(flat) dash:vec4f };
 @vertex fn vs(@builtin(vertex_index) vertex:u32,@builtin(instance_index) instance:u32)->Out {
  let s=segments[indices[instance]];let a=(s.ab.xy-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;
- let b=(s.ab.zw-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;let delta=b-a;let len=max(length(delta),0.0001);let dir=delta/len;let normal=vec2f(-dir.y,dir.x);
+ let b=(s.ab.zw-view.camera)*vec2f(view.scale,-view.scale)+view.viewport*.5;let delta=b-a;let len=max(length(delta),0.0001);let dir=select(vec2f(1,0),delta/len,len>0.0001);let normal=vec2f(-dir.y,dir.x);
  let halfWidth=max(s.style.x*.5,.5);let pad=halfWidth+1.0;
  let corners=array<vec2f,6>(vec2f(0,-1),vec2f(1,-1),vec2f(1,1),vec2f(0,-1),vec2f(1,1),vec2f(0,1));let corner=corners[vertex];let local=vec2f(mix(-pad,len+pad,corner.x),corner.y*pad);let pixel=a+dir*local.x+normal*local.y;
  var o:Out;o.position=vec4f(pixel/view.viewport*vec2f(2,-2)+vec2f(-1,1),0,1);o.local=local;o.metrics=vec2f(len,halfWidth);o.color=s.color;o.style=s.style;o.dash=s.dash;return o;
@@ -136,7 +137,7 @@ struct Out { @builtin(position) position:vec4f, @location(0) local:vec2f, @locat
 @fragment fn fs(o:Out)->@location(0) vec4f {
  let outside=length(vec2f(max(max(-o.local.x,o.local.x-o.metrics.x),0.0),o.local.y))-o.metrics.y;
  let alpha=1.0-smoothstep(-.55,.55,outside);
- if(o.style.y>0.0){let pattern=array<f32,6>(o.style.y,o.style.z,o.dash.x,o.dash.y,o.dash.z,o.dash.w);let cycle=o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w;var d=(max(o.local.x,0.0)/view.scale+o.style.w)%cycle;for(var i=0u;i<6u;i++){if(d<pattern[i]){if(i%2u==1u){discard;}break;}d-=pattern[i];}}
+ if(o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w>0.0){let pattern=array<f32,6>(o.style.y,o.style.z,o.dash.x,o.dash.y,o.dash.z,o.dash.w);let cycle=o.style.y+o.style.z+o.dash.x+o.dash.y+o.dash.z+o.dash.w;var d=(max(o.local.x,0.0)/view.scale+o.style.w)%cycle;for(var i=0u;i<6u;i++){if(d<pattern[i]){if(i%2u==1u){discard;}break;}d-=pattern[i];}}
  return vec4f(o.color.rgb,o.color.a*alpha);
 }`;
 class GPUBackend {
@@ -209,6 +210,7 @@ class GPUBackend {
             pass.end();
         }
         const pass = encoder.beginRenderPass({ colorAttachments: [{ view: this.context.getCurrentTexture().createView(), clearValue: { r: 0, g: 0, b: 0, a: 0 }, loadOp: 'clear', storeOp: 'store' }] });
+        if (camera.clipInset > 0) { const x = Math.min(this.canvas.width - 1, Math.ceil(camera.clipInset * ratio)), y = Math.min(this.canvas.height - 1, Math.ceil(camera.clipInset * ratio)); pass.setScissorRect(x, y, this.canvas.width - x, this.canvas.height - y); }
         pass.setPipeline(this.render);
         for (const b of this.batches) {
             pass.setBindGroup(0, b.renderGroup);
@@ -230,10 +232,10 @@ precision highp float;
 layout(location=0) in vec4 ab;layout(location=1) in vec4 color;layout(location=2) in vec4 style;layout(location=3) in vec4 dash;
 uniform vec2 camera;uniform vec2 viewport;uniform float scale;
 out vec2 local;flat out vec2 metrics;flat out vec4 col;flat out vec4 sty;flat out vec4 dsh;
-void main(){vec2 a=(ab.xy-camera)*vec2(scale,-scale)+viewport*.5,b=(ab.zw-camera)*vec2(scale,-scale)+viewport*.5;vec2 delta=b-a;float len=max(length(delta),.0001);vec2 dir=delta/len,n=vec2(-dir.y,dir.x);float halfWidth=max(style.x*.5,.5),pad=halfWidth+1.;vec2 corners[6]=vec2[6](vec2(0,-1),vec2(1,-1),vec2(1,1),vec2(0,-1),vec2(1,1),vec2(0,1));vec2 corner=corners[gl_VertexID];local=vec2(mix(-pad,len+pad,corner.x),corner.y*pad);vec2 pixel=a+dir*local.x+n*local.y;gl_Position=vec4(pixel/viewport*vec2(2,-2)+vec2(-1,1),0,1);metrics=vec2(len,halfWidth);col=color;sty=style;dsh=dash;}`;
+void main(){vec2 a=(ab.xy-camera)*vec2(scale,-scale)+viewport*.5,b=(ab.zw-camera)*vec2(scale,-scale)+viewport*.5;vec2 delta=b-a;float len=max(length(delta),.0001);vec2 dir=len>.0001?delta/len:vec2(1,0),n=vec2(-dir.y,dir.x);float halfWidth=max(style.x*.5,.5),pad=halfWidth+1.;vec2 corners[6]=vec2[6](vec2(0,-1),vec2(1,-1),vec2(1,1),vec2(0,-1),vec2(1,1),vec2(0,1));vec2 corner=corners[gl_VertexID];local=vec2(mix(-pad,len+pad,corner.x),corner.y*pad);vec2 pixel=a+dir*local.x+n*local.y;gl_Position=vec4(pixel/viewport*vec2(2,-2)+vec2(-1,1),0,1);metrics=vec2(len,halfWidth);col=color;sty=style;dsh=dash;}`;
 const GLSL_FRAGMENT = `#version 300 es
 precision highp float;in vec2 local;flat in vec2 metrics;flat in vec4 col;flat in vec4 sty;flat in vec4 dsh;uniform float scale;out vec4 frag;
-void main(){float outside=length(vec2(max(max(-local.x,local.x-metrics.x),0.),local.y))-metrics.y;float alpha=1.-smoothstep(-.55,.55,outside);if(sty.y>0.){float pattern[6]=float[6](sty.y,sty.z,dsh.x,dsh.y,dsh.z,dsh.w);float cycle=sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w;float pos=mod(max(local.x,0.)/scale+sty.w,cycle);for(int i=0;i<6;i++){if(pos<pattern[i]){if(i%2==1)discard;break;}pos-=pattern[i];}}frag=vec4(col.rgb,col.a*alpha);}`;
+void main(){float outside=length(vec2(max(max(-local.x,local.x-metrics.x),0.),local.y))-metrics.y;float alpha=1.-smoothstep(-.55,.55,outside);if(sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w>0.){float pattern[6]=float[6](sty.y,sty.z,dsh.x,dsh.y,dsh.z,dsh.w);float cycle=sty.y+sty.z+dsh.x+dsh.y+dsh.z+dsh.w;float pos=mod(max(local.x,0.)/scale+sty.w,cycle);for(int i=0;i<6;i++){if(pos<pattern[i]){if(i%2==1)discard;break;}pos-=pattern[i];}}frag=vec4(col.rgb,col.a*alpha);}`;
 class GLBackend {
     constructor(canvas, onLost) { this.canvas = canvas; this.name = 'WebGL2'; this.onLost = onLost; }
     async init() {
@@ -303,6 +305,7 @@ class CanvasBackend {
 }
 export function drawPath(ctx, path, camera, override = {}) {
     const points = path.points;
+    if (path.stroke === false && !override.color) return;
     if (!points.length)
         return;
     ctx.beginPath();
@@ -319,25 +322,49 @@ export function drawPath(ctx, path, camera, override = {}) {
     ctx.lineWidth = override.width || path.width || 1.5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    ctx.setLineDash((override.dash || path.dash || []).map(v => v * camera.scale));
+    ctx.setLineDash((override.dash || path.dash || []).map(v => Math.max(0, v * camera.scale)));
+    ctx.lineDashOffset = -(path.dashPhase || 0) * camera.scale;
     ctx.globalAlpha = path.opacity ?? 1;
     ctx.stroke();
     ctx.globalAlpha = 1;
-    ctx.setLineDash([]);
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+}
+export function drawFill(ctx, path, camera) {
+    if (!path.fill) return;
+    ctx.save(); ctx.beginPath();
+    for (const contour of path.contours || [path.points]) {
+        contour.forEach((p, i) => { const q = camera.screen(p); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.closePath();
+    }
+    ctx.fillStyle = path.fill; ctx.globalAlpha = path.opacity ?? 1; ctx.fill(path.fillRule || 'evenodd'); ctx.restore();
+}
+function cadFont(name) {
+    const clean = String(name || '').replace(/["'\\;{}]/g, '').replace(/\.(ttf|otf)$/i, '');
+    return !clean || /\.shx$|^(txt|standard)$/i.test(clean) ? 'ui-sans-serif, system-ui, sans-serif' : `"${clean}", ui-sans-serif, system-ui, sans-serif`;
 }
 export function drawText(ctx, t, camera) {
-    const s = camera.screen(t.p), h = t.height * camera.scale;
-    if (h < 2 || h > 2000)
-        return;
-    ctx.save();
-    ctx.translate(s.x, s.y);
-    ctx.rotate(-(t.rotation || 0) * Math.PI / 180);
-    ctx.scale(t.widthFactor || 1, 1);
-    ctx.fillStyle = t.color || '#344755';
-    ctx.textAlign = t.align || 'left';
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = `${h}px Inter, ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    String(t.text).split('\n').forEach((line, i) => ctx.fillText(line, 0, i * h * 1.3));
+    const s = camera.screen(t.p), h = t.nominalHeight || t.height;
+    if (!(h > 0) || !Number.isFinite(h)) return;
+    ctx.save(); ctx.translate(s.x, s.y);
+    if (t.frame) { const [a, b, c, d] = t.frame, z = camera.scale; ctx.transform(a * z, -b * z, -c * z, d * z, 0, 0); }
+    else { ctx.rotate(-(t.rotation || 0) * Math.PI / 180); ctx.scale((t.widthFactor || 1) * camera.scale, camera.scale); }
+    const setFont = (height, style) => ctx.font = `${style.italic ? 'italic ' : ''}${style.bold ? 'bold ' : ''}${height}px ${cadFont(style.font || t.font)}`;
+    const layout = textLayout(t, (text, height, style) => { setFont(height, style); return ctx.measureText(text).width; });
+    ctx.globalAlpha = t.opacity ?? 1; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    if (t.backgroundFill) {
+        const pad = Math.max(0, (t.backgroundScale || 1.5) - 1) * h;
+        ctx.fillStyle = (t.backgroundFill & 2) ? '#fbfcfb' : t.backgroundColor || '#ffffff';
+        ctx.fillRect(layout.minX - pad, layout.minY - pad, layout.width + 2 * pad, layout.height + 2 * pad);
+    }
+    for (const line of layout.lines) for (const run of line.runs) {
+        ctx.save(); ctx.translate(run.x, run.y); ctx.scale(run.width ? run.width / Math.max(1e-12, (setFont(run.height, run), ctx.measureText(run.text).width)) : 1, 1);
+        if (run.oblique) ctx.transform(1, 0, -Math.tan(run.oblique * Math.PI / 180), 1, 0, 0);
+        ctx.fillStyle = run.color || t.color || '#344755'; ctx.fillText(run.text, 0, 0);
+        ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = Math.max(.25, run.height / 18);
+        for (const [enabled, y] of [[run.underline, run.height * .12], [run.overline, -run.height * .85], [run.strike, -run.height * .35]]) if (enabled) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(ctx.measureText(run.text).width, y); ctx.stroke();
+        }
+        ctx.restore();
+    }
     ctx.restore();
 }
 /** Retained CAD renderer. Geometry uploads only after document/tessellation changes. */
@@ -349,7 +376,7 @@ export class CadRenderer {
         this.onStatus = onStatus;
         this.dpr = Math.min(globalThis.devicePixelRatio || 1, 3);
         this.grid = true;
-        this.rulers = true;
+        this.rulers = true; this.camera.clipInset = 22;
         this.disposed = false;
         this.stats = { backend: 'Initializing', frameMs: 0, buildMs: 0, segments: 0, entities: 0, draws: 0 };
         this.background = document.createElement('canvas');
@@ -413,6 +440,7 @@ export class CadRenderer {
         this.initialize(true, backend === 'WebGL2').finally(() => this.recovering = false);
     }
     resize() {
+        this.dpr = Math.min(globalThis.devicePixelRatio || 1, 3);
         const r = this.host.getBoundingClientRect();
         this.camera.width = Math.max(1, r.width);
         this.camera.height = Math.max(1, r.height);
@@ -438,9 +466,16 @@ export class CadRenderer {
             requestAnimationFrame(() => { this.pending = false; this.render(); });
         }
     }
+    containsPoint(p) { const inset = this.rulers ? 22 : 0; return p.x >= inset && p.y >= inset && p.x < this.camera.width && p.y < this.camera.height; }
     render() {
         if (!this.doc || !this.engine || this.disposed)
             return;
+        this.camera.clipInset = this.rulers ? 22 : 0;
+        const clip = `inset(${this.camera.clipInset}px 0px 0px ${this.camera.clipInset}px)`;
+        this.canvas.style.clipPath = clip; this.overlay.style.clipPath = clip;
+        const viewKey = [this.camera.x, this.camera.y, this.camera.scale, this.camera.width, this.camera.height].join(':');
+        if (this.scene?.hasInfinite && this.viewKey !== viewKey) this.sceneDirty = true;
+        this.viewKey = viewKey;
         const start = performance.now(), lod = Math.floor(Math.log2(this.camera.scale || 1));
         if (this.pendingEntities?.size && !this.sceneDirty && this.scene && Math.abs(lod - (this.lod ?? lod)) < 2) {
             const t = performance.now(), ranges = updateSceneEntities(this.scene, this.doc, this.pendingEntities, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3) });
@@ -461,7 +496,7 @@ export class CadRenderer {
         }
         if (this.sceneDirty || !this.scene || Math.abs(lod - (this.lod ?? lod)) >= 2) {
             this.lod = lod;
-            this.scene = buildScene(this.doc, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3) });
+            this.scene = buildScene(this.doc, { tolerance: clamp(.22 / (this.camera.scale * this.dpr), .00001, 3), view: this.camera.viewport });
             try {
                 this.engine.upload(this.scene);
             }
@@ -475,9 +510,14 @@ export class CadRenderer {
             this.stats.segments = this.scene.count;
             this.stats.entities = this.scene.items.length;
         }
+        // Hardware strokes have six dash slots. Preserve long patterns and zero-length ink dots through the ordered fidelity compositor.
+        const ordered = this.scene.paths.some(p => p.fill || p.dash?.length > 6 || p.dash?.some((v, i) => i % 2 === 0 && v === 0)) || this.scene.texts.some(t => t.backgroundFill);
+        this.orderedComposite = ordered;
+        this.canvas.style.visibility = ordered ? 'hidden' : 'visible';
+        this.stats.compositor = ordered ? 'Canvas 2D fidelity composite' : this.engine.name;
         this.drawBackground();
         try {
-            this.engine.draw(this.camera, this.dpr);
+            if (!ordered) this.engine.draw(this.camera, this.dpr);
         }
         catch (e) {
             this.recover(e.message, this.engine.name);
@@ -486,13 +526,21 @@ export class CadRenderer {
         const ctx = this.ctx;
         ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
         ctx.clearRect(0, 0, this.camera.width, this.camera.height);
+        ctx.save(); ctx.beginPath(); ctx.rect(this.camera.clipInset, this.camera.clipInset, this.camera.width, this.camera.height); ctx.clip();
         const view = this.camera.viewport;
-        for (const t of this.scene.texts) {
-            const pad = t.text.length * t.height;
-            if (t.p.x + pad >= view.minX && t.p.x - pad <= view.maxX && t.p.y + t.height >= view.minY && t.p.y - t.height <= view.maxY)
-                drawText(ctx, t, this.camera);
+        if (ordered) {
+            const visible = new Set(this.scene.index.search(view).map(item=>item.id));
+            for (const [id, span] of this.scene.spans) {
+                if (!visible.has(id) && !['RAY','XLINE'].includes(this.scene.entities.get(id)?.type)) continue;
+                for (let i=span.pathStart; i<span.pathStart+span.pathCount; i++) { const p=this.scene.paths[i]; drawFill(ctx,p,this.camera); drawPath(ctx,p,this.camera); }
+                for (let i=span.textStart; i<span.textStart+span.textCount; i++) drawText(ctx,this.scene.texts[i],this.camera);
+            }
+        } else for (const t of this.scene.texts) {
+            const layout = textLayout(t), pad = Math.max(layout.width, layout.height) * Math.max(1, ...(t.frame || [1]).map(Math.abs));
+            if (t.p.x + pad >= view.minX && t.p.x - pad <= view.maxX && t.p.y + pad >= view.minY && t.p.y - pad <= view.maxY) drawText(ctx, t, this.camera);
         }
         this.drawOverlay?.(ctx, this.camera);
+        ctx.restore();
         this.stats.frameMs = performance.now() - start;
         this.stats.draws++;
         this.onFrame?.(this.stats);
@@ -503,17 +551,6 @@ export class CadRenderer {
         c.clearRect(0, 0, cam.width, cam.height);
         c.fillStyle = '#fbfcfb';
         c.fillRect(0, 0, cam.width, cam.height);
-        // Solid fills are rendered behind batched GPU strokes; no painter-order claim is made.
-        for (const p of this.scene.paths)
-            if (p.fill && intersects(bounds(p.points), cam.viewport)) {
-                c.beginPath();
-                p.points.forEach((v, i) => { const s = cam.screen(v); i ? c.lineTo(s.x, s.y) : c.moveTo(s.x, s.y); });
-                c.closePath();
-                c.fillStyle = p.fill;
-                c.globalAlpha = .15;
-                c.fill('evenodd');
-                c.globalAlpha = 1;
-            }
         if (this.grid) {
             let step = 10;
             while (step * cam.scale < 18)
@@ -531,6 +568,9 @@ export class CadRenderer {
                     c.fill();
                 }
         }
+        c.save(); c.beginPath(); c.rect(cam.clipInset || 0, cam.clipInset || 0, cam.width, cam.height); c.clip();
+        for (const p of this.scene.paths) if (!this.orderedComposite && p.fill && intersects(bounds(p.contours ? p.contours.flat() : p.points), cam.viewport)) drawFill(c, p, cam);
+        c.restore();
         if (this.rulers) {
             c.fillStyle = '#f3f6f4';
             c.fillRect(0, 0, cam.width, 22);
