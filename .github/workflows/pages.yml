@@ -28,12 +28,13 @@ jobs:
           python-version: '3.12'
       - name: Link reusable packages without network dependencies
         run: node scripts/bootstrap.mjs
-      - name: Unit tests, production build, and reusable package archives
+      - name: Unit tests, catalogue, production build, and reusable package archives
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
           npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run catalog
           npm run build
           npm run pack:packages
       - name: Clean offline installation and integration of all reusable packages
@@ -49,15 +50,18 @@ jobs:
           with sync_playwright() as playwright:
               print('CHROMIUM_EXECUTABLE=' + playwright.chromium.executable_path)
           PY
-      - name: Browser smoke, native touch, pixel clipping, and independent DXF audits
+      - name: Browser editing, mobile catalogue, pixel clipping, and independent DXF audits
         shell: bash
         run: |
           set -euo pipefail
           python tests/browser_smoke.py
           python tests/browser_workflows.py
           python tests/browser_fidelity.py
+          python tests/browser_symbols.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
+          python tests/audit_symbol_library.py
+          python tests/render_symbol_atlas.py
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
