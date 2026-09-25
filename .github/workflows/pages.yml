@@ -35,6 +35,7 @@ jobs:
           mkdir -p artifacts
           npm test 2>&1 | tee artifacts/ci-unit-tests.log
           npm run catalog
+          node scripts/drawing-tool-samples.mjs
           npm run build
           npm run pack:packages
       - name: Clean offline installation and integration of all reusable packages
@@ -61,12 +62,14 @@ jobs:
           CONDUIT_TEST_ORIGIN=localhost python tests/browser_interop.py
           CONDUIT_TEST_ORIGIN=localhost python tests/browser_cad_editing.py
           CONDUIT_TEST_ORIGIN=localhost python tests/browser_parametric.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_drawing_tools.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
           python tests/audit_symbol_library.py
           python tests/audit_interop.py
           python tests/audit_cad_editing.py
           python tests/audit_parametric.py
+          python tests/audit_drawing_tools.py
           python tests/render_symbol_atlas.py
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
@@ -76,7 +79,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-      - name: Upload validation reports and all thirteen npm archives
+      - name: Upload validation reports and all reusable npm archives
         if: always()
         uses: actions/upload-artifact@v4
         with:
