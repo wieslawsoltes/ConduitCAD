@@ -1,3 +1,61 @@
+# Validation record — Conduit CAD 0.6.0
+
+`npm test`: **415 passing tests**, zero failures/skips (332 inherited + 83 new).
+New tests cover all 28 factory/session workflows, native ASCII/binary round-trips,
+conditioned circumcircles, clockwise/reflex arc containment, canonical ellipse
+axes, C1 interpolation and closure, donuts, pattern fills, boundary rejection,
+normalized WIPEOUT geometry, exact polar/Cartesian points, validation recovery,
+triangle/quad native ordering, curved snapping and nested infinite-line indexing.
+
+`tests/browser_drawing_tools.py`: **83 new checks** plus 163 inherited integrated
+checks, **246 total**, not 246 browser/device combinations. The suite operates the
+actual palette and canvas to construct every tool, verifies repeat/draft state,
+uses Back/Finish/Close/options/exact fields, edits native controls and properties,
+checks undo/redo, saves and independently reads a real binary download, uses new
+tools in the shared-block editor, and tests native touch taps and a two-contact
+pinch with no unintended geometry. Mobile command bars are tested for 44px targets,
+non-overlap and document overflow. No uncaught JavaScript exceptions.
+
+`tests/audit_drawing_tools.py`: **148 independent checks** over ASCII and binary
+native outputs. ezdxf reads every new type and checks arcs, axes/parameters, knots
+and controls, polylines/bulges/width, SOLID/3DFACE wire ordering, hatch pattern and
+native curve edges, WIPEOUT boundary mapping, construction directions, text,
+leaders and dimension subtypes/measurements/pictures. Both files have zero audit
+errors or repairs. The browser's separately downloaded binary DXF also audits.
+
+All existing native interop, dimension editing, parametric, fidelity, symbol atlas
+and industry-starter audits remain in the pipeline. Strict public TypeScript
+consumers and empty-cache offline installation/import cover **14 version-0.6.0
+archives**, including the new drawing package.
+
+```sh
+node scripts/bootstrap.mjs
+npm test
+npm run catalog
+npm run build
+npm run pack:packages
+node scripts/verify-packages.mjs
+tsc -p tests/tsconfig.json
+python tests/browser_drawing_tools.py
+python tests/audit_drawing_tools.py
+```
+
+The browser suite defaults to the standalone document locally and uses
+`CONDUIT_TEST_ORIGIN=localhost` in CI. Local browser policy blocks server navigation;
+standalone execution is recorded separately rather than claiming a real-origin
+local run. CI validates production delivery through localhost. Save/schedule are
+stubbed for deterministic history transactions; neither mode proves persistence
+durability. Rendering is Canvas 2D and mobile inputs are browser emulation, not a
+physical-device or WebGPU/WebGL2 equivalence benchmark. The older backend smoke
+probe reports requested versus actual fallback rather than treating a request as
+proof of hardware execution. Independent ezdxf readback is not a vendor certificate.
+
+Reports: `artifacts/browser-drawing-tools.json`, `drawing-tools-native-audit.json`,
+`package-consumer.json`, `ci-unit-tests.log`. Fixtures and sample generator are
+checked in; generated screenshots show the active mobile palette and command UI.
+
+---
+
 # Validation record — Conduit CAD 0.5.0
 
 ## Shared block and parametric authoring checks

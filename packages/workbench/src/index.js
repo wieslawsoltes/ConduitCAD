@@ -1,3 +1,5 @@
+import { DRAWING_TOOLS, drawingTool } from '@conduitcad/drawing';
+import { beginDrawing, acceptDrawingPoint, drawingPointerUp, drawingPreview, updateDrawingControls, finishDrawing, drawingToolSections, bindDrawingSearch, drawingAction, drawingCommand, nativeGrips, changeNativeGrip, renderDrawingInspector, nativePropertyChange } from './drawing-workbench.js';
 import { parametricAction, renderParametricInspector, refreshCalculations, drawParametricOverlay, startBlockEditor, finishBlockEditor, parameterManager, constraintAuthor } from './parametric-workbench.js';
 import { renderCadEditing, changeCadEditing, cadEditingAction } from './cad-editing.js';
 import { editDimension, dimensionGrips, regenerateDimensions, setDynamicParameters, dynamicParameterGrips, dynamicGripValue } from '@conduitcad/model';
@@ -14,7 +16,7 @@ import { ProjectStore, downloadFile } from '@conduitcad/storage';
 import { writeSVG, renderPNG, writeBOM } from '@conduitcad/exchange';
 import { icon, escapeHTML } from './icons.js';
 const E = escapeHTML;
-const TOOL_INFO = { select: ['Select', 'Tap an object to select · drag to move'], pan: ['Pan', 'Drag the drawing · pinch to zoom'], line: ['Line', 'Tap two endpoints, or drag to draw a line'], polyline: ['Polyline', 'Tap vertices · Finish to complete the path'], rect: ['Rectangle', 'Tap opposite corners, or drag a rectangle'], circle: ['Circle', 'Tap the center, then set the radius'], connect: ['Connect', 'Tap a port, then a destination · routes avoid equipment'], text: ['Text', 'Tap the drawing to place editable text'], dimension: ['Dimension', 'Pick two points for an aligned dimension'], insert: ['Place symbol', 'Tap to place · Escape cancels'] };
+const TOOL_INFO = { ...Object.fromEntries(DRAWING_TOOLS.map(t => [t.id, [t.label, t.steps[0]]])), select: ['Select', 'Tap an object to select · drag to move'], pan: ['Pan', 'Drag the drawing · pinch to zoom'], line: ['Line', 'Tap two endpoints, or drag to draw a line'], polyline: ['Polyline', 'Tap vertices · Finish to complete the path'], rect: ['Rectangle', 'Tap opposite corners, or drag a rectangle'], circle: ['Circle', 'Tap the center, then set the radius'], connect: ['Connect', 'Tap a port, then a destination · routes avoid equipment'], text: ['Text', 'Tap the drawing to place editable text'], dimension: ['Dimension', 'Pick two points for an aligned dimension'], insert: ['Place symbol', 'Tap to place · Escape cancels'] };
 const btn = (action, label, ic, cls = '', title = label) => `<button type="button" data-action="${action}" class="${cls}" title="${E(title)}" aria-label="${E(label)}">${ic ? icon(ic) : ''}<span>${E(label)}</span></button>`;
 const iconButton = (action, ic, label, cls = '') => `<button type="button" data-action="${action}" class="icon-btn ${cls}" title="${E(label)}" aria-label="${E(label)}">${icon(ic)}</button>`;
 const filledContains = (p, contours) => { let inside=false; for (const poly of contours) for(let i=0,j=poly.length-1;i<poly.length;j=i++) {const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;} return inside; };
@@ -105,7 +107,7 @@ export class Workbench {
  <header class="appbar"><div class="brand"><span class="logo">${icon('logo')}</span><span class="brand-name">conduit</span><small>CAD</small></div><div class="document-title"><span class="divider"></span><button class="doc-title-button" data-action="rename" title="Rename drawing"><span class="doc-name"></span>${icon('down')}</button><span class="save-status">${icon('check')} Local workspace</span></div><div class="appbar-actions">${btn('new', 'New', 'plus', 'desktop-only', 'Create a drawing')}${btn('open', 'Open DXF', 'folder', 'btn')}${btn('export', 'Export', 'export', 'btn primary')}${iconButton('help', 'help', 'Help & shortcuts', 'desktop-only')}<div class="avatar" title="Local workspace · no account">CC</div></div></header>
  <nav class="workbar" aria-label="Workspace tools"><div class="workspace-label">${icon('symbols')} Design workspace</div>${btn('mode-draw', 'Draw', 'line', 'tab active')}${btn('mode-connect', 'Connect', 'connect', 'tab')}${btn('mode-inspect', 'Inspect', 'properties', 'tab')}<span class="spacer"></span>${btn('parameters', 'Parameters', 'param', 'compact optional')}${btn('line-styles', 'Line styles', 'line', 'compact optional')}<span class="separator desktop-only"></span>${btn('toggle-library', 'Library', 'symbols', 'compact mobile-only')}${iconButton('toggle-inspector', 'properties', 'Properties and layers', 'compact inspector-toggle')}${iconButton('command', 'command', 'Command palette', 'compact optional')}${iconButton('more', 'more', 'More drawing tools', 'compact mobile-only')}</nav>
  <main class="workspace"><aside class="library" aria-label="Symbol library"><div class="panel-heading"><h2>Symbol library <small class="library-count"></small></h2>${iconButton('toggle-library', 'close', 'Close library', 'mobile-only')}</div><p class="panel-subtitle">Drag a symbol. Make a connection.</p><div class="searchbox">${icon('search')}<input id="symbol-search" type="search" placeholder="Find a symbol…" aria-label="Search symbols" autocomplete="off"></div><div class="category-tabs"><select id="symbol-category" aria-label="Symbol category"><option value="All">All categories</option>${CATEGORIES.map(c => `<option value="${E(c.id)}" ${c.id === this.category ? 'selected' : ''}>${E(c.name)} · ${SYMBOLS.filter(s => s.category === c.id).length}</option>`).join('')}<option value="Custom">Custom / imported blocks</option></select></div><div class="library-summary" role="status" aria-live="polite"></div><div class="library-scroll"></div><div class="library-footer">${btn('library-guide', 'Conventions & library updates', 'help')}</div></aside>
- <section class="canvas-area" aria-label="Drawing canvas"><div class="viewport" tabindex="0" role="application" aria-label="CAD drawing. Use toolbar tools, touch gestures, or keyboard shortcuts."></div><div class="canvas-head"><div class="undo-group">${iconButton('undo', 'undo', 'Undo · Ctrl/⌘ Z')}${iconButton('redo', 'redo', 'Redo · Ctrl/⌘ Shift Z')}</div><div class="render-badge"><span class="dot"></span><span class="backend-name">Initializing</span><span class="stats-text quiet"> · retained renderer</span></div></div><div class="view-label">MODEL SPACE / TOP</div><div class="axis"><svg viewBox="0 0 38 38"><path d="M8 29V5m0 24h24M5 8l3-3 3 3m18 18 3 3-3 3" fill="none" stroke="#9aafa0" stroke-width="1.2"/><text x="2" y="4" font-size="6" fill="#94aa99">Y</text><text x="33" y="33" font-size="6" fill="#94aa99">X</text></svg><span class="unit-label">mm</span></div><div class="zoom-controls">${iconButton('zoom-out', 'minus', 'Zoom out')}<span class="zoom-value">100%</span>${iconButton('zoom-in', 'plus', 'Zoom in')}<span class="separator"></span>${iconButton('fit', 'fit', 'Fit drawing · F')}</div><div class="tool-hint"></div><button class="finish-button hide" data-action="finish">${icon('check')} Finish path</button><nav class="tool-dock" aria-label="Drawing tools">
+ <section class="canvas-area" aria-label="Drawing canvas"><div class="viewport" tabindex="0" role="application" aria-label="CAD drawing. Use toolbar tools, touch gestures, or keyboard shortcuts."></div><div class="canvas-head"><div class="undo-group">${iconButton('undo', 'undo', 'Undo · Ctrl/⌘ Z')}${iconButton('redo', 'redo', 'Redo · Ctrl/⌘ Shift Z')}</div><div class="render-badge"><span class="dot"></span><span class="backend-name">Initializing</span><span class="stats-text quiet"> · retained renderer</span></div></div><div class="view-label">MODEL SPACE / TOP</div><div class="axis"><svg viewBox="0 0 38 38"><path d="M8 29V5m0 24h24M5 8l3-3 3 3m18 18 3 3-3 3" fill="none" stroke="#9aafa0" stroke-width="1.2"/><text x="2" y="4" font-size="6" fill="#94aa99">Y</text><text x="33" y="33" font-size="6" fill="#94aa99">X</text></svg><span class="unit-label">mm</span></div><div class="zoom-controls">${iconButton('zoom-out', 'minus', 'Zoom out')}<span class="zoom-value">100%</span>${iconButton('zoom-in', 'plus', 'Zoom in')}<span class="separator"></span>${iconButton('fit', 'fit', 'Fit drawing · F')}</div><div class="tool-hint"></div><div class="drawing-session-controls hide" role="toolbar" aria-label="Active drawing command">${btn('draw-exact-point', 'Point…', 'ruler')}${btn('draw-back', 'Back', 'undo')}${btn('draw-close', 'Close', 'polyline')}${btn('draw-options', 'Options', 'properties')}${btn('draw-cancel', 'Cancel', 'close')}</div><button class="finish-button hide" data-action="finish">${icon('check')} Finish path</button><nav class="tool-dock" aria-label="Drawing tools">
  ${this.toolButton('select', 'Select', 'select')}${this.toolButton('pan', 'Pan', 'pan', 'mobile-hidden')}${this.toolButton('line', 'Line', 'line')}${this.toolButton('connect', 'Connect', 'connect')}<span class="dock-divider"></span>${this.toolButton('rect', 'Rectangle', 'rect', 'mobile-hidden')}${this.toolButton('circle', 'Circle', 'circle', 'mobile-hidden')}${this.toolButton('text', 'Text', 'text', 'mobile-hidden')}${this.toolButton('dimension', 'Measure', 'dimension', 'desktop-only')}${btn('shapes', 'Shapes', 'rect', 'mobile-only')}${btn('toggle-library', 'Symbols', 'symbols', 'mobile-only')}${btn('toggle-inspector', 'Edit', 'properties', 'mobile-only')}<span class="dock-divider"></span>${btn('more', 'More', 'more', '')}
  </nav></section>
  <aside class="inspector" aria-label="Drawing properties"><div class="inspector-tabs"><button data-inspector="properties" class="active">Properties</button><button data-inspector="layers">Layers</button><button data-inspector="qa">Check</button>${iconButton('toggle-inspector', 'close', 'Close properties', 'mobile-only')}</div><div class="inspector-content"></div></aside><div class="sheet-backdrop" data-action="close-panels"></div></main>
@@ -125,7 +127,7 @@ export class Workbench {
         }, opt);
         this.$('.library-scroll').addEventListener('pointerdown', e => this.libraryPointerDown(e), opt);
         this.$('.viewport').addEventListener('dblclick', () => {
-            if (this.tool === 'polyline')
+            if (this.tool === 'polyline' || this.drawingSession?.canFinish)
                 this.finishPath();
             else if (this.tool === 'select' && this.selection.size === 1) {
                 const e = this.selected()[0];
@@ -225,6 +227,7 @@ export class Workbench {
         }
     }
     async action(action) {
+        if(drawingAction(this,action))return;
         if(parametricAction(this,action))return;
         if(cadEditingAction(this,action))return;
         switch (action) {
@@ -491,6 +494,7 @@ export class Workbench {
         if (tool !== 'insert')
             this.previewSymbol = null;
         this.draft = [];
+        beginDrawing(this,tool);
         this.connectionStart = null;
         this.preview = null;
         this.snap = null;
@@ -513,6 +517,7 @@ export class Workbench {
         this.$('.tool-hint').textContent = hint;
         this.$('.tool-hint').classList.toggle('working', this.tool !== 'select' && this.tool !== 'pan');
         this.$('.finish-button').classList.toggle('hide', !(this.tool === 'polyline' && this.draft.length >= 2));
+        updateDrawingControls(this);
         this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
     }
     isMobile() { return matchMedia('(max-width:720px)').matches; }
@@ -704,12 +709,14 @@ export class Workbench {
             host.append(section);
         }
         renderCadEditing(this,e,host);
+        renderDrawingInspector(this,e,host);
         host.scrollTop = scroll;
     }
     constraintsHTML(selected) { const ids = new Set(selected.map(e => e.id)), cs = this.doc.constraints.filter(c => (c.entities || [c.entityId]).some(id => ids.has(id))); return cs.length ? `<div class="inspector-section"><h3>Sketch constraints</h3>${cs.map(c => `<div class="constraint-item">${icon('param')}<span>${E(c.type)}${c.value !== undefined ? ' = ' + E(c.value) : ''}</span><button data-constraint-delete="${E(c.id)}" title="Remove constraint">${icon('close')}</button></div>`).join('')}</div>` : ''; }
     onChange(event) {
         const t = event.target;
         try {
+            if(nativePropertyChange(this,t))return;
             if(changeCadEditing(this,t))return;
             if(t.id==='dxf-mode'){this.modal.querySelector('#dxf-version').disabled=t.value==='preserve';this.modal.querySelector('#dxf-strict').disabled=t.value==='preserve';return;}
             if (t.id === 'symbol-category') {
@@ -875,7 +882,7 @@ export class Workbench {
             const e = item.entity;
             if (!e || !isVisible(e, this.doc))
                 continue;
-            const g = entityGeometry(e, this.doc, { tolerance: .5 / this.camera.scale });
+            const g = entityGeometry(e, this.doc, { tolerance: .5 / this.camera.scale, view:this.camera.viewport });
             let d = Infinity;
             for (const path of g.paths) {
                 if(path.clips?.some(polygon=>!filledContains(p,[polygon])))continue;
@@ -1011,6 +1018,7 @@ export class Workbench {
         // OCS points cannot be exposed as WCS grips. Projected body dragging is handled by moveEntity.
         const n = e.extrusion;
         if (n && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'INSERT', 'HATCH', 'SOLID', 'TRACE'].includes(e.type) && (Math.abs(n.x || 0) > 1e-12 || Math.abs(n.y || 0) > 1e-12 || Math.abs((n.z ?? 1) - 1) > 1e-12)) return [];
+        const additional=nativeGrips(e);if(additional!==null)return additional;
         if(e.type==='DIMENSION')return e.dimension?.version===1?dimensionGrips(e,this.doc):e.block?[]:[{...e.a,key:'a'},{...e.b,key:'b'}];
         if (e.type === 'LINE' || e.type === 'DIMENSION')
             return [{ ...e.a, key: 'a' }, { ...e.b, key: 'b' }];
@@ -1108,6 +1116,7 @@ export class Workbench {
             return;
         }
         const q = this.snapPoint(world, new Set(), this.draft.at(-1));
+        if(this.drawingSession){this.cursor=q;this.drag={kind:'native-draw',start:q};this.preview=drawingPreview(this,q,q);this.renderer.invalidate();return;}
         this.cursor = q;
         this.drag = { kind: 'draw', start: q, wasDraft: !!this.draft.length };
         this.preview = this.makePreview(q, q);
@@ -1150,7 +1159,8 @@ export class Workbench {
         }
         if (drag.kind === 'grip') {
             const i = this.doc.entities.findIndex(e => e.id === drag.id), e = clone(drag.original), g = drag.grip, q = this.snapPoint(raw, this.selection);
-            if(g.key.startsWith('dyn:')) {const name=g.key.slice(4);setDynamicParameters(e,this.doc,{[name]:dynamicGripValue(e,this.doc,name,q)});}
+            if(changeNativeGrip(e,g,q)) {}
+            else if(g.key.startsWith('dyn:')) {const name=g.key.slice(4);setDynamicParameters(e,this.doc,{[name]:dynamicGripValue(e,this.doc,name,q)});}
             else if(g.key.startsWith('dim:')) {editDimension(e,this.doc,{[g.key.slice(4)]:q});}
             else if (g.key === 'radius') {
                 e.r = Math.max(.001, distance(e.c, q));
@@ -1211,6 +1221,8 @@ export class Workbench {
         }
         else if (drag.kind === 'insert')
             this.previewSymbol = this.symbolAt(this.pendingSymbol, this.cursor.x, this.cursor.y, false);
+        else if (drag.kind === 'native-draw')
+            this.preview = drawingPreview(this,drag.start,this.cursor);
         else if (drag.kind === 'draw')
             this.preview = this.makePreview(this.draft[0] || drag.start, this.cursor);
         this.renderer.invalidate();
@@ -1298,6 +1310,10 @@ export class Workbench {
                 this.ask('Place text', [{ name: 'text', label: 'Text', value: 'Label' }, { name: 'height', label: 'Text height · ' + this.doc.units, value: '14' }], v => { this.edit('Add text', () => this.doc.entities.push(text(drag.p, v.text, this.eval(v.height), { layer: 'Annotations', layout: this.doc.activeLayout }))); this.setTool('select'); });
                 return;
             }
+            if (drag.kind === 'native-draw') {
+                const end=this.snapPoint(raw,new Set(),this.draft.at(-1)||drag.start);
+                drawingPointerUp(this,drag,end,moved);return;
+            }
             if (drag.kind === 'draw') {
                 const end = this.snapPoint(raw, new Set(), this.draft.at(-1) || drag.start);
                 if (this.tool === 'polyline') {
@@ -1332,6 +1348,7 @@ export class Workbench {
         }
     }
     makePreview(a, b) {
+        if(this.drawingSession)return drawingPreview(this,a,b);
         const props = { layer: this.currentLayer, color: '#259e87', width: 1.7 };
         if (this.tool === 'line')
             return line(a, b, props);
@@ -1364,6 +1381,7 @@ export class Workbench {
         this.updateSelection();
     }
     finishPath() {
+        if(finishDrawing(this))return;
         if (this.tool !== 'polyline' || this.draft.length < 2)
             return;
         this.edit('Draw polyline', () => { const e = polyline(this.draft, false, { layer: this.currentLayer, layout: this.doc.activeLayout }); this.doc.entities.push(e); this.selection = new Set([e.id]); });
@@ -1431,7 +1449,7 @@ export class Workbench {
                 }
         }
         if (this.preview) {
-            const g = entityGeometry(this.preview, this.doc, { tolerance: .25 / cam.scale });
+            const g = entityGeometry(this.preview, this.doc, { tolerance: .25 / cam.scale, view:cam.viewport });
             ctx.globalAlpha = .8;
             for (const p of g.paths)
                 drawPath(ctx, p, cam, { color: '#239b80', width: 1.8 });
@@ -1440,7 +1458,7 @@ export class Workbench {
             ctx.globalAlpha = 1;
         }
         if (this.previewSymbol) {
-            const g = entityGeometry(this.previewSymbol, this.doc, { tolerance: .25 / cam.scale });
+            const g = entityGeometry(this.previewSymbol, this.doc, { tolerance: .25 / cam.scale, view:cam.viewport });
             for (const p of g.paths)
                 drawPath(ctx, p, cam, { color: '#28a082', width: 2 });
             for (const port of ports(this.previewSymbol, this.doc)) {
@@ -1736,7 +1754,7 @@ export class Workbench {
             } });
     }
     lineStylesDialog() { this.openModal('Line & connection library', `<p>Choose a line type, then connect symbol ports or free points. Every connector is a native DXF polyline with optional application metadata.</p><div class="line-style-list">${LINE_STYLES.map(s => `<button data-style="${s.id}"><svg viewBox="0 0 90 20"><path d="M3 10h84" stroke="${s.color}" stroke-width="${s.width}" ${s.dash.length ? `stroke-dasharray="${s.dash.join(' ')}"` : ''}/>${s.arrow === 'end' ? `<path d="m77 5 9 5-9 5" fill="none" stroke="${s.color}" stroke-width="${s.width}"/>` : ''}</svg><span>${E(s.name)}</span>${s.id === this.lineStyle ? icon('check') : ''}</button>`).join('')}</div>`); }
-    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); }
+    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${drawingToolSections(this)}${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); bindDrawingSearch(this); }
     editText(e) { this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false } = {}) {
         this.closeModal();
@@ -1922,7 +1940,7 @@ export class Workbench {
             overlay.remove();
         }
     }
-    commandDialog() { this.openModal('Command palette', `<div class="command-input">${icon('code')}<input id="cad-command" placeholder="LINE 0,0 100,50" autocomplete="off" spellcheck="false" aria-label="CAD command"></div><div class="error-text"></div><p class="muted-note">Enter executes. Commands use drawing units and comma-separated point coordinates.</p><table class="keyboard-table"><tr><td>Line with exact endpoints</td><td>LINE 0,0 100,50</td></tr><tr><td>Circle with center and radius</td><td>CIRCLE 0,0 25</td></tr><tr><td>Rectangle · x, y, width, height</td><td>RECT 0 0 120 80</td></tr><tr><td>Move selected objects</td><td>MOVE 10 -20</td></tr><tr><td>Transforms and editing</td><td>ROTATE 45 / OFFSET 10</td></tr><tr><td>Named parameter</td><td>PARAM size=100</td></tr><tr><td>History and view</td><td>UNDO / REDO / FIT</td></tr></table>`, { confirm: 'Run command', onConfirm: () => { this.executeCommand(this.modal.querySelector('#cad-command').value); this.closeModal(); } }); }
+    commandDialog() { this.openModal('Command palette', `<div class="command-input">${icon('code')}<input id="cad-command" placeholder="LINE 0,0 100,50" autocomplete="off" spellcheck="false" aria-label="CAD command"></div><div class="error-text"></div><p class="muted-note">Enter executes. Commands use drawing units and comma-separated point coordinates.</p><table class="keyboard-table"><tr><td>Line with exact endpoints</td><td>LINE 0,0 100,50</td></tr><tr><td>New point-driven tools</td><td>ARC / ELLIPSE / SPLINE / HATCH / MTEXT</td></tr><tr><td>Exact native 3-point arc</td><td>ARC 0,0 50,50 100,0</td></tr><tr><td>Next absolute / relative point</td><td>NEXT 10,20 / NEXT @50&lt;30</td></tr><tr><td>Complete path</td><td>FINISH / CLOSE</td></tr><tr><td>Circle with center and radius</td><td>CIRCLE 0,0 25</td></tr><tr><td>Rectangle · x, y, width, height</td><td>RECT 0 0 120 80</td></tr><tr><td>Move selected objects</td><td>MOVE 10 -20</td></tr><tr><td>Transforms and editing</td><td>ROTATE 45 / OFFSET 10</td></tr><tr><td>Named parameter</td><td>PARAM size=100</td></tr><tr><td>History and view</td><td>UNDO / REDO / FIT</td></tr></table>`, { confirm: 'Run command', onConfirm: () => { this.executeCommand(this.modal.querySelector('#cad-command').value); this.closeModal(); } }); }
     executeCommand(source) {
         const s = source.trim(), split = s.indexOf(' '), cmd = (split < 0 ? s : s.slice(0, split)).toUpperCase(), rest = split < 0 ? '' : s.slice(split + 1).trim(), args = rest.replace(/,/g, ' ').split(/\s+/).filter(Boolean);
         if(cmd==='BEDIT'){startBlockEditor(this,rest||this.selected()[0]?.block);return;}
@@ -1933,6 +1951,7 @@ export class Workbench {
         if(cmd==='BSAVEAS'){this.action('block-save-as');return;}
         if(cmd==='PARAMETERS'){parameterManager(this);return;}
         if(cmd==='SOLVE'){this.edit('Solve constraints',()=>this.solveConstraints());return;}
+        if(drawingCommand(this,cmd,rest))return;
         const nums = () => args.map(v => this.eval(v));
         if (['LINE', 'L'].includes(cmd)) {
             const n = nums();
@@ -2062,7 +2081,8 @@ export class Workbench {
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 e.preventDefault();
                 if (this.draft.length) {
-                    this.draft.pop();
+                    if(this.drawingSession)this.drawingSession.undo();else this.draft.pop();
+                    this.preview=null;
                     this.updateTools();
                     this.renderer.invalidate();
                 }
@@ -2075,7 +2095,7 @@ export class Workbench {
                 this.finishPath();
                 return;
             }
-            const key = e.key.toLowerCase(), tools = { v: 'select', h: 'pan', l: 'line', p: 'polyline', r: 'rect', c: 'circle', k: 'connect', t: 'text', d: 'dimension' };
+            const key = e.key.toLowerCase(), tools = { v: 'select', h: 'pan', l: 'line', p: 'polyline', r: 'rect', c: 'circle', k: 'connect', t: 'text', d: 'dimension', a:'arc', e:'ellipse', b:'spline' };
             if (tools[key]) {
                 this.setTool(tools[key]);
                 e.preventDefault();
@@ -2099,7 +2119,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.5.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.6.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>14</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

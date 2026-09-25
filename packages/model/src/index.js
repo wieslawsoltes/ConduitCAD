@@ -57,6 +57,7 @@ export function entityGeometry(e, doc, options = {}) {
         return { paths: [], texts: [] };
     const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));
     const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];
+    let hasInfinite = false;
     const path = (pts, closed = false, fill = null, extra = {}) => {
         if (pts.length > 1)
             paths.push({ points: pts.map(p => transform(p, m)), closed, fill: fill === 'BYBLOCK' || fill === 'BYLAYER' ? style.color : fill, ...style, ...extra, entityId: e.id });
@@ -103,6 +104,7 @@ export function entityGeometry(e, doc, options = {}) {
             for(const child of doc.entities) {
                 if(child.type==='VIEWPORT'||!isVisible(child,model))continue;
                 const g=entityGeometry(child,model,{matrix:compose(m,projection),tolerance,depth:depth+1});
+                hasInfinite ||= !!g.hasInfinite;
                 warnings.push(...(g.warnings||[]));
                 const clips=[rectangularClip,worldClip];
                 for(const p of g.paths)paths.push({...p,clips:[...(p.clips||[]),...clips],entityId:e.id});
@@ -205,6 +207,7 @@ export function entityGeometry(e, doc, options = {}) {
         }
         case 'RAY':
         case 'XLINE': {
+            hasInfinite = true;
             const p = transform(e.p, m), q = transform(add(e.p, e.direction), m), d = sub(q, p), v = options.view || { minX: p.x - 10000, maxX: p.x + 10000, minY: p.y - 10000, maxY: p.y + 10000 };
             let lo = e.type === 'RAY' ? 0 : -Infinity, hi = Infinity;
             for (const axis of ['x', 'y']) {
@@ -212,7 +215,7 @@ export function entityGeometry(e, doc, options = {}) {
                 if (Math.abs(d[axis]) < 1e-12) { if (p[axis] < min || p[axis] > max) hi = -Infinity; }
                 else { const a = (min - p[axis]) / d[axis], b = (max - p[axis]) / d[axis]; lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b)); }
             }
-            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, entityId: e.id });
+            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, infinite: true, entityId: e.id });
             break;
         }
         case 'DIMENSION': {
@@ -221,6 +224,7 @@ export function entityGeometry(e, doc, options = {}) {
                     const picture = buildDimensionPicture(e,doc);
                     for (const child of picture.entities) {
                         const g=entityGeometry(child,doc,{...options,matrix:m,depth:depth+1,parentStyle:style,parentLayer:layerFor(e,doc)});
+                        hasInfinite ||= !!g.hasInfinite;
                         paths.push(...g.paths.map(p=>({...p,entityId:e.id})));texts.push(...g.texts.map(t=>({...t,entityId:e.id})));
                     }
                 } catch(error) { warnings.push({entityId:e.id,message:error.message}); }
@@ -228,6 +232,7 @@ export function entityGeometry(e, doc, options = {}) {
             }
             if (e.block && doc.blocks[e.block]) {
                 const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
+                hasInfinite ||= !!g.hasInfinite;
                 for (const p of g.paths)
                     paths.push(p);
                 for (const t of g.texts)
@@ -272,6 +277,7 @@ export function entityGeometry(e, doc, options = {}) {
                         if (attribute.invisible)
                             continue;
                         const g = entityGeometry(attribute, doc, { ...options, matrix: compose(m, matrix(attributeOffset)), depth: depth + 1 });
+                        hasInfinite ||= !!g.hasInfinite;
                         for (const t of g.texts)
                             texts.push({ ...t, entityId: e.id });
                     }
@@ -282,6 +288,7 @@ export function entityGeometry(e, doc, options = {}) {
                         if (cl?.visible === false)
                             continue;
                         const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl, view: options.view });
+                        hasInfinite ||= !!g.hasInfinite;
                         warnings.push(...(g.warnings || []));
                         for (const p of g.paths)
                             paths.push({ ...p, entityId: e.id });
@@ -306,12 +313,12 @@ export function entityGeometry(e, doc, options = {}) {
             label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');
         }
     }
-    return warnings.length ? { paths, texts, warnings } : { paths, texts };
+    return { paths, texts, ...(warnings.length ? { warnings } : {}), ...(hasInfinite ? { hasInfinite: true } : {}) };
 }
 export function entityBounds(e, doc) {
     if(e.type==='VIEWPORT')return e.viewportId===1?emptyBounds():bounds(viewportRectangle(e));
     if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
-    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
+    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.filter(p => !p.infinite).flatMap(p => p.contours ? p.contours.flat() : p.points);
     for (const t of g.texts) {
         const layout = layoutCadText(t), frame = t.frame || matrix({ rotation: t.rotation }).slice(0, 4), tm = [...frame, t.p.x, t.p.y];
         // Layout coordinates are font coordinates (Y down); model coordinates are Y up.

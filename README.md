@@ -1,18 +1,29 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.5.0.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.6.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar
 geometry kernel, parameter expressions and an analytic planar constraint solver.
 WebGPU strokes and compute culling are implemented, with WebGL2 and Canvas 2D
-fallbacks. The application is built from 13 independently packaged ES modules.
+fallbacks. The application is built from 14 independently packaged ES modules.
 
 This is an engineering foundation, **not full AutoCAD, Visio, universal DXF,
 or certified engineering-system parity**. Read [the exact compatibility
 boundary](docs/DXF_COMPATIBILITY.md) before importing production drawings.
 
 ![Desktop workbench](artifacts/desktop-canvas.png)
+
+## Expanded native drawing tools
+
+Version 0.6.0 adds 28 point-driven workflows across 15 native entity families:
+arcs, additional circle modes, ellipses/elliptical arcs, through-point splines,
+Béziers, regular polygons, donuts, SOLID/planar 3DFACE, hatches, wipeouts,
+POINT/RAY/XLINE, MTEXT, leaders and dimension variants. **More** on desktop or
+**Shapes** on mobile opens the searchable tool catalogue. Staged prompts, live
+previews, Back/Finish/Close, exact Cartesian/polar points and repeated placement
+use the same headless `@conduitcad/drawing` factories in the document and block editor.
+See [Drawing tools](docs/DRAWING_TOOLS.md) for workflows, native inspectors and limits.
 
 ## Shared block editing and parametric authoring
 
@@ -104,7 +115,7 @@ and layer panels, keyboard shortcuts, crossing/window selection, and command pal
 | Area | Implementation in this release |
 |---|---|
 | Touch editing | Pointer capture, touch / pen / mouse, pinch-pan arbitration, tap-tap and drag drawing, symbol drag/drop, magnifier, large tool buttons, numeric sheets |
-| CAD drafting | Lines, polylines, rectangles, circles, text, aligned visible dimensions; selection, move, rotate, copy/paste, duplicate, delete, grip editing and bounded undo/redo |
+| CAD drafting | Lines, polylines, rectangles, arcs, circles, ellipses, splines, polygons, fills, masks, leaders, multiline text and native dimension variants; selection, move, rotate, copy/paste, duplicate, delete, grip editing and bounded undo/redo |
 | Precision | Grid, endpoint, midpoint, center, quadrant, insertion, port and line-intersection snapping; orthographic constraint; numeric commands |
 | Geometry kernel | Double-precision affine geometry, intersections, projections, bulge arcs, adaptive curve tessellation, rational NURBS evaluation, polyline offsets and two-line fillets |
 | Parametrics | Safe arithmetic expressions and named dependencies; authored radius, line length and rectangle dimensions; analytic component-partitioned constraints, rank/DOF diagnostics, named driving/reference dimensions, calculated annotations and atomic rollback |
@@ -162,6 +173,7 @@ See [symbol conventions](docs/SYMBOLS.md), [release notes](RELEASE_NOTES.md) and
 |---|---|
 | `@conduitcad/geometry` | Numeric planar kernel, affine transforms and curve evaluation |
 | `@conduitcad/spatial` | Packed BVH with bounded incremental update overlay |
+| `@conduitcad/drawing` | Native entity construction, point sessions and validated boundaries |
 | `@conduitcad/model` | JSON document, entities, block instances, ports and portable geometry |
 | `@conduitcad/history` | Atomic synchronous transactions and bounded snapshot history |
 | `@conduitcad/constraints` | Safe parameter expressions and damped least-squares sketch solver |

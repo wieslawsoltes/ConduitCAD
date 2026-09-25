@@ -49,5 +49,5 @@ const sw = `const CACHE='conduit-${version}-${hash}';const FILES=['./','./index.
 await fs.writeFile(out + '/sw.js', sw);
 const standalone = html.replace(/<link rel="(?:icon|manifest)"[^>]*>/g, '').replace('<link rel="stylesheet" href="styles.css">', `<style>${css}</style>`).replace('<script src="app.js"></script>', `<script>globalThis.__CONDUIT_STANDALONE__=true;\n${app.replace(/<\/script/gi, '<\\/script')}</script>`);
 await fs.writeFile(out + '/ConduitCAD.html', standalone);
-await fs.writeFile(out + '/build-info.json', JSON.stringify({ version, sha256: hash, packages: 13, applicationBytes: Buffer.byteLength(app), standaloneBytes: Buffer.byteLength(standalone) }, null, 2));
+await fs.writeFile(out + '/build-info.json', JSON.stringify({ version, sha256: hash, packages: (await fs.readdir(root + '/packages', {withFileTypes:true})).filter(e=>e.isDirectory()).length, applicationBytes: Buffer.byteLength(app), standaloneBytes: Buffer.byteLength(standalone) }, null, 2));
 console.log(`Built dist/ and standalone ConduitCAD.html (${Math.round(Buffer.byteLength(standalone) / 1024)} KiB). Version hash: ${hash}`);

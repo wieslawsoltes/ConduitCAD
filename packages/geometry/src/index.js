@@ -232,6 +232,9 @@ export function filletLines(a, b, c, d, radius) {
     return { p, q, c: cen, r: radius, start: Math.atan2(p.y - cen.y, p.x - cen.x), end: Math.atan2(q.y - cen.y, q.x - cen.x), clockwise: cross(sub(p, cen), sub(q, cen)) < 0 };
 }
 export function snapCandidates(entity) {
+    const n=entity.extrusion;
+    // OCS data is not WCS. Do not offer incorrect planar snaps on projected planes.
+    if(n&&['ARC','CIRCLE','LWPOLYLINE','POLYLINE','SOLID','TRACE','TEXT'].includes(entity.type)&&(Math.abs(n.x||0)>1e-12||Math.abs(n.y||0)>1e-12||Math.abs((n.z??1)-1)>1e-12))return [];
     switch (entity.type) {
         case 'LINE': return [{ ...entity.a, kind: 'endpoint' }, { ...entity.b, kind: 'endpoint' }, { ...lerp(entity.a, entity.b, .5), kind: 'midpoint' }];
         case 'CIRCLE':
@@ -245,7 +248,30 @@ export function snapCandidates(entity) {
             const at = a => ({ x: entity.c.x + entity.r * Math.cos(a), y: entity.c.y + entity.r * Math.sin(a) });
             return [{ ...entity.c, kind: 'center' }, ...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].filter(onArc).map(a => ({ ...at(a), kind: 'quadrant' })), ...(entity.type === 'ARC' ? [{ ...at(entity.start), kind: 'endpoint' }, { ...at(entity.end), kind: 'endpoint' }] : [])];
         }
-        case 'LWPOLYLINE': return entity.points.flatMap((p, i) => [{ ...p, kind: 'endpoint' }, ...(i < entity.points.length - 1 || entity.closed ? [{ ...lerp(p, entity.points[(i + 1) % entity.points.length], .5), kind: 'midpoint' }] : [])]);
+        case 'ELLIPSE': {
+            const a=entity.major,c=entity.c,r=entity.ratio,n=entity.extrusion||{x:0,y:0,z:1};
+            const v={x:(n.y||0)*(a.z||0)-(n.z??1)*a.y,y:(n.z??1)*a.x-(n.x||0)*(a.z||0),z:(n.x||0)*a.y-(n.y||0)*a.x};
+            const f=Math.hypot(a.x,a.y,a.z||0)*r/Math.hypot(v.x,v.y,v.z);
+            if(!Number.isFinite(f))return [];
+            const start=entity.start??0,end=entity.end??TAU,norm=t=>(t%TAU+TAU)%TAU,full=Math.abs(end-start)>=TAU-1e-9;
+            const at=t=>({x:c.x+a.x*Math.cos(t)+v.x*f*Math.sin(t),y:c.y+a.y*Math.cos(t)+v.y*f*Math.sin(t)});
+            return [{...c,kind:'center'},...[0,Math.PI/2,Math.PI,Math.PI*1.5].filter(t=>full||norm(t-start)<=norm(end-start)+EPS).map(t=>({...at(t),kind:'quadrant'})),...(!full?[{...at(start),kind:'endpoint'},{...at(end),kind:'endpoint'}]:[])];
+        }
+        case 'SPLINE': {
+            const cp=entity.controlPoints||[],knots=entity.knots||[],degree=entity.degree;
+            if(cp.length<2||knots.length!==cp.length+degree+1)return [];
+            const a=knots[degree],b=knots[cp.length];
+            return [a,b].map(t=>({...nurbsPoint(cp,degree,knots,t,entity.weights),kind:'endpoint'}));
+        }
+        case 'POINT': case 'RAY': case 'XLINE': return [{...entity.p,kind:entity.type==='POINT'?'node':'origin'}];
+        case 'TEXT': case 'MTEXT': return [{...entity.p,kind:'insertion'}];
+        case 'SOLID': case '3DFACE': case 'LEADER': case 'POLYLINE':
+        case 'LWPOLYLINE': return (entity.points||[]).flatMap((p,i)=>{
+            const q=entity.points[(i+1)%entity.points.length],closed=entity.closed||['SOLID','3DFACE'].includes(entity.type);
+            let midpoint=lerp(p,q,.5);
+            if(entity.type==='LWPOLYLINE'&&p.bulge){const arc=bulgeArc(p,q,p.bulge);if(arc){const t=arc.start+arc.sweep/2;midpoint={x:arc.c.x+arc.r*Math.cos(t),y:arc.c.y+arc.r*Math.sin(t)};}}
+            return [{...p,kind:'endpoint'},...(i<entity.points.length-1||closed?[{...midpoint,kind:'midpoint'}]:[])];
+        });
         case 'INSERT': return [{ x: entity.x, y: entity.y, kind: 'insertion' }];
         default: return [];
     }

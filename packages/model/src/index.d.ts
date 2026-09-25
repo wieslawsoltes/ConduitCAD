@@ -180,6 +180,8 @@ export interface RenderText {
     opacity?: number;
 }
 export interface EntityGeometry {
+    /** Includes currently clipped-away construction geometry in nested references. */
+    hasInfinite?: boolean;
     paths: RenderPath[];
     texts: RenderText[];
     warnings?: Array<{entityId?: string; message: string}>;

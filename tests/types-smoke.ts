@@ -82,3 +82,12 @@ const blockDefinition = editedBlockDefinition(session);
 const prepared = prepareBlockUpdate(documentModel,'Part',blockDefinition,{expectedSignature:session.signature,attributes:true});
 const constraintBased: import('@conduitcad/model').DynamicDefinition = {version:2,parameters:[{name:'Width',type:'distance',default:100},{name:'HalfWidth',type:'distance',default:50,expression:'Width/2'}],actions:[{type:'polar-array',parameter:'Width',angle:360,base:{x:0,y:0}}],constraints:[{type:'length',entityId:e.id,value:'Width'}]};
 void [solve.degreesOfFreedom,solve.conflicts,solve.annotations,prepared.report.updatedInserts,updateBlockDefinition,inspectBlockReferences,describeParameters({Width:100,Diagonal:'hypot(Width,Width)'}),inferSketchConstraints([e]),evaluateCalculations, constraintBased,app.beginBlockEdit,app.saveBlockEdit];
+
+import {DRAWING_TOOLS, DrawingSession, createDrawingEntity, hatchPattern, parseDrawingPoint, type DrawingToolId} from '@conduitcad/drawing';
+const newTool: DrawingToolId = DRAWING_TOOLS[0].id;
+const drawingSession = new DrawingSession(newTool);
+const drawingPoint = parseDrawingPoint('@30<45',{x:0,y:0},x=>Number(x));
+const drawingResult = drawingSession.add(drawingPoint, {layer:'0'}, documentModel);
+const drawingPreview = drawingSession.preview({x:20,y:50},{},documentModel);
+const nativeEllipse = createDrawingEntity('ellipse',[{x:0,y:0},{x:50,y:0},{x:0,y:20}],{}, {},documentModel);
+void [drawingResult,drawingPreview,nativeEllipse,hatchPattern({pattern:'cross'}).pattern,drawingSession.canFinish,app.drawingSession];

@@ -39,13 +39,14 @@ function writeStrokeData(data, paths, origin, offset = 0) {
 }
 export function buildScene(doc, { tolerance = .25, origin = null, view = null } = {}) {
     const paths = [], texts = [], items = [], diagnostics = [], spans = new Map(), entities = new Map();
-    let b = emptyBounds(), count = 0;
+    let b = emptyBounds(), count = 0, hasInfinite = false;
     const started = performance.now();
     for (const e of doc.entities) {
         if (!isVisible(e, doc))
             continue;
         const g = entityGeometry(e, doc, { tolerance, view }), span = { pathStart: paths.length, pathCount: g.paths.length, textStart: texts.length, textCount: g.texts.length, offset: count, count: 0, itemIndex: -1 };
         diagnostics.push(...(g.warnings || []));
+        hasInfinite ||= !!g.hasInfinite;
         for (const path of g.paths) {
             paths.push(path);
             count += segmentCount(path);
@@ -56,7 +57,7 @@ export function buildScene(doc, { tolerance = .25, origin = null, view = null } 
         const bb = entityBounds(e, doc);
         if (validBounds(bb)) {
             span.itemIndex = items.length;
-            items.push({ ...bb, id: e.id, entity: e });
+            items.push({ ...(g.paths.some(p=>p.infinite)?union(bb,bounds(g.paths.flatMap(p=>p.points))):bb), id: e.id, entity: e });
             b = union(b, bb);
         }
         spans.set(e.id, span);
@@ -65,10 +66,11 @@ export function buildScene(doc, { tolerance = .25, origin = null, view = null } 
     origin = origin || (validBounds(b) ? center(b) : { x: 0, y: 0 });
     const data = new Float32Array(count * 16);
     writeStrokeData(data, paths, origin);
-    return { paths, texts, items, diagnostics, hasInfinite: doc.entities.some(e => ['RAY', 'XLINE'].includes(e.type)), spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
+    return { paths, texts, items, diagnostics, hasInfinite, spans, entities, index: new SpatialIndex(items), bounds: b, origin, data, count, buildMs: performance.now() - started };
 }
 /** Patch equal-topology edits in place. A null result requests a full rebuild. */
 export function updateSceneEntities(scene, doc, ids, { tolerance = .25 } = {}) {
+    if(scene.hasInfinite)return null;
     const requested = new Set(ids), replacements = [];
     for (const e of doc.entities) {
         if (!requested.has(e.id))

@@ -1,3 +1,22 @@
+## 0.6 native drawing API
+
+```js
+import {DrawingSession, createDrawingEntity, parseDrawingPoint} from '@conduitcad/drawing';
+import {createDocument} from '@conduitcad/model';
+const doc = createDocument('New geometry');
+const arc = createDrawingEntity('arc', [{x:0,y:0},{x:50,y:50},{x:100,y:0}]);
+doc.entities.push(arc);
+const command = new DrawingSession('ellipse');
+command.add({x:0,y:0});
+command.add({x:80,y:0});
+const ellipse = command.add(parseDrawingPoint('0,40'));
+doc.entities.push(ellipse);
+```
+
+`DRAWING_TOOLS` exposes the catalogue and prompts. Session factories are pure with
+respect to the document; the embedding host commits results through its own
+history/solver pipeline. All new geometry is XY at Z=0. See DRAWING_TOOLS.md.
+
 ## 0.5 block authoring / solver API
 
 The complete typed surface and executable example are in

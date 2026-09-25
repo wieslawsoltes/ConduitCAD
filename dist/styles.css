@@ -73,3 +73,37 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 /* Graphical block authoring and parametric inspection. */
 .block-editor-bar{display:flex;flex-shrink:0;gap:10px;align-items:center;padding:7px 14px;border-bottom:1px solid #c9b0db;background:#f6f0fb;z-index:24}.block-editor-bar strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;max-width:24vw;white-space:nowrap}.block-editor-bar>div{display:flex;gap:5px;flex:1;overflow-x:auto;scrollbar-width:thin}.block-editor-bar button{white-space:nowrap;min-height:38px;font-size:11px}.author-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.author-grid .field{min-width:0}.solve-summary{background:#edf6f1;border:1px solid #caddce;padding:12px;margin:10px 0;border-radius:8px;line-height:1.6;font-variant-numeric:tabular-nums}.solver-list{display:grid;gap:8px;max-height:45vh;overflow:auto}.solver-list section{display:grid;gap:5px;padding:10px;border:1px solid var(--border);border-radius:8px}.solver-list small{color:var(--muted)}.solver-list section>div{display:flex;gap:5px}.parametric-tools p{line-height:1.5}.parametric-tools .operation-grid{grid-template-columns:1fr 1fr}.param-row{grid-template-columns:minmax(75px,1fr) minmax(90px,2fr) minmax(55px,1fr) 34px!important}.param-row output{font-variant-numeric:tabular-nums;align-self:center;overflow-wrap:anywhere;padding:4px}.param-head{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;color:var(--muted);font-size:11px;padding-right:34px}.calculation-table{display:grid;gap:5px}.calculation-table>div{padding:8px;background:#f7faf7;border-radius:5px;display:grid;gap:4px}.calculation-table small{color:var(--muted)}#author-schema{width:100%;height:230px;font:12px ui-monospace,monospace}.param-result{color:var(--teal)}
 @media(max-width:720px){.block-editor-bar{display:block;padding:4px 8px}.block-editor-bar strong{display:block;max-width:90vw;margin-bottom:3px;font-size:10px}.block-editor-bar button{min-height:44px}.author-grid{grid-template-columns:1fr}.param-row{grid-template-columns:minmax(65px,1fr) minmax(95px,1.7fr) 55px 30px!important;gap:4px!important}.param-row input{padding:8px 5px;font-size:12px}.param-row button{padding:4px;min-width:28px}.parametric-tools button{min-height:44px}.solver-list button{min-height:44px}}
+
+/* Point-driven CAD command UI: viewport-local, scrollable touch targets. */
+.drawing-session-controls { position:absolute; bottom:130px; left:50%; transform:translateX(-50%); display:flex; gap:4px; max-width:calc(100% - 24px); overflow-x:auto; padding:5px; border:1px solid var(--border,#d7e1dc); border-radius:12px; background:var(--surface,#fff); box-shadow:0 3px 14px #15352a15; z-index:12; }
+.drawing-session-controls button { min-height:44px; flex-shrink:0; display:flex; align-items:center; gap:5px; padding:8px 10px; font-size:12px; }
+.drawing-session-controls .icon { width:17px;height:17px; }
+.drawing-session-controls button:disabled { opacity:.45;cursor:default; }
+.drawing-tool-group h3 { margin:18px 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+.drawing-tool-search { margin-top:18px; }
+.drawing-tool-group button { min-height:48px; text-align:left; }
+.drawing-tool-group button[hidden],.drawing-tool-group[hidden] { display:none; }
+.native-entity-editor textarea { width:100%;min-height:90px;resize:vertical; }
+.native-entity-editor button { min-height:44px;display:flex;align-items:center;gap:8px;margin-top:8px; }
+.native-vertex-scroll { max-height:50vh;overflow:auto; }
+.native-vertex-scroll table { width:100%;table-layout:fixed;border-collapse:collapse; }
+.native-vertex-scroll th:first-child { width:35px; }
+.native-vertex-scroll td { padding:3px; }
+.native-vertex-scroll input { min-width:0;width:100%;min-height:44px; }
+@media(max-width:720px) {
+ .drawing-session-controls { bottom:125px;max-width:calc(100% - 12px); }
+ .drawing-session-controls button { padding:8px; }
+ .drawing-session-controls .icon { display:none; }
+ .drawing-session-controls:not(.hide) ~ .finish-button { bottom:178px; }
+ .tool-hint.working { max-width:calc(100% - 24px);white-space:normal; }
+}
+@media(max-height:500px) and (orientation:landscape) {
+ .drawing-session-controls { bottom:58px;max-width:calc(100% - 110px); }
+ .drawing-session-controls:not(.hide) ~ .finish-button { bottom:112px; }
+}
+
+.drawing-session-controls:not(.hide) ~ .finish-button { bottom:190px;min-height:44px; }
+@media(max-height:500px) and (orientation:landscape) {
+ .drawing-session-controls:not(.hide) ~ .finish-button { bottom:112px; }
+ .tool-hint.working { display:block;bottom:12px;max-width:calc(100% - 180px);white-space:normal; }
+}

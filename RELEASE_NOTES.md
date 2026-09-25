@@ -1,3 +1,35 @@
+# Conduit CAD 0.6.0 — expanded native drawing tools
+
+- 28 new drawing workflows across 15 native DXF entity families, in a searchable
+  desktop/mobile tool catalogue and the same isolated graphical block editor.
+- Three-point/center arcs, additional circles, ellipses/elliptical arcs, C1
+  through-point cubic splines, Bézier controls, polygons, donuts/discs, SOLID,
+  planar 3DFACE, native hatches/masks, construction geometry, MTEXT and leaders.
+- Aligned/axis/radius/diameter/angular/ordinate construction with explicit point
+  prompts and the existing native managed-dimension regeneration/export engine.
+- Reusable `@conduitcad/drawing` factories and staged sessions; live previews,
+  Finish/Close/Back, exact Cartesian/polar expression input, safe retry and repeat.
+- Native arc/ellipse/spline/direction/hatch grips; exact vertex/control tables;
+  multiline content, ellipse parameters and polyline width inspectors; undo/redo.
+- Native curve-boundary hatch snapshots with even-odd islands and user-defined
+  line/cross patterns. Correct bulge midpoints, ellipse and curve endpoint snaps.
+- Viewport-clipped infinite construction geometry now remains pickable away from
+  its origin, including nested references, without distorting finite fit bounds.
+- All fourteen reusable packages versioned 0.6.0 with typed public contracts.
+
+Executed validation: 415 Node tests (83 new), 246 integrated browser checks
+(83 new), 148 independent drawing-tool DXF field checks across ASCII/binary,
+all prior native interop/editing/parametric/symbol/fidelity audits, TypeScript
+consumers and clean offline integration of fourteen npm archives. See VALIDATION.md.
+
+The new tools author XY geometry at Z=0. Splines are C1 Hermite-derived native
+B-splines, not Autodesk FIT/C2 parity. LEADER is not MLEADER. Hatch snapshots are
+not associative; faces are not B-rep solids. Existing annotation/font and DXF
+boundaries remain. Browser tests use Canvas and emulated touch, not physical-GPU
+qualification. See docs/DRAWING_TOOLS.md for precise behavior and limits.
+
+---
+
 # Conduit CAD 0.5.0 — shared block editor and parametric authoring
 
 - Isolated graphical native block canvas with save/save-close/discard/test,

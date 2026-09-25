@@ -1,5 +1,14 @@
 # Architecture and rendering contract
 
+## Native construction sessions
+
+`drawing` provides the 28 tool descriptors, native construction factories and
+`DrawingSession` without DOM or renderer dependencies. `workbench` shares those
+factories between pointer picks, previews, coordinate commands and block authoring.
+A draft never mutates the model; a completed entity enters history, solving and
+render invalidation through the existing edit transaction. Invalid completion
+leaves prior picks available for correction. See DRAWING_TOOLS.md.
+
 ## Ownership and boundaries
 
 `model` owns a JSON-serializable DXF-oriented document. Geometry is expressed as

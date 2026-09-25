@@ -1,0 +1,32 @@
+{
+  "name": "@conduitcad/drawing",
+  "version": "0.6.0",
+  "description": "Native CAD drawing factories and touch-ready point-session state machines",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "types": "./src/index.d.ts",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@conduitcad/geometry": "0.6.0",
+    "@conduitcad/model": "0.6.0"
+  }
+}

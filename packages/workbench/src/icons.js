@@ -1,4 +1,18 @@
 const paths = {
+    arc: 'M3 18A9 9 0 0 1 21 18 M2 16h3v4H2z M19 16h3v4h-3z',
+    ellipse: 'M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M12 4v16 M2 12h20',
+    spline: 'M3 18C5-3 18 28 21 6 M3 18 7 3 M17 21l4-15 M5 1h4v4H5z M15 19h4v4h-4z',
+    polygon: 'M12 2l9 5v10l-9 5-9-5V7z',
+    donut: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M17 12a5 5 0 1 0-10 0 5 5 0 0 0 10 0',
+    solid: 'M3 20 9 3l12 14-18 3 M5 16l5-11 M8 19l5-11 M12 18l4-6 M16 17l2-2',
+    hatch: 'M3 3h18v18H3z M3 11l8-8 M3 19 19 3 M9 21 21 9 M17 21l4-4',
+    wipeout: 'M3 5h18v14H3z M8 9l8 6 M16 9l-8 6',
+    point: 'M12 3v7 M12 14v7 M3 12h7 M14 12h7 M12 12h.01',
+    ray: 'M3 19 21 1 M2 17h4v4H2z M15 1h6v6',
+    xline: 'M2 22 22 2 M2 15v7h7 M15 2h7v7',
+    mtext: 'M3 4h18 M3 9h18 M3 14h14 M3 19h10',
+    leader: 'M3 20l9-12h10 M3 14v6h6',
+
     logo: 'M5 5h6v6H5z M19 13h6v6h-6z M5 21h6v6H5z M11 8h5a6 6 0 0 1 6 5 M8 11v10 M11 24h5a6 6 0 0 0 6-5',
     select: 'm5 3 14 11-7 1-4 7Z', pan: 'M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-2-7-5l-3-5a2 2 0 0 1 3-2l3 3',
     line: 'M5 19 19 5 M3 17h4v4H3z M17 3h4v4h-4z', polyline: 'M4 18 9 5l7 11 5-10 M2 16h4v4H2z M7 3h4v4H7z M14 14h4v4h-4z',

@@ -10,6 +10,8 @@ export class Workbench {
     doc: any;
     selection: Set<any>;
     tool: string;
+    drawingSession: import("@conduitcad/drawing").DrawingSession | null;
+    drawingOptions?: Partial<Record<import("@conduitcad/drawing").DrawingToolId, import("@conduitcad/drawing").DrawingOptions>>;
     category: string;
     librarySearch: string;
     inspectorTab: string;

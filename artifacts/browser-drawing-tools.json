@@ -1,0 +1,342 @@
+{
+  "checks": [
+    {
+      "name": "search isolates ellipse tool choices",
+      "passed": true
+    },
+    {
+      "name": "palette closes and starts staged command",
+      "passed": true
+    },
+    {
+      "name": "arc: pointer workflow creates one native ARC",
+      "passed": true
+    },
+    {
+      "name": "arc: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "arc-center: pointer workflow creates one native ARC",
+      "passed": true
+    },
+    {
+      "name": "arc-center: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "circle-3p: pointer workflow creates one native CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "circle-3p: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "circle-diameter: pointer workflow creates one native CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "circle-diameter: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "ellipse: pointer workflow creates one native ELLIPSE",
+      "passed": true
+    },
+    {
+      "name": "ellipse: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "ellipse-arc: pointer workflow creates one native ELLIPSE",
+      "passed": true
+    },
+    {
+      "name": "ellipse-arc: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "spline: pointer workflow creates one native SPLINE",
+      "passed": true
+    },
+    {
+      "name": "spline: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "bezier: pointer workflow creates one native SPLINE",
+      "passed": true
+    },
+    {
+      "name": "bezier: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "polygon: pointer workflow creates one native LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "polygon: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "donut: pointer workflow creates one native LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "donut: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "solid: pointer workflow creates one native SOLID",
+      "passed": true
+    },
+    {
+      "name": "solid: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "face: pointer workflow creates one native 3DFACE",
+      "passed": true
+    },
+    {
+      "name": "face: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "hatch: pointer workflow creates one native HATCH",
+      "passed": true
+    },
+    {
+      "name": "hatch: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "wipeout: pointer workflow creates one native WIPEOUT",
+      "passed": true
+    },
+    {
+      "name": "wipeout: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "point: pointer workflow creates one native POINT",
+      "passed": true
+    },
+    {
+      "name": "point: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "ray: pointer workflow creates one native RAY",
+      "passed": true
+    },
+    {
+      "name": "ray: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "xline: pointer workflow creates one native XLINE",
+      "passed": true
+    },
+    {
+      "name": "xline: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "mtext: pointer workflow creates one native MTEXT",
+      "passed": true
+    },
+    {
+      "name": "mtext: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "leader: pointer workflow creates one native LEADER",
+      "passed": true
+    },
+    {
+      "name": "leader: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-aligned: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-aligned: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-horizontal: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-horizontal: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-vertical: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-vertical: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-radius: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-radius: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-diameter: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-diameter: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-angular: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-angular: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-angular-lines: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-angular-lines: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-ordinate-x: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-ordinate-x: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "dim-ordinate-y: pointer workflow creates one native DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "dim-ordinate-y: repeat remains armed without stale draft",
+      "passed": true
+    },
+    {
+      "name": "invalid collinear arc keeps first two picks",
+      "passed": true
+    },
+    {
+      "name": "Back removes exactly one staged pick",
+      "passed": true
+    },
+    {
+      "name": "relative exact point and NEXT complete the same session",
+      "passed": true
+    },
+    {
+      "name": "Close creates native closed spline and clears draft",
+      "passed": true
+    },
+    {
+      "name": "drag shows native polygon preview",
+      "passed": true
+    },
+    {
+      "name": "drag commits configured polygon exactly once",
+      "passed": true
+    },
+    {
+      "name": "new drawing transaction supports undo redo",
+      "passed": true
+    },
+    {
+      "name": "multiline options produce native paragraph content",
+      "passed": true
+    },
+    {
+      "name": "native MTEXT inspector keeps paragraph semantics",
+      "passed": true
+    },
+    {
+      "name": "ellipse axis inspector changes native ratio",
+      "passed": true
+    },
+    {
+      "name": "invalid native property rolls back without corrupting entity",
+      "passed": true
+    },
+    {
+      "name": "control table edits spline without flattening",
+      "passed": true
+    },
+    {
+      "name": "spline control grip changes the native curve",
+      "passed": true
+    },
+    {
+      "name": "selected circular boundaries keep native arcs and island topology",
+      "passed": true
+    },
+    {
+      "name": "all drawn tools save as a real independently audited binary DXF",
+      "passed": true
+    },
+    {
+      "name": "binary download contains all fifteen native entity families",
+      "passed": true
+    },
+    {
+      "name": "new tools author native entities inside isolated block canvas",
+      "passed": true
+    },
+    {
+      "name": "block save retains new entity types on shared references",
+      "passed": true
+    },
+    {
+      "name": "mobile shape palette exposes searched native arc tool",
+      "passed": true
+    },
+    {
+      "name": "native touch taps draw a single arc on mobile",
+      "passed": true
+    },
+    {
+      "name": "mobile active command has 44px controls and no overflow",
+      "passed": true
+    },
+    {
+      "name": "Finish and touch command bar do not overlap",
+      "passed": true
+    },
+    {
+      "name": "two-finger gesture creates neither entity nor accidental draft point",
+      "passed": true
+    },
+    {
+      "name": "Cancel returns to select without stale preview",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "passed": true
+    }
+  ],
+  "passed": 83,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "origin": "localhost",
+  "storage": "save/schedule stubbed for deterministic transactions"
+}

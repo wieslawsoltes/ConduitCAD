@@ -1,4 +1,4 @@
-"""Independently audit the three shipped DXF examples using ezdxf."""
+"""Independently audit the shipped root DXF examples using ezdxf."""
 from pathlib import Path
 import json
 import ezdxf
@@ -20,5 +20,5 @@ output = ROOT / "artifacts" / "dxf-audit.json"
 output.parent.mkdir(exist_ok=True)
 output.write_text(json.dumps(reports, indent=2) + "\n")
 print(json.dumps(reports, indent=2))
-assert len(reports) == 3, "Expected three sample DXFs"
+assert {Path(r["file"]).name for r in reports} == {"pid.dxf", "electrical.dxf", "flow.dxf", "drawing-tools.dxf"}, "Expected the three engineering examples and native drawing-tool gallery"
 assert all(not r["errors"] and not r["fixes"] for r in reports), "DXF audit reported errors or repairs"

@@ -1,5 +1,13 @@
 [
   {
+    "file": "samples/drawing-tools.dxf",
+    "ezdxfVersion": "1.4.4",
+    "dxfVersion": "AC1024",
+    "entities": 56,
+    "errors": [],
+    "fixes": []
+  },
+  {
     "file": "samples/electrical.dxf",
     "ezdxfVersion": "1.4.4",
     "dxfVersion": "AC1024",

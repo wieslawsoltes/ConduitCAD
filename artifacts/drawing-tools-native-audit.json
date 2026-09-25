@@ -1,0 +1,602 @@
+{
+  "checks": [
+    {
+      "name": "ascii: zero audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "ascii: one native record per tool plus curved hatch",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc: CCW DXF angles preserve requested sweep",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc-center: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc-center: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "ascii/arc-center: CCW DXF angles preserve requested sweep",
+      "passed": true
+    },
+    {
+      "name": "ascii/circle-3p: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/circle-3p: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "ascii/circle-diameter: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/circle-diameter: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "ascii/ellipse: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/ellipse: major vector, ratio and parameter interval",
+      "passed": true
+    },
+    {
+      "name": "ascii/ellipse-arc: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/ellipse-arc: major vector, ratio and parameter interval",
+      "passed": true
+    },
+    {
+      "name": "ascii/spline: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/spline: native controls and knots",
+      "passed": true
+    },
+    {
+      "name": "ascii/spline: sampled NURBS endpoints",
+      "passed": true
+    },
+    {
+      "name": "ascii/bezier: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/bezier: native controls and knots",
+      "passed": true
+    },
+    {
+      "name": "ascii/bezier: sampled NURBS endpoints",
+      "passed": true
+    },
+    {
+      "name": "ascii/polygon: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/polygon: native polyline closure and bulges",
+      "passed": true
+    },
+    {
+      "name": "ascii/donut: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/donut: native polyline closure and bulges",
+      "passed": true
+    },
+    {
+      "name": "ascii/donut: donut retains native stroke width",
+      "passed": true
+    },
+    {
+      "name": "ascii/solid: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/solid: native vertex ordering",
+      "passed": true
+    },
+    {
+      "name": "ascii/face: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/face: native vertex ordering",
+      "passed": true
+    },
+    {
+      "name": "ascii/hatch: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/hatch: user-defined hatch pattern and boundary",
+      "passed": true
+    },
+    {
+      "name": "ascii/hatch: pattern line angles and spacing",
+      "passed": true
+    },
+    {
+      "name": "ascii/wipeout: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/wipeout: normalized mask maps back to drawing polygon",
+      "passed": true
+    },
+    {
+      "name": "ascii/point: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/point: native point coordinates",
+      "passed": true
+    },
+    {
+      "name": "ascii/ray: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/ray: native origin and unit direction",
+      "passed": true
+    },
+    {
+      "name": "ascii/xline: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/xline: native origin and unit direction",
+      "passed": true
+    },
+    {
+      "name": "ascii/mtext: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/mtext: multiline text and native width",
+      "passed": true
+    },
+    {
+      "name": "ascii/leader: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/leader: vertices and arrow",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-aligned: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-aligned: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-aligned: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-horizontal: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-horizontal: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-horizontal: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-vertical: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-vertical: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-vertical: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-radius: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-radius: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-radius: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-diameter: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-diameter: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-diameter: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular-lines: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular-lines: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-angular-lines: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-x: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-x: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-x: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-y: native entity type",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-y: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/dim-ordinate-y: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: native circle and ellipse hatch edges retained",
+      "passed": true
+    },
+    {
+      "name": "binary: zero audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "binary: one native record per tool plus curved hatch",
+      "passed": true
+    },
+    {
+      "name": "binary/arc: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/arc: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "binary/arc: CCW DXF angles preserve requested sweep",
+      "passed": true
+    },
+    {
+      "name": "binary/arc-center: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/arc-center: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "binary/arc-center: CCW DXF angles preserve requested sweep",
+      "passed": true
+    },
+    {
+      "name": "binary/circle-3p: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/circle-3p: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "binary/circle-diameter: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/circle-diameter: native center and radius",
+      "passed": true
+    },
+    {
+      "name": "binary/ellipse: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/ellipse: major vector, ratio and parameter interval",
+      "passed": true
+    },
+    {
+      "name": "binary/ellipse-arc: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/ellipse-arc: major vector, ratio and parameter interval",
+      "passed": true
+    },
+    {
+      "name": "binary/spline: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/spline: native controls and knots",
+      "passed": true
+    },
+    {
+      "name": "binary/spline: sampled NURBS endpoints",
+      "passed": true
+    },
+    {
+      "name": "binary/bezier: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/bezier: native controls and knots",
+      "passed": true
+    },
+    {
+      "name": "binary/bezier: sampled NURBS endpoints",
+      "passed": true
+    },
+    {
+      "name": "binary/polygon: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/polygon: native polyline closure and bulges",
+      "passed": true
+    },
+    {
+      "name": "binary/donut: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/donut: native polyline closure and bulges",
+      "passed": true
+    },
+    {
+      "name": "binary/donut: donut retains native stroke width",
+      "passed": true
+    },
+    {
+      "name": "binary/solid: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/solid: native vertex ordering",
+      "passed": true
+    },
+    {
+      "name": "binary/face: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/face: native vertex ordering",
+      "passed": true
+    },
+    {
+      "name": "binary/hatch: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/hatch: user-defined hatch pattern and boundary",
+      "passed": true
+    },
+    {
+      "name": "binary/hatch: pattern line angles and spacing",
+      "passed": true
+    },
+    {
+      "name": "binary/wipeout: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/wipeout: normalized mask maps back to drawing polygon",
+      "passed": true
+    },
+    {
+      "name": "binary/point: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/point: native point coordinates",
+      "passed": true
+    },
+    {
+      "name": "binary/ray: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/ray: native origin and unit direction",
+      "passed": true
+    },
+    {
+      "name": "binary/xline: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/xline: native origin and unit direction",
+      "passed": true
+    },
+    {
+      "name": "binary/mtext: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/mtext: multiline text and native width",
+      "passed": true
+    },
+    {
+      "name": "binary/leader: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/leader: vertices and arrow",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-aligned: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-aligned: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-aligned: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-horizontal: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-horizontal: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-horizontal: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-vertical: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-vertical: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-vertical: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-radius: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-radius: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-radius: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-diameter: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-diameter: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-diameter: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular-lines: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular-lines: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-angular-lines: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-x: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-x: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-x: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-y: native entity type",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-y: native dimension subtype and picture",
+      "passed": true
+    },
+    {
+      "name": "binary/dim-ordinate-y: regenerated measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: native circle and ellipse hatch edges retained",
+      "passed": true
+    }
+  ],
+  "passed": 148,
+  "files": 2,
+  "validator": "ezdxf 1.4.4",
+  "errors": 0,
+  "repairs": 0,
+  "scope": "Independent native field and geometry readback; not a vendor conformance certification"
+}
