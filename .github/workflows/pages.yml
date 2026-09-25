@@ -58,9 +58,11 @@ jobs:
           python tests/browser_workflows.py
           python tests/browser_fidelity.py
           python tests/browser_symbols.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_interop.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
           python tests/audit_symbol_library.py
+          python tests/audit_interop.py
           python tests/render_symbol_atlas.py
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
