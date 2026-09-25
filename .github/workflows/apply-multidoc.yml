@@ -1,0 +1,138 @@
+name: Apply verified multi-document release
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/apply-multidoc.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-multidoc-source-import
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify complete source patch and preserve concurrent changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, hashlib, json, lzma, os, pathlib, subprocess, urllib.request
+          base = 'b1c87f2062348e02c56eb42304332167267a319a'
+          shas = '''3e310567eda4fdb7391ad01fe064d5bd1f87b20d
+          da56ee8f03c30ed0e89cd633111e2114ea2dacd6
+          bfbf9516a247f2f5ade6be6f7e45341f44b294b8
+          c7e3e07cd2c393952ae66f0569ac87fbb29eae54
+          29f20bcbf5bb2547127a7e6ad8998066ca6625ab
+          7edce1b3d0b87f108b406967fc52e0b7264adf40
+          225048d4bf5b2f3976cba366dddc4535a863efcc'''.split()
+          parts = []
+          for index, sha in enumerate(shas):
+              request = urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}', headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  record = json.load(response)
+              data = base64.b64decode(record['content'])
+              assert len(data) == (6000 if index < 6 else 2728)
+              assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == sha
+              parts.append(data)
+          compressed = b''.join(parts)
+          assert len(compressed) == 38728
+          assert hashlib.sha256(compressed).hexdigest() == '0032910bace026f6d081f5ca67738e8e248c4cd296885487768b43ebbec33920'
+          decoder = lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch = decoder.decompress(compressed, max_length=172524)
+          assert decoder.eof and not decoder.unused_data and len(patch) == 172523
+          assert hashlib.sha256(patch).hexdigest() == '89cfffb66801496f55f1f4b7aca39bd502f757ffb40f6b105a0d3dcdd051b175'
+          target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'multidoc.patch'
+          target.write_bytes(patch)
+          stat = subprocess.check_output(['git', 'apply', '--numstat', str(target)], text=True)
+          paths = [line.split('\t', 2)[2] for line in stat.splitlines()]
+          assert len(paths) == 56 and len(set(paths)) == 56
+          for name in paths:
+              path = pathlib.PurePosixPath(name)
+              assert not path.is_absolute() and '..' not in path.parts and '\\' not in name
+              assert not any(p in ('.git', '.github', 'node_modules') for p in path.parts)
+              assert path.parts[0] in ('README.md', 'RELEASE_NOTES.md', 'package.json', 'packages', 'tests', 'docs')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', base, 'HEAD'], check=True)
+          subprocess.run(['git', 'diff', '--quiet', base, 'HEAD', '--', *paths], check=True)
+          subprocess.run(['git', 'apply', '--unidiff-zero', '--check', str(target)], check=True)
+          subprocess.run(['git', 'apply', '--unidiff-zero', str(target)], check=True)
+          print('Applied 56 checksum-verified source, documentation, declaration and test files.')
+          PY
+      - name: Test and reproduce all deliverables
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run build
+          rm -f artifacts/npm/*-0.6.0.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install browser and independent DXF validator
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:
+              print('CHROMIUM_EXECUTABLE=' + p.chromium.executable_path)
+          PY
+      - name: Validate documents, native storage, mobile UI and DXF regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/browser_smoke.py
+          python tests/browser_workflows.py
+          python tests/browser_fidelity.py
+          python tests/browser_symbols.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_interop.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_cad_editing.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_parametric.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_drawing_tools.py
+          CONDUIT_TEST_ORIGIN=localhost python tests/browser_documents.py
+          python tests/audit_dxf.py
+          python tests/audit_fidelity.py
+          python tests/audit_symbol_library.py
+          python tests/audit_interop.py
+          python tests/audit_cad_editing.py
+          python tests/audit_parametric.py
+          python tests/audit_drawing_tools.py
+          python tests/render_symbol_atlas.py
+      - name: Commit complete validated workspace to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git add -f dist artifacts/npm
+          git diff --cached --stat
+          git commit -m 'feat: multi-document sessions, atomic recovery and responsive mobile workspace'
+          git push origin HEAD:main
+          echo "Release source commit: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save validation evidence and all package archives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduitcad-070-workspace-validation
+          path: artifacts
+          if-no-files-found: warn
