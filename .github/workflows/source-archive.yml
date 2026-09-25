@@ -8,14 +8,23 @@ permissions:
 jobs:
   archive:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Create reproducible source archive
-        run: git archive --format=tar HEAD > "$RUNNER_TEMP/conduit-source.tar"
+      - name: Create reproducible source archive and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/conduit-snapshot"
+          git archive --format=tar HEAD > "$RUNNER_TEMP/conduit-snapshot/conduit-source.tar"
+          git rev-parse HEAD > "$RUNNER_TEMP/conduit-snapshot/revision.txt"
+          cd "$RUNNER_TEMP/conduit-snapshot"
+          sha256sum conduit-source.tar > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: conduit-source-snapshot
-          path: ${{ runner.temp }}/conduit-source.tar
+          path: ${{ runner.temp }}/conduit-snapshot
           retention-days: 7
+          if-no-files-found: error
