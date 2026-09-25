@@ -1,6 +1,500 @@
 'use strict';
 (()=>{
 const __modules=Object.create(null);
+// packages/dxf/src/codec.js
+__modules["packages/dxf/src/codec.js"]=(()=>{
+/** Lossless tag values and bounded ASCII/binary transport. DXF R13+ uses
+ * two-byte group codes; R12 uses one-byte codes with a 255 escape. */
+const SIGNATURE = 'AutoCAD Binary DXF\r\n\x1a\0';
+const between = (c, a, b) => c >= a && c <= b;
+function groupType(c) {
+    if (!Number.isInteger(c) || c < 0 || c > 1071) throw new Error(`Invalid DXF group code ${c}`);
+    if (between(c, 310, 319) || c === 1004) return 'binary';
+    if (between(c, 10, 59) || between(c, 110, 149) || between(c, 210, 239) || between(c, 460, 469) || between(c, 1010, 1059)) return 'double';
+    if (between(c, 60, 79) || between(c, 170, 179) || between(c, 270, 289) || between(c, 370, 389) || between(c, 400, 409) || between(c, 1060, 1070)) return 'int16';
+    if (between(c, 90, 99) || between(c, 420, 429) || between(c, 440, 459) || c === 1071) return 'int32';
+    if (between(c, 160, 169)) return 'int64';
+    if (between(c, 290, 299)) return 'byte';
+    return 'string';
+}
+function checkedValue(c, value) {
+    const type = groupType(c);
+    if (type === 'string') { const s=String(value); if (/[\r\n\0]/.test(s)) throw new Error(`Control character in DXF group ${c}`); return s; }
+    if (type === 'binary') { const s=String(value).trim(); if (!/^(?:[\da-f]{2}){0,127}$/i.test(s)) throw new Error(`Invalid binary chunk in group ${c}`); return s; }
+    const s=String(value).trim();
+    if (!s || !(type !== 'int64' ? /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/ : /^[-+]?\d+$/).test(s)) throw new Error(`Invalid ${type} in group ${c}`);
+    if (type === 'int64') { const n=BigInt(s); if(n<-(1n<<63n)||n>=(1n<<63n))throw new Error(`Int64 overflow in group ${c}`);return s; }
+    const n=Number(s); if(!Number.isFinite(n))throw new Error(`Non-finite DXF value in group ${c}`);
+    if (type!=='double') { const lo=type==='byte'?0:type==='int16'?-32768:-2147483648, hi=type==='byte'?1:type==='int16'?32767:2147483647;
+        if(!Number.isInteger(n)||n<lo||n>hi)throw new Error(`DXF ${type} overflow in group ${c}`); }
+    return n;
+}
+function limitOptions(options) {
+    const n=options.maxPairs??8000000;
+    if(!Number.isSafeInteger(n)||n<1||n>8000000)throw new Error('Invalid DXF maxPairs limit');
+    return n;
+}
+function readAsciiTags(source, options={}) {
+    if(typeof source!=='string'||source.length>128*1024*1024)throw new Error('DXF input exceeds 128 MiB text limit');
+    const max=limitOptions(options), lines=source.replace(/^\uFEFF/,'').split(/\r\n|\n|\r/), pairs=[];
+    while(lines.length&&lines.at(-1)==='')lines.pop();
+    if(lines.length%2)throw new Error('Truncated DXF group/value pair');
+    let eof=false;
+    for(let i=0;i<lines.length;i+=2) {
+        if(pairs.length>=max)throw new Error('DXF group-code safety limit exceeded');
+        if(!/^\s*\d+\s*$/.test(lines[i]))throw new Error(`Invalid DXF group code at line ${i+1}`);
+        const c=Number(lines[i]), value=checkedValue(c,lines[i+1]);
+        if(eof) { if(c!==999)throw new Error('Data after DXF EOF marker'); else {pairs.push([c,value]);continue;} }
+        pairs.push([c,value]); if(c===0&&String(value).trim()==='EOF')eof=true;
+    }
+    if(!eof)throw new Error('DXF EOF marker missing (file may be truncated)');
+    return pairs;
+}
+function decodeCodePage(page='ANSI_1252') {
+    const p=String(page).toUpperCase().replace(/^ANSI_/, '');
+    const names={'874':'windows-874','932':'shift_jis','936':'gbk','949':'euc-kr','950':'big5','1361':'euc-kr','UTF-8':'utf-8','UTF8':'utf-8'};
+    return names[p] || (/^125[0-8]$/.test(p)?'windows-'+p:/^DOS(?:_|)(\d+)$/.test(p)?'ibm'+p.match(/\d+/)[0]:'windows-1252');
+}
+function readBinaryTags(input, options={}) {
+    const u=input instanceof Uint8Array?input:new Uint8Array(input);
+    if(u.length>128*1024*1024)throw new Error('DXF input exceeds 128 MiB limit');
+    if(u.length<24 || SIGNATURE.split('').some((s,i)=>u[i]!==s.charCodeAt(0)))throw new Error('Invalid binary DXF signature');
+    const v=new DataView(u.buffer,u.byteOffset,u.byteLength), max=limitOptions(options), result=[];
+    // Structural SECTION/999 tag at the beginning disambiguates the code width.
+    const r12=options.r12??(u[23]!==0); let pos=22,eof=false;
+    const need=n=>{if(pos+n>u.length)throw new Error('Truncated binary DXF');};
+    const strings=[];
+    while(pos<u.length) {
+        if(result.length>=max)throw new Error('DXF group-code safety limit exceeded');
+        need(r12?1:2);let c;
+        if(r12) {c=u[pos++];if(c===255){need(2);c=v.getUint16(pos,true);pos+=2;}}else {c=v.getUint16(pos,true);pos+=2;}
+        const t=groupType(c);let value;
+        if(t==='string') {const start=pos;while(pos<u.length&&u[pos])pos++;need(1);value=new TextDecoder('windows-1252').decode(u.subarray(start,pos));strings.push([result.length,start,pos]);pos++;}
+        else if(t==='binary'){need(1);const n=u[pos++];need(n);value=Array.from(u.subarray(pos,pos+n),b=>b.toString(16).padStart(2,'0')).join('');pos+=n;}
+        else if(t==='double'){need(8);value=v.getFloat64(pos,true);pos+=8;}
+        else if(t==='int16'){need(2);value=v.getInt16(pos,true);pos+=2;}
+        else if(t==='int32'){need(4);value=v.getInt32(pos,true);pos+=4;}
+        else if(t==='int64'){need(8);value=v.getBigInt64(pos,true).toString();pos+=8;}
+        else {need(1);value=u[pos++];}
+        checkedValue(c,value);result.push([c,value]);
+        if(c===0&&value==='EOF'){eof=true;break;}
+    }
+    if(!eof)throw new Error('Binary DXF EOF marker missing');
+    if(pos!==u.length)throw new Error('Data after binary DXF EOF marker');
+    // Decode *after* scanning the header, including strings preceding $DWGCODEPAGE.
+    let key='',ver='AC1009',page='ANSI_1252';
+    for(const [c,x] of result){if(c===9)key=x;else if(key==='$ACADVER'&&c===1)ver=x;else if(key==='$DWGCODEPAGE'&&c===3)page=x;}
+    const decoder=new TextDecoder(options.encoding || (ver>='AC1021'?'utf-8':decodeCodePage(page)),{fatal:true});
+    for(const [i,a,b] of strings)result[i][1]=decoder.decode(u.subarray(a,b));
+    return result;
+}
+function writeAsciiTags(pairs,{version='AC1024'}={}) {
+    return pairs.map(([c,v])=>{let s=String(checkedValue(c,v));if(version<'AC1021')s=s.replace(/[\u0080-\uffff]/g,x=>'\\U+'+x.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0'));return `${c}\r\n${s}\r\n`;}).join('');
+}
+function writeBinaryTags(pairs,{version='AC1024',r12=version<='AC1009'}={}) {
+    const bytes=[],encoder=new TextEncoder();let size=22;
+    for(const [c,v] of pairs) {
+        if(c===999)continue; // Binary DXF does not carry ASCII comments.
+        const value=checkedValue(c,v),t=groupType(c),codeSize=r12?(c<255?1:3):2;
+        let payload;
+        if(t==='string') {let s=String(value);if(version<'AC1021')s=s.replace(/[\u0080-\uffff]/g,x=>'\\U+'+x.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0'));payload=encoder.encode(s+'\0');}
+        else if(t==='binary'){const s=String(value);payload=new Uint8Array(1+s.length/2);payload[0]=s.length/2;for(let i=0;i<s.length;i+=2)payload[1+i/2]=parseInt(s.slice(i,i+2),16);}
+        else {payload=new Uint8Array(t==='double'||t==='int64'?8:t==='int32'?4:t==='int16'?2:1);const d=new DataView(payload.buffer);if(t==='double')d.setFloat64(0,value,true);else if(t==='int64')d.setBigInt64(0,BigInt(value),true);else if(t==='int32')d.setInt32(0,value,true);else if(t==='int16')d.setInt16(0,value,true);else payload[0]=value;}
+        size+=codeSize+payload.length;if(size>128*1024*1024)throw new Error('Binary DXF output exceeds safety limit');bytes.push([c,codeSize,payload]);
+    }
+    const out=new Uint8Array(size),view=new DataView(out.buffer);out.set(encoder.encode(SIGNATURE));let i=22;
+    for(const [c,n,p] of bytes){if(n===1)out[i++]=c;else {if(n===3)out[i++]=255;view.setUint16(i,c,true);i+=2;}out.set(p,i);i+=p.length;}return out;
+}
+function splitSections(pairs) {
+    const sections=Object.create(null);let name=null,ended=false;
+    for(let i=0;i<pairs.length;i++) {const [c,v]=pairs[i];
+        if(c===0&&v==='SECTION'){if(name!==null||pairs[i+1]?.[0]!==2)throw new Error('Malformed DXF SECTION nesting');name=String(pairs[++i][1]).trim();if(Object.hasOwn(sections,name))throw new Error('Duplicate DXF section '+name);sections[name]=[];}
+        else if(c===0&&v==='ENDSEC'){if(name===null)throw new Error('Unmatched DXF ENDSEC');name=null;}
+        else if(c===0&&v==='EOF'){if(name!==null)throw new Error('Unclosed DXF section '+name);ended=true;break;}
+        else if(name!==null)sections[name].push(pairs[i]);else if(c!==999)throw new Error('DXF tag outside section');
+    }
+    if(!ended)throw new Error('DXF EOF marker missing');return sections;
+}
+function splitRecords(pairs) {
+    const result=[];let r=[];for(const p of pairs){if(p[0]===0&&r.length){result.push(r);r=[];}r.push(p);}if(r.length)result.push(r);return result;
+}
+
+/** Semantic string decoding; raw transport tags remain unchanged for preservation. */
+function decodeTextEscapes(value) {
+    return typeof value === 'string' ? value.replace(/\\U\+([0-9a-f]{4})/gi,(_,hex)=>String.fromCharCode(parseInt(hex,16))) : value;
+}
+
+return {groupType,checkedValue,readAsciiTags,decodeCodePage,readBinaryTags,writeAsciiTags,writeBinaryTags,splitSections,splitRecords,decodeTextEscapes};
+})();
+// packages/dxf/src/interop.js
+__modules["packages/dxf/src/interop.js"]=(()=>{
+const {splitRecords, decodeTextEscapes} = __modules["packages/dxf/src/codec.js"];
+const get = (r,c,d=undefined) => decodeTextEscapes(r.find(p=>p[0]===c)?.[1] ?? d);
+const all = (r,c) => r.filter(p=>p[0]===c).map(p=>p[1]);
+const point = (r,c=10) => ({x:+get(r,c,0),y:+get(r,c+10,0),z:+get(r,c+20,0)});
+const has = (r,c) => r.some(p=>p[0]===c);
+const key = v => String(v ?? '').toUpperCase();
+function subclassTags(raw,name) {
+    const i=raw.findIndex(p=>p[0]===100 && p[1]===name);
+    if(i<0) return [];
+    let end=i+1;
+    while(end<raw.length && raw[end][0]!==100 && raw[end][0]<1000) end++;
+    return raw.slice(i+1,end);
+}
+/** Reactor/extension and XDATA fields do not share the entity field namespace. */
+function graphicalTags(raw) {
+    const result=[]; let depth=0;
+    for(const [c,v] of raw) {
+        if(c>=1000) break;
+        if(c===102) {
+            if(String(v).startsWith('{')) depth++;
+            else if(v==='}') { if(!depth) throw new Error('Unmatched extension-data closing brace'); depth--; }
+            else if(!depth) result.push([c,v]);
+        } else if(!depth) result.push([c,v]);
+    }
+    if(depth) throw new Error('Unclosed extension-data group');
+    return result;
+}
+const DIMSTYLE_FIELDS = {dimscale:40,dimasz:41,dimexo:42,dimdli:43,dimexe:44,dimrnd:45,dimdle:46,dimtp:47,dimtm:48,dimtxt:140,dimcen:141,dimtsz:142,dimaltf:143,dimlfac:144,dimtvp:145,dimtfac:146,dimgap:147,dimpost:3,dimapost:4,dimtad:77,dimzin:78,dimdec:271,dimtdec:272,dimaltu:273,dimlunit:277,dimdsep:278,dimclrd:176,dimclre:177,dimclrt:178};
+const DIM_POINTS = {definitionPoint:10,textMidpoint:11,dimensionInsert:12,a:13,b:14,defpoint4:15,defpoint5:16};
+const DIM_SCALARS = {dimensionAngle:50,obliqueAngle:52,textRotation:53,horizontalDirection:51,leaderLength:40,measurement:42,attachment:71,dimensionVersion:280};
+const points = (r,c=10) => {
+    const result=[]; let p;
+    for(const [code,v] of r) {
+        if(code===c) { p={x:+v,y:0,z:0}; result.push(p); }
+        else if(p && code===c+10) p.y=+v;
+        else if(p && code===c+20) p.z=+v;
+    }
+    return result;
+};
+const count = n => {
+    if(!Number.isSafeInteger(n) || n<0 || n>1000000) throw new Error('Invalid DXF collection count');
+    return n;
+};
+function readSpline(r) {
+    return {degree:+get(r,71,3),splineFlags:+get(r,70,0),knots:all(r,40).map(Number),weights:all(r,41).map(Number),controlPoints:points(r),fitPoints:points(r,11)};
+}
+function readInteropEntity(e,r) {
+    if(e.type==='DIMENSION') {
+        e.dimtype=+get(r,70,0); e.dimstyle=get(r,3,'STANDARD');
+        for(const [k,c] of Object.entries(DIM_POINTS)) if(has(r,c)) e[k]=point(r,c);
+        for(const [k,c] of Object.entries(DIM_SCALARS)) if(has(r,c)) e[k]=+get(r,c);
+    } else if(e.type==='VIEWPORT') {
+        const sub=subclassTags(r,'AcDbViewport'), v=sub.length?sub:r;
+        Object.assign(e,{c:point(v),viewportWidth:+get(v,40,1),viewportHeight:+get(v,41,1),viewHeight:+get(v,45,1),viewportId:+get(v,69,2),viewportStatus:+get(v,68,1),viewCenter:point(v,12),viewTarget:point(v,17),viewDirection:has(v,16)?point(v,16):{x:0,y:0,z:1},viewTwist:+get(v,51,0),viewportFlags:+get(v,90,0),frozenLayerHandles:all(v,331).map(String),clipHandle:get(v,340)});
+        if(e.viewportWidth<0 || e.viewportHeight<0 || e.viewHeight<=0) throw new Error('Invalid VIEWPORT dimensions');
+    } else if(e.type==='MESH') {
+        const v=subclassTags(r,'AcDbSubDMesh'); let i=0;
+        const read=c=>{if(v[i]?.[0]!==c) throw new Error(`Malformed MESH: expected group ${c}`);return v[i++][1];};
+        e.meshVersion=+read(71); e.blendCrease=+read(72); e.subdivision=+read(91);
+        const n=count(+read(92)); e.points=[];
+        for(let k=0;k<n;k++) e.points.push({x:+read(10),y:+read(20),z:+read(30)});
+        const size=count(+read(93)); let used=0; e.faces=[];
+        const index=()=>{const x=+read(90);if(!Number.isSafeInteger(x)||x<0||x>=n) throw new Error('Invalid MESH vertex index');return x;};
+        while(used<size) {
+            const length=count(+read(90)); used++;
+            if(length<3 || used+length>size) throw new Error('Invalid MESH face size');
+            const face=[];for(let k=0;k<length;k++) face.push(index());
+            used+=length; e.faces.push(face);
+        }
+        const ne=count(+read(94)); e.edges=[];
+        for(let k=0;k<ne;k++) e.edges.push([index(),index()]);
+        const nc=count(+read(95)); e.creases=[];
+        for(let k=0;k<nc;k++) e.creases.push(+read(140));
+        if(nc!==ne) throw new Error('MESH crease/edge count mismatch');
+        e.meshOverrides=v.slice(i);
+    } else if(e.type==='HELIX') {
+        e.helixSpline=readSpline(subclassTags(r,'AcDbSpline'));
+        const v=subclassTags(r,'AcDbHelix');
+        Object.assign(e,{helixMajor:+get(v,90,29),helixMinor:+get(v,91,63),axisBase:point(v),startPoint:point(v,11),axis:point(v,12),radius:+get(v,40,1),turns:+get(v,41,1),turnHeight:+get(v,42,1),handedness:!!get(v,290,1),helixConstraint:+get(v,280,1)});
+    } else if(e.type==='WIPEOUT') {
+        const v=subclassTags(r,'AcDbWipeout');
+        Object.assign(e,{p:point(v),uPixel:point(v,11),vPixel:point(v,12),imageSize:point(v,13),boundary:points(v,14),boundaryType:+get(v,71,2),imageFlags:+get(v,70,7),clipping:!!get(v,280,1)});
+        if(e.boundary.length!==count(+get(v,91,e.boundary.length))) throw new Error('WIPEOUT boundary count mismatch');
+        if(e.boundaryType===1 && e.boundary.length!==2) throw new Error('WIPEOUT rectangle requires two corners');
+        if(e.boundaryType===2 && e.boundary.length<3) throw new Error('WIPEOUT polygon requires at least three points');
+    }
+}
+function writeInteropEntity(e,pair,pp) {
+    if(e.type==='DIMENSION') {
+        const type=(e.dimtype??33)&15;
+        if(type>6) throw new Error(`Unsupported DIMENSION subtype ${type}`);
+        pair(100,'AcDbDimension');pair(2,e.block);pp(10,e.definitionPoint || e.a);pp(11,e.textMidpoint || e.definitionPoint || e.a);
+        pair(70,(e.dimtype??33)|32);pair(1,e.text??'<>');pair(3,e.dimstyle||'STANDARD');
+        for(const [k,c] of Object.entries(DIM_SCALARS)) if(e[k]!==undefined && ![50,52,40].includes(c)) pair(c,e[k]);
+        if(e.dimensionInsert)pp(12,e.dimensionInsert);
+        const names=['AcDbAlignedDimension','AcDbAlignedDimension','AcDb2LineAngularDimension','AcDbDiametricDimension','AcDbRadialDimension','AcDb3PointAngularDimension','AcDbOrdinateDimension'];
+        pair(100,names[type]);
+        if([0,1,2,5,6].includes(type)) {if(e.a)pp(13,e.a);if(e.b)pp(14,e.b);}
+        if([2,3,4,5].includes(type)&&e.defpoint4)pp(15,e.defpoint4);
+        if(type===2&&e.defpoint5)pp(16,e.defpoint5);
+        if([0,1].includes(type)&&e.obliqueAngle!==undefined)pair(52,e.obliqueAngle);
+        if(type===0){pair(50,e.dimensionAngle||0);pair(100,'AcDbRotatedDimension');}
+        if([3,4].includes(type))pair(40,e.leaderLength||0);
+    } else if(e.type==='VIEWPORT') {
+        pair(100,'AcDbViewport');pp(10,e.c);pair(40,e.viewportWidth);pair(41,e.viewportHeight);pair(68,e.viewportStatus??1);pair(69,e.viewportId??2);
+        pair(12,e.viewCenter?.x||0);pair(22,e.viewCenter?.y||0);pp(16,e.viewDirection||{x:0,y:0,z:1});pp(17,e.viewTarget);
+        pair(45,e.viewHeight);pair(51,e.viewTwist||0);pair(90,e.viewportFlags||0);
+        for(const h of e.frozenLayerHandles||[])pair(331,h);
+        if(e.clipHandle)pair(340,e.clipHandle);
+        pair(281,0);
+    } else if(e.type==='MESH') {
+        pair(100,'AcDbSubDMesh');pair(71,e.meshVersion??2);pair(72,e.blendCrease??0);pair(91,e.subdivision??0);pair(92,count(e.points.length));
+        for(const p of e.points)pp(10,p);
+        pair(93,(e.faces||[]).reduce((n,f)=>n+1+f.length,0));
+        const index=x=>{if(!Number.isSafeInteger(x)||x<0||x>=e.points.length)throw new Error('Invalid MESH vertex index');pair(90,x);};
+        for(const f of e.faces||[]){if(f.length<3)throw new Error('Invalid MESH face');pair(90,count(f.length));for(const x of f)index(x);}
+        pair(94,count(e.edges?.length||0));for(const edge of e.edges||[]){if(edge.length!==2)throw new Error('Invalid MESH edge');for(const x of edge)index(x);}
+        const creases=e.creases||new Array(e.edges?.length||0).fill(0);
+        if(creases.length!==(e.edges?.length||0))throw new Error('MESH crease/edge count mismatch');
+        pair(95,count(creases.length));for(const c of creases)pair(140,c);
+        for(const [c,v] of e.meshOverrides||[[90,0]])pair(c,v);
+    } else if(e.type==='HELIX') {
+        const s=e.helixSpline||{};pair(100,'AcDbSpline');pair(70,s.splineFlags||0);pair(71,s.degree||3);
+        pair(72,s.knots?.length||0);pair(73,s.controlPoints?.length||0);pair(74,s.fitPoints?.length||0);
+        for(const v of s.knots||[])pair(40,v);for(const v of s.weights||[])pair(41,v);
+        for(const p of s.controlPoints||[])pp(10,p);for(const p of s.fitPoints||[])pp(11,p);
+        pair(100,'AcDbHelix');pair(90,e.helixMajor??29);pair(91,e.helixMinor??63);pp(10,e.axisBase);pp(11,e.startPoint);pp(12,e.axis||{x:0,y:0,z:1});
+        pair(40,e.radius);pair(41,e.turns);pair(42,e.turnHeight);pair(290,e.handedness===false?0:1);pair(280,e.helixConstraint??1);
+    } else if(e.type==='WIPEOUT') {
+        pair(100,'AcDbWipeout');pair(90,0);pp(10,e.p);pp(11,e.uPixel);pp(12,e.vPixel);pair(13,e.imageSize?.x||1);pair(23,e.imageSize?.y||1);
+        pair(70,e.imageFlags??7);pair(280,e.clipping===false?0:1);pair(281,50);pair(282,50);pair(283,0);pair(71,e.boundaryType??2);pair(91,e.boundary.length);
+        for(const p of e.boundary){pair(14,p.x);pair(24,p.y);}
+    } else return false;
+    return true;
+}
+function readDocumentInterop(doc,sections) {
+    const tableRecords=splitRecords(sections.TABLES||[]), objects=splitRecords(sections.OBJECTS||[]);
+    doc.dimstyles=Object.create(null);doc.layoutSettings=Object.create(null);
+    const blockNames=new Map(), layerNames=new Map(), layoutByOwner=new Map();
+    for(const r of tableRecords) {
+        const type=get(r,0), handle=key(get(r,type==='DIMSTYLE'?105:5));
+        if(type==='BLOCK_RECORD')blockNames.set(handle,get(r,2));
+        if(type==='LAYER')layerNames.set(handle,get(r,2));
+        if(type==='DIMSTYLE') {
+            const s={};for(const [k,c] of Object.entries(DIMSTYLE_FIELDS))if(has(r,c))s[k]=get(r,c);
+            doc.dimstyles[get(r,2,'STANDARD')]=s;
+        }
+    }
+    for(const raw of objects) {
+        if(get(raw,0)!=='LAYOUT')continue;
+        const l=subclassTags(raw,'AcDbLayout'),p=subclassTags(raw,'AcDbPlotSettings'),name=get(l,1,'Layout1');
+        doc.layoutSettings[name]={tabOrder:+get(l,71,0),paperWidth:+get(p,44,420),paperHeight:+get(p,45,297),paperUnits:+get(p,72,1),rotation:+get(p,73,0)};
+        layoutByOwner.set(key(get(l,330)),name);
+    }
+    // Inactive paper layouts are stored inside special BLOCKs, not ENTITIES.
+    for(const [owner,name] of layoutByOwner) {
+        const blockName=blockNames.get(owner), b=doc.blocks[blockName];
+        if(b && /^\*(Model|Paper)_Space/i.test(blockName)) {
+            for(const e of b.entities||[]){e.layout=name;doc.entities.push(e);}
+            delete doc.blocks[blockName];
+        }
+    }
+    for(const [name,b] of Object.entries(doc.blocks))if(/^\*(Model|Paper)_Space(?:\d+)?$/i.test(name)) {
+        const layout=/Model/i.test(name)?'Model':'Layout1';
+        for(const e of b.entities||[]){e.layout=layout;doc.entities.push(e);}delete doc.blocks[name];
+    }
+    for(const e of doc.entities) {
+        const owner=get(graphicalTags(e._dxf?.raw||[]),330);
+        if(layoutByOwner.has(key(owner)))e.layout=layoutByOwner.get(key(owner));
+        if(e.type==='VIEWPORT') {
+            e.frozenLayers=(e.frozenLayerHandles||[]).map(h=>layerNames.get(key(h))).filter(Boolean);
+            const d=e.viewDirection;
+            if((e.viewportFlags&7)||Math.abs(d?.x||0)>1e-9||Math.abs(d?.y||0)>1e-9||(d?.z??1)<=0)doc.importDiagnostics.push({severity:'warning',type:'VIEWPORT',message:'Perspective, tilted and depth-clipped viewport contents are not rendered; native fields remain available.'});
+        }
+    }
+    doc.layouts=[...new Set(['Model',...Object.keys(doc.layoutSettings),...doc.entities.map(e=>e.layout||'Model')])].sort((a,b)=>a==='Model'?-1:b==='Model'?1:(doc.layoutSettings[a]?.tabOrder||0)-(doc.layoutSettings[b]?.tabOrder||0));
+    let variable='';for(const [c,v]of sections.HEADER||[]){if(c===9)variable=v;else if(variable==='$INSUNITS'&&c===70)doc.insunits=v;}
+    // Application metadata is an XRECORD, so binary DXF need not depend on 999 comments.
+    const root=objects.find(r=>get(r,0)==='DICTIONARY' && key(get(graphicalTags(r),330,'0'))==='0');
+    const entry=root?.findIndex(p=>p[0]===3&&p[1]==='CONDUITCAD_METADATA');
+    if(entry>=0) {
+        const h=root[entry+1]?.[1],rec=objects.find(r=>key(get(r,5))===key(h)&&get(r,0)==='XRECORD');
+        if(rec)try{const value=JSON.parse(all(subclassTags(rec,'AcDbXrecord'),1).join(''));for(const k of ['parameters','constraints','metadata'])if(value[k]!==undefined)doc[k]=value[k];}catch{doc.importDiagnostics.push({severity:'warning',message:'Invalid Conduit XRECORD metadata.'});}
+    }
+}
+
+return {subclassTags,graphicalTags,DIMSTYLE_FIELDS,readInteropEntity,writeInteropEntity,readDocumentInterop};
+})();
+// packages/dxf/src/structure.js
+__modules["packages/dxf/src/structure.js"]=(()=>{
+const {splitSections, splitRecords, writeAsciiTags} = __modules["packages/dxf/src/codec.js"];
+const {DIMSTYLE_FIELDS} = __modules["packages/dxf/src/interop.js"];
+const get=(r,c,d)=>r.find(p=>p[0]===c)?.[1]??d;
+const set=(r,c,v)=>{const i=r.findIndex(p=>p[0]===c);if(i<0)r.push([c,v]);else r[i]=[c,v];};
+const handle=r=>String(get(r,get(r,0)==='DIMSTYLE'?105:5,'')).toUpperCase();
+/** Normalize table ownership and the layout database, never guessing foreign handles. */
+function completeDXFStructure(pairs,doc,version,{includeMetadata=true}={}) {
+    const sections=splitSections(pairs), tables=splitRecords(sections.TABLES||[]), entities=splitRecords(sections.ENTITIES||[]),blocks=splitRecords(sections.BLOCKS||[]);
+    let seed=0x100n;
+    for(const r of [...tables,...entities,...blocks])if(/^[\dA-F]+$/.test(handle(r)))seed=seed>BigInt('0x'+handle(r))?seed:BigInt('0x'+handle(r))+1n;
+    const next=()=>{const h=seed.toString(16).toUpperCase();seed++;return h;};
+    const tableMap=new Map();let current=null;
+    for(const r of tables) {
+        if(get(r,0)==='TABLE') {current={header:r,records:[]};tableMap.set(get(r,2),current);}
+        else if(get(r,0)==='ENDTAB')current=null;
+        else if(current)current.records.push(r);
+    }
+    function ensureTable(name) {
+        if(!tableMap.has(name))tableMap.set(name,{header:[[0,'TABLE'],[2,name],[5,next()],[330,'0'],[100,'AcDbSymbolTable'],[70,0]],records:[]});
+        return tableMap.get(name);
+    }
+    const styleTable=ensureTable('STYLE'),styles=new Map(styleTable.records.map(r=>[get(r,2),handle(r)]));
+    for(const name of ['VPORT','VIEW','UCS','DIMSTYLE','APPID'])ensureTable(name);
+    const dim=ensureTable('DIMSTYLE');
+    set(dim.header,100,'AcDbSymbolTable');dim.header.push([100,'AcDbDimStyleTable'],[71,0]);
+    for(const [name,style]of Object.entries({STANDARD:{},...doc.dimstyles})) {
+        const r=[[0,'DIMSTYLE'],[105,next()],[330,handle(dim.header)],[100,'AcDbSymbolTableRecord'],[100,'AcDbDimStyleTableRecord'],[2,name],[70,0]];
+        for(const [k,c]of Object.entries(DIMSTYLE_FIELDS))if(style[k]!==undefined)r.push([c,style[k]]);
+        if(styles.get('STANDARD'))r.push([340,styles.get('STANDARD')]);
+        dim.records.push(r);
+    }
+    const app=ensureTable('APPID');
+    if(!app.records.some(r=>get(r,2)==='ACAD'))app.records.push([[0,'APPID'],[5,next()],[100,'AcDbSymbolTableRecord'],[100,'AcDbRegAppTableRecord'],[2,'ACAD'],[70,0]]);
+    const layouts=[...new Set(['Model',...(doc.layouts||[]),...doc.entities.map(e=>e.layout||'Model')])];
+    if(layouts.length===1)layouts.push('Layout1');
+    const br=ensureTable('BLOCK_RECORD'), brMap=new Map(br.records.map(r=>[get(r,2),r]));
+    const definitions=new Map();let block;
+    for(const r of blocks) {
+        if(get(r,0)==='BLOCK'){block={begin:r,entities:[],end:null};definitions.set(get(r,2),block);}
+        else if(get(r,0)==='ENDBLK'){if(block)block.end=r;block=null;}
+        else if(block)block.entities.push(r);
+    }
+    const layoutBlocks=new Map();let paper=0;
+    for(const name of layouts) {
+        const blockName=name==='Model'?'*Model_Space':paper++===0?'*Paper_Space':`*Paper_Space${paper-1}`;
+        let record=brMap.get(blockName);
+        if(!record){record=[[0,'BLOCK_RECORD'],[5,next()],[100,'AcDbSymbolTableRecord'],[100,'AcDbBlockTableRecord'],[2,blockName],[70,0],[280,1],[281,0]];br.records.push(record);brMap.set(blockName,record);}
+        if(!definitions.has(blockName))definitions.set(blockName,{begin:[[0,'BLOCK'],[5,next()],[330,handle(record)],[100,'AcDbEntity'],[8,'0'],[100,'AcDbBlockBegin'],[2,blockName],[70,0],[10,0],[20,0],[30,0],[3,blockName],[1,'']],entities:[],end:[[0,'ENDBLK'],[5,next()],[330,handle(record)],[100,'AcDbEntity'],[8,'0'],[100,'AcDbBlockEnd']]});
+        layoutBlocks.set(name,record);
+    }
+    // Only top-level records get layout owners; ATTRIB/VERTEX/SEQEND keep entity owners.
+    let lastLayout='Model';
+    const activePaper=layouts.find(l=>l!=='Model'), modelEntities=[];
+    for(const r of entities) {
+        const type=get(r,0),child=['VERTEX','ATTRIB','SEQEND'].includes(type);
+        const name=child?lastLayout:get(r,410,get(r,67,0)?activePaper:'Model');
+        if(!child){lastLayout=name;set(r,330,handle(layoutBlocks.get(name)||layoutBlocks.get('Model')));}
+        if(name!=='Model'&&name!==activePaper)definitions.get(get(layoutBlocks.get(name),2)).entities.push(r);
+        else modelEntities.push(r);
+    }
+    const root=next(),layoutDictionary=next(),groupDictionary=next();
+    const rootRecord=[[0,'DICTIONARY'],[5,root],[330,'0'],[100,'AcDbDictionary'],[281,1],[3,'ACAD_LAYOUT'],[350,layoutDictionary],[3,'ACAD_GROUP'],[350,groupDictionary]];
+    const layoutRecord=[[0,'DICTIONARY'],[5,layoutDictionary],[330,root],[100,'AcDbDictionary'],[281,1]],objects=[rootRecord,layoutRecord,[[0,'DICTIONARY'],[5,groupDictionary],[330,root],[100,'AcDbDictionary'],[281,1]]];
+    for(let i=0;i<layouts.length;i++) {
+        const name=layouts[i],h=next(),record=layoutBlocks.get(name),s=doc.layoutSettings?.[name]||{},w=s.paperWidth??420,height=s.paperHeight??297;
+        layoutRecord.push([3,name],[350,h]);set(record,340,h);
+        objects.push([[0,'LAYOUT'],[5,h],[330,layoutDictionary],[100,'AcDbPlotSettings'],[1,''],[2,''],[4,''],[6,''],[40,0],[41,0],[42,0],[43,0],[44,w],[45,height],[46,0],[47,0],[48,0],[49,0],[140,0],[141,0],[142,1],[143,1],[70,0],[72,s.paperUnits??1],[73,s.rotation??0],[74,5],[7,''],[75,16],[76,0],[77,0],[78,300],[147,1],[148,0],[149,0],[100,'AcDbLayout'],[1,name],[70,1],[71,i],[10,0],[20,0],[11,w],[21,height],[12,0],[22,0],[32,0],[14,0],[24,0],[34,0],[15,w],[25,height],[35,0],[146,0],[13,0],[23,0],[33,0],[16,1],[26,0],[36,0],[17,0],[27,1],[37,0],[76,0],[330,handle(record)]]);
+    }
+    if(includeMetadata) {
+        const h=next(),value=JSON.stringify({parameters:doc.parameters,constraints:doc.constraints,metadata:doc.metadata}).replace(/[\u007f-\uffff]/g,c=>'\\u'+c.charCodeAt(0).toString(16).padStart(4,'0'));
+        rootRecord.push([3,'CONDUITCAD_METADATA'],[350,h]);
+        const r=[[0,'XRECORD'],[5,h],[330,root],[100,'AcDbXrecord'],[280,1]];
+        for(let i=0;i<value.length;i+=200)r.push([1,value.slice(i,i+200)]);objects.push(r);
+    }
+    for(const t of tableMap.values()) {
+        set(t.header,70,t.records.length);
+        const h=handle(t.header);for(const r of t.records)set(r,330,h);
+    }
+    const header=sections.HEADER||[];
+    const headerSet=(name,c,value)=>{const i=header.findIndex(p=>p[0]===9&&p[1]===name);if(i<0)header.push([9,name],[c,value]);else header[i+1]=[c,value];};
+    headerSet('$HANDSEED',5,seed.toString(16).toUpperCase());headerSet('$DWGCODEPAGE',3,'ANSI_1252');headerSet('$CLAYER',8,'0');headerSet('$TILEMODE',70,1);
+    const out=[];
+    const section=(name,content)=>{out.push([0,'SECTION'],[2,name]);for(const p of content)out.push(p);out.push([0,'ENDSEC']);};
+    section('HEADER',header);
+    section('TABLES',[...tableMap.values()].flatMap(t=>[...t.header,...t.records.flat(),[0,'ENDTAB']]));
+    section('BLOCKS',[...definitions.values()].flatMap(b=>[...b.begin,...b.entities.flat(),...(b.end||[])]));
+    section('ENTITIES',modelEntities.flat());section('OBJECTS',objects.flat());out.push([0,'EOF']);
+    return writeAsciiTags(out,{version});
+}
+
+return {completeDXFStructure};
+})();
+// packages/dxf/src/preservation.js
+__modules["packages/dxf/src/preservation.js"]=(()=>{
+const {splitSections, splitRecords, writeAsciiTags} = __modules["packages/dxf/src/codec.js"];
+const {graphicalTags} = __modules["packages/dxf/src/interop.js"];
+const copy = v => JSON.parse(JSON.stringify(v));
+const key = h => String(h??'').toUpperCase();
+const get=(r,c,d)=>r.find(p=>p[0]===c)?.[1]??d;
+const stable = value => {
+    if(Array.isArray(value))return value.map(stable);
+    if(value && typeof value==='object')return Object.fromEntries(Object.keys(value).sort().filter(k=>value[k]!==undefined).map(k=>[k,stable(value[k])]));
+    return value;
+};
+const same=(a,b)=>JSON.stringify(stable(a))===JSON.stringify(stable(b));
+const cleanEntity=e=>Object.fromEntries(Object.entries(e).filter(([k])=>!['_dxf','dirty'].includes(k)));
+const state=doc=>({units:doc.units,insunits:doc.insunits,parameters:doc.parameters,constraints:doc.constraints,metadata:doc.metadata,layers:doc.layers,blocks:doc.blocks,linetypes:doc.linetypes,linetypeScale:doc.linetypeScale,signedLinetypes:doc.signedLinetypes,textStyles:doc.textStyles,dimstyles:doc.dimstyles,layouts:doc.layouts,layoutSettings:doc.layoutSettings,rawSections:doc.rawSections,source:doc.source});
+/** Capture an immutable-by-convention, serializable source database and semantic baseline.
+ * The original input remains a separate exact-byte export path. */
+function capturePreservation(doc,pairs) {
+    if(!pairs)throw new Error('Source tags required for DXF preservation');
+    doc._dxfPreservation={pairs:copy(pairs),state:copy(state(doc)),entities:doc.entities.map(e=>({id:e.id,handle:e._dxf?.handle,raw:copy(e._dxf?.raw||[]),value:copy(cleanEntity(e))}))};
+}
+function inspectDXFGraph(doc) {
+    const source=doc._dxfPreservation?.pairs;
+    if(!source)return {nodes:[],diagnostics:[]};
+    const nodes=[],diagnostics=[],handles=new Set();
+    for(const [section,pairs]of Object.entries(splitSections(source)))for(const tags of splitRecords(pairs)) {
+        const type=get(tags,0);if(!type)continue;
+        const identity=get(tags,type==='DIMSTYLE'?105:5);if(!identity)continue;
+        const h=key(identity);
+        if(!/^[0-9A-F]{1,16}$/.test(h))diagnostics.push({severity:'error',message:`Invalid handle ${h}`});
+        if(handles.has(h))diagnostics.push({severity:'error',message:`Duplicate handle ${h}`});handles.add(h);
+        const references=[];
+        for(let i=0;i<tags.length;i++) {
+            const [code,v]=tags[i];
+            if((code>=320&&code<=369)||(code>=390&&code<=399)||code===480||code===481||code===1005)if(key(v)!=='0')references.push({code,target:key(v),index:i});
+        }
+        nodes.push({handle:h,type,section,references,tags:copy(tags)});
+    }
+    for(const node of nodes)for(const r of node.references)if(!handles.has(r.target))diagnostics.push({severity:'warning',code:r.code,message:`${node.handle} references missing handle ${r.target}`});
+    return {nodes,diagnostics};
+}
+const EDITS = {
+    LINE:{a:10,b:11},CIRCLE:{c:10,r:40},ARC:{c:10,r:40,start:50,end:51},
+    POINT:{p:10},TEXT:{p:10,alignPoint:11,text:1,height:40,rotation:50,widthFactor:41,oblique:51},
+    MTEXT:{p:10,height:40,mtextWidth:41}
+};
+/** Safe edits are deliberately a whitelist. Unknown dependency semantics never get guessed. */
+function writePreservedDXF(doc,{version=doc.importVersion}={}) {
+    const saved=doc._dxfPreservation;
+    if(!saved)throw new Error('This document has no preserved DXF source');
+    if(version!==doc.importVersion)throw new Error('Record-preserving export requires the original DXF version');
+    if(!same(state(doc),saved.state))throw new Error('Record-preserving export cannot merge changed tables, blocks, metadata, layouts or source sections');
+    if(doc.entities.length!==saved.entities.length)throw new Error('Record-preserving export rejects added or deleted entities');
+    const graph=inspectDXFGraph(doc);
+    if(graph.diagnostics.some(d=>d.severity==='error'))throw new Error('Source object graph contains invalid or duplicate handles');
+    const incoming=new Set(graph.nodes.flatMap(n=>n.references.map(r=>r.target)));
+    const replacements=new Map();
+    for(let i=0;i<doc.entities.length;i++) {
+        const e=doc.entities[i],before=saved.entities[i],after=cleanEntity(e);
+        if(e.id!==before.id||key(e._dxf?.handle)!==key(before.handle)||!same(e._dxf?.raw||[],before.raw))throw new Error('Record-preserving export rejects changed entity order, identity or raw records');
+        if(same(after,before.value))continue;
+        if(!before.handle || incoming.has(key(before.handle)))throw new Error('Entity has incoming references; dependency-sensitive edits require a native evaluator');
+        if(before.raw.some(([c])=>c===102||c>=1000))throw new Error('Extended entity semantics make this edit unsafe to merge');
+        const fields=EDITS[e.type];if(!fields)throw new Error(`Record-preserving edits are not implemented for ${e.type}`);
+        const changed=[...new Set([...Object.keys(after),...Object.keys(before.value)])].filter(k=>!same(after[k],before.value[k]));
+        if(changed.some(k=>!(k in fields)))throw new Error(`Unmapped record-preserving edit: ${changed.filter(k=>!(k in fields)).join(', ')}`);
+        const raw=copy(before.raw), scope=graphicalTags(raw);
+        const set=(code,v)=>{const positions=[];for(let j=0;j<raw.length;j++)if(raw[j][0]===code)positions.push(j);if(positions.length>1)throw new Error(`Ambiguous source field ${code}`);if(positions.length)raw[positions[0]]=[code,v];else {const last=raw.findIndex(p=>p[0]>=1000);raw.splice(last<0?raw.length:last,0,[code,v]);}};
+        for(const name of changed) {
+            const c=fields[name],value=after[name];
+            if(value===undefined)throw new Error('Removing a native field is not a safe preserving edit');
+            if(typeof value==='object') {
+                if(!value||!Number.isFinite(value.x)||!Number.isFinite(value.y)||!Number.isFinite(value.z??0))throw new Error('Invalid preserved point');
+                set(c,value.x);set(c+10,value.y);if(scope.some(p=>p[0]===c+20)||(value.z??0)!==0)set(c+20,value.z??0);
+            } else {if(['r','height','widthFactor'].includes(name)&&!(value>0))throw new Error('Invalid preserved size');set(c,['start','end'].includes(name)?value*180/Math.PI:value);}
+        }
+        replacements.set(key(before.handle),raw);
+    }
+    const records=splitRecords(saved.pairs);
+    const result=records.flatMap(r=>replacements.get(key(get(r,5)))||r);
+    return writeAsciiTags(result,{version});
+}
+
+return {capturePreservation,inspectDXFGraph,writePreservedDXF};
+})();
 // packages/dxf/src/fidelity.js
 __modules["packages/dxf/src/fidelity.js"]=(()=>{
 /** DXF entity fidelity helpers. Native values remain native: OCS coordinates,
@@ -650,8 +1144,53 @@ function layoutCadText(t, measure) {
 
 return {ocsTransform,ellipseEdgePoints,hatchContours,inPolygon,hatchRegionContours,hatchPatternSegments,widePolylineContours,signedDashPattern,cadTextRuns,layoutCadText};
 })();
+// packages/model/src/interop.js
+__modules["packages/model/src/interop.js"]=(()=>{
+const {matrix, compose, bounds, splinePoints} = __modules["packages/geometry/src/index.js"];
+const {inPolygon} = __modules["packages/model/src/fidelity.js"];
+/** Top-view WCS -> paper DCS. Twist is applied before the DCS center offset. */
+function viewportTransform(e) {
+    const d=e.viewDirection||{x:0,y:0,z:1};
+    if((e.viewportFlags&7)||Math.abs(d.x)>1e-9||Math.abs(d.y)>1e-9||d.z<=0) return null;
+    const s=e.viewportHeight/e.viewHeight;
+    if(!(s>0)||!Number.isFinite(s))return null;
+    const c=e.viewCenter||{x:0,y:0},target=e.viewTarget||{x:0,y:0};
+    return compose(matrix({x:e.c.x-c.x*s,y:e.c.y-c.y*s}),compose(matrix({sx:s,sy:s,rotation:e.viewTwist||0}),matrix({x:-target.x,y:-target.y})));
+}
+function viewportRectangle(e) {
+    const {x,y}=e.c,w=e.viewportWidth/2,h=e.viewportHeight/2;
+    return [{x:x-w,y:y-h},{x:x+w,y:y-h},{x:x+w,y:y+h},{x:x-w,y:y+h}];
+}
+function insideClips(p,clips) {
+    return !clips || clips.every(polygon=>inPolygon(p,polygon));
+}
+function wipeoutPoints(e) {
+    let vertices=e.boundary||[];
+    if(e.boundaryType===1&&vertices.length===2) {
+        const [a,b]=vertices;vertices=[a,{x:b.x,y:a.y},b,{x:a.x,y:b.y}];
+    }
+    const p=e.p,u=e.uPixel,v=e.vPixel,height=e.imageSize?.y??1;
+    return vertices.map(q=>({x:p.x+u.x*(q.x+.5)+v.x*(height-q.y-.5),y:p.y+u.y*(q.x+.5)+v.y*(height-q.y-.5)}));
+}
+function helixPoints(e,tolerance=.25) {
+    const spline=e.helixSpline;
+    if(spline?.controlPoints?.length && spline.knots?.length)return splinePoints(spline,tolerance);
+    const a=e.axis||{x:0,y:0,z:1},l=Math.hypot(a.x,a.y,a.z);if(!l)return [];
+    const n={x:a.x/l,y:a.y/l,z:a.z/l},b=e.axisBase,s=e.startPoint;
+    if(!b||!s||!(e.radius>0)||!Number.isFinite(e.turns)||!Number.isFinite(e.turnHeight))return [];
+    const v={x:s.x-b.x,y:s.y-b.y,z:(s.z||0)-(b.z||0)},dot=v.x*n.x+v.y*n.y+v.z*n.z;
+    const radial={x:v.x-dot*n.x,y:v.y-dot*n.y,z:v.z-dot*n.z},r=Math.hypot(radial.x,radial.y,radial.z);if(!r)return [];
+    const u={x:radial.x/r*e.radius,y:radial.y/r*e.radius,z:radial.z/r*e.radius};
+    const w={x:n.y*u.z-n.z*u.y,y:n.z*u.x-n.x*u.z,z:n.x*u.y-n.y*u.x};
+    const steps=Math.min(8192,Math.max(16,Math.ceil(Math.abs(e.turns)*Math.PI*2*Math.sqrt(e.radius/Math.max(tolerance,1e-8))))),sign=e.handedness===false?-1:1;
+    return Array.from({length:steps+1},(_,i)=>{const f=i/steps,theta=sign*f*e.turns*Math.PI*2,z=f*e.turns*e.turnHeight;return {x:s.x-u.x+u.x*Math.cos(theta)+w.x*Math.sin(theta)+n.x*z,y:s.y-u.y+u.y*Math.cos(theta)+w.y*Math.sin(theta)+n.y*z,z:(s.z||0)-u.z+u.z*Math.cos(theta)+w.z*Math.sin(theta)+n.z*z};});
+}
+
+return {viewportTransform,viewportRectangle,insideClips,wipeoutPoints,helixPoints};
+})();
 // packages/model/src/index.js
 __modules["packages/model/src/index.js"]=(()=>{
+const {viewportTransform, viewportRectangle, wipeoutPoints, helixPoints} = __modules["packages/model/src/interop.js"];
 const {ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText} = __modules["packages/model/src/fidelity.js"];
 const {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules["packages/geometry/src/index.js"];
 function textLayout(text, measure) { return layoutCadText(text, measure); }
@@ -723,6 +1262,42 @@ function entityGeometry(e, doc, options = {}) {
             lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });
     };
     switch (e.type) {
+        case 'MESH': {
+            const edges=new Set();
+            const edge=(a,b)=>{const id=a<b?a+':'+b:b+':'+a;if(edges.has(id))return;edges.add(id);if(e.points?.[a]&&e.points?.[b])path([e.points[a],e.points[b]]);};
+            for(const face of e.faces||[])for(let i=0;i<face.length;i++)edge(face[i],face[(i+1)%face.length]);
+            for(const [a,b] of e.edges||[])edge(a,b);
+            break;
+        }
+        case 'HELIX': path(helixPoints(e,curveTolerance)); break;
+        case 'WIPEOUT': path(wipeoutPoints(e),true,'#fbfcfb',{stroke:false}); break;
+        case 'VIEWPORT': {
+            if(e.viewportId===1)break;
+            const rectangle=viewportRectangle(e);
+            path(rectangle,true);
+            if(e.viewportStatus===0||(e.viewportFlags&131072))break;
+            const projection=viewportTransform(e);
+            if(!projection){warnings.push({severity:'warning',type:'VIEWPORT',message:'Only top-view orthographic viewport contents can be rendered.'});break;}
+            let clip=rectangle;
+            if(e.clipHandle) {
+                const boundary=doc.entities.find(q=>String(q._dxf?.handle||'').toUpperCase()===String(e.clipHandle).toUpperCase());
+                const candidate=boundary && boundary.type!=='VIEWPORT' ? entityGeometry(boundary,doc,{tolerance:curveTolerance,depth:depth+1}).paths.find(p=>p.closed):null;
+                if(!candidate){warnings.push({severity:'warning',type:'VIEWPORT',message:'Unresolved or unsupported viewport clipping boundary; content is not drawn.'});break;}
+                clip=candidate.points;
+            }
+            const worldClip=clip.map(p=>transform(p,m)), rectangularClip=rectangle.map(p=>transform(p,m));
+            const frozen=new Set((e.frozenLayers||[]).map(n=>n.toUpperCase()));
+            const model={...doc,activeLayout:'Model',layers:doc.layers.map(l=>frozen.has(l.name.toUpperCase())?{...l,visible:false}:l)};
+            for(const child of doc.entities) {
+                if(child.type==='VIEWPORT'||!isVisible(child,model))continue;
+                const g=entityGeometry(child,model,{matrix:compose(m,projection),tolerance,depth:depth+1});
+                warnings.push(...(g.warnings||[]));
+                const clips=[rectangularClip,worldClip];
+                for(const p of g.paths)paths.push({...p,clips:[...(p.clips||[]),...clips],entityId:e.id});
+                for(const t of g.texts)texts.push({...t,clips:[...(t.clips||[]),...clips],entityId:e.id});
+            }
+            break;
+        }
         case 'LINE':
             path([e.a, e.b]);
             break;
@@ -830,7 +1405,7 @@ function entityGeometry(e, doc, options = {}) {
         }
         case 'DIMENSION': {
             if (e.block && doc.blocks[e.block]) {
-                const g = entityGeometry({ ...e, type: 'INSERT', x: 0, y: 0 }, doc, { ...options, depth: depth + 1 });
+                const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
                 for (const p of g.paths)
                     paths.push(p);
                 for (const t of g.texts)
@@ -912,6 +1487,7 @@ function entityGeometry(e, doc, options = {}) {
     return warnings.length ? { paths, texts, warnings } : { paths, texts };
 }
 function entityBounds(e, doc) {
+    if(e.type==='VIEWPORT')return e.viewportId===1?emptyBounds():bounds(viewportRectangle(e));
     if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
     const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
     for (const t of g.texts) {
@@ -937,6 +1513,8 @@ function ports(e, doc) {
     return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
 }
 function moveEntity(e, dx, dy) {
+    if(e.type==='VIEWPORT'&&e.clipHandle)throw new Error('Moving a clipped viewport requires moving its boundary in the same transaction; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.block)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
     const worldDX = dx, worldDY = dy;
     if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
         const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
@@ -949,7 +1527,7 @@ function moveEntity(e, dx, dy) {
             p.y += dy;
         }
     };
-    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint', 'axisBase', 'startPoint', 'definitionPoint', 'textMidpoint', 'dimensionInsert', 'defpoint4', 'defpoint5'])
         mv(e[key]);
     for (const key of ['points', 'controlPoints', 'fitPoints'])
         for (const p of e[key] || [])
@@ -962,6 +1540,7 @@ function moveEntity(e, dx, dy) {
         for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);
     }
     for (const definition of e.patternLines || []) mv(definition.base);
+    if(e.type==='HELIX')for(const key of ['controlPoints','fitPoints'])for(const p of e.helixSpline?.[key]||[])mv(p);
     if (e.type === 'INSERT') {
         e.x += dx;
         e.y += dy;
@@ -971,6 +1550,7 @@ function moveEntity(e, dx, dy) {
     e.dirty = true;
 }
 function transformEntity(e, m) {
+    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
     const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
     if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
     if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
@@ -1029,7 +1609,7 @@ function transformEntity(e, m) {
         e.rotation = (e.rotation || 0) + rot;
     e.dirty = true;
 }
-function explodeEntity(e, doc) { const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
+function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
 function detachReferences(doc, deleted) {
     for (const e of doc.entities) {
         const c = e.connector;
@@ -1046,14 +1626,13 @@ return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDo
 })();
 // packages/dxf/src/index.js
 __modules["packages/dxf/src/index.js"]=(()=>{
+const {readAsciiTags, readBinaryTags, writeBinaryTags, splitSections, decodeCodePage, decodeTextEscapes} = __modules["packages/dxf/src/codec.js"];
+const {readInteropEntity, writeInteropEntity, readDocumentInterop, graphicalTags} = __modules["packages/dxf/src/interop.js"];
+const {completeDXFStructure} = __modules["packages/dxf/src/structure.js"];
+const {capturePreservation, writePreservedDXF, inspectDXFGraph} = __modules["packages/dxf/src/preservation.js"];
 const {readEntityFidelity, writeHatchData} = __modules["packages/dxf/src/fidelity.js"];
 const {createDocument, entity, uid, cleanText, clone, entityGeometry} = __modules["packages/model/src/index.js"];
 const {TAU, arcPoints} = __modules["packages/geometry/src/index.js"];
-const NUMBER_CODES = c => (c >= 10 && c <= 59) || (c >= 110 && c <= 149) || (c >= 210 && c <= 239) || (c >= 460 && c <= 469) || (c >= 1010 && c <= 1059);
-const INT16_CODES = c => (c >= 60 && c <= 79) || (c >= 170 && c <= 179) || (c >= 270 && c <= 289) || (c >= 370 && c <= 389) || (c >= 400 && c <= 409) || (c >= 1060 && c <= 1070);
-const INT32_CODES = c => (c >= 90 && c <= 99) || (c >= 420 && c <= 429) || (c >= 440 && c <= 459) || c === 1071;
-const INT64_CODES = c => c >= 160 && c <= 169;
-const BINARY_CODES = c => (c >= 310 && c <= 319) || c === 1004;
 // Default ACI modelspace palette, verified against ezdxf 1.4.4.
 // ACI 7 follows this application's light canvas. Palette data attribution: THIRD_PARTY_NOTICES.md.
 const ACI_PALETTE = [0, 16711680, 16776960, 65280, 65535, 255, 16711935, 16777215, 8421504, 12632256, 16711680, 16744319, 10813440, 10834514, 8323072, 8339263, 4980736, 4990502, 2490368, 2495251, 16727808, 16752511, 10823936, 10839890, 8331008, 8343359, 4985600, 4992806, 2492672, 2496275, 16744192, 16760703, 10834432, 10845266, 8339200, 8347455, 4990464, 4995366, 2495232, 2497555, 16760576, 16768895, 10845184, 10850642, 8347392, 8351551, 4995328, 4997670, 2497536, 2498835, 16776960, 16777087, 10855680, 10855762, 8355584, 8355647, 5000192, 5000230, 2500096, 2500115, 12582656, 14679935, 8168704, 9545042, 6258432, 7307071, 3755008, 4344870, 1844736, 2172435, 8388352, 12582783, 5416192, 8168786, 4161280, 6258495, 2509824, 3755046, 1254912, 1844755, 4194048, 10485631, 2729216, 6792530, 2064128, 5209919, 1264640, 3099686, 599552, 1517075, 65280, 8388479, 42240, 5416274, 32512, 4161343, 19456, 2509862, 9728, 1254931, 65343, 8388511, 42281, 5416295, 32543, 4161359, 19475, 2509871, 9737, 1267735, 65407, 8388543, 42322, 5416316, 32575, 4161375, 19494, 2509881, 9747, 1267740, 65471, 8388575, 42364, 5416337, 32607, 4161391, 19513, 2509890, 9756, 1267800, 65535, 8388607, 42405, 5416357, 32639, 4161407, 19532, 2509900, 9766, 1267800, 49151, 8380415, 31909, 5411237, 24447, 4157311, 14668, 2507390, 7206, 1267800, 32767, 8372223, 21157, 5405861, 16255, 4153215, 9804, 2505086, 4902, 1252440, 16383, 8364031, 10661, 5400485, 8063, 4149119, 4940, 2502526, 2342, 1251160, 255, 8355839, 165, 5395109, 127, 4145023, 76, 2500222, 38, 1250136, 4129023, 10452991, 2687141, 6771365, 2031743, 5193599, 1245260, 3090046, 589862, 1512280, 8323327, 12550143, 5374117, 8147621, 4128895, 6242175, 2490444, 3745406, 1245222, 1839960, 12517631, 14647295, 8126629, 9523877, 6226047, 7290751, 3735628, 4335180, 1835046, 5772120, 16711935, 16744447, 10813605, 10834597, 8323199, 8339327, 4980812, 4990540, 2490406, 5772120, 16711871, 16744415, 10813564, 10834577, 8323167, 8339311, 4980793, 4990530, 2490396, 5772120, 16711807, 16744383, 10813522, 10834556, 8323135, 8339295, 4980774, 4990521, 2490387, 5772060, 16711743, 16744351, 10813481, 10834535, 8323103, 8339279, 4980755, 4990511, 2490377, 5772055, 0, 6645093, 6710886, 10066329, 13421772, 16777215];
@@ -1063,106 +1642,14 @@ function aciColor(index) {
         return '#000000';
     return '#' + (ACI_PALETTE[index] ?? 0).toString(16).padStart(6, '0');
 }
-function parseAsciiPairs(source, { maxPairs = 8000000 } = {}) {
-    const lines = source.replace(/^\uFEFF/, '').split(/\r\n|\n|\r/), pairs = [];
-    for (let i = 0; i + 1 < lines.length; i += 2) {
-        if (pairs.length >= maxPairs)
-            throw new Error('DXF group-code safety limit exceeded');
-        const code = Number(lines[i].trim());
-        if (!Number.isInteger(code) || code < 0 || code > 1071)
-            throw new Error(`Invalid DXF group code at line ${i + 1}`);
-        const raw = lines[i + 1], value = INT64_CODES(code) ? raw.trim() : (NUMBER_CODES(code) || INT16_CODES(code) || INT32_CODES(code) || INT64_CODES(code) || (code >= 290 && code <= 299)) ? Number(raw.trim()) : raw;
-        if (INT64_CODES(code) && !/^[-+]?\d+$/.test(value))
-            throw new Error('Invalid DXF int64 value');
-        if (typeof value === 'number' && !Number.isFinite(value))
-            throw new Error(`Invalid DXF numeric value at line ${i + 2}`);
-        pairs.push([code, value]);
-    }
-    if (!pairs.some(([c, v]) => c === 0 && String(v).trim() === 'EOF'))
-        throw new Error('DXF EOF marker missing (file may be truncated)');
-    return pairs;
+function parseAsciiPairs(source, options = {}) { return readAsciiTags(source, options); }
+function parseBinaryPairs(input, options = {}) { return readBinaryTags(input, options); }
+function inspectObjectGraph(doc) { return inspectDXFGraph(doc); }
+function writeDXFBinary(doc, options = {}) {
+    const version=options.version || (options.mode==='preserve' ? doc.importVersion : 'AC1024');
+    return writeBinaryTags(readAsciiTags(writeDXF(doc,{...options,version})),{version});
 }
-function parseBinaryPairs(input, { maxPairs = 8000000 } = {}) {
-    const u = input instanceof Uint8Array ? input : new Uint8Array(input), v = new DataView(u.buffer, u.byteOffset, u.byteLength);
-    let pos = 22;
-    const pairs = []; let decoder = new TextDecoder('windows-1252'), headerKey = ''; 
-    const r12 = u[23] !== 0;
-    const need = n => {
-        if (pos + n > u.length)
-            throw new Error('Truncated binary DXF');
-    };
-    while (pos < u.length) {
-        if (pairs.length >= maxPairs)
-            throw new Error('DXF safety limit exceeded');
-        need(r12 ? 1 : 2);
-        let code;
-        if (r12) {
-            code = u[pos++];
-            if (code === 255) {
-                need(2);
-                code = v.getUint16(pos, true);
-                pos += 2;
-            }
-        }
-        else {
-            code = v.getUint16(pos, true);
-            pos += 2;
-        }
-        let value;
-        if (NUMBER_CODES(code)) {
-            need(8);
-            value = v.getFloat64(pos, true);
-            pos += 8;
-        }
-        else if (INT16_CODES(code)) {
-            need(2);
-            value = v.getInt16(pos, true);
-            pos += 2;
-        }
-        else if (INT32_CODES(code)) {
-            need(4);
-            value = v.getInt32(pos, true);
-            pos += 4;
-        }
-        else if (INT64_CODES(code)) {
-            need(8);
-            const n = v.getBigInt64(pos, true);
-            value = n.toString();
-            pos += 8;
-        }
-        else if (code >= 290 && code <= 299) {
-            need(1);
-            value = u[pos++];
-        }
-        else if (BINARY_CODES(code)) {
-            need(1);
-            const count = u[pos++];
-            need(count);
-            value = Array.from(u.subarray(pos, pos + count), n => n.toString(16).padStart(2, '0')).join('');
-            pos += count;
-        }
-        else {
-            const start = pos;
-            while (pos < u.length && u[pos] !== 0)
-                pos++;
-            need(1);
-            value = decoder.decode(u.subarray(start, pos));
-            pos++;
-        }
-        if (typeof value === 'number' && !Number.isFinite(value))
-            throw new Error('Non-finite binary DXF value');
-        pairs.push([code, value]);
-        if (code === 9) headerKey = value;
-        else if (headerKey === '$ACADVER' && code === 1 && /^AC\d+$/.test(value) && +value.slice(2) >= 1021) decoder = new TextDecoder('utf-8');
-        else if (headerKey === '$DWGCODEPAGE' && code === 3 && decoder.encoding !== 'utf-8') { try { decoder = new TextDecoder(({ ANSI_1250: 'windows-1250', ANSI_1251: 'windows-1251', ANSI_932: 'shift_jis', ANSI_936: 'gbk', ANSI_950: 'big5' })[value] || 'windows-1252'); } catch {} }
-        if (code === 0 && value === 'EOF')
-            break;
-    }
-    if (!pairs.some(([c, v]) => c === 0 && v === 'EOF'))
-        throw new Error('Binary DXF EOF marker missing');
-    return pairs;
-}
-const get = (r, c, d = undefined) => r.find(x => x[0] === c)?.[1] ?? d;
+const get = (r, c, d = undefined) => decodeTextEscapes(r.find(x => x[0] === c)?.[1] ?? d);
 const all = (r, c) => r.filter(x => x[0] === c).map(x => x[1]);
 const pt = (r, c = 10) => ({ x: Number(get(r, c, 0)), y: Number(get(r, c + 10, 0)), z: Number(get(r, c + 20, 0)) });
 const points = (r, c = 10) => {
@@ -1214,8 +1701,9 @@ function metadata(raw) {
         return {};
     }
 }
-function parseEntity(raw, diagnostics, options = {}) {
-    const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw, handle: get(raw, 5) }, dirty: false };
+function parseEntity(original, diagnostics, options = {}) {
+    const raw = graphicalTags(original);
+    const type = String(get(raw, 0, 'UNKNOWN')).trim(), e = { id: get(raw, 5) ? 'dxf-' + get(raw, 5) : uid(), type, layer: String(get(raw, 8, '0')).trim(), layout: get(raw, 410, get(raw, 67, 0) ? 'Layout1' : 'Model'), _dxf: { raw: original, handle: get(raw, 5) }, dirty: false };
     const aci = Number(get(raw, 62, 256)), trueColor = get(raw, 420);
     e.colorIndex = aci; e.colorMode = trueColor === undefined ? 'aci' : 'truecolor';
     if (trueColor !== undefined)
@@ -1226,7 +1714,7 @@ function parseEntity(raw, diagnostics, options = {}) {
         e.color = aciColor(aci);
     e.lineweight = Number(get(raw, 370, -1));
     e.linetype = get(raw, 6, 'BYLAYER');
-    if (get(raw, 60, 0))
+    if (get(raw, 60, 0) || aci < 0)
         e.hidden = true;
     switch (type) {
         case 'LINE':
@@ -1275,7 +1763,7 @@ function parseEntity(raw, diagnostics, options = {}) {
         case 'ATTRIB':
         case 'ATTDEF':
             e.p = pt(raw);
-            e.text = type === 'MTEXT' ? all(raw, 3).join('') + get(raw, 1, '') : get(raw, 1, '');
+            e.text = type === 'MTEXT' ? decodeTextEscapes(all(raw, 3).join('') + (raw.find(p=>p[0]===1)?.[1] ?? '')) : get(raw, 1, '');
             e.height = Number(get(raw, 40, 12));
             e.rotation = Number(get(raw, 50, 0));
             e.align = get(raw, 72, 0) === 1 ? 'center' : get(raw, 72, 0) === 2 ? 'right' : 'left';
@@ -1332,12 +1820,17 @@ function parseEntity(raw, diagnostics, options = {}) {
         case 'LEADER':
         case 'RAY':
         case 'XLINE':
-        case 'SEQEND': break;
+        case 'SEQEND':
+        case 'VIEWPORT':
+        case 'WIPEOUT':
+        case 'MESH':
+        case 'HELIX': break;
         default:
             e.unsupported = true;
             diagnostics.push({ severity: 'warning', type, message: `${type}: retained in original source; no editable display implementation.` });
     }
-    const meta = metadata(raw);
+    readInteropEntity(e, raw);
+    const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
     for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])
@@ -1377,34 +1870,22 @@ function parseDXF(input, options = {}) {
             if (!enc) {
                 const ver = prefix.match(/\$ACADVER\s*\r?\n\s*1\s*\r?\n\s*(AC\d+)/)?.[1];
                 const cp = prefix.match(/ANSI_(\d+)/)?.[1];
-                enc = ver && Number(ver.slice(2)) >= 1021 ? 'utf-8' : cp === '1250' ? 'windows-1250' : cp === '1251' ? 'windows-1251' : cp === '932' ? 'shift_jis' : 'windows-1252';
+                enc = ver && Number(ver.slice(2)) >= 1021 ? 'utf-8' : decodeCodePage('ANSI_' + (cp || '1252'));
             }
-            rawText = new TextDecoder(enc).decode(bytes);
+            rawText = new TextDecoder(enc, {fatal:true}).decode(bytes);
+            source = {format:'ascii',base64:base64(bytes),encoding:enc};
         }
         else
             rawText = String(input);
         pairs = parseAsciiPairs(rawText, options);
-        source = bytes ? { format: 'ascii', base64: base64(bytes) } : { format: 'ascii', text: rawText };
+        source = bytes ? source : { format: 'ascii', text: rawText };
     }
     const doc = createDocument(options.name || 'Imported DXF');
-    doc.layers = []; doc.textStyles = {}; doc.linetypes = { CONTINUOUS: [] }; doc.signedLinetypes = true;
+    doc.blocks = Object.create(null); doc.layers = []; doc.textStyles = Object.create(null); doc.linetypes = Object.assign(Object.create(null), { CONTINUOUS: [] }); doc.signedLinetypes = true;
     doc.source = source;
-    doc.rawSections = {};
+    doc.rawSections = Object.create(null);
     doc.importDiagnostics = [];
-    let section = '', current = [], sections = {};
-    for (let i = 0; i < pairs.length; i++) {
-        const [c, v] = pairs[i];
-        if (c === 0 && v === 'SECTION') {
-            section = String(pairs[++i]?.[1] || '');
-            current = [];
-        }
-        else if (c === 0 && v === 'ENDSEC') {
-            sections[section] = current;
-            section = '';
-        }
-        else if (section)
-            current.push(pairs[i]);
-    }
+    const sections = splitSections(pairs);
     if (!sections.ENTITIES && !sections.BLOCKS)
         throw new Error('DXF contains neither ENTITIES nor BLOCKS sections');
     const header = sections.HEADER || [];
@@ -1468,7 +1949,7 @@ function parseDXF(input, options = {}) {
     for (const raw of records(sections.BLOCKS || [])) {
         const t = get(raw, 0);
         if (t === 'BLOCK') {
-            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], ...metadata(raw) };
+            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol };
             blockRecords = [];
         }
         else if (t === 'ENDBLK') {
@@ -1487,7 +1968,7 @@ function parseDXF(input, options = {}) {
         if (seen.has(e.id))
             e.id = uid();
         seen.add(e.id);
-        if (!doc.layers.some(l => l.name === e.layer))
+        if (!doc.layers.some(l => l.name.toUpperCase() === e.layer.toUpperCase()))
             doc.layers.push({ name: e.layer, color: '#344755', visible: true, locked: false });
         if (!doc.layouts.includes(e.layout))
             doc.layouts.push(e.layout);
@@ -1504,33 +1985,53 @@ function parseDXF(input, options = {}) {
             doc.importDiagnostics.push({ severity: 'warning', message: 'Conduit header metadata could not be decoded.' });
         }
     }
+    readDocumentInterop(doc,sections);
     const unsupported = doc.entities.filter(e => e.unsupported).length;
     doc.importDiagnostics.unshift({ severity: 'info', message: `${doc.entities.length} model/layout entities, ${Object.keys(doc.blocks).length} blocks, ${doc.layers.length} layers; ${unsupported} unsupported entities.` });
     for (const [name, p] of Object.entries(sections))
         if (!['HEADER', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(name))
             doc.rawSections[name] = p;
-    doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; arbitrary objects, dictionaries and ownership graphs are not losslessly rewritten.' });
+    doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; normalized export rebuilds represented objects. Record-preserving export retains foreign graphs but rejects unsafe edits.' });
+    capturePreservation(doc,pairs);
+    return doc;
+}
+function prepareNativeDimensions(document) {
+    const doc={...document,blocks:{...document.blocks},entities:document.entities.slice()};let serial=0;
+    const prepare=e=>{
+        if(e.type!=='DIMENSION' || (e.block&&doc.blocks[e.block]))return e;
+        if(e.dimtype!==undefined&&(e.dimtype&15)!==1)throw new Error('Imported dimension has no graphics block; its type requires a native dimension evaluator');
+        if(!e.a||!e.b)throw new Error('DIMENSION is missing definition points');
+        const dx=e.b.x-e.a.x,dy=e.b.y-e.a.y,length=Math.hypot(dx,dy);if(length<1e-12)throw new Error('Zero-length DIMENSION');
+        const off=e.offset??30,p={x:e.a.x-dy/length*off,y:e.a.y+dx/length*off,z:e.a.z||0};
+        let name;do{name='*DCC'+(++serial);}while(doc.blocks[name]);
+        const g=entityGeometry(e,doc);doc.blocks[name]={name,base:{x:0,y:0},entities:[...g.paths.map(p=>({type:'LWPOLYLINE',points:p.points,closed:p.closed,layer:e.layer,color:p.color})),...g.texts.map(t=>({type:'TEXT',p:t.p,text:t.text,height:t.height,rotation:t.rotation,align:t.align,color:t.color,layer:e.layer}))]};
+        return {...e,block:name,dimtype:33,definitionPoint:p,textMidpoint:g.texts[0]?.p||p};
+    };
+    doc.entities=doc.entities.map(prepare);for(const [name,b]of Object.entries(document.blocks))doc.blocks[name]={...b,entities:(b.entities||[]).map(prepare)};
     return doc;
 }
 function asciiJson(data) { return JSON.stringify(data).replace(/[\u007f-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')); }
 /** Normalized AC1024 / R2010 ASCII DXF. The project format preserves full app semantics. */
-function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
+function writeDXF(doc, options = {}) {
+    const { version = options.mode==='preserve' ? doc.importVersion || 'AC1024' : 'AC1024', includeMetadata = true, mode = 'normalized', strict = false } = options;
+    if(mode === 'preserve')return writePreservedDXF(doc,{version});
+    if(mode !== 'normalized')throw new Error('Unknown DXF export mode');
+    if(strict && exportReport(doc).warnings.length)throw new Error(exportReport(doc).warnings.join(' '));
+    doc = prepareNativeDimensions(doc);
+    for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) {
+        if(e.type==='MESH' && version<'AC1024')throw new Error('MESH requires DXF R2010 or newer');
+        if(e.type==='HELIX' && version<'AC1021')throw new Error('HELIX requires DXF R2007 or newer');
+        if(e.gradient && version<'AC1018')throw new Error('Gradient HATCH requires DXF R2004 or newer');
+    }
     if (!['AC1015', 'AC1018', 'AC1021', 'AC1024', 'AC1027', 'AC1032'].includes(version))
         throw new Error('Supported export versions: R2000–R2018');
     const out = [];
+    // Normalized output allocates new handles; never convert a 64-bit source
+    // handle to Number (incrementing a rounded value can otherwise loop forever).
     let handle = 0x100;
-    const used = new Set();
-    for (const e of doc.entities) {
-        if (e._dxf?.handle) {
-            used.add(e._dxf.handle.toUpperCase());
-            handle = Math.max(handle, parseInt(e._dxf.handle, 16) + 1 || 0x100);
-        }
-    }
-    const next = () => {
-        while (used.has(handle.toString(16).toUpperCase()))
-            handle++;
-        return (handle++).toString(16).toUpperCase();
-    };
+    const next = () => (handle++).toString(16).toUpperCase();
+    const nativeHandles=new WeakMap(), sourceHandles=new Map(), layerHandles=new Map();
+    for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) { const h=next(); nativeHandles.set(e,h);if(e._dxf?.handle)sourceHandles.set(String(e._dxf.handle).toUpperCase(),h); }
     const pair = (c, v) => {
         if (typeof v === 'number' && !Number.isFinite(v))
             throw new Error(`Nonfinite DXF value for code ${c}`);
@@ -1555,7 +2056,9 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(9, '$ACADVER');
     pair(1, version);
     pair(9, '$INSUNITS');
-    pair(70, ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4);
+    const knownUnits = { 0: 'unitless', 1: 'in', 2: 'ft', 4: 'mm', 5: 'cm', 6: 'm' };
+    const unitCode = doc.insunits !== undefined && (knownUnits[doc.insunits] || 'unitless') === doc.units ? doc.insunits : ({ unitless: 0, in: 1, ft: 2, mm: 4, cm: 5, m: 6 })[doc.units] ?? 4;
+    pair(70, unitCode);
     pair(9, '$LTSCALE'); pair(40, doc.linetypeScale || 1);
     pair(9, '$MEASUREMENT');
     pair(70, doc.units === 'in' || doc.units === 'ft' ? 0 : 1);
@@ -1610,7 +2113,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(70, doc.layers.length);
     for (const l of doc.layers) {
         pair(0, 'LAYER');
-        pair(5, next());
+        const layerHandle=next();layerHandles.set(l.name,layerHandle);pair(5, layerHandle);
         pair(100, 'AcDbSymbolTableRecord');
         pair(100, 'AcDbLayerTableRecord');
         pair(2, l.name);
@@ -1627,7 +2130,8 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(5, next());
     pair(330, '0');
     pair(100, 'AcDbSymbolTable');
-    const textStyles = { STANDARD: { font: 'txt', widthFactor: 1 }, ...doc.textStyles };
+    const textStyles = { ...doc.textStyles };
+    if(!Object.keys(textStyles).some(n=>n.toUpperCase()==='STANDARD'))textStyles.STANDARD={font:'txt',widthFactor:1};
     pair(70, Object.keys(textStyles).length);
     for (const [name, style] of Object.entries(textStyles)) {
         pair(0, 'STYLE'); pair(5, next()); pair(100, 'AcDbSymbolTableRecord'); pair(100, 'AcDbTextStyleTableRecord');
@@ -1654,7 +2158,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     pair(330, '0');
     pair(100, 'AcDbSymbolTable');
     pair(70, Object.keys(doc.blocks).length + 2);
-    const blockRecords = {};
+    const blockRecords = Object.create(null);
     for (const name of ['*Model_Space', '*Paper_Space', ...Object.keys(doc.blocks).filter(n => !['*Model_Space', '*Paper_Space'].includes(n))]) {
         blockRecords[name] = next();
         pair(0, 'BLOCK_RECORD');
@@ -1667,7 +2171,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
     end();
     const header = (e, t = e.type, owner) => {
         pair(0, t);
-        const emittedHandle = next(); pair(5, emittedHandle);
+        const emittedHandle = nativeHandles.get(e) || next(); pair(5, emittedHandle);
         if (owner)
             pair(330, owner);
         pair(100, 'AcDbEntity');
@@ -1700,17 +2204,11 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         if (e.unsupported) {
             return;
         } // The original-source download is the lossless preservation path.
-        if (e.type === 'DIMENSION' && !e.block) {
-            const g = entityGeometry(e, doc);
-            for (const p of g.paths)
-                emit({ type: 'LWPOLYLINE', points: p.points, closed: p.closed, layer: e.layer, color: p.color }, owner);
-            for (const t of g.texts)
-                emit({ type: 'TEXT', ...t, layer: e.layer }, owner);
-            return;
-        }
         const type = e.type === 'POLYLINE' && !(e.flags & (8|16|64)) ? 'LWPOLYLINE' : e.type;
         const entityHandle = header(e, type, owner);
-        switch (type) {
+        const native=e.type==='VIEWPORT'?{...e,clipHandle:e.clipHandle?sourceHandles.get(String(e.clipHandle).toUpperCase()):undefined,frozenLayerHandles:(e.frozenLayers||[]).map(n=>layerHandles.get(n)).filter(Boolean)}:e;
+        if(e.type==='VIEWPORT'&&e.clipHandle&&!native.clipHandle)throw new Error('Cannot export unresolved viewport clipping boundary');
+        if (!writeInteropEntity(native, pair, pp)) switch (type) {
             case 'POLYLINE':
                 pair(100,(e.flags&64)?'AcDbPolyFaceMesh':(e.flags&16)?'AcDbPolygonMesh':'AcDb3dPolyline');
                 pair(66,1); pp(10,{x:0,y:0,z:e.elevation || 0}); pair(70,(e.flags || 8)|(e.closed?1:0));
@@ -1764,7 +2262,7 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 break;
             case 'SPLINE':
                 pair(100, 'AcDbSpline');
-                pair(70, (e.closed ? 1 : 0) | (e.weights?.length ? 4 : 0) | 8);
+                pair(70, ((e.splineFlags || 0) & ~5) | (e.closed ? 1 : 0) | (e.weights?.length ? 4 : 0));
                 pair(71, e.degree);
                 pair(72, e.knots.length);
                 pair(73, e.controlPoints.length);
@@ -1806,8 +2304,9 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
                 pair(100, 'AcDbMText'); pp(10, e.p); pair(40, e.height || 12); pair(41, e.mtextWidth || 0);
                 pair(71, e.attachment || (e.align === 'center' ? 2 : e.align === 'right' ? 3 : 1)); pair(7, e.styleName || 'STANDARD');
                 const value = String(e.text || '').replace(/\r?\n/g, '\\P');
-                for (let i = 0; i < value.length - 250; i += 250) pair(3, value.slice(i, i + 250));
-                pair(1, value.slice(Math.max(0, Math.ceil((value.length - 250) / 250)) * 250));
+                const chunks=[];let chunk='',size=0;const encoder=new TextEncoder();
+                for(const char of value){const bytes=Number(version.slice(2))<1021?char.split('').reduce((n,c)=>n+(c.charCodeAt(0)>127?7:1),0):encoder.encode(char).length;if(size+bytes>250){chunks.push(chunk);chunk='';size=0;}chunk+=char;size+=bytes;}
+                chunks.push(chunk);chunks.forEach((v,i)=>pair(i===chunks.length-1?1:3,v));
                 const a = (e.rotation || 0) * Math.PI / 180; pp(11, { x: Math.cos(a), y: Math.sin(a) });
                 pair(73, e.lineSpacingStyle || 1); pair(44, e.lineSpacing || 1);
                 if (e.backgroundFill) { pair(90, e.backgroundFill); pair(45, e.backgroundScale || 1.5); pair(63, 7); if (e.backgroundColor) pair(421, parseInt(e.backgroundColor.slice(1), 16)); }
@@ -1879,13 +2378,14 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         }
         if (type === 'INSERT' && (e.attributes?.length || e.tag)) {
             for (const a of e.attributes || [])
-                emit(a, owner);
+                emit(a, entityHandle);
             if (e.tag) {
                 const block = doc.blocks[e.block], offset = block?.symbol?.labelOffset || 55;
-                emit({ type: 'ATTRIB', p: { x: e.x, y: e.y - Math.abs((e.sy ?? 1) * offset) }, text: e.tag, height: e.tagHeight || 12, align: 'center', attributeTag: 'TAG', layer: e.layer }, owner);
+                emit({ type: 'ATTRIB', p: { x: e.x, y: e.y - Math.abs((e.sy ?? 1) * offset) }, text: e.tag, height: e.tagHeight || 12, align: 'center', attributeTag: 'TAG', layer: e.layer }, entityHandle);
             }
             pair(0, 'SEQEND');
             pair(5, next());
+            pair(330, entityHandle);
             pair(100, 'AcDbEntity');
             pair(8, e.layer || '0');
         }
@@ -1920,11 +2420,19 @@ function writeDXF(doc, { version = 'AC1024', includeMetadata = true } = {}) {
         emit(e, blockRecords[e.layout && e.layout !== 'Model' ? '*Paper_Space' : '*Model_Space']);
     end();
     pair(0, 'EOF');
-    return out.join('\r\n') + '\r\n';
+    return completeDXFStructure(readAsciiTags(out.join('\r\n')+'\r\n'), doc, version, {includeMetadata});
 }
-function exportReport(doc) { const unsupported = doc.entities.filter(e => e.unsupported), hatches = doc.entities.filter(e => e.type === 'HATCH'), dims = doc.entities.filter(e => e.type === 'DIMENSION' && !e.block); return { format: 'ASCII DXF R2010', unsupported: unsupported.map(e => ({ id: e.id, type: e.type })), warnings: [...(unsupported.length ? [`${unsupported.length} unsupported entities omitted from normalized export. Use Original DXF to retain every record.`] : []), ...(hatches.some(e => e.associative) ? ['Hatch boundaries exported natively, but associativity is detached to avoid dangling handles.'] : []), ...(dims.length ? [`${dims.length} authored dimensions exported as visible line/text geometry.`] : []), ...(Object.keys(doc.rawSections || {}).length ? ['Original OBJECTS and other opaque sections are not regenerated.'] : [])], originalAvailable: !!doc.source }; }
+function exportReport(doc) {
+    const entities=[...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])],unsupported=entities.filter(e=>e.unsupported);
+    return {format:'ASCII or binary DXF R2000–R2018',unsupported:unsupported.map(e=>({id:e.id,type:e.type})),warnings:[
+        ...(unsupported.length?[`${unsupported.length} unsupported entities omitted from normalized export (including block contents). Use record-preserving or original DXF export.`]:[]),
+        ...(entities.some(e=>e.type==='HATCH'&&e.associative)?['Hatch associations are detached in normalized export.']:[]),
+        ...(entities.some(e=>e._dxf?.raw?.some(p=>p[0]===1001&&p[1]!=='CONDUITCAD'))?['Foreign application XDATA is retained only by record-preserving export.']:[]),
+        ...(Object.keys(doc.rawSections||{}).length?['Foreign OBJECTS/CLASSES sections are rebuilt, not merged, in normalized export. Record-preserving mode retains original graphs and refuses unsafe changes.']:[])
+    ],originalAvailable:!!doc.source,preservationAvailable:!!doc._dxfPreservation};
+}
 
-return {aciColor,parseAsciiPairs,parseBinaryPairs,parseDXF,writeDXF,exportReport};
+return {aciColor,parseAsciiPairs,parseBinaryPairs,inspectObjectGraph,writeDXFBinary,parseDXF,writeDXF,exportReport};
 })();
 // apps/studio/dxf-worker.js
 __modules["apps/studio/dxf-worker.js"]=(()=>{

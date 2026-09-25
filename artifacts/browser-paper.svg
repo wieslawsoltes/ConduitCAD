@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 -154 128 108"><title>interop-binary</title><rect x="36" y="-154" width="128" height="108" fill="#ffffff"/>
+<path d="M60.000000 -70.000000 L140.000000 -70.000000 L140.000000 -130.000000 L60.000000 -130.000000 Z" fill="none" fill-rule="evenodd" opacity="1" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<defs><clipPath id="cc-clip-1" clipPathUnits="userSpaceOnUse"><path d="M60 -70 L140 -70 L140 -130 L60 -130 Z"/></clipPath></defs><g clip-path="url(#cc-clip-1)">
+<defs><clipPath id="cc-clip-2" clipPathUnits="userSpaceOnUse"><path d="M60 -70 L140 -70 L110 -130 L90 -130 L60 -70 Z"/></clipPath></defs><g clip-path="url(#cc-clip-2)">
+<path d="M0.000000 -120.000000 L200.000000 -120.000000" fill="none" fill-rule="evenodd" opacity="1" stroke="#0000ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+</g>
+<path d="M60.000000 -70.000000 L140.000000 -70.000000 L110.000000 -130.000000 L90.000000 -130.000000 L60.000000 -70.000000 Z" fill="none" fill-rule="evenodd" opacity="1" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

@@ -1,3 +1,69 @@
+# Validation record — Conduit CAD 0.3.0
+
+## Native interchange release checks
+
+- **206 passing Node tests** (164 existing plus 42 new interop/codec/regression
+  tests). Tests include scalar widths/int64s/overflows, malformed source input,
+  legacy/Unicode/binary exchange, all represented native dimension types, inactive
+  paper layouts, handle remapping, viewport transformations/clips, wireframe mesh,
+  native helix data, masks, preserved opaque records and refusal of unsafe edits.
+- **101 integrated browser checks**: 29 existing editing checks, 14 existing
+  fidelity checks, 33 library/mobile checks and **25 new interop checks**. The new
+  suite opens independent ASCII and binary fixtures via real File/Blob workers,
+  switches paper layouts, checks actual pixels inside/outside polygon clips,
+  tests WIPEOUT and frozen layers, validates clipped picking and non-mutating imports, and saves actual
+  desktop/mobile binary downloads for ezdxf readback.
+- **110 independent audit checks** in `tests/audit_interop.py`: native DIMENSION
+  subtype/points/picture records, MESH topology/Z, HELIX spline/analytic data,
+  WIPEOUT boundaries, model/paper ownership and viewport references/frozen layers.
+  Four normalized/preserving × ASCII/binary files plus an authored dimension file
+  reopen with zero ezdxf audit errors or repairs. The independent input is also audited.
+- Existing 37-entity fidelity audit, all 223 symbol masters and 20 starters, and
+  root example audits remain part of CI. Each generated DXF is independently read.
+- Strict TypeScript consumers and clean offline installation/import of all 13
+  version-0.3.0 npm archives are tested. No font files are distributed.
+
+The native fixture is generated independently using ezdxf 1.4.4, including an
+interpolated HELIX spline and unknown dictionary/XRECORD with an exact int64 and
+binary chunk. Its generator and ASCII source file are checked in; tests derive binary variants.
+
+```sh
+node scripts/bootstrap.mjs
+npm test
+npm run catalog
+npm run build
+npm run pack:packages
+node scripts/verify-packages.mjs
+tsc -p tests/tsconfig.json
+python tests/browser_smoke.py
+python tests/browser_workflows.py
+python tests/browser_fidelity.py
+python tests/browser_symbols.py
+python tests/browser_interop.py
+python tests/audit_dxf.py
+python tests/audit_fidelity.py
+python tests/audit_symbol_library.py
+python tests/audit_interop.py
+```
+
+The optional Python validators use `tests/requirements.txt`. Set
+`CHROMIUM_EXECUTABLE` to an installed Chromium or install Playwright Chromium.
+The interop browser suite defaults to the standalone document with a test-only
+memory store; `CONDUIT_TEST_ORIGIN=localhost` serves the production build with
+real origin storage. CI runs the localhost mode. Neither is a storage durability
+qualification. New results are in `artifacts/interop-audit.json`, `browser-interop.json` and
+`ci-unit-tests.log`; old reports keep their historical scope.
+
+These browser tests execute Canvas 2D at desktop and emulated-mobile viewports,
+not physical phone hardware. The test-only memory adapter bypasses persistence
+at the standalone opaque origin. File input and actual downloads are exercised,
+but storage durability, PWA installation and device-specific GPU performance
+are not certified. The native backend probe is separate and is not evidence of
+this release's cross-backend pixel equivalence. A successful ezdxf audit validates
+syntax, fields and ownership for these fixtures, not all AutoCAD/vendor semantics.
+
+---
+
 # Validation record — Conduit CAD 0.2.1
 
 ## Executed engineering-library checks

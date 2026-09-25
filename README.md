@@ -1,6 +1,6 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.2.1.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.3.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar
@@ -13,6 +13,20 @@ or certified engineering-system parity**. Read [the exact compatibility
 boundary](docs/DXF_COMPATIBILITY.md) before importing production drawings.
 
 ![Desktop workbench](artifacts/desktop-canvas.png)
+
+## Native DXF interchange update
+
+Version 0.3.0 adds native DIMENSION subtypes and anonymous graphics generation,
+model/paper-space ownership and layout dictionaries, top-view paper viewports
+with rectangular/polygon clipping and frozen layers, WIPEOUT masking, native
+MESH topology and HELIX spline data, binary export, and conservative record
+preservation. The object inspector retains original unknown class/handle data
+without claiming to execute its vendor semantics.
+
+Opening a DXF or previewing a library symbol no longer injects unused definitions.
+The export dialog separates normalized files, preserved source records, and
+unchanged original bytes. See [DXF compatibility](docs/DXF_COMPATIBILITY.md),
+[interop APIs](docs/API.md) and [executed validation](docs/VALIDATION.md).
 
 ## Run immediately
 

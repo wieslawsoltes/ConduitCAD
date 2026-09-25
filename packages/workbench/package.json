@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/workbench",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Modular Conduit CAD workbench engine",
   "type": "module",
   "main": "./src/index.js",
@@ -29,17 +29,17 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.2.1",
-    "@conduitcad/spatial": "0.2.1",
-    "@conduitcad/model": "0.2.1",
-    "@conduitcad/history": "0.2.1",
-    "@conduitcad/constraints": "0.2.1",
-    "@conduitcad/routing": "0.2.1",
-    "@conduitcad/symbols": "0.2.1",
-    "@conduitcad/dxf": "0.2.1",
-    "@conduitcad/renderer": "0.2.1",
-    "@conduitcad/input": "0.2.1",
-    "@conduitcad/storage": "0.2.1",
-    "@conduitcad/exchange": "0.2.1"
+    "@conduitcad/geometry": "0.3.0",
+    "@conduitcad/spatial": "0.3.0",
+    "@conduitcad/model": "0.3.0",
+    "@conduitcad/history": "0.3.0",
+    "@conduitcad/constraints": "0.3.0",
+    "@conduitcad/routing": "0.3.0",
+    "@conduitcad/symbols": "0.3.0",
+    "@conduitcad/dxf": "0.3.0",
+    "@conduitcad/renderer": "0.3.0",
+    "@conduitcad/input": "0.3.0",
+    "@conduitcad/storage": "0.3.0",
+    "@conduitcad/exchange": "0.3.0"
   }
 }

@@ -4,7 +4,7 @@ import { History } from '@conduitcad/history';
 import { ConstraintSolver, evaluateExpression, resolveParameters } from '@conduitcad/constraints';
 import { routeOrthogonal, routePorts, routeVia, graphFromDocument } from '@conduitcad/routing';
 import { SYMBOLS, LINE_STYLES, CATEGORIES, STANDARD_REFERENCES, DRAWING_TYPES, searchSymbols, symbolUpdates, updateSymbolDefinitions, installSymbols, insertSymbol, createDemo } from '@conduitcad/symbols';
-import { parseDXF, writeDXF, exportReport } from '@conduitcad/dxf';
+import { parseDXF, writeDXF, writeDXFBinary, inspectObjectGraph, exportReport } from '@conduitcad/dxf';
 import { CadRenderer, Camera, drawPath, drawText } from '@conduitcad/renderer';
 import { PointerController } from '@conduitcad/input';
 import { ProjectStore, downloadFile } from '@conduitcad/storage';
@@ -84,7 +84,7 @@ export class Workbench {
             const saved = await this.store.load();
             if (saved?.document) {
                 try {
-                    this.doc = installSymbols(validateDocument(saved.document));
+                    this.doc = validateDocument(saved.document);
                     this.renderer.setDocument(this.doc);
                     this.updateUI();
                     this.toast('Recovered your last drawing from this device.');
@@ -424,6 +424,8 @@ export class Workbench {
         }
     }
     updateFrame(stats) {
+        const layout = this.doc.activeLayout || 'Model';
+        this.$('.view-label').textContent = layout === 'Model' ? 'MODEL SPACE / TOP' : `PAPER SPACE / ${layout}`;
         const badge = this.$('.backend-name');
         if (badge) badge.textContent = this.renderer.orderedComposite ? 'Canvas 2D · fidelity' : stats.backend;
         this.$('.render-badge')?.setAttribute('title', `${stats.compositor || stats.backend}. Stroke engine: ${stats.backend}. ${this.rendererMessage || ''}`);
@@ -692,6 +694,7 @@ export class Workbench {
     onChange(event) {
         const t = event.target;
         try {
+            if(t.id==='dxf-mode'){this.modal.querySelector('#dxf-version').disabled=t.value==='preserve';this.modal.querySelector('#dxf-strict').disabled=t.value==='preserve';return;}
             if (t.id === 'symbol-category') {
                 this.category = t.value; this.librarySearch = ''; this.$('#symbol-search').value = '';
                 this.renderLibrary(); this.$('.library-scroll').scrollTop = 0; return;
@@ -856,6 +859,7 @@ export class Workbench {
             const g = entityGeometry(e, this.doc, { tolerance: .5 / this.camera.scale });
             let d = Infinity;
             for (const path of g.paths) {
+                if(path.clips?.some(polygon=>!filledContains(p,[polygon])))continue;
                 for (const contour of path.contours || [path.points]) {
                     for (let i=1;i<contour.length;i++) d=Math.min(d,distanceToSegment(p,contour[i-1],contour[i]));
                     if (path.closed && contour.length>1) d=Math.min(d,distanceToSegment(p,contour.at(-1),contour[0]));
@@ -988,6 +992,7 @@ export class Workbench {
         // OCS points cannot be exposed as WCS grips. Projected body dragging is handled by moveEntity.
         const n = e.extrusion;
         if (n && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'INSERT', 'HATCH', 'SOLID', 'TRACE'].includes(e.type) && (Math.abs(n.x || 0) > 1e-12 || Math.abs(n.y || 0) > 1e-12 || Math.abs((n.z ?? 1) - 1) > 1e-12)) return [];
+        if(e.type==='DIMENSION'&&e.block)return [];
         if (e.type === 'LINE' || e.type === 'DIMENSION')
             return [{ ...e.a, key: 'a' }, { ...e.b, key: 'b' }];
         if (e.type === 'CIRCLE' || e.type === 'ARC')
@@ -1786,6 +1791,7 @@ export class Workbench {
             }
             this.onClick(e);
         });
+        backdrop.addEventListener('change', e => this.onChange(e));
         backdrop.addEventListener('keydown', e => {
             if (e.key === 'Tab') {
                 const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')], first = focus[0], last = focus.at(-1);
@@ -1842,19 +1848,23 @@ export class Workbench {
         } finally { this.switchingDocument = false; }
     }
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
-    exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>Normalized planar CAD entities, blocks, layers and tags.</small></span></button><button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
+    exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
     async doExport(format) {
         const name = this.basename(), version = this.modal?.querySelector('#dxf-version')?.value || 'AC1024';
         if (format === 'project')
             downloadFile(name + '.conduit.json', JSON.stringify(this.doc, null, 2), 'application/json');
-        else if (format === 'dxf') {
-            const report = exportReport(this.doc);
-            downloadFile(name + '.dxf', writeDXF(this.doc, { version }), 'application/dxf');
-            if (report.warnings.length)
+        else if (format === 'dxf' || format === 'dxf-binary') {
+            const report = exportReport(this.doc),mode=this.modal?.querySelector('#dxf-mode')?.value || 'normalized';
+            const strict=this.modal?.querySelector('#dxf-strict')?.checked || false;
+            const options={version:mode==='preserve'?this.doc.importVersion:version,mode,strict};
+            const data=format==='dxf-binary'?writeDXFBinary(this.doc,options):writeDXF(this.doc,options);
+            downloadFile(name + (format==='dxf-binary'?'-binary':'') + '.dxf',data,'application/dxf');
+            if (report.warnings.length && mode!=='preserve')
                 this.toast('DXF exported with the limitations shown in Export. Keep a project copy.', true);
             else
                 this.toast('DXF drawing exported');
         }
+        else if(format==='dxf-graph')downloadFile(name+'-dxf-graph.json',JSON.stringify(inspectObjectGraph(this.doc),null,2),'application/json');
         else if (format === 'svg')
             downloadFile(name + '.svg', writeSVG(this.doc), 'image/svg+xml');
         else if (format === 'png') {
@@ -1909,7 +1919,7 @@ export class Workbench {
                 throw new Error('Current drawing could not be backed up locally. Export it before replacing it.');
             }
             this.cancelGesture();
-            this.doc = installSymbols(doc);
+            this.doc = doc;
             this.selection.clear();
             this.history.clear();
             this.currentLayer = this.doc.layers.find(l => l.visible && !l.locked)?.name || '0';
@@ -2103,7 +2113,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.2.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, full paper-layout/XCLIP behavior, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.3.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

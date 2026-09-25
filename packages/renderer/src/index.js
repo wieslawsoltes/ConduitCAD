@@ -303,7 +303,7 @@ class CanvasBackend {
     }
     dispose() { }
 }
-export function drawPath(ctx, path, camera, override = {}) {
+function drawPathUnclipped(ctx, path, camera, override = {}) {
     const points = path.points;
     if (path.stroke === false && !override.color) return;
     if (!points.length)
@@ -329,7 +329,7 @@ export function drawPath(ctx, path, camera, override = {}) {
     ctx.globalAlpha = 1;
     ctx.setLineDash([]); ctx.lineDashOffset = 0;
 }
-export function drawFill(ctx, path, camera) {
+function drawFillUnclipped(ctx, path, camera) {
     if (!path.fill) return;
     ctx.save(); ctx.beginPath();
     for (const contour of path.contours || [path.points]) {
@@ -341,7 +341,7 @@ function cadFont(name) {
     const clean = String(name || '').replace(/["'\\;{}]/g, '').replace(/\.(ttf|otf)$/i, '');
     return !clean || /\.shx$|^(txt|standard)$/i.test(clean) ? 'ui-sans-serif, system-ui, sans-serif' : `"${clean}", ui-sans-serif, system-ui, sans-serif`;
 }
-export function drawText(ctx, t, camera) {
+function drawTextUnclipped(ctx, t, camera) {
     const s = camera.screen(t.p), h = t.nominalHeight || t.height;
     if (!(h > 0) || !Number.isFinite(h)) return;
     ctx.save(); ctx.translate(s.x, s.y);
@@ -511,7 +511,7 @@ export class CadRenderer {
             this.stats.entities = this.scene.items.length;
         }
         // Hardware strokes have six dash slots. Preserve long patterns and zero-length ink dots through the ordered fidelity compositor.
-        const ordered = this.scene.paths.some(p => p.fill || p.dash?.length > 6 || p.dash?.some((v, i) => i % 2 === 0 && v === 0)) || this.scene.texts.some(t => t.backgroundFill);
+        const ordered = this.scene.paths.some(p => p.fill || p.clips?.length || p.dash?.length > 6 || p.dash?.some((v, i) => i % 2 === 0 && v === 0)) || this.scene.texts.some(t => t.backgroundFill || t.clips?.length);
         this.orderedComposite = ordered;
         this.canvas.style.visibility = ordered ? 'hidden' : 'visible';
         this.stats.compositor = ordered ? 'Canvas 2D fidelity composite' : this.engine.name;
@@ -628,4 +628,25 @@ export class CadRenderer {
         for (const c of [this.background, this.canvas, this.overlay])
             c.remove();
     }
+}
+
+export function drawPath(ctx, path, camera, override = {}) {
+    withEntityClip(ctx,path,camera,()=>drawPathUnclipped(ctx,path,camera,override));
+}
+
+export function drawFill(ctx, path, camera) {
+    withEntityClip(ctx,path,camera,()=>drawFillUnclipped(ctx,path,camera));
+}
+
+export function drawText(ctx, t, camera) {
+    withEntityClip(ctx,t,camera,()=>drawTextUnclipped(ctx,t,camera));
+}
+
+function withEntityClip(ctx,geometry,camera,draw) {
+    if(!geometry.clips?.length){draw();return;}
+    ctx.save();
+    try {
+        for(const polygon of geometry.clips){ctx.beginPath();polygon.forEach((p,i)=>{const q=camera.screen(p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});ctx.closePath();ctx.clip();}
+        draw();
+    } finally {ctx.restore();}
 }

@@ -1,36 +1,31 @@
 # @conduitcad/dxf
 
-ASCII/binary DXF reading and normalized ASCII writing. Version **0.2.1**, native ESM JavaScript, MIT license.
-
-R12/modern binary group streams, ASCII parsing, common 2D entity semantics, native blocks, Conduit XDATA and original-source preservation. Edited exports are not universal lossless DXF round trips.
-
-## Use
-
-Install this package and its sibling dependencies from the supplied npm archives,
-or run `node scripts/bootstrap.mjs` in the complete workspace. The package name is
-prepared for npm distribution; this release does not claim a registry publication.
+Native DXF reader/writer, binary tag transport, conservative record preservation,
+and source-object graph inspection. Package version 0.3.0; MIT licensed.
 
 ```js
-import { aciColor, parseAsciiPairs, parseBinaryPairs } from '@conduitcad/dxf';
+import {parseDXF,writeDXF,writeDXFBinary,inspectObjectGraph,exportReport} from '@conduitcad/dxf';
+const drawing=parseDXF(inputBytes);
+const report=exportReport(drawing);
+const ascii=writeDXF(drawing,{version:'AC1032'});
+const binary=writeDXFBinary(drawing,{version:'AC1032'});
+const preserved=writeDXF(drawing,{mode:'preserve'});
+const objects=inspectObjectGraph(drawing);
 ```
 
-`src/index.js` contains the implementation and `src/index.d.ts` the TypeScript
-API declarations. Browser-facing components require a browser DOM; the geometry,
-model, history, routing, constraints, symbol, DXF and scene compilation engines
-can also be used in Node.js. There are no external runtime dependencies beyond
-the following sibling packages.
+ASCII and binary R2000–R2018 normalization preserves implemented geometry,
+native dimension subtypes/pictures, supported layer/text/line/dimension tables,
+model/paper-space layout ownership, viewport references, MESH, HELIX and WIPEOUT.
+Input also recognizes the R12 byte-code binary representation. Re-encoding old
+versions preserves their source tags in `mode: 'preserve'`.
 
-**Dependencies:** `@conduitcad/geometry`, `@conduitcad/model`.
+Preserving mode is not a generic database merge or an associative evaluator.
+It rejects changed structural data, dependencies, unknown edits and version
+conversion. It retains arbitrary original object/tag records for unchanged or
+explicitly supported safe edits. `strict: true` makes normalization reject known
+losses reported by `exportReport`. Preserve the native project and original
+input when production interoperability matters.
 
-## Public exports
-
-`aciColor`, `parseAsciiPairs`, `parseBinaryPairs`, `parseDXF`, `writeDXF`, `exportReport`.
-
-## Documentation and validation
-
-The full source workspace contains `docs/API.md` with integration examples,
-`docs/ARCHITECTURE.md`, `docs/DXF_COMPATIBILITY.md`, and `docs/VALIDATION.md`.
-Tests and raw validation reports are included there. These are original reusable
-2D engineering components, not a claim of complete AutoCAD/Visio compatibility.
-
-The ACI palette carries the attribution in `THIRD_PARTY_NOTICES.md`.
+The application has no runtime network/decode service dependency. No font or
+proprietary CAD assets are supplied. See the workspace compatibility matrix,
+native fixture tests and independent ezdxf audit for exact implementation scope.

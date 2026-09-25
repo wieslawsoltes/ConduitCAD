@@ -58,7 +58,12 @@ test('unsupported DXF entity and opaque sections are retained and export is tran
 test('non-default OCS projects an edge-on circle to the top view', () => { const r = parseDXF(dxf('0\nCIRCLE\n10\n0\n20\n0\n40\n4\n210\n0\n220\n1\n230\n0\n')); const g=entityGeometry(r.entities[0],r); assert.ok(g.paths[0].points.every(p=>Math.abs(p.y)<1e-8)); assert.deepEqual(parseDXF(writeDXF(r)).entities[0].extrusion,{x:0,y:1,z:0}); });
 test('old POLYLINE VERTEX and SEQEND import as one path', () => { const r = parseDXF(dxf('0\nPOLYLINE\n70\n1\n0\nVERTEX\n10\n0\n20\n0\n42\n1\n0\nVERTEX\n10\n20\n20\n0\n0\nSEQEND\n')); assert.equal(r.entities.length, 1); assert.equal(r.entities[0].points.length, 2); assert.equal(r.entities[0].closed, true); });
 test('native HATCH export retains loops and pattern definitions', () => { const d=createDocument(); d.entities.push(entity('HATCH',{solid:false,pattern:'USER',loops:[{points:[{x:0,y:0},{x:10,y:0},{x:0,y:10}],closed:true}],patternLines:[{angle:0,base:{x:0,y:0},offset:{x:0,y:2},dashes:[]}]})); const r=parseDXF(writeDXF(d)); assert.equal(r.entities[0].type,'HATCH'); assert.equal(r.entities[0].patternLines.length,1); assert.ok(entityGeometry(r.entities[0],r).paths.length>1); });
-test('authored dimension exports visible geometry with warning', () => { const d = createDocument(); d.entities.push(entity('DIMENSION', { a: { x: 0, y: 0 }, b: { x: 100, y: 0 }, offset: 20 })); assert.ok(exportReport(d).warnings.some(x => x.includes('dimensions'))); const r = parseDXF(writeDXF(d)); assert.ok(r.entities.some(e => e.type === 'TEXT')); assert.ok(r.entities.length > 3); });
+test('authored dimension exports native DIMENSION and a complete graphics block', () => {
+    const d=createDocument();d.entities.push(entity('DIMENSION',{a:{x:0,y:0},b:{x:100,y:0},offset:20}));
+    const r=parseDXF(writeDXF(d));assert.equal(r.entities.length,1);assert.equal(r.entities[0].type,'DIMENSION');
+    assert.equal(r.entities[0].dimtype,33);assert.ok(r.blocks[r.entities[0].block].entities.length>3);
+    assert.ok(entityGeometry(r.entities[0],r).texts.some(t=>t.text==='100.0'));
+});
 test('malformed or truncated ASCII DXF is rejected', () => {
     for (const src of ['not dxf', '0\nLINE\n10\nNaN\n0\nEOF\n', '-1\nTEST\n0\nEOF\n'])
         assert.throws(() => parseDXF(src));

@@ -132,6 +132,10 @@ export interface CadDocument {
         string | number
     ]>>;
     importVersion?: string;
+    insunits?: number;
+    dimstyles?: Record<string, Record<string, number | string>>;
+    layoutSettings?: Record<string, {tabOrder?: number; paperWidth?: number; paperHeight?: number; paperUnits?: number; rotation?: number}>;
+    _dxfPreservation?: unknown;
 }
 export interface RenderStyle {
     color: string;
@@ -140,6 +144,7 @@ export interface RenderStyle {
     opacity: number;
 }
 export interface RenderPath extends RenderStyle {
+    clips?: Point[][];
     points: Point[];
     closed: boolean;
     fill?: string | null;
@@ -235,3 +240,23 @@ export type TextLayoutInput = Partial<RenderText> & {text: string};
 /** Advances returned by measure exclude run width scaling; the layout applies it. */
 export function textLayout(text: TextLayoutInput, measure?: (text: string, height: number, style: TextRunStyle) => number): CadTextLayout;
 export function objectCoordinateTransform(normal?: Point3D, elevation?: number): Matrix2D;
+
+export interface DimensionEntity extends CadEntity {
+    type: 'DIMENSION'; dimtype?: number; dimstyle?: string; block?: string;
+    definitionPoint?: Point3D; textMidpoint?: Point3D; dimensionInsert?: Point3D;
+    a?: Point3D; b?: Point3D; defpoint4?: Point3D; defpoint5?: Point3D;
+    dimensionAngle?: number; measurement?: number;
+}
+export interface ViewportEntity extends CadEntity {
+    type: 'VIEWPORT'; c: Point3D; viewportWidth: number; viewportHeight: number; viewHeight: number;
+    viewportId?: number; viewportStatus?: number; viewportFlags?: number;
+    viewCenter?: Point3D; viewTarget?: Point3D; viewDirection?: Point3D; viewTwist?: number;
+    frozenLayers?: string[]; clipHandle?: string;
+}
+export interface MeshEntity extends CadEntity {
+    type: 'MESH'; points: Point3D[]; faces: number[][]; edges?: [number, number][]; creases?: number[]; subdivision?: number;
+}
+export interface WipeoutEntity extends CadEntity {
+    type: 'WIPEOUT'; p: Point3D; uPixel: Point3D; vPixel: Point3D; imageSize: Point;
+    boundary: Point[]; boundaryType?: 1 | 2; clipping?: boolean;
+}

@@ -225,3 +225,24 @@ foreign CAD applications see normal blocks/primitives, not a proprietary stencil
 escape stubs, keeps endpoint bodies as obstacles, and rejects colliding escape
 stubs. This prevents a return route from passing back through a directional-valve
 body. `routeVia` remains the free-point waypoint router; it does not infer ports.
+
+## Native DXF modes and object inspection (0.3.0)
+
+```js
+import {parseDXF, writeDXF, writeDXFBinary, exportReport, inspectObjectGraph} from '@conduitcad/dxf';
+const doc = parseDXF(await file.arrayBuffer(), {name: file.name});
+const warnings = exportReport(doc); // known normalized-output losses
+const graph = inspectObjectGraph(doc); // original handle graph and raw tags
+const ascii = writeDXF(doc, {version: 'AC1032'});
+const binary = writeDXFBinary(doc, {version: 'AC1032'}); // Uint8Array
+// Preserving mode uses the input version and rejects unsafe modifications.
+const preserved = writeDXFBinary(doc, {mode: 'preserve'});
+// Enforce known-loss refusal when normalizing:
+// writeDXF(doc, {version: 'AC1032', strict: true});
+```
+
+Preserving mode retains original records, not arbitrary edit semantics. Its
+safety checks are part of the API contract and must not be bypassed by a host.
+Native dimension, viewport, mesh, helix and wipeout interfaces are exported by
+`@conduitcad/model`. `RenderPath`/`RenderText` carry `clipPolygons` for use by host
+renderers. A custom renderer must intersect all these clip polygons before paint.

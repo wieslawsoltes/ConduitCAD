@@ -48,3 +48,20 @@ code convention. The reader defaults to wire degrees, supports an explicit known
 producer override, and the writer uses a direction vector. Independent ezdxf
 fixtures verify the chosen exchange behavior. Symbol reference scope and the
 absence of certification are documented separately in SYMBOLS.md.
+
+
+## Native interchange review (0.3.0)
+
+- Autodesk DXF 2026 DIMENSION documentation:
+  https://help.autodesk.com/cloudhelp/2026/ENU/AutoCAD-DXF/files/GUID-239A1BDD-7459-4BB9-8DD7-08EC79BF1EB0.htm
+- Autodesk extended-data code/value rules:
+  https://help.autodesk.com/cloudhelp/2026/ENU/AutoCAD-DXF/files/GUID-A2A628B0-3699-4740-A215-C560E7242F63.htm
+- Independent implementation documentation and fixture producer:
+  https://ezdxf.readthedocs.io/en/stable/dxfinternals/filestructure.html
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/dimension.html
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/viewport.html
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/mesh.html
+  https://ezdxf.readthedocs.io/en/stable/dxfentities/wipeout.html
+
+These references guide the implemented subset. They do not establish universal
+AutoCAD rendering equivalence or proprietary application-object evaluation.

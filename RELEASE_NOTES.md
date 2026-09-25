@@ -1,3 +1,45 @@
+# Conduit CAD 0.3.0 — native DXF interoperability
+
+- Shared bounded ASCII/binary tag codec: explicit scalar types, exact decimal
+  int64s, finite/integer/count guards, binary chunk validation, R12 code widths,
+  second-pass legacy text decoding, Unicode-safe MTEXT chunks and binary output.
+- Native DIMENSION types 0–6 and type flags, definition points, dimension styles
+  and graphics blocks. Authored aligned dimensions export as native DIMENSION
+  records plus generated anonymous pictures, without flattening the entity.
+- Required tables, ownership chains, root/layout dictionaries, multiple paper
+  block records, inactive-layout entity recovery, viewport reference remapping,
+  frozen layers, and a valid HANDSEED. Normalized handle allocation never rounds
+  64-bit source handles to unsafe JavaScript numbers.
+- Orthographic top-view paper viewports, DCS target/center/twist transforms,
+  rectangular and supported closed polygon/curve clipping in Canvas/SVG/PNG.
+  Clipped-away paths are not picked; layout extents do not include hidden model
+  contents. Perspective/tilted/depth-clipped views are diagnosed, not fabricated.
+- Native MESH topology and Z, HELIX analytic fields and spline representation,
+  and WIPEOUT masks with normalized-image boundary conversion. This is wireframe
+  mesh/helix display, not solid modeling or subdivision surface evaluation.
+- Source-record-preserving mode retains arbitrary unknown records, classes,
+  handles, dictionaries, extension data, binary chunks and XDATA. It allows only
+  explicitly mapped unreferenced coordinate/scalar edits and rejects unsupported
+  structural or dependency-sensitive changes. Original-byte export remains separate.
+- File opening/recovery and cancelled library previews no longer install unused
+  symbol definitions. Native dimension block grips are withheld to prevent stale
+  anonymous pictures. Real binary downloads and mobile export controls are tested.
+- All 13 reusable packages, declarations, tests and generated deliverables updated.
+
+Validation: 206 Node tests; 101 integrated browser checks (76 existing + 25 new),
+110 independent native-interchange audit checks plus the existing fidelity and
+symbol/sample audits. New browser checks use real File/Blob workers and saved
+binary downloads, with Canvas 2D pixel tests. They are not physical-device GPU
+benchmarks or an AutoCAD certification. See docs/VALIDATION.md for reproduction.
+
+This release does not claim every DXF feature: full fonts/Bigfont, dynamic-block
+or associative evaluation, ACIS solids, external references/images/underlays,
+all complex entities, XCLIP and complete 3D plotting semantics remain incomplete.
+Gradient tags remain native; gradient preview is still flat-color. Unknown
+semantics can be retained in preserving mode without being edited or rendered.
+
+---
+
 # Conduit CAD 0.2.1 — engineering symbol libraries
 
 223 original masters in eleven categories, up from 64 in three; 21 connection

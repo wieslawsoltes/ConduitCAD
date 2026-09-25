@@ -3,12 +3,20 @@ import { buildScene, Camera, drawPath, drawText, drawFill } from '@conduitcad/re
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
 export function writeSVG(doc, { padding = 24, background = '#ffffff' } = {}) {
     const scene = buildScene(doc, { tolerance: .08 }), b = documentBounds(doc), x = b.minX - padding, y = b.minY - padding, w = b.maxX - b.minX + padding * 2, h = b.maxY - b.minY + padding * 2, parts = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${-y - h} ${w} ${h}"><title>${esc(doc.name)}</title><rect x="${x}" y="${-y - h}" width="${w}" height="${h}" fill="${esc(background)}"/>`];
+    let serial=0;
+    const beginClip=geometry=>{
+        for(const polygon of geometry.clips||[]){const id='cc-clip-'+(++serial),d=polygon.map((p,i)=>`${i?'L':'M'}${p.x} ${-p.y}`).join(' ')+' Z';parts.push(`<defs><clipPath id="${id}" clipPathUnits="userSpaceOnUse"><path d="${d}"/></clipPath></defs><g clip-path="url(#${id})">`);}
+    };
+    const endClip=geometry=>{for(const _ of geometry.clips||[])parts.push('</g>');};
     for (const span of scene.spans.values()) {
         for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) {
+            beginClip(p);
             const d = (p.contours || [p.points]).map(points => points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(6)} ${(-p.y).toFixed(6)}`).join(' ') + (p.closed || p.contours ? ' Z' : '')).join(' ');
             parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" fill-rule="evenodd" opacity="${p.opacity ?? 1}" stroke="${p.stroke === false ? 'none' : esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
+            endClip(p);
         }
         for (const t of scene.texts.slice(span.textStart, span.textStart + span.textCount)) {
+            beginClip(t);
             const angle = (t.rotation || 0) * Math.PI / 180;
             const [a,b,c,d] = t.frame || [Math.cos(angle),Math.sin(angle),-Math.sin(angle),Math.cos(angle)];
             const layout = textLayout(t);
@@ -22,6 +30,7 @@ export function writeSVG(doc, { padding = 24, background = '#ffffff' } = {}) {
                 parts.push(`<text x="${run.x}" y="${run.y}" font-family="${esc(font)}" font-size="${run.height}" fill="${esc(run.color || t.color)}" font-weight="${run.bold ? 'bold' : 'normal'}" font-style="${run.italic ? 'italic' : 'normal'}" textLength="${run.width}" lengthAdjust="spacingAndGlyphs" xml:space="preserve" text-decoration="${[run.underline ? 'underline' : '',run.overline ? 'overline' : '',run.strike ? 'line-through' : ''].filter(Boolean).join(' ') || 'none'}">${esc(run.text)}</text>`);
             }
             parts.push('</g>');
+            endClip(t);
         }
     }
     parts.push('</svg>');

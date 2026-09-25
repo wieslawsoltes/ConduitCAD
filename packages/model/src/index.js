@@ -1,3 +1,4 @@
+import { viewportTransform, viewportRectangle, wipeoutPoints, helixPoints } from './interop.js';
 import { ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText } from './fidelity.js';
 import { matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds } from '@conduitcad/geometry';
 export function textLayout(text, measure) { return layoutCadText(text, measure); }
@@ -69,6 +70,42 @@ export function entityGeometry(e, doc, options = {}) {
             lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });
     };
     switch (e.type) {
+        case 'MESH': {
+            const edges=new Set();
+            const edge=(a,b)=>{const id=a<b?a+':'+b:b+':'+a;if(edges.has(id))return;edges.add(id);if(e.points?.[a]&&e.points?.[b])path([e.points[a],e.points[b]]);};
+            for(const face of e.faces||[])for(let i=0;i<face.length;i++)edge(face[i],face[(i+1)%face.length]);
+            for(const [a,b] of e.edges||[])edge(a,b);
+            break;
+        }
+        case 'HELIX': path(helixPoints(e,curveTolerance)); break;
+        case 'WIPEOUT': path(wipeoutPoints(e),true,'#fbfcfb',{stroke:false}); break;
+        case 'VIEWPORT': {
+            if(e.viewportId===1)break;
+            const rectangle=viewportRectangle(e);
+            path(rectangle,true);
+            if(e.viewportStatus===0||(e.viewportFlags&131072))break;
+            const projection=viewportTransform(e);
+            if(!projection){warnings.push({severity:'warning',type:'VIEWPORT',message:'Only top-view orthographic viewport contents can be rendered.'});break;}
+            let clip=rectangle;
+            if(e.clipHandle) {
+                const boundary=doc.entities.find(q=>String(q._dxf?.handle||'').toUpperCase()===String(e.clipHandle).toUpperCase());
+                const candidate=boundary && boundary.type!=='VIEWPORT' ? entityGeometry(boundary,doc,{tolerance:curveTolerance,depth:depth+1}).paths.find(p=>p.closed):null;
+                if(!candidate){warnings.push({severity:'warning',type:'VIEWPORT',message:'Unresolved or unsupported viewport clipping boundary; content is not drawn.'});break;}
+                clip=candidate.points;
+            }
+            const worldClip=clip.map(p=>transform(p,m)), rectangularClip=rectangle.map(p=>transform(p,m));
+            const frozen=new Set((e.frozenLayers||[]).map(n=>n.toUpperCase()));
+            const model={...doc,activeLayout:'Model',layers:doc.layers.map(l=>frozen.has(l.name.toUpperCase())?{...l,visible:false}:l)};
+            for(const child of doc.entities) {
+                if(child.type==='VIEWPORT'||!isVisible(child,model))continue;
+                const g=entityGeometry(child,model,{matrix:compose(m,projection),tolerance,depth:depth+1});
+                warnings.push(...(g.warnings||[]));
+                const clips=[rectangularClip,worldClip];
+                for(const p of g.paths)paths.push({...p,clips:[...(p.clips||[]),...clips],entityId:e.id});
+                for(const t of g.texts)texts.push({...t,clips:[...(t.clips||[]),...clips],entityId:e.id});
+            }
+            break;
+        }
         case 'LINE':
             path([e.a, e.b]);
             break;
@@ -176,7 +213,7 @@ export function entityGeometry(e, doc, options = {}) {
         }
         case 'DIMENSION': {
             if (e.block && doc.blocks[e.block]) {
-                const g = entityGeometry({ ...e, type: 'INSERT', x: 0, y: 0 }, doc, { ...options, depth: depth + 1 });
+                const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
                 for (const p of g.paths)
                     paths.push(p);
                 for (const t of g.texts)
@@ -258,6 +295,7 @@ export function entityGeometry(e, doc, options = {}) {
     return warnings.length ? { paths, texts, warnings } : { paths, texts };
 }
 export function entityBounds(e, doc) {
+    if(e.type==='VIEWPORT')return e.viewportId===1?emptyBounds():bounds(viewportRectangle(e));
     if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
     const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
     for (const t of g.texts) {
@@ -283,6 +321,8 @@ export function ports(e, doc) {
     return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
 }
 export function moveEntity(e, dx, dy) {
+    if(e.type==='VIEWPORT'&&e.clipHandle)throw new Error('Moving a clipped viewport requires moving its boundary in the same transaction; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.block)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
     const worldDX = dx, worldDY = dy;
     if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
         const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
@@ -295,7 +335,7 @@ export function moveEntity(e, dx, dy) {
             p.y += dy;
         }
     };
-    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint', 'axisBase', 'startPoint', 'definitionPoint', 'textMidpoint', 'dimensionInsert', 'defpoint4', 'defpoint5'])
         mv(e[key]);
     for (const key of ['points', 'controlPoints', 'fitPoints'])
         for (const p of e[key] || [])
@@ -308,6 +348,7 @@ export function moveEntity(e, dx, dy) {
         for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);
     }
     for (const definition of e.patternLines || []) mv(definition.base);
+    if(e.type==='HELIX')for(const key of ['controlPoints','fitPoints'])for(const p of e.helixSpline?.[key]||[])mv(p);
     if (e.type === 'INSERT') {
         e.x += dx;
         e.y += dy;
@@ -317,6 +358,7 @@ export function moveEntity(e, dx, dy) {
     e.dirty = true;
 }
 export function transformEntity(e, m) {
+    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
     const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
     if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
     if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
@@ -375,7 +417,7 @@ export function transformEntity(e, m) {
         e.rotation = (e.rotation || 0) + rot;
     e.dirty = true;
 }
-export function explodeEntity(e, doc) { const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
+export function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
 export function detachReferences(doc, deleted) {
     for (const e of doc.entities) {
         const c = e.connector;

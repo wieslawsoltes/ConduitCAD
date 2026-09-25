@@ -49,3 +49,11 @@ const auditErrors: string[] = auditSymbols().flatMap(r=>r.errors);
 const newer = symbolUpdates(documentModel).map(s=>s.id);
 updateSymbolDefinitions(documentModel,newer);
 void [master?.ports[0]?.medium, CATEGORIES[0].description, STANDARD_REFERENCES['ISO-1219-1'].scope, SYMBOLS[0].symbol.review, templates, auditErrors, createDrawing('water-treatment')];
+
+import {writeDXFBinary, inspectObjectGraph, type DXFWriteOptions, type DXFPair} from '@conduitcad/dxf';
+import type {DimensionEntity, ViewportEntity, MeshEntity, WipeoutEntity} from '@conduitcad/model';
+const preservingOptions: DXFWriteOptions = {mode: 'preserve'};
+const binary: Uint8Array = writeDXFBinary(native, preservingOptions);
+const graphTags: DXFPair[] = inspectObjectGraph(native).nodes.flatMap(node => node.tags);
+const mesh: MeshEntity = {id:'mesh',type:'MESH',layer:'0',points:[{x:0,y:0,z:0},{x:1,y:0,z:0},{x:0,y:1,z:0}],faces:[[0,1,2]]};
+void [binary, graphTags, mesh];
