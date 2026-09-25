@@ -2,6 +2,245 @@ globalThis.__CONDUIT_DXF_WORKER__="'use strict';\n(()=>{\nconst __modules=Object
 'use strict';
 (()=>{
 const __modules=Object.create(null);
+// packages/workspace/src/index.js
+__modules["packages/workspace/src/index.js"]=(()=>{
+/** In-memory CAD sessions. Context belongs to the host; it is never serialized implicitly. */
+class DocumentWorkspace {
+    constructor({ store, key = 'default', capture = session => ({ document: session.document }), beforeSave = () => {}, onChange = () => {}, maxDocuments = 32, debounce = 650 } = {}) {
+        if (!Number.isInteger(maxDocuments) || maxDocuments < 1 || maxDocuments > 128) throw new RangeError('Invalid document limit');
+        if (!Number.isFinite(debounce) || debounce < 0) throw new RangeError('Invalid recovery delay');
+        this.store = store;
+        this.key = key;
+        this.capture = capture;
+        this.beforeSave = beforeSave;
+        this.onChange = onChange;
+        this.maxDocuments = maxDocuments;
+        this.debounce = debounce;
+        this.sessions = [];
+        this.activeId = null;
+        this.sequence = 0;
+        this.queue = Promise.resolve();
+        this.timer = null;
+        this.disposed = false;
+        this.error = null;
+    }
+    get active() { return this.sessions.find(session => session.id === this.activeId) || null; }
+    get dirty() { return this.sessions.some(session => session.revision !== session.savedRevision); }
+    get(id) { return this.sessions.find(session => session.id === id) || null; }
+    add(document, { id, context = {}, saved = false, activate = true } = {}) {
+        if (this.disposed) throw new Error('Workspace is closed');
+        if (this.sessions.length >= this.maxDocuments) throw new Error(`Close a drawing before opening more than ${this.maxDocuments} documents`);
+        if (!document || typeof document !== 'object' || !Array.isArray(document.entities)) throw new TypeError('A CAD document is required');
+        id ||= globalThis.crypto?.randomUUID?.() || `drawing-${Date.now().toString(36)}-${++this.sequence}`;
+        if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,128}$/.test(id) || this.get(id)) throw new Error('Invalid or duplicate document session ID');
+        const session = { id, document, context, revision: 0, savedRevision: saved ? 0 : -1, saving: false, savedAt: null, error: null };
+        this.sessions.push(session);
+        if (activate || !this.activeId) this.activeId = id;
+        this.onChange({ type: 'open', session });
+        return session;
+    }
+    activate(id) {
+        const session = this.get(id);
+        if (!session) throw new Error('Drawing is not open');
+        this.activeId = id;
+        this.onChange({ type: 'activate', session });
+        return session;
+    }
+    markChanged(id = this.activeId) {
+        const session = this.get(id);
+        if (!session) return;
+        session.revision++;
+        session.error = null;
+        this.onChange({ type: 'change', session });
+    }
+    remove(id, { discard = false } = {}) {
+        const index = this.sessions.findIndex(session => session.id === id);
+        if (index < 0) return false;
+        const session = this.sessions[index];
+        if (!discard && session.revision !== session.savedRevision) throw new Error('Save or explicitly discard unsaved changes first');
+        this.sessions.splice(index, 1);
+        if (this.activeId === id) this.activeId = this.sessions[Math.min(index, this.sessions.length - 1)]?.id || null;
+        this.onChange({ type: 'close', session });
+        return true;
+    }
+    move(id, index) {
+        const from = this.sessions.findIndex(session => session.id === id);
+        if (from < 0 || !Number.isInteger(index) || index < 0 || index >= this.sessions.length) throw new RangeError('Invalid tab position');
+        const [session] = this.sessions.splice(from, 1);
+        this.sessions.splice(index, 0, session);
+        this.onChange({ type: 'reorder', session });
+    }
+    schedule() {
+        if (this.disposed) return;
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => { this.timer = null; this.saveAll().catch(() => {}); }, this.debounce);
+    }
+    /** Serialized snapshots + an atomic store transaction prevent late saves from overwriting newer edits. */
+    saveAll() {
+        if (this.disposed) return Promise.reject(new Error('Workspace is closed'));
+        clearTimeout(this.timer);
+        this.timer = null;
+        const operation = this.queue.catch(() => {}).then(async () => {
+            let captured = [];
+            try {
+                this.beforeSave();
+                captured = this.sessions.map(session => ({ session, revision: session.revision, record: { ...this.capture(session), id: session.id } }));
+                // Capture before the first await: callers can continue editing while storage is busy.
+                const records = JSON.parse(JSON.stringify(captured.map(item => item.record)));
+                const manifest = { version: 1, activeId: this.activeId, ids: captured.map(item => item.session.id) };
+                for (const { session } of captured) session.saving = true;
+                this.onChange({ type: 'saving' });
+                if (!this.store?.saveWorkspace) throw new Error('Recovery storage is unavailable');
+                await this.store.saveWorkspace(records, manifest, this.key);
+                const savedAt = new Date().toISOString();
+                this.error = null;
+                for (const { session, revision } of captured) {
+                    session.savedRevision = revision;
+                    session.savedAt = savedAt;
+                    session.error = null;
+                }
+                return manifest;
+            } catch (error) {
+                this.error = error;
+                for (const session of this.sessions) session.error = error;
+                throw error;
+            } finally {
+                for (const { session } of captured) session.saving = false;
+                this.onChange({ type: this.error ? 'error' : 'saved', error: this.error });
+            }
+        });
+        this.queue = operation;
+        return operation;
+    }
+    flush() { return this.saveAll(); }
+    dispose() { clearTimeout(this.timer); this.timer = null; this.disposed = true; }
+}
+
+/** Merge reachable DXF block definitions; names are case-insensitive and never overwritten. */
+function mergeClipboardBlocks(destination, source, entities) {
+    const clone = value => JSON.parse(JSON.stringify(value));
+    const indexNames = definitions => {
+        const index = new Map();
+        for (const name of Object.keys(definitions)) {
+            const folded = name.toUpperCase();
+            if (index.has(folded)) throw new Error('Ambiguous case-insensitive clipboard block names');
+            index.set(folded, name);
+        }
+        return index;
+    };
+    const sourceIndex = indexNames(source), destinationIndex = indexNames(destination);
+    const names = new Map(), visiting = new Set(), result = Object.create(null), allocated = new Set();
+    const resolve = requested => {
+        if (!requested) return requested;
+        const name = sourceIndex.get(requested.toUpperCase());
+        if (!name) return destinationIndex.get(requested.toUpperCase()) || requested;
+        if (visiting.has(name)) throw new Error('Circular clipboard block reference');
+        if (names.has(name)) return names.get(name);
+        visiting.add(name);
+        const block = clone(source[name]);
+        for (const entity of block.entities || []) if (entity.block) entity.block = resolve(entity.block);
+        const existing = destinationIndex.get(name.toUpperCase());
+        let next = existing || name;
+        const equivalent = candidate => JSON.stringify({ ...candidate, name: undefined }) === JSON.stringify({ ...block, name: undefined });
+        if (existing && !equivalent(destination[existing])) {
+            let index = 1;
+            do { next = `${name}_copy${index++}`; }
+            while (destinationIndex.has(next.toUpperCase()) || allocated.has(next.toUpperCase()) || sourceIndex.has(next.toUpperCase()));
+        }
+        names.set(name, next);
+        visiting.delete(name);
+        block.name = next;
+        if (!destinationIndex.has(next.toUpperCase())) {
+            result[next] = block;
+            allocated.add(next.toUpperCase());
+        }
+        return next;
+    };
+    const copied = clone(entities);
+    for (const entity of copied) if (entity.block) entity.block = resolve(entity.block);
+    return { blocks: result, entities: copied, names };
+}
+
+return {DocumentWorkspace,mergeClipboardBlocks};
+})();
+// packages/history/src/index.js
+__modules["packages/history/src/index.js"]=(()=>{
+/** Atomic serializable transactions with bounded undo memory and redo invalidation. */
+class History {
+    constructor({ capture, restore, onChange = () => { }, limit = 80, maxBytes = 32 * 1024 * 1024 }) { this.capture = capture; this.restore = restore; this.onChange = onChange; this.limit = limit; this.maxBytes = maxBytes; this.undoStack = []; this.redoStack = []; this.pending = null; }
+    begin(label = 'Edit') {
+        if (this.pending)
+            return;
+        this.pending = { label, before: JSON.stringify(this.capture()) };
+    }
+    commit() {
+        if (!this.pending)
+            return false;
+        const item = this.pending;
+        this.pending = null;
+        const after = JSON.stringify(this.capture());
+        if (after === item.before)
+            return false;
+        item.after = after;
+        this.undoStack.push(item);
+        this.redoStack = [];
+        let bytes = this.undoStack.reduce((n, x) => n + x.before.length + x.after.length, 0);
+        while (this.undoStack.length > 1 && (this.undoStack.length > this.limit || bytes > this.maxBytes)) {
+            const old = this.undoStack.shift();
+            bytes -= old.before.length + old.after.length;
+        }
+        this.onChange();
+        return true;
+    }
+    cancel() {
+        if (!this.pending)
+            return;
+        const p = this.pending;
+        this.pending = null;
+        this.restore(JSON.parse(p.before));
+        this.onChange();
+    }
+    run(label, action) {
+        this.begin(label);
+        try {
+            const result = action();
+            this.commit();
+            return result;
+        }
+        catch (error) {
+            this.cancel();
+            throw error;
+        }
+    }
+    undo() {
+        if (this.pending)
+            this.cancel();
+        const item = this.undoStack.pop();
+        if (!item)
+            return false;
+        this.restore(JSON.parse(item.before));
+        this.redoStack.push(item);
+        this.onChange();
+        return true;
+    }
+    redo() {
+        if (this.pending)
+            this.cancel();
+        const item = this.redoStack.pop();
+        if (!item)
+            return false;
+        this.restore(JSON.parse(item.after));
+        this.undoStack.push(item);
+        this.onChange();
+        return true;
+    }
+    clear() { this.pending = null; this.undoStack = []; this.redoStack = []; this.onChange(); }
+    get canUndo() { return this.undoStack.length > 0; }
+    get canRedo() { return this.redoStack.length > 0; }
+}
+
+return {History};
+})();
 // packages/geometry/src/index.js
 __modules["packages/geometry/src/index.js"]=(()=>{
 /** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */
@@ -2286,6 +2525,648 @@ function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':
 
 return {icon,escapeHTML};
 })();
+// packages/workbench/src/parametric-workbench.js
+__modules["packages/workbench/src/parametric-workbench.js"]=(()=>{
+const {beginBlockEdit, editedBlockDefinition, updateBlockDefinition, inspectBlockReferences, duplicateBlockDefinition, renameBlockDefinition, evaluateDynamicBlock, clone, entity, uid, entityBounds, isLocked, regenerateDimensions, createBlockDefinition, deleteBlockDefinition, syncInsertAttributes} = __modules["packages/model/src/index.js"];
+const {ConstraintSolver, resolveParameters, describeParameters, reservedParameterNames, constraintAnnotations, constraintMeasurement, evaluateExpression, inferSketchConstraints, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
+const {History} = __modules["packages/history/src/index.js"];
+const {bounds} = __modules["packages/geometry/src/index.js"];
+const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
+const B=(action,label)=>`<button class="btn" data-action="${action}">${label}</button>`;
+const number=n=>Number.isFinite(n)?Number(n.toPrecision(8)).toString():'—';
+const field=(name,label,value,type='input')=>`<label class="field">${E(label)}<${type} data-block-field="${name}" ${type==='input'?`value="${E(value)}"`:''}>${type==='textarea'?E(value):''}</${type}></label>`;
+const readFields=w=>Object.fromEntries([...w.modal.querySelectorAll('[data-block-field]')].map(e=>[e.dataset.blockField,e.value]));
+function cameraState(w){return {x:w.camera.x,y:w.camera.y,scale:w.camera.scale};}
+function restoreHistory(w){return new History({capture:()=>w.doc,restore:d=>{w.doc=d;w.selection=new Set([...w.selection].filter(id=>d.entities.some(e=>e.id===id)));w.renderer.setDocument(d);w.updateUI();},onChange:()=>{w.updateHistory();w.updateUI();w.documentChanged?.();}});}
+function startBlockEditor(w,name){
+    if(w.blockSession)throw new Error('Save or close the current block editor first');
+    const session=beginBlockEdit(w.doc,name);
+    session.parentDocument=w.doc;session.parentHistory=w.history;session.parentSelection=[...w.selection];session.parentCamera=cameraState(w);session.parentLayer=w.currentLayer;session.parentCategory=w.category;
+    w.closeModal();w.setTool('select');w.closePanels();w.blockSession=session;w.doc=session.draft;w.selection.clear();w.lastSolve=null;w.currentLayer='0';w.category='Custom';
+    w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);w.openPanel('inspector');w.scheduleRecovery?.();
+}
+function finishBlockEditor(w,save=false,stay=false,newName=null){
+    const s=w.blockSession;if(!s)throw new Error('The block editor is not open');
+    if(s.testing){endBlockTest(w);if(!save)return;}
+    s.draft=w.doc;let report=null;
+    if(save){
+        const replacement=editedBlockDefinition(s),parent=s.parentDocument;
+        const temporary=clone(parent);
+        for(const [key,definition]of Object.entries(s.draft.blocks))if(!Object.hasOwn(temporary.blocks,key))temporary.blocks[key]=clone(definition);
+        for(const layer of s.draft.layers)if(!temporary.layers.some(l=>l.name===layer.name))temporary.layers.push(clone(layer));
+        let name=s.name,options={expectedSignature:s.signature};
+        if(newName){duplicateBlockDefinition(temporary,name,newName);name=newName;options={};}
+        report=updateBlockDefinition(temporary,name,replacement,options);
+        // Re-evaluate complete nested geometry before publishing a shared definition.
+        for(const id of report.inserts){const insert=temporary.entities.find(e=>e.id===id);entityBounds(insert,temporary);}
+        const scratch=w.doc;w.doc=parent;
+        try{
+            s.parentHistory.run(newName?'Save block as '+newName:'Update block '+s.name,()=>{
+                w.doc=temporary;w.reroute(new Set(report.inserts));regenerateDimensions(w.doc);
+            });
+            s.parentDocument=w.doc;
+        }catch(error){s.parentDocument=w.doc;w.doc=scratch;throw error;}
+        w.doc=scratch;
+        if(stay&&!newName){const again=beginBlockEdit(s.parentDocument,s.name);s.signature=again.signature;w.toast(`Saved block; ${report.updatedInserts} inserts updated`);renderBlockBar(w);return report;}
+    }
+    w.setTool('select');w.doc=s.parentDocument;w.history=s.parentHistory;w.selection=new Set(s.parentSelection);w.currentLayer=s.parentLayer;w.category=s.parentCategory;Object.assign(w.camera,s.parentCamera);w.blockSession=null;w.lastSolve=null;
+    w.$('.block-editor-bar')?.remove();for(const button of w.root.querySelectorAll('.appbar button:disabled'))button.disabled=false;w.renderer.setDocument(w.doc);w.updateUI();w.renderer.resize();w.renderer.invalidate();w.scheduleRecovery?.();
+    if(save)w.toast(`Block saved; ${report.updatedInserts} direct/nested inserts updated`);else w.toast('Block edit cancelled; drawing unchanged');
+    return report;
+}
+function renderBlockBar(w){
+    w.$('.block-editor-bar')?.remove();if(!w.blockSession)return;
+    for(const button of w.root.querySelectorAll('.appbar [data-action="export"]')){button.disabled=true;button.title='Save or close the block editor first';}
+    const bar=document.createElement('nav');bar.className='block-editor-bar';bar.setAttribute('aria-label','Block editor');
+    bar.innerHTML=`<strong>${w.blockSession.testing?'TEST BLOCK':'BLOCK EDITOR'} · ${E(w.blockSession.name)}</strong><div>${w.blockSession.testing?B('block-test-close','Return to editor'):`${B('block-save','Save block')}${B('block-save-close','Save & close')}${B('block-test','Test block')}${B('block-settings','Base / ports / attributes')}${B('block-author','Parameters & actions')}${B('block-close','Discard & close')}`}</div>`;
+    w.$('.workbar').after(bar);w.renderer.resize();
+}
+function testBlock(w){
+    const s=w.blockSession;if(!s||s.testing)throw new Error('Open a block for editing first');s.draft=w.doc;
+    const definition=editedBlockDefinition(s);if(definition.dynamic)evaluateDynamicBlock(definition,{});
+    s.testDraft=w.doc;s.testHistory=w.history;s.testSelection=[...w.selection];s.testCamera=cameraState(w);s.testing=true;
+    w.doc={...clone(w.doc),entities:[entity('INSERT',{block:s.name,x:0,y:0,sx:1,sy:1,layer:'0'})],constraints:[],blockEditing:undefined};w.doc.blocks[s.name]=definition;syncInsertAttributes(w.doc.entities[0],w.doc);w.selection=new Set([w.doc.entities[0].id]);w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);
+}
+function endBlockTest(w){const s=w.blockSession;if(!s?.testing)return;w.doc=s.testDraft;w.history=s.testHistory;w.selection=new Set(s.testSelection);Object.assign(w.camera,s.testCamera);delete s.testing;w.renderer.setDocument(w.doc);w.updateUI();renderBlockBar(w);}
+function renderParametricInspector(w,host){
+    if(w.inspectorTab!=='properties')return;
+    const selected=w.selected(),section=document.createElement('section');section.className='inspector-section parametric-tools';
+    if(w.blockSession&&!w.blockSession.testing){
+        section.innerHTML=`<h3>Block authoring</h3><p>Editing shared definition <strong>${E(w.blockSession.name)}</strong>. Save updates all direct and nested inserts atomically.</p><div class="operation-grid">${B('block-author','Parameters & actions')}${B('block-attribute','Add attribute')}${B('block-port','Add anchored port')}${B('constraint','Constrain selection')}${B('auto-constrain','Auto constrain selection')}${B('solver-report','Solve status')}${B('block-save-as','Save block as')}</div>`;
+    }else if(selected.length===1&&selected[0].type==='INSERT'){
+        const info=inspectBlockReferences(w.doc,selected[0].block);
+        section.innerHTML=`<h3>Shared block definition</h3><p>${info.direct.length} direct inserts · ${info.nested.length} nested references.</p><div class="operation-grid">${B('block-edit','Edit block geometry')}${B('block-copy','Make unique')}${B('block-rename','Rename definition')}${B('block-sync-attributes','Synchronize attributes')}</div>`;
+    }else section.innerHTML=`<h3>Parametric sketch</h3><div class="operation-grid">${B('solver-report','Solve status')}${B('constraint','Add constraint')}${B('auto-constrain','Auto constrain')}${B('calculated-text','Calculated annotation')}${B('constraint-display','Show / hide constraints')}${B('blocks','Block manager')}${B('parametric-demo','Constrained bracket')}</div>`;
+    if(selected.length===1&&selected[0].calculation)section.innerHTML+=`<p>Calculated value: <strong>${E(selected[0].text)}</strong></p>${B('calculation-bake','Convert to static text')}`;
+    const card=host.querySelector('.object-card');if(card)card.after(section);else host.prepend(section);
+    if(w.doc.constraints?.length){const report=w.lastSolve,diagnostic=document.createElement('div');diagnostic.className='solve-summary';diagnostic.setAttribute('role','status');diagnostic.innerHTML=report?`<strong>${E(report.status)}</strong> · ${report.degreesOfFreedom} free variables<br>${report.equations} equations · rank ${report.rank} · residual ${number(report.residual)}`:`${w.doc.constraints.length} constraints · ${B('solver-report','Analyze sketch')}`;section.append(diagnostic);}
+}
+function settings(w){
+    const info=w.doc.blockEditing;if(!info)throw new Error('Open the block editor first');
+    w.openModal('Block base and connection ports',`${field('x','Base X',info.base.x)}${field('y','Base Y',info.base.y)}${field('ports','Ports · name, x, y, dx, dy; optional anchor {entityId, point}',JSON.stringify(info.ports,null,2),'textarea')}<p>Insert anchors remain unchanged. Changing the base moves the geometry relative to every insertion point. Connected terminals may not be deleted.</p><div class="error-text"></div>`,{confirm:'Apply',onConfirm:()=>{const v=readFields(w),ports=JSON.parse(v.ports);if(!Array.isArray(ports))throw new Error('Ports must be an array');w.edit('Edit block base and ports',()=>{info.base={x:w.eval(v.x),y:w.eval(v.y)};info.ports=ports;});w.closeModal();}});
+}
+function addPort(w){
+    const e=w.selected()[0];if(!w.doc.blockEditing)throw new Error('Open the block editor first');
+    const p=e?.b||e?.c||e?.p||e?.points?.[0]||{x:0,y:0},key=e?.b?'b':e?.c?'c':e?.p?'p':'points.0';
+    w.ask('Add block connection port',[{name:'name',label:'Unique port name',value:'port'+(w.doc.blockEditing.ports.length+1)},{name:'x',label:'X',value:p.x},{name:'y',label:'Y',value:p.y},{name:'angle',label:'Outward direction · degrees',value:0}],v=>w.edit('Add connection port',()=>{
+        if(w.doc.blockEditing.ports.some(p=>p.name===v.name))throw new Error('Duplicate port name');const a=w.eval(v.angle)*Math.PI/180;
+        w.doc.blockEditing.ports.push({name:v.name,x:w.eval(v.x),y:w.eval(v.y),dx:Math.cos(a),dy:Math.sin(a),...(e?{anchor:{entityId:e.id,point:key}}:{})});
+    }));
+}
+function addAttribute(w){
+    if(!w.doc.blockEditing)throw new Error('Open the block editor first');
+    w.ask('Add attribute definition',[{name:'tag',label:'Unique tag',value:'TAG'},{name:'text',label:'Default text',value:'Value'},{name:'x',label:'X',value:w.camera.x},{name:'y',label:'Y',value:w.camera.y},{name:'height',label:'Text height',value:12}],v=>w.edit('Add attribute definition',()=>{
+        if(!v.tag.trim()||w.doc.entities.some(e=>e.type==='ATTDEF'&&e.tag.toUpperCase()===v.tag.toUpperCase()))throw new Error('Duplicate or empty attribute tag');
+        const height=w.eval(v.height);if(height<=0)throw new Error('Text height must be positive');w.doc.entities.push(entity('ATTDEF',{attributeTag:v.tag,tag:v.tag,text:v.text,p:{x:w.eval(v.x),y:w.eval(v.y)},height,layer:'0'}));
+    }));
+}
+function blockAuthor(w){
+    if(!w.doc.blockEditing)throw new Error('Open the block editor first');const spec=w.doc.blockEditing.dynamic||{version:2,parameters:[],actions:[],constraints:[]};
+    w.openModal('Block parameters & actions',`<p>Selection becomes the action selection set. Add a parameter, then attach an action. Sketch constraints may reference numeric parameter names.</p><div class="author-grid">${field('name','Parameter name','Length')}<label class="field">Type<select data-block-field="type">${['distance','angle','number','integer','boolean','enum'].map(t=>`<option>${t}</option>`).join('')}</select></label>${field('default','Default value','100')}${field('min','Minimum (optional)','')}${field('max','Maximum (optional)','')}${field('expression','Derived expression (optional)','')}${field('values','Enum / discrete values · JSON','')}</div><button class="btn" id="author-add-parameter">Add parameter</button><hr><div class="author-grid"><label class="field">Parameter<select id="author-parameter">${spec.parameters.map(p=>`<option>${E(p.name)}</option>`).join('')}</select></label><label class="field">Action<select id="author-action">${['stretch','move','rotate','scale','flip','array','polar','polar-array','visibility','lookup'].map(t=>`<option>${t}</option>`).join('')}</select></label>${field('dx','Direction / array step X','1')}${field('dy','Direction / array step Y','0')}${field('states','Visibility states / lookup rows (JSON)', '{}','textarea')}</div><button class="btn" id="author-add-action">Add action using selection (${w.selection.size})</button><div id="author-message" role="status"></div><h3>Definition</h3><textarea id="author-schema" aria-label="Complete block behavior schema">${E(JSON.stringify(spec,null,2))}</textarea><p class="muted-note">The full schema remains editable for selection sets, crossing windows, polar angles and ordered actions. Unsupported transformations are rejected. This authors Conduit behavior, not proprietary Autodesk action graphs.</p><div class="error-text"></div>`,{wide:true,confirm:'Apply behavior',onConfirm:()=>{
+        const dynamic=JSON.parse(w.modal.querySelector('#author-schema').value);w.edit('Update block behavior',()=>{const candidate=editedBlockDefinition({...w.blockSession,draft:w.doc});candidate.dynamic={...dynamic,constraints:w.doc.constraints};evaluateDynamicBlock(candidate,{});w.doc.blockEditing.dynamic=dynamic;for(const p of dynamic.parameters)if(['number','distance','angle','integer'].includes(p.type))w.doc.parameters[p.name]=p.expression??p.default;});w.closeModal();
+    }});
+    const save=(modify)=>{try{const d=JSON.parse(w.modal.querySelector('#author-schema').value);modify(d);w.modal.querySelector('#author-schema').value=JSON.stringify(d,null,2);w.modal.querySelector('#author-parameter').innerHTML=d.parameters.map(p=>`<option>${E(p.name)}</option>`).join('');w.modal.querySelector('#author-message').textContent='Staged in definition. Apply to validate.';}catch(e){w.modal.querySelector('.error-text').textContent=e.message;}};
+    w.modal.querySelector('#author-add-parameter').onclick=()=>save(d=>{
+        const v=readFields(w),p={name:v.name,type:v.type,default:v.type==='enum'?v.default:v.type==='boolean'?v.default==='true':w.eval(v.default)};
+        if(v.type==='boolean'&&!['true','false'].includes(v.default))throw new Error('Boolean default must be true or false');
+        if(d.parameters.some(p=>p.name===v.name))throw new Error('Duplicate parameter');if(v.values)p.values=JSON.parse(v.values);if(v.expression)p.expression=v.expression;if(v.min)p.min=w.eval(v.min);if(v.max)p.max=w.eval(v.max);
+        if(['distance','angle'].includes(p.type))p.grip={base:{x:0,y:0},direction:{x:1,y:0},radius:40};d.version=2;d.parameters.push(p);
+    });
+    w.modal.querySelector('#author-add-action').onclick=()=>save(d=>{
+        const v=readFields(w),type=w.modal.querySelector('#author-action').value,parameter=w.modal.querySelector('#author-parameter').value;
+        if(!parameter)throw new Error('Add a parameter first');if(!w.selection.size&&type!=='lookup')throw new Error('Select the geometry affected by this action before opening authoring');
+        const a={type,parameter,entities:[...w.selection],direction:{x:w.eval(v.dx),y:w.eval(v.dy)},base:clone(w.doc.blockEditing.base)};
+        if(type==='stretch'){let points=[];for(const e of w.selected()){const b=entityBounds(e,w.doc);points.push({x:b.minX,y:b.minY},{x:b.maxX,y:b.maxY});}const b=bounds(points);a.box={minX:(b.minX+b.maxX)/2,minY:b.minY-1,maxX:b.maxX+1,maxY:b.maxY+1};}
+        if(type==='array')a.step={x:w.eval(v.dx),y:w.eval(v.dy)};if(type==='visibility')a.states=JSON.parse(v.states);if(type==='lookup'){a.rows=JSON.parse(v.states);delete a.entities;}d.actions.push(a);
+    });
+}
+function blockManager(w){
+    if(w.blockSession)throw new Error('Save or close the active block editor first');
+    const names=Object.keys(w.doc.blocks).filter(n=>!w.doc.blocks[n].dimensionPicture&&!w.doc.blocks[n].dynamicInstance).sort();
+    w.openModal('Block definitions',`<label class="field">Definition<select id="block-name">${names.map(n=>`<option>${E(n)}</option>`).join('')}</select></label><div class="operation-grid"><button class="btn" id="manager-insert">Insert at view center</button><button class="btn" id="manager-delete">Delete unused definition</button></div><hr><label class="field">New block name<input id="manager-name" value="NewBlock"></label><button class="btn" id="manager-create">Create and edit block</button><p>Edit geometry, constrain sketches, define ports and attributes. Save refreshes every placement. Referenced definitions cannot be deleted; all operations are undoable.</p><div class="error-text"></div>`,{confirm:'Edit definition',onConfirm:()=>startBlockEditor(w,w.modal.querySelector('#block-name').value)});
+    const guarded=action=>{try{action();}catch(e){w.modal.querySelector('.error-text').textContent=e.message;}};
+    w.modal.querySelector('#manager-create').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#manager-name').value.trim();w.edit('Create block '+name,()=>createBlockDefinition(w.doc,name));startBlockEditor(w,name);});
+    w.modal.querySelector('#manager-insert').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#block-name').value;w.edit('Insert block '+name,()=>{const e=entity('INSERT',{block:name,x:w.camera.x,y:w.camera.y,sx:1,sy:1,layer:w.currentLayer,layout:w.doc.activeLayout});syncInsertAttributes(e,w.doc);w.doc.entities.push(e);w.selection=new Set([e.id]);});w.closeModal();});
+    w.modal.querySelector('#manager-delete').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#block-name').value;w.edit('Delete unused block',()=>deleteBlockDefinition(w.doc,name));blockManager(w);});
+}
+const constraintTypes=['horizontal','vertical','length','radius','diameter','angle','angle-between','coincident','concentric','parallel','perpendicular','collinear','equal','distance','distance-x','distance-y','point-on-line','point-on-circle','midpoint','tangent','symmetric','fixed','fixed-point'];
+const unaryTypes=new Set(['horizontal','vertical','length','radius','diameter','angle','fixed','fixed-point']);
+const numericTypes=new Set(['length','radius','diameter','angle','angle-between','distance','distance-x','distance-y']);
+function constraintAuthor(w){
+    const selected=[...w.selection].map(id=>w.doc.entities.find(e=>e.id===id)).filter(Boolean);if(!selected.length)throw new Error('Select sketch geometry first');
+    const options=e=>['a','b','c','p'].filter(k=>e?.[k]).concat((e?.points||[]).map((_,i)=>`points.${i}`)).map(k=>`<option>${k}</option>`).join('');
+    w.openModal('Constrain sketch',`<p>${selected.length} objects in selection order. Dimensions are driving unless marked Reference. Angular expressions use degrees.</p><label class="field">Constraint<select id="constraint-type">${constraintTypes.map(t=>`<option>${t}</option>`).join('')}</select></label><div class="author-grid"><label class="field">First point<select id="constraint-point-a">${options(selected[0])}</select></label><label class="field">Second point<select id="constraint-point-b">${options(selected[1])}</select></label></div><div class="author-grid"><label class="field">First polyline segment (0-based)<input id="constraint-segment-a" value="0"></label><label class="field">Second polyline segment<input id="constraint-segment-b" value="0"></label></div><label class="field">Value or parameter expression<input id="constraint-value" value="100"></label><label class="field">Name (optional)<input id="constraint-name" placeholder="d1"></label><label><input id="constraint-reference" type="checkbox"> Reference measurement (does not constrain geometry)</label><div class="error-text"></div>`,{confirm:'Apply constraint',onConfirm:()=>{
+        const type=w.modal.querySelector('#constraint-type').value,reference=w.modal.querySelector('#constraint-reference').checked,name=w.modal.querySelector('#constraint-name').value.trim(),value=w.modal.querySelector('#constraint-value').value;
+        if(name&&(!/^[A-Za-z_]\w*$/.test(name)||reservedParameterNames().includes(name)||w.doc.constraints.some(c=>c.name===name)||Object.hasOwn(w.doc.parameters,name)))throw new Error('Constraint name must be unique and not shadow parameters');
+        if(reference&&!numericTypes.has(type))throw new Error('Reference mode requires a measurable dimensional constraint');
+        const count=unaryTypes.has(type)?1:type==='symmetric'?3:2;if(!unaryTypes.has(type)&&selected.length!==count)throw new Error(`This constraint requires ${count} objects`);
+        const pa=w.modal.querySelector('#constraint-point-a').value,pb=w.modal.querySelector('#constraint-point-b').value,segmentA=Number(w.modal.querySelector('#constraint-segment-a').value),segmentB=Number(w.modal.querySelector('#constraint-segment-b').value);
+        w.edit('Add '+type+' constraint',()=>{
+            const groups=unaryTypes.has(type)?selected.map(e=>[e]):[selected];
+            for(const [index,es]of groups.entries())w.doc.constraints.push({id:uid('constraint'),type,entities:es.map(e=>e.id),...(name?{name:groups.length>1?`${name}_${index+1}`:name}:{}),...(numericTypes.has(type)?{value}:{}),reference,segmentA,segmentB,pointA:pa||undefined,pointB:pb||undefined,...(type==='fixed'?{target:clone(es[0])}:{}),...(type==='fixed-point'?{target:clone(es[0][pa]||es[0].points?.[Number(pa.slice(7))])}:{})});
+            w.solveConstraints();w.showConstraintAnnotations=true;
+        });w.closeModal();w.toast('Constraint applied');
+    }});
+    const a=w.modal.querySelector('#constraint-point-a');if([...a.options].some(o=>o.value==='b'))a.value='b';
+}
+function parameterManager(w){
+    const descriptors=describeParameters(w.doc.parameters);
+    const row=(name,expression,value)=>`<div class="param-row"><input class="param-name" aria-label="Parameter name" value="${E(name)}"><input class="param-expression" aria-label="Expression for ${E(name)}" value="${E(typeof expression==='object'?expression.expression:expression)}"><output class="param-result">${number(value)}</output><button class="remove-param" aria-label="Remove parameter">×</button></div>`;
+    w.openModal('Parameters & solved calculations',`<p>Dependency-aware expressions. Functions include sqrt, hypot, sin, cos, atan2, min/max, clamp, rad and deg. Trigonometry uses radians; dimensional angle constraints use degrees.</p><div class="param-head"><span>Name</span><span>Expression</span><span>Calculated</span></div><div id="parameter-rows">${descriptors.map(p=>row(p.name,p.expression,p.value)).join('')}</div><button class="btn" id="add-parameter">Add parameter</button><div class="error-text" role="status"></div><h3>Constraint measurements</h3><div class="calculation-table">${constraintAnnotations(w.doc.entities,w.doc.constraints,w.doc.parameters).map(a=>`<div><b>${E(a.text)}</b><small>${a.reference?'Reference only':`Expression: ${E(a.expression??'geometric')}`}</small></div>`).join('')||'No constrained measurements.'}</div>`,{wide:true,confirm:'Apply parameters',onConfirm:()=>{
+        const values=read();resolveParameters(values);w.edit('Apply parametric calculations',()=>{w.doc.parameters=values;for(const e of w.doc.entities)w.evaluateParametric(e);if(w.doc.blockEditing?.dynamic)for(const p of w.doc.blockEditing.dynamic.parameters){if(!Object.hasOwn(values,p.name))throw new Error('Block parameter must be edited through Parameters & actions');if(p.expression!==undefined)p.expression=values[p.name];else if(typeof p.default==='number')p.default=evaluateExpression(values[p.name],values);}
+            w.solveConstraints();w.reroute();});w.closeModal();
+    }});
+    function read(){const next={};for(const r of w.modal.querySelectorAll('.param-row')){const name=r.querySelector('.param-name').value.trim();if(!/^[A-Za-z_]\w*$/.test(name)||reservedParameterNames().includes(name)||Object.hasOwn(next,name))throw new Error('Invalid, reserved or duplicate parameter: '+name);next[name]=r.querySelector('.param-expression').value;}return next;}
+    w.modal.querySelector('#add-parameter').onclick=()=>w.modal.querySelector('#parameter-rows').insertAdjacentHTML('beforeend',row('size'+w.modal.querySelectorAll('.param-row').length,'100',100));
+    w.modal.addEventListener('click',event=>event.target.closest('.remove-param')?.closest('.param-row')?.remove());
+    w.modal.addEventListener('input',()=>{try{const values=resolveParameters(read());for(const r of w.modal.querySelectorAll('.param-row'))r.querySelector('output').textContent=number(values[r.querySelector('.param-name').value.trim()]);w.modal.querySelector('.error-text').textContent='';}catch(error){w.modal.querySelector('.error-text').textContent=error.message;}});
+}
+function solverReport(w){
+    const report=w.solver.analyze(w.doc.entities,w.constraintsForSolve(),w.doc.parameters);w.lastSolve=report;
+    const measured=new Map(report.annotations.map(a=>[a.id,a]));
+    w.openModal('Parametric solve diagnostics',`<div class="solve-summary"><strong>${E(report.status)}</strong><p>${report.degreesOfFreedom} free scalar variables · rank ${report.rank} / ${report.variables}<br>${report.equations} equations in ${report.components.length} connected components · ${report.redundantEquations} dependent equations<br>Residual ${number(report.residual)}</p></div><p class="muted-note">Rank describes the supported planar variables at this configuration; it is not a proof of global uniqueness. Highlighted residuals are implicated constraints, not a minimal conflicting set.</p><div class="solver-list">${w.doc.constraints.map(c=>{const d=report.constraints.find(x=>x.id===c.id),a=measured.get(c.id);return `<section data-constraint-row="${E(c.id)}"><strong>${E(c.name||c.type)}</strong><span>${E(a?.text||c.type)}</span><small>${c.suppressed?'Suppressed':c.reference?'Reference':d?.satisfied?d.redundant?'Satisfied · dependent equation':'Satisfied':`Residual ${number(d?.residual)}`}</small><div><button class="btn" data-constraint-operation="edit" data-id="${E(c.id)}">Edit</button><button class="btn" data-constraint-operation="suppress" data-id="${E(c.id)}">${c.suppressed?'Enable':'Suppress'}</button><button class="btn" data-constraint-operation="remove" data-id="${E(c.id)}">Remove</button></div></section>`;}).join('')}</div>${B('solver-run','Solve now')}${B('constraint-display','Show / hide annotations')}${B('calculated-text','Calculated annotation')}`,{wide:true});
+    w.modal.addEventListener('click',event=>{const t=event.target.closest('[data-constraint-operation]');if(!t)return;const c=w.doc.constraints.find(c=>c.id===t.dataset.id);if(!c)return;
+        try{if(t.dataset.constraintOperation==='edit'){w.ask('Edit constraint',[{name:'name',label:'Name',value:c.name||''},{name:'value',label:'Expression (dimensional constraints)',value:c.value??''},{name:'reference',label:'Reference only · true / false',value:String(!!c.reference)}],v=>w.edit('Edit constraint',()=>{if(v.reference==='true'&&!numericTypes.has(c.type))throw new Error('Only dimensional constraints can be reference measurements');c.name=v.name;if(numericTypes.has(c.type))c.value=v.value;c.reference=v.reference==='true';}));return;}
+            w.edit('Edit constraint set',()=>{if(t.dataset.constraintOperation==='remove')w.doc.constraints=w.doc.constraints.filter(x=>x!==c);else c.suppressed=!c.suppressed;});solverReport(w);
+        }catch(e){w.toast(e.message,true);}
+    });
+}
+function refreshCalculations(w){
+    const annotations=constraintAnnotations(w.doc.entities,w.doc.constraints||[],w.doc.parameters||{});w.constraintLabels=annotations;
+    evaluateCalculations(w.doc.entities,w.doc.constraints||[],w.doc.parameters||{});
+}
+function calculatedText(w){w.ask('Calculated annotation',[{name:'expression',label:'Expression · user parameters and named measured constraints',value:Object.keys(w.doc.parameters)[0]||'100'},{name:'prefix',label:'Prefix',value:'Size = '},{name:'suffix',label:'Suffix',value:' '+w.doc.units},{name:'precision',label:'Decimal precision',value:3}],v=>w.edit('Create calculated annotation',()=>{const e=entity('TEXT',{p:{x:w.camera.x,y:w.camera.y},height:12,layer:'Annotations',text:'',layout:w.doc.activeLayout,calculation:{version:1,expression:v.expression,prefix:v.prefix,suffix:v.suffix,precision:Number(v.precision)}});w.doc.entities.push(e);w.selection=new Set([e.id]);refreshCalculations(w);}));}
+function drawParametricOverlay(w,ctx,cam){
+    if(w.showConstraintAnnotations){const seen=new Map();ctx.save();ctx.font='11px ui-monospace,monospace';ctx.textBaseline='middle';
+        for(const a of w.constraintLabels||[]){if(!a.visible||!a.entityIds.some(id=>w.doc.entities.some(e=>e.id===id&&(e.layout||'Model')===(w.doc.activeLayout||'Model'))))continue;const p=cam.screen(a.position),key=a.entityIds[0],offset=seen.get(key)||0;seen.set(key,offset+1);const x=p.x+12,y=p.y-18-offset*20;if(x<24||y<24||x>cam.width-24||y>cam.height-24)continue;const width=ctx.measureText(a.text).width+12;ctx.fillStyle=a.reference?'#f0f3fb':'#e4f3ed';ctx.strokeStyle='#65a48b';ctx.lineWidth=1;ctx.fillRect(x,y-9,width,18);ctx.strokeRect(x,y-9,width,18);ctx.fillStyle='#265547';ctx.fillText(a.text,x+6,y);}
+        ctx.restore();
+    }
+    if(w.doc.blockEditing){ctx.save();const base=cam.screen(w.doc.blockEditing.base);ctx.strokeStyle='#9252b8';ctx.beginPath();ctx.moveTo(base.x-10,base.y);ctx.lineTo(base.x+10,base.y);ctx.moveTo(base.x,base.y-10);ctx.lineTo(base.x,base.y+10);ctx.stroke();ctx.font='11px sans-serif';
+        for(const port of w.doc.blockEditing.ports){const p=cam.screen(port);ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle='#f9f3ff';ctx.fill();ctx.stroke();ctx.fillStyle='#674280';ctx.fillText(port.name,p.x+9,p.y-7);}ctx.restore();
+    }
+}
+function parametricDemo(w){w.edit('Create constrained bracket',()=>{
+    const base={x:w.camera.x,y:w.camera.y},a=entity('LINE',{a:base,b:{x:base.x+120,y:base.y},layer:'0'}),b=entity('LINE',{a:{x:base.x+120,y:base.y},b:{x:base.x+120,y:base.y+70},layer:'0'}),hole=entity('CIRCLE',{c:{x:base.x+60,y:base.y+35},r:12,layer:'0'});
+    w.doc.entities.push(a,b,hole);Object.assign(w.doc.parameters,{bracketWidth:120,bracketHeight:70,holeDiameter:'bracketHeight/3'});
+    const cs=[{type:'fixed-point',entities:[a.id],pointA:'a',target:base},{type:'horizontal',entities:[a.id]},{type:'length',entities:[a.id],value:'bracketWidth',name:'widthMeasured'},{type:'coincident',entities:[a.id,b.id]},{type:'vertical',entities:[b.id]},{type:'length',entities:[b.id],value:'bracketHeight'},{type:'diameter',entities:[hole.id],value:'holeDiameter'},{type:'length',entities:[a.id],reference:true,name:'spanReference'}];
+    w.doc.constraints.push(...cs.map(c=>({id:uid('constraint'),...c})));w.selection=new Set([a.id,b.id,hole.id]);w.showConstraintAnnotations=true;
+});w.closeModal();w.renderer.fit();}
+function parametricAction(w,action){
+    if(w.blockSession&&['new','open','export','save-project','rename','library-guide'].includes(action))throw new Error('Save or close the block editor before changing or exporting the drawing');
+    if(action==='block-edit'){const e=w.selected()[0];if(!e||e.type!=='INSERT'||isLocked(e,w.doc))throw new Error('Select an unlocked block insert');startBlockEditor(w,e.block);return true;}
+    if(action==='blocks'){blockManager(w);return true;}
+    if(action==='block-save'||action==='block-save-close'){finishBlockEditor(w,true,action==='block-save');return true;}
+    if(action==='block-close'){w.openModal('Discard block edits?','<p>The drawing and its inserts keep the last saved definition.</p>',{confirm:'Discard edits',onConfirm:()=>{w.closeModal();finishBlockEditor(w,false);}});return true;}
+    if(action==='block-test'){testBlock(w);return true;}if(action==='block-test-close'){endBlockTest(w);return true;}
+    if(action==='block-settings'){settings(w);return true;}if(action==='block-port'){addPort(w);return true;}if(action==='block-attribute'){addAttribute(w);return true;}if(action==='block-author'){blockAuthor(w);return true;}
+    if(action==='block-save-as'){w.ask('Save block as',[{name:'name',label:'New block name',value:w.blockSession.name+'_copy'}],v=>finishBlockEditor(w,true,false,v.name));return true;}
+    if(action==='block-sync-attributes'){const e=w.selected()[0];if(e?.type!=='INSERT')throw new Error('Select a block insert');w.edit('Synchronize block attributes',()=>{const report=updateBlockDefinition(w.doc,e.block,w.doc.blocks[e.block]);w.reroute(new Set(report.inserts));});return true;}
+    if(action==='block-copy'||action==='block-rename'){const e=w.selected()[0];if(e?.type!=='INSERT')throw new Error('Select a block insert');w.ask(action==='block-copy'?'Make insert unique':'Rename shared block',[{name:'name',label:'New definition name',value:e.block+'_copy'}],v=>w.edit('Change block identity',()=>{if(action==='block-copy'){duplicateBlockDefinition(w.doc,e.block,v.name);w.doc.entities.find(x=>x.id===e.id).block=v.name;}else renameBlockDefinition(w.doc,e.block,v.name);}));return true;}
+    if(action==='auto-constrain'){const selected=w.selected();if(!selected.length)throw new Error('Select sketch geometry first');w.edit('Auto constrain sketch',()=>{w.doc.constraints.push(...inferSketchConstraints(selected,w.doc.constraints));w.showConstraintAnnotations=true;});return true;}
+    if(action==='constraint'){constraintAuthor(w);return true;}if(action==='parameters'){parameterManager(w);return true;}if(action==='solver-report'){solverReport(w);return true;}
+    if(action==='solver-run'){w.edit('Solve parametric sketch',()=>w.solveConstraints());solverReport(w);return true;}
+    if(action==='constraint-display'){w.showConstraintAnnotations=!w.showConstraintAnnotations;refreshCalculations(w);w.renderer.invalidate();return true;}
+    if(action==='calculation-bake'){const e=w.selected()[0];if(!e?.calculation)throw new Error('Select calculated text');w.edit('Convert calculation to static text',()=>{delete e.calculation;});return true;}
+    if(action==='calculated-text'){calculatedText(w);return true;}if(action==='parametric-demo'){parametricDemo(w);return true;}
+    return false;
+}
+
+return {restoreHistory,startBlockEditor,finishBlockEditor,renderBlockBar,renderParametricInspector,constraintAuthor,parameterManager,refreshCalculations,drawParametricOverlay,parametricAction};
+})();
+// packages/workbench/src/document-workbench.js
+__modules["packages/workbench/src/document-workbench.js"]=(()=>{
+const {DocumentWorkspace} = __modules["packages/workspace/src/index.js"];
+const {History} = __modules["packages/history/src/index.js"];
+const {createDocument, validateDocument, clone, beginBlockEdit} = __modules["packages/model/src/index.js"];
+const {DrawingSession} = __modules["packages/drawing/src/index.js"];
+const {renderBlockBar, restoreHistory, refreshCalculations} = __modules["packages/workbench/src/parametric-workbench.js"];
+const {escapeHTML:E, icon} = __modules["packages/workbench/src/icons.js"];
+const defaults = () => ({ tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
+const fields = Object.keys(defaults());
+const cameraState = w => ({ x: w.camera.x, y: w.camera.y, scale: w.camera.scale });
+const dirty = session => session.revision !== session.savedRevision;
+const button = (action, label, cls = '') => `<button type="button" class="btn ${cls}" data-action="${action}">${E(label)}</button>`;
+
+function createDocumentHistory(w) {
+    return new History({
+        capture: () => w.doc,
+        restore: document => {
+            w.doc = document;
+            w.selection = new Set([...w.selection].filter(id => document.entities.some(e => e.id === id)));
+            w.lastSolve = null;
+            refreshCalculations(w);
+            w.renderer.setDocument(document);
+            w.updateUI();
+        },
+        onChange: () => {
+            w.updateHistory();
+            documentChanged(w);
+            w.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: w.doc, documentId: w.documents?.activeId } }));
+        }
+    });
+}
+function captureActiveDocument(w) {
+    const session = w.documents?.active;
+    if (!session) return;
+    const context = {};
+    for (const key of fields) context[key] = key === 'grid' ? w.renderer.grid : w[key] ?? defaults()[key];
+    context.doc = w.doc;
+    context.history = w.history;
+    context.selection = w.selection;
+    context.camera = cameraState(w);
+    context.libraryScroll = w.$('.library-scroll').scrollTop;
+    context.inspectorScroll = w.$('.inspector-content').scrollTop;
+    session.context = context;
+    session.document = w.blockSession?.parentDocument || w.doc;
+}
+function snapshotSession(session) {
+    const c = session.context, block = c.blockSession;
+    const state = { camera: c.camera, selection: [...(c.selection || [])], settings: {}, libraryScroll: c.libraryScroll, inspectorScroll: c.inspectorScroll };
+    for (const key of ['category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle', 'gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations', 'drawingOptions']) state.settings[key] = c[key];
+    state.tool = block?.testing ? 'select' : c.tool;
+    state.draft = block?.testing ? [] : c.draft;
+    state.drawing = !block?.testing && c.drawingSession ? { tool: c.tool, options: c.drawingSession.options, points: c.drawingSession.points } : null;
+    if (block) state.block = {
+        name: block.name, signature: block.signature, draft: block.testing ? block.testDraft : c.doc,
+        parentCamera: block.parentCamera, parentSelection: block.parentSelection,
+        parentLayer: block.parentLayer, parentCategory: block.parentCategory
+    };
+    if (block && !block.testing && c.history?.pending) state.block.draft = JSON.parse(c.history.pending.before);
+    if (block?.testing) { state.camera = block.testCamera; state.selection = block.testSelection; }
+    return { document: !block && c.history?.pending ? JSON.parse(c.history.pending.before) : session.document, state };
+}
+function restoreContext(w, document, state = {}) {
+    const context = { ...defaults(), doc: document, history: createDocumentHistory(w), selection: new Set(), camera: { x: 0, y: 0, scale: 1 } };
+    for (const key of ['category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle']) if (typeof state.settings?.[key] === 'string') context[key] = state.settings[key];
+    for (const key of ['gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations']) if (typeof state.settings?.[key] === 'boolean') context[key] = state.settings[key];
+    for (const key of ['x', 'y', 'scale']) if (Number.isFinite(state.camera?.[key])) context.camera[key] = state.camera[key];
+    context.camera.scale = Math.min(5000, Math.max(.00001, context.camera.scale));
+    if (state.settings?.drawingOptions && typeof state.settings.drawingOptions === 'object') context.drawingOptions = clone(state.settings.drawingOptions);
+    if (state.block) {
+        const block = state.block;
+        const session = beginBlockEdit(document, block.name);
+        session.draft = validateDocument(block.draft);
+        if (!session.draft.blockEditing) throw new Error('Missing recovered block draft');
+        Object.assign(session, { signature: block.signature, parentDocument: document, parentHistory: context.history, parentSelection: block.parentSelection || [], parentCamera: block.parentCamera || context.camera, parentLayer: block.parentLayer || '0', parentCategory: block.parentCategory || 'Custom' });
+        context.blockSession = session;
+        context.doc = session.draft;
+        context.history = restoreHistory(w);
+    }
+    context.selection = new Set((Array.isArray(state.selection) ? state.selection : []).filter(id => context.doc.entities.some(e => e.id === id)));
+    // Recovery resumes accepted geometry, never a partially applied pointer drag.
+    if (state.drawing) {
+        const session = new DrawingSession(state.drawing.tool, state.drawing.options);
+        if (!Array.isArray(state.drawing.points) || state.drawing.points.length > 512 || state.drawing.points.some(p => !Number.isFinite(p.x) || !Number.isFinite(p.y))) throw new Error('Invalid recovered drawing command');
+        session.points = clone(state.drawing.points);
+        context.tool = state.drawing.tool;
+        context.drawingSession = session;
+        context.draft = session.points;
+    } else if (['line', 'polyline', 'rect', 'circle', 'dimension'].includes(state.tool)) {
+        if (Array.isArray(state.draft) && state.draft.length <= 512 && state.draft.every(p => Number.isFinite(p.x) && Number.isFinite(p.y))) {
+            context.tool = state.tool; context.draft = clone(state.draft);
+        }
+    }
+    context.libraryScroll = Math.max(0, Number(state.libraryScroll) || 0);
+    context.inspectorScroll = Math.max(0, Number(state.inspectorScroll) || 0);
+    return context;
+}
+function recoveryIdentity(w) {
+    if (w.options.workspaceKey) return { key: w.options.workspaceKey, recoveryKey: w.options.workspaceKey };
+    let key, previous;
+    try { key = sessionStorage.getItem('conduit-workspace-id'); previous = localStorage.getItem('conduit-recent-workspace'); } catch {}
+    const recoveryKey = key || previous || 'default';
+    key ||= globalThis.crypto?.randomUUID?.() || 'tab-' + Date.now().toString(36);
+    try { sessionStorage.setItem('conduit-workspace-id', key); } catch {}
+    return { key, recoveryKey };
+}
+function initializeDocuments(w) {
+    const identity = recoveryIdentity(w);
+    w.recoveryKey = identity.recoveryKey;
+    w.documents = new DocumentWorkspace({
+        store: w.store, key: identity.key, maxDocuments: w.options.maxDocuments ?? 32,
+        beforeSave: () => { if (!w.disposed) captureActiveDocument(w); }, capture: snapshotSession,
+        onChange: event => {
+            if (w.disposed) return;
+            renderDocuments(w);
+            if (event.type === 'saved') {
+                try { localStorage.setItem('conduit-recent-workspace', w.documents.key); } catch {}
+            }
+            if (event.type === 'error') w.toast('Device recovery failed. Your tabs remain open; export a project copy.', true);
+        }
+    });
+    w.documents.add(w.doc, { context: {} });
+    captureActiveDocument(w);
+    w.documentImportQueue = Promise.resolve();
+    const nav = document.createElement('nav'); nav.className = 'document-bar'; nav.setAttribute('aria-label', 'Open drawings');
+    nav.innerHTML = `<div class="document-tabs" role="tablist" aria-label="Drawing documents"></div><button type="button" class="document-new" data-action="new" aria-label="New drawing tab" title="New drawing tab">${icon('plus')}</button><button type="button" class="document-switcher" data-action="document-list" aria-label="Manage open drawings" title="Manage open drawings">${icon('layers')}<span class="document-count"></span></button>`;
+    w.$('.appbar').after(nav);
+    w.$('.workspace').id = 'document-panel';
+    w.$('.workspace').setAttribute('role', 'tabpanel');
+    const signal = w.abort.signal;
+    nav.addEventListener('keydown', event => {
+        const tabs = [...nav.querySelectorAll('[role="tab"]')], index = tabs.indexOf(event.target);
+        if (index < 0) return;
+        const direction = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+        if (direction || ['Home', 'End'].includes(event.key)) {
+            event.preventDefault(); event.stopPropagation();
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + direction + tabs.length) % tabs.length;
+            tabs.forEach((tab, i) => { tab.tabIndex = i === next ? 0 : -1; });
+            tabs[next].focus();
+        } else if (event.key === 'Delete') {
+            event.preventDefault(); event.stopPropagation(); requestCloseDocument(w, event.target.dataset.documentId);
+        }
+    }, { signal });
+    window.addEventListener('beforeunload', event => {
+        if (w.documents.dirty || w.blockSession && w.history.pending) { event.preventDefault(); event.returnValue = ''; }
+    }, { signal });
+    window.addEventListener('pagehide', () => { if(!w.initializing)w.documents.saveAll().catch(() => {}); }, { signal });
+    renderDocuments(w);
+}
+async function claimWorkspace(w) {
+    if (w.options.workspaceKey || !navigator.locks?.request) return;
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const result = await new Promise(resolve => {
+            navigator.locks.request('conduit-workspace:' + w.documents.key, { ifAvailable: true }, lock => {
+                resolve(lock ? 'acquired' : 'busy');
+                if (lock) return new Promise(release => { w.releaseWorkspaceLock = release; });
+            }).catch(() => resolve('unavailable'));
+        });
+        if (result === 'acquired') return;
+        w.documents.key = globalThis.crypto?.randomUUID?.() || 'window-' + Date.now().toString(36) + '-' + attempt;
+        try { sessionStorage.setItem('conduit-workspace-id', w.documents.key); } catch {}
+        if (result === 'unavailable') return;
+        // A fork also needs a held lease: subsequently duplicating that page must fork again.
+    }
+    throw new Error('Could not acquire an exclusive recovery workspace');
+}
+async function forkRecoveryWorkspace(w) {
+    // Never overwrite damaged/partially recovered records with a new blank manifest.
+    w.releaseWorkspaceLock?.(); w.releaseWorkspaceLock = null;
+    w.documents.key = globalThis.crypto?.randomUUID?.() || 'recovered-' + Date.now().toString(36);
+    try { sessionStorage.setItem('conduit-workspace-id', w.documents.key); } catch {}
+    await claimWorkspace(w);
+}
+async function recoverDocuments(w) {
+    let recovery;
+    try { recovery = await w.store.loadWorkspace(w.recoveryKey); }
+    catch (error) { w.recoveryIncomplete = true; w.toast('Saved workspace could not be read. The recovery data has not been deleted.', true); return false; }
+    if (!recovery?.records?.length) return false;
+    if (recovery.manifest?.version !== 1 || !Array.isArray(recovery.records) || recovery.records.length > w.documents.maxDocuments) {
+        w.recoveryIncomplete = true;
+        w.toast('Saved workspace exceeds the document limit or has an unsupported format.', true); return false;
+    }
+    const restored = [], errors = [];
+    for (const record of recovery.records) {
+        try {
+            if (!record || !/^[a-zA-Z0-9_-]{1,128}$/.test(record.id)) throw new Error('Missing drawing record');
+            const document = validateDocument(record.document), context = restoreContext(w, document, record.state);
+            if (restored.some(s => s.id === record.id)) throw new Error('Duplicate drawing session');
+            restored.push({ id: record.id, document, context });
+        } catch (error) { errors.push(error.message); }
+    }
+    if (!restored.length) { w.recoveryIncomplete = true; w.toast('No saved drawings could be recovered; original recovery records were retained.', true); return false; }
+    w.documents.sessions = []; w.documents.activeId = null;
+    for (const record of restored) w.documents.add(record.document, { id: record.id, context: record.context, saved: true, activate: false });
+    if (errors.length) w.recoveryIncomplete = true;
+    const id = w.documents.get(recovery.manifest.activeId)?.id || restored[0].id;
+    applyDocument(w, w.documents.activate(id));
+    w.toast(`Recovered ${restored.length} drawing${restored.length === 1 ? '' : 's'}${errors.length ? `; ${errors.length} record(s) could not be read` : ' from this device'}.`, errors.length > 0);
+    return true;
+}
+function documentChanged(w) {
+    if (!w.documents || w.disposed) return;
+    w.documents.markChanged();
+    w.documents.schedule();
+}
+function scheduleRecovery(w) { if (w.documents && !w.disposed && !w.initializing) w.documents.schedule(); }
+function applyDocument(w, session) {
+    const context = session.context;
+    for (const key of fields) if (key !== 'grid') w[key] = context[key] ?? defaults()[key];
+    w.doc = context.doc || session.document;
+    w.history = context.history || createDocumentHistory(w);
+    w.selection = context.selection || new Set();
+    Object.assign(w.camera, context.camera || { x: 0, y: 0, scale: 1 });
+    w.renderer.grid = context.grid ?? true;
+    w.cursor = null; w.snap = null; w.preview = null; w.hoveredPort = null; w.drag = null; w.pointer = null;
+    w.$('#symbol-search').value = w.librarySearch || '';
+    w.$('.block-editor-bar')?.remove();
+    for (const el of w.root.querySelectorAll('.appbar button:disabled')) el.disabled = false;
+    renderBlockBar(w);
+    w.renderer.setDocument(w.doc); w.renderer.resize(); w.updateUI(); w.renderer.invalidate();
+    w.$('.library-scroll').scrollTop = context.libraryScroll || 0;
+    w.$('.inspector-content').scrollTop = context.inspectorScroll || 0;
+    if (!context.camera) { w.renderer.fit(); context.camera = cameraState(w); }
+    renderDocuments(w);
+}
+function activateDocument(w, id) {
+    if (!w.documents.get(id)) throw new Error('Drawing is no longer open');
+    w.closeModal(); w.closePanels(); w.hideContext();
+    if (id === w.documents.activeId) return w.documents.active;
+    w.input.reset(); w.cancelGesture(); captureActiveDocument(w);
+    const previousId = w.documents.activeId;
+    const session = w.documents.activate(id);
+    applyDocument(w, session);
+    scheduleRecovery(w);
+    w.$(`[data-document-id="${id}"][role="tab"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    w.root.dispatchEvent(new CustomEvent('conduit:documentchange', { detail: { previousId, documentId: id, document: session.document } }));
+    return session;
+}
+function openDocument(w, document, options = {}) {
+    // Capacity and validation are checked before cancelling any source gesture.
+    if (w.documents.sessions.length >= w.documents.maxDocuments) throw new Error(`Close a drawing before opening more than ${w.documents.maxDocuments} documents`);
+    validateDocument(document);
+    w.closeModal(); w.closePanels(); w.input.reset(); w.cancelGesture(); captureActiveDocument(w);
+    const context = { ...defaults(), ...options.context, doc: document, history: createDocumentHistory(w), selection: new Set() };
+    const session = w.documents.add(document, { context });
+    applyDocument(w, session); captureActiveDocument(w); scheduleRecovery(w);
+    w.root.dispatchEvent(new CustomEvent('conduit:documentchange', { detail: { documentId: session.id, document } }));
+    return session;
+}
+function renderDocuments(w) {
+    const workspace = w.documents, host = w.$('.document-tabs');
+    if (!workspace || !host) return;
+    const active = workspace.active;
+    const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
+    const signature = JSON.stringify([workspace.activeId, data]);
+    if (w.documentTabSignature !== signature) {
+        const scroll = host.scrollLeft, focused = document.activeElement?.dataset?.documentId;
+        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${s.editing ? '◇' : s.dirty ? '●' : '▱'}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
+        host.scrollLeft = scroll;
+        if (focused) host.querySelector(`[data-document-id="${focused}"][role="tab"]`)?.focus({ preventScroll: true });
+        w.documentTabSignature = signature;
+    }
+    w.$('.document-count').textContent = String(workspace.sessions.length);
+    w.$('.workspace').setAttribute('aria-labelledby', `tab-${workspace.activeId}`);
+    w.$('.doc-name').textContent = data.find(s=>s.id===workspace.activeId)?.name || w.doc.name;
+    const status = active?.error ? 'Recovery failed' : active?.saving ? 'Saving on device…' : active && dirty(active) ? 'Not yet saved on device' : 'Saved on device';
+    w.$('.save-status').textContent = status;
+    w.$('.document-switcher').title = `${workspace.sessions.length} open drawings · ${status}`;
+    document.title = `${w.doc.name} — Conduit CAD`;
+}
+async function performClose(w, id, mode) {
+    const workspace = w.documents, session = workspace.get(id);
+    if (!session) return;
+    if (mode === 'save') {
+        await workspace.saveAll();
+        if (dirty(session)) throw new Error('Drawing changed while saving; save it again before closing');
+    }
+    const wasActive = id === workspace.activeId;
+    if (wasActive) { w.input.reset(); w.cancelGesture(); captureActiveDocument(w); }
+    workspace.remove(id, { discard: mode === 'discard' });
+    w.closeModal(); w.closePanels();
+    if (workspace.active && wasActive) applyDocument(w, workspace.active);
+    else if (workspace.active) renderDocuments(w);
+    else openDocument(w, createDocument('Untitled drawing'));
+    scheduleRecovery(w);
+    w.$(`[role="tab"][data-document-id="${workspace.activeId}"]`)?.focus();
+}
+function requestCloseDocument(w, id) {
+    captureActiveDocument(w);
+    const session = w.documents.get(id);
+    if (!session) return;
+    if (dirty(session) || session.context.blockSession || session.context.draft?.length) {
+        w.openModal('Close drawing?', `<p><strong>${E(session.document.name)}</strong></p><p>${session.context.blockSession ? 'This tab has a block authoring session. Save on device keeps its recovery draft; it does not commit the draft into the block definition.' : 'Save a recovery copy on this device before closing. Export a project file for a portable backup.'}</p><div class="document-close-actions">${button('document-close-save:'+id,'Save on device & close','primary')}${button('document-close-discard:'+id,'Close without saving','danger')}${button('modal-close','Cancel')}</div><div class="error-text" role="alert"></div>`);
+        return;
+    }
+    return performClose(w, id, 'saved');
+}
+function documentList(w) {
+    captureActiveDocument(w);
+    w.openModal('Open drawings', `<p>Each drawing keeps its own undo history, view, selection and block-editing draft. Device recovery is not a downloaded project backup.</p><input type="search" id="document-search" aria-label="Find open drawing" placeholder="Find a drawing…"><div class="document-list">${w.documents.sessions.map((session, index) => `<section data-document-search="${E(session.document.name.toLowerCase())}"><button class="document-list-open" data-document-id="${session.id}" data-document-operation="activate"><strong>${E(session.document.name)}</strong><small>${session.id === w.documents.activeId ? 'Active · ' : ''}${session.document.entities.length} entities · ${session.document.units} · ${session.error ? 'Recovery failed' : dirty(session) ? 'Not saved' : 'Saved on device'}${session.context.blockSession ? ' · Block draft' : ''}</small></button><div class="document-list-actions">${button('document-duplicate:'+session.id,'Duplicate')}${button('document-reorder:'+session.id,'Move left',index === 0 ? 'first-document' : '')}${button('document-close:'+session.id,'Close')}</div></section>`).join('')}</div><details class="document-recent"><summary>Recently closed on this device</summary><div class="document-recent-list">Loading saved drawings…</div></details><div class="document-list-footer">${button('new','New drawing','primary')}${button('open','Open files')}${button('document-save-all','Save all on device')}</div>`, { wide: true });
+    const modal = w.modal;
+    w.store.listWorkspace?.(w.documents.key).then(records => {
+        if (w.modal !== modal) return;
+        const recent = records.filter(record => !w.documents.get(record.id)).slice(0, 30);
+        modal.querySelector('.document-recent-list').innerHTML = recent.length ? recent.map(record => `<div><span>${E(record.name)}${record.blockDraft ? ' · Block draft' : ''}</span>${button('document-reopen:'+record.id,'Reopen')}</div>`).join('') : '<p>No closed drawings saved in this workspace.</p>';
+    }).catch(() => { if (w.modal === modal) modal.querySelector('.document-recent-list').textContent = 'Device recovery is unavailable.'; });
+    w.modal.querySelector('#document-search').addEventListener('input', event => {
+        const query = event.target.value.toLowerCase();
+        w.modal.querySelectorAll('[data-document-search]').forEach(row => { row.hidden = !row.dataset.documentSearch.includes(query); });
+    });
+}
+async function documentAction(w, action) {
+    const separator = action.indexOf(':'), command = separator < 0 ? action : action.slice(0, separator), id = separator < 0 ? w.documents.activeId : action.slice(separator + 1);
+    if (command === 'document-list') documentList(w);
+    else if (command === 'document-save-all') { await w.documents.saveAll(); w.toast('All open drawings saved on this device.'); w.closeModal(); }
+    else if (command === 'document-reopen') {
+        if (w.documents.get(id)) { activateDocument(w, id); return; }
+        const record = await w.store.loadWorkspaceRecord(id, w.documents.key);
+        if (!record) throw new Error('Saved drawing could not be found');
+        const document = validateDocument(record.document), context = restoreContext(w, document, record.state);
+        if (w.documents.sessions.length >= w.documents.maxDocuments) throw new Error('Close a drawing before reopening more files');
+        w.input.reset(); w.cancelGesture(); captureActiveDocument(w); w.closeModal(); w.closePanels();
+        const session = w.documents.add(document, { id, context, saved: true });
+        applyDocument(w, session); scheduleRecovery(w);
+    }
+    else if (command === 'document-close') await requestCloseDocument(w, id);
+    else if (command === 'document-close-save') await performClose(w, id, 'save');
+    else if (command === 'document-close-discard') await performClose(w, id, 'discard');
+    else if (command === 'document-duplicate') {
+        captureActiveDocument(w);
+        const session = w.documents.get(id); if (!session) throw new Error('Drawing is no longer open');
+        const copied = clone(session.document); copied.name += ' — copy';
+        openDocument(w, copied); w.toast('Independent copy opened; unsaved block drafts are not committed into the copy.');
+    } else if (command === 'document-reorder') {
+        const index = w.documents.sessions.findIndex(session => session.id === id);
+        if (index > 0) { w.documents.move(id, index - 1); scheduleRecovery(w); documentList(w); }
+    } else throw new Error('Unknown document command');
+}
+function documentKeyDown(w, event) {
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 's' && !w.modal) {
+        event.preventDefault(); documentAction(w, 'document-save-all').catch(error => w.toast(error.message, true)); return true;
+    }
+    if (event.altKey && ['PageUp', 'PageDown'].includes(event.key) && !w.modal) {
+        event.preventDefault(); const sessions = w.documents.sessions, index = sessions.findIndex(s => s.id === w.documents.activeId);
+        activateDocument(w, sessions[(index + (event.key === 'PageUp' ? -1 : 1) + sessions.length) % sessions.length].id); return true;
+    }
+    return !!event.target.closest?.('.document-bar');
+}
+function disposeDocuments(w) {
+    captureActiveDocument(w);
+    const pending = w.documents.saveAll();
+    w.disposed = true; w.documents.dispose();
+    return pending.catch(() => {}).finally(() => { w.releaseWorkspaceLock?.(); w.store.dispose(); });
+}
+
+return {createDocumentHistory,captureActiveDocument,initializeDocuments,claimWorkspace,forkRecoveryWorkspace,recoverDocuments,documentChanged,scheduleRecovery,activateDocument,openDocument,renderDocuments,requestCloseDocument,documentList,documentAction,documentKeyDown,disposeDocuments};
+})();
+// packages/workbench/src/mobile-workspace.js
+__modules["packages/workbench/src/mobile-workspace.js"]=(()=>{
+/** Responsive sheets and keyboard-aware viewport. No user-agent/device-name detection. */
+function bindMobileWorkspace(w) {
+    const signal = w.abort.signal;
+    const media = matchMedia('(max-width:720px), (max-height:540px) and (pointer:coarse)');
+    w.mobileMedia = media;
+    const updateViewport = () => {
+        if (w.disposed) return;
+        const viewport = window.visualViewport;
+        const height = viewport && Math.abs(viewport.scale - 1) < .01 ? viewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--workspace-vh', `${height}px`);
+        document.documentElement.style.setProperty('--workspace-top', `${viewport && Math.abs(viewport.scale - 1) < .01 ? viewport.offsetTop : 0}px`);
+        const focused = document.activeElement?.matches('input,textarea,[contenteditable="true"]');
+        const keyboard = media.matches && focused && window.innerHeight - height > 120;
+        document.documentElement.classList.toggle('workspace-keyboard', !!keyboard);
+        w.$('.app').classList.toggle('mobile-workspace', media.matches);
+        for (const name of ['library', 'inspector']) {
+            const panel = w.$('.' + name);
+            panel.inert = media.matches && !panel.classList.contains('open');
+        }
+        const bar = w.$('.document-bar').getBoundingClientRect();
+        w.$('.app').style.setProperty('--sheet-top', `${bar.bottom}px`);
+        if (w.modal && keyboard) requestAnimationFrame(() => document.activeElement?.scrollIntoView?.({ block: 'nearest' }));
+        w.renderer.resize();
+    };
+    window.visualViewport?.addEventListener('resize', updateViewport, { signal });
+    window.visualViewport?.addEventListener('scroll', updateViewport, { signal });
+    window.addEventListener('resize', updateViewport, { signal });
+    media.addEventListener('change', () => { w.closePanels(); updateViewport(); }, { signal });
+    document.addEventListener('focusin', updateViewport, { signal });
+    document.addEventListener('focusout', () => setTimeout(updateViewport, 0), { signal });
+    for (const name of ['library', 'inspector']) {
+        const panel = w.$('.' + name), handle = document.createElement('button');
+        panel.id = 'panel-' + name;
+        handle.type = 'button'; handle.className = 'sheet-handle';
+        handle.setAttribute('aria-label', `Expand or reduce ${name === 'library' ? 'symbol library' : 'properties'} sheet`);
+        handle.setAttribute('aria-expanded', 'false'); handle.innerHTML = '<span></span>';
+        panel.prepend(handle);
+        let start = null, suppressClick = false;
+        const expand = value => { panel.classList.toggle('expanded', value); handle.setAttribute('aria-expanded', String(value)); };
+        handle.addEventListener('click', () => { if (suppressClick) { suppressClick = false; return; } expand(!panel.classList.contains('expanded')); }, { signal });
+        handle.addEventListener('pointerdown', event => { start = { y: event.clientY, id: event.pointerId }; handle.setPointerCapture(event.pointerId); }, { signal });
+        handle.addEventListener('pointerup', event => {
+            if (!start || start.id !== event.pointerId) return;
+            const delta = event.clientY - start.y; start = null;
+            if (Math.abs(delta) < 35) return;
+            suppressClick = true;
+            setTimeout(() => { suppressClick = false; }, 0);
+            if (delta < 0) expand(true);
+            else if (panel.classList.contains('expanded')) expand(false);
+            else w.closePanels();
+        }, { signal });
+        handle.addEventListener('pointercancel', () => { start = null; suppressClick = false; }, { signal });
+    }
+    w.updateMobileViewport = updateViewport;
+    updateViewport();
+}
+function updateMobilePanels(w, focusName = null) {
+    if (!w.mobileMedia) return;
+    for (const name of ['library', 'inspector']) {
+        const panel = w.$('.' + name), open = panel.classList.contains('open');
+        panel.inert = w.mobileMedia.matches && !open;
+        for (const control of w.root.querySelectorAll(`[data-action="toggle-${name}"]`)) {
+            control.setAttribute('aria-expanded', String(open));
+            control.setAttribute('aria-controls', panel.id);
+        }
+    }
+    if (w.mobileMedia.matches && focusName) {
+        w.panelPreviousFocus = document.activeElement;
+        const focus = w.$(`.${focusName} .sheet-handle`);
+        focus?.focus({ preventScroll: true });
+    }
+}
+
+return {bindMobileWorkspace,updateMobilePanels};
+})();
 // packages/workbench/src/drawing-workbench.js
 __modules["packages/workbench/src/drawing-workbench.js"]=(()=>{
 const {DRAWING_TOOLS, drawingTool, DrawingSession, createDrawingEntity, parseDrawingPoint, hatchFromEntities, validateBoundary} = __modules["packages/drawing/src/index.js"];
@@ -2528,292 +3409,6 @@ function editVertices(w) {
 }
 
 return {beginDrawing,commitDrawing,acceptDrawingPoint,drawingPointerUp,drawingPreview,updateDrawingControls,finishDrawing,drawingToolSections,bindDrawingSearch,drawingOptionsDialog,drawingAction,drawingCommand,nativeGrips,changeNativeGrip,renderDrawingInspector,nativePropertyChange};
-})();
-// packages/history/src/index.js
-__modules["packages/history/src/index.js"]=(()=>{
-/** Atomic serializable transactions with bounded undo memory and redo invalidation. */
-class History {
-    constructor({ capture, restore, onChange = () => { }, limit = 80, maxBytes = 32 * 1024 * 1024 }) { this.capture = capture; this.restore = restore; this.onChange = onChange; this.limit = limit; this.maxBytes = maxBytes; this.undoStack = []; this.redoStack = []; this.pending = null; }
-    begin(label = 'Edit') {
-        if (this.pending)
-            return;
-        this.pending = { label, before: JSON.stringify(this.capture()) };
-    }
-    commit() {
-        if (!this.pending)
-            return false;
-        const item = this.pending;
-        this.pending = null;
-        const after = JSON.stringify(this.capture());
-        if (after === item.before)
-            return false;
-        item.after = after;
-        this.undoStack.push(item);
-        this.redoStack = [];
-        let bytes = this.undoStack.reduce((n, x) => n + x.before.length + x.after.length, 0);
-        while (this.undoStack.length > 1 && (this.undoStack.length > this.limit || bytes > this.maxBytes)) {
-            const old = this.undoStack.shift();
-            bytes -= old.before.length + old.after.length;
-        }
-        this.onChange();
-        return true;
-    }
-    cancel() {
-        if (!this.pending)
-            return;
-        const p = this.pending;
-        this.pending = null;
-        this.restore(JSON.parse(p.before));
-        this.onChange();
-    }
-    run(label, action) {
-        this.begin(label);
-        try {
-            const result = action();
-            this.commit();
-            return result;
-        }
-        catch (error) {
-            this.cancel();
-            throw error;
-        }
-    }
-    undo() {
-        if (this.pending)
-            this.cancel();
-        const item = this.undoStack.pop();
-        if (!item)
-            return false;
-        this.restore(JSON.parse(item.before));
-        this.redoStack.push(item);
-        this.onChange();
-        return true;
-    }
-    redo() {
-        if (this.pending)
-            this.cancel();
-        const item = this.redoStack.pop();
-        if (!item)
-            return false;
-        this.restore(JSON.parse(item.after));
-        this.undoStack.push(item);
-        this.onChange();
-        return true;
-    }
-    clear() { this.pending = null; this.undoStack = []; this.redoStack = []; this.onChange(); }
-    get canUndo() { return this.undoStack.length > 0; }
-    get canRedo() { return this.redoStack.length > 0; }
-}
-
-return {History};
-})();
-// packages/workbench/src/parametric-workbench.js
-__modules["packages/workbench/src/parametric-workbench.js"]=(()=>{
-const {beginBlockEdit, editedBlockDefinition, updateBlockDefinition, inspectBlockReferences, duplicateBlockDefinition, renameBlockDefinition, evaluateDynamicBlock, clone, entity, uid, entityBounds, isLocked, regenerateDimensions, createBlockDefinition, deleteBlockDefinition, syncInsertAttributes} = __modules["packages/model/src/index.js"];
-const {ConstraintSolver, resolveParameters, describeParameters, reservedParameterNames, constraintAnnotations, constraintMeasurement, evaluateExpression, inferSketchConstraints, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
-const {History} = __modules["packages/history/src/index.js"];
-const {bounds} = __modules["packages/geometry/src/index.js"];
-const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
-const B=(action,label)=>`<button class="btn" data-action="${action}">${label}</button>`;
-const number=n=>Number.isFinite(n)?Number(n.toPrecision(8)).toString():'—';
-const field=(name,label,value,type='input')=>`<label class="field">${E(label)}<${type} data-block-field="${name}" ${type==='input'?`value="${E(value)}"`:''}>${type==='textarea'?E(value):''}</${type}></label>`;
-const readFields=w=>Object.fromEntries([...w.modal.querySelectorAll('[data-block-field]')].map(e=>[e.dataset.blockField,e.value]));
-function cameraState(w){return {x:w.camera.x,y:w.camera.y,scale:w.camera.scale};}
-function restoreHistory(w){return new History({capture:()=>w.doc,restore:d=>{w.doc=d;w.selection=new Set([...w.selection].filter(id=>d.entities.some(e=>e.id===id)));w.renderer.setDocument(d);w.updateUI();},onChange:()=>{w.updateHistory();w.updateUI();}});}
-function startBlockEditor(w,name){
-    if(w.blockSession)throw new Error('Save or close the current block editor first');
-    const session=beginBlockEdit(w.doc,name);
-    session.parentDocument=w.doc;session.parentHistory=w.history;session.parentSelection=[...w.selection];session.parentCamera=cameraState(w);session.parentLayer=w.currentLayer;session.parentCategory=w.category;
-    w.closeModal();w.setTool('select');w.closePanels();w.blockSession=session;w.doc=session.draft;w.selection.clear();w.lastSolve=null;w.currentLayer='0';w.category='Custom';
-    w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);w.openPanel('inspector');
-}
-function finishBlockEditor(w,save=false,stay=false,newName=null){
-    const s=w.blockSession;if(!s)throw new Error('The block editor is not open');
-    if(s.testing){endBlockTest(w);if(!save)return;}
-    s.draft=w.doc;let report=null;
-    if(save){
-        const replacement=editedBlockDefinition(s),parent=s.parentDocument;
-        const temporary=clone(parent);
-        for(const [key,definition]of Object.entries(s.draft.blocks))if(!Object.hasOwn(temporary.blocks,key))temporary.blocks[key]=clone(definition);
-        for(const layer of s.draft.layers)if(!temporary.layers.some(l=>l.name===layer.name))temporary.layers.push(clone(layer));
-        let name=s.name,options={expectedSignature:s.signature};
-        if(newName){duplicateBlockDefinition(temporary,name,newName);name=newName;options={};}
-        report=updateBlockDefinition(temporary,name,replacement,options);
-        // Re-evaluate complete nested geometry before publishing a shared definition.
-        for(const id of report.inserts){const insert=temporary.entities.find(e=>e.id===id);entityBounds(insert,temporary);}
-        const scratch=w.doc;w.doc=parent;
-        try{
-            s.parentHistory.run(newName?'Save block as '+newName:'Update block '+s.name,()=>{
-                w.doc=temporary;w.reroute(new Set(report.inserts));regenerateDimensions(w.doc);
-            });
-            s.parentDocument=w.doc;
-        }catch(error){s.parentDocument=w.doc;w.doc=scratch;throw error;}
-        w.doc=scratch;
-        if(stay&&!newName){const again=beginBlockEdit(s.parentDocument,s.name);s.signature=again.signature;w.toast(`Saved block; ${report.updatedInserts} inserts updated`);renderBlockBar(w);return report;}
-    }
-    w.setTool('select');w.doc=s.parentDocument;w.history=s.parentHistory;w.selection=new Set(s.parentSelection);w.currentLayer=s.parentLayer;w.category=s.parentCategory;Object.assign(w.camera,s.parentCamera);w.blockSession=null;w.lastSolve=null;
-    w.$('.block-editor-bar')?.remove();for(const button of w.root.querySelectorAll('.appbar button:disabled'))button.disabled=false;w.renderer.setDocument(w.doc);w.updateUI();w.renderer.resize();w.renderer.invalidate();w.store.schedule(w.doc);
-    if(save)w.toast(`Block saved; ${report.updatedInserts} direct/nested inserts updated`);else w.toast('Block edit cancelled; drawing unchanged');
-    return report;
-}
-function renderBlockBar(w){
-    w.$('.block-editor-bar')?.remove();if(!w.blockSession)return;
-    for(const button of w.root.querySelectorAll('.appbar [data-action="open"],.appbar [data-action="new"],.appbar [data-action="export"]')){button.disabled=true;button.title='Save or close the block editor first';}
-    const bar=document.createElement('nav');bar.className='block-editor-bar';bar.setAttribute('aria-label','Block editor');
-    bar.innerHTML=`<strong>${w.blockSession.testing?'TEST BLOCK':'BLOCK EDITOR'} · ${E(w.blockSession.name)}</strong><div>${w.blockSession.testing?B('block-test-close','Return to editor'):`${B('block-save','Save block')}${B('block-save-close','Save & close')}${B('block-test','Test block')}${B('block-settings','Base / ports / attributes')}${B('block-author','Parameters & actions')}${B('block-close','Discard & close')}`}</div>`;
-    w.$('.workbar').after(bar);w.renderer.resize();
-}
-function testBlock(w){
-    const s=w.blockSession;if(!s||s.testing)throw new Error('Open a block for editing first');s.draft=w.doc;
-    const definition=editedBlockDefinition(s);if(definition.dynamic)evaluateDynamicBlock(definition,{});
-    s.testDraft=w.doc;s.testHistory=w.history;s.testSelection=[...w.selection];s.testCamera=cameraState(w);s.testing=true;
-    w.doc={...clone(w.doc),entities:[entity('INSERT',{block:s.name,x:0,y:0,sx:1,sy:1,layer:'0'})],constraints:[],blockEditing:undefined};w.doc.blocks[s.name]=definition;syncInsertAttributes(w.doc.entities[0],w.doc);w.selection=new Set([w.doc.entities[0].id]);w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);
-}
-function endBlockTest(w){const s=w.blockSession;if(!s?.testing)return;w.doc=s.testDraft;w.history=s.testHistory;w.selection=new Set(s.testSelection);Object.assign(w.camera,s.testCamera);delete s.testing;w.renderer.setDocument(w.doc);w.updateUI();renderBlockBar(w);}
-function renderParametricInspector(w,host){
-    if(w.inspectorTab!=='properties')return;
-    const selected=w.selected(),section=document.createElement('section');section.className='inspector-section parametric-tools';
-    if(w.blockSession&&!w.blockSession.testing){
-        section.innerHTML=`<h3>Block authoring</h3><p>Editing shared definition <strong>${E(w.blockSession.name)}</strong>. Save updates all direct and nested inserts atomically.</p><div class="operation-grid">${B('block-author','Parameters & actions')}${B('block-attribute','Add attribute')}${B('block-port','Add anchored port')}${B('constraint','Constrain selection')}${B('auto-constrain','Auto constrain selection')}${B('solver-report','Solve status')}${B('block-save-as','Save block as')}</div>`;
-    }else if(selected.length===1&&selected[0].type==='INSERT'){
-        const info=inspectBlockReferences(w.doc,selected[0].block);
-        section.innerHTML=`<h3>Shared block definition</h3><p>${info.direct.length} direct inserts · ${info.nested.length} nested references.</p><div class="operation-grid">${B('block-edit','Edit block geometry')}${B('block-copy','Make unique')}${B('block-rename','Rename definition')}${B('block-sync-attributes','Synchronize attributes')}</div>`;
-    }else section.innerHTML=`<h3>Parametric sketch</h3><div class="operation-grid">${B('solver-report','Solve status')}${B('constraint','Add constraint')}${B('auto-constrain','Auto constrain')}${B('calculated-text','Calculated annotation')}${B('constraint-display','Show / hide constraints')}${B('blocks','Block manager')}${B('parametric-demo','Constrained bracket')}</div>`;
-    if(selected.length===1&&selected[0].calculation)section.innerHTML+=`<p>Calculated value: <strong>${E(selected[0].text)}</strong></p>${B('calculation-bake','Convert to static text')}`;
-    const card=host.querySelector('.object-card');if(card)card.after(section);else host.prepend(section);
-    if(w.doc.constraints?.length){const report=w.lastSolve,diagnostic=document.createElement('div');diagnostic.className='solve-summary';diagnostic.setAttribute('role','status');diagnostic.innerHTML=report?`<strong>${E(report.status)}</strong> · ${report.degreesOfFreedom} free variables<br>${report.equations} equations · rank ${report.rank} · residual ${number(report.residual)}`:`${w.doc.constraints.length} constraints · ${B('solver-report','Analyze sketch')}`;section.append(diagnostic);}
-}
-function settings(w){
-    const info=w.doc.blockEditing;if(!info)throw new Error('Open the block editor first');
-    w.openModal('Block base and connection ports',`${field('x','Base X',info.base.x)}${field('y','Base Y',info.base.y)}${field('ports','Ports · name, x, y, dx, dy; optional anchor {entityId, point}',JSON.stringify(info.ports,null,2),'textarea')}<p>Insert anchors remain unchanged. Changing the base moves the geometry relative to every insertion point. Connected terminals may not be deleted.</p><div class="error-text"></div>`,{confirm:'Apply',onConfirm:()=>{const v=readFields(w),ports=JSON.parse(v.ports);if(!Array.isArray(ports))throw new Error('Ports must be an array');w.edit('Edit block base and ports',()=>{info.base={x:w.eval(v.x),y:w.eval(v.y)};info.ports=ports;});w.closeModal();}});
-}
-function addPort(w){
-    const e=w.selected()[0];if(!w.doc.blockEditing)throw new Error('Open the block editor first');
-    const p=e?.b||e?.c||e?.p||e?.points?.[0]||{x:0,y:0},key=e?.b?'b':e?.c?'c':e?.p?'p':'points.0';
-    w.ask('Add block connection port',[{name:'name',label:'Unique port name',value:'port'+(w.doc.blockEditing.ports.length+1)},{name:'x',label:'X',value:p.x},{name:'y',label:'Y',value:p.y},{name:'angle',label:'Outward direction · degrees',value:0}],v=>w.edit('Add connection port',()=>{
-        if(w.doc.blockEditing.ports.some(p=>p.name===v.name))throw new Error('Duplicate port name');const a=w.eval(v.angle)*Math.PI/180;
-        w.doc.blockEditing.ports.push({name:v.name,x:w.eval(v.x),y:w.eval(v.y),dx:Math.cos(a),dy:Math.sin(a),...(e?{anchor:{entityId:e.id,point:key}}:{})});
-    }));
-}
-function addAttribute(w){
-    if(!w.doc.blockEditing)throw new Error('Open the block editor first');
-    w.ask('Add attribute definition',[{name:'tag',label:'Unique tag',value:'TAG'},{name:'text',label:'Default text',value:'Value'},{name:'x',label:'X',value:w.camera.x},{name:'y',label:'Y',value:w.camera.y},{name:'height',label:'Text height',value:12}],v=>w.edit('Add attribute definition',()=>{
-        if(!v.tag.trim()||w.doc.entities.some(e=>e.type==='ATTDEF'&&e.tag.toUpperCase()===v.tag.toUpperCase()))throw new Error('Duplicate or empty attribute tag');
-        const height=w.eval(v.height);if(height<=0)throw new Error('Text height must be positive');w.doc.entities.push(entity('ATTDEF',{attributeTag:v.tag,tag:v.tag,text:v.text,p:{x:w.eval(v.x),y:w.eval(v.y)},height,layer:'0'}));
-    }));
-}
-function blockAuthor(w){
-    if(!w.doc.blockEditing)throw new Error('Open the block editor first');const spec=w.doc.blockEditing.dynamic||{version:2,parameters:[],actions:[],constraints:[]};
-    w.openModal('Block parameters & actions',`<p>Selection becomes the action selection set. Add a parameter, then attach an action. Sketch constraints may reference numeric parameter names.</p><div class="author-grid">${field('name','Parameter name','Length')}<label class="field">Type<select data-block-field="type">${['distance','angle','number','integer','boolean','enum'].map(t=>`<option>${t}</option>`).join('')}</select></label>${field('default','Default value','100')}${field('min','Minimum (optional)','')}${field('max','Maximum (optional)','')}${field('expression','Derived expression (optional)','')}${field('values','Enum / discrete values · JSON','')}</div><button class="btn" id="author-add-parameter">Add parameter</button><hr><div class="author-grid"><label class="field">Parameter<select id="author-parameter">${spec.parameters.map(p=>`<option>${E(p.name)}</option>`).join('')}</select></label><label class="field">Action<select id="author-action">${['stretch','move','rotate','scale','flip','array','polar','polar-array','visibility','lookup'].map(t=>`<option>${t}</option>`).join('')}</select></label>${field('dx','Direction / array step X','1')}${field('dy','Direction / array step Y','0')}${field('states','Visibility states / lookup rows (JSON)', '{}','textarea')}</div><button class="btn" id="author-add-action">Add action using selection (${w.selection.size})</button><div id="author-message" role="status"></div><h3>Definition</h3><textarea id="author-schema" aria-label="Complete block behavior schema">${E(JSON.stringify(spec,null,2))}</textarea><p class="muted-note">The full schema remains editable for selection sets, crossing windows, polar angles and ordered actions. Unsupported transformations are rejected. This authors Conduit behavior, not proprietary Autodesk action graphs.</p><div class="error-text"></div>`,{wide:true,confirm:'Apply behavior',onConfirm:()=>{
-        const dynamic=JSON.parse(w.modal.querySelector('#author-schema').value);w.edit('Update block behavior',()=>{const candidate=editedBlockDefinition({...w.blockSession,draft:w.doc});candidate.dynamic={...dynamic,constraints:w.doc.constraints};evaluateDynamicBlock(candidate,{});w.doc.blockEditing.dynamic=dynamic;for(const p of dynamic.parameters)if(['number','distance','angle','integer'].includes(p.type))w.doc.parameters[p.name]=p.expression??p.default;});w.closeModal();
-    }});
-    const save=(modify)=>{try{const d=JSON.parse(w.modal.querySelector('#author-schema').value);modify(d);w.modal.querySelector('#author-schema').value=JSON.stringify(d,null,2);w.modal.querySelector('#author-parameter').innerHTML=d.parameters.map(p=>`<option>${E(p.name)}</option>`).join('');w.modal.querySelector('#author-message').textContent='Staged in definition. Apply to validate.';}catch(e){w.modal.querySelector('.error-text').textContent=e.message;}};
-    w.modal.querySelector('#author-add-parameter').onclick=()=>save(d=>{
-        const v=readFields(w),p={name:v.name,type:v.type,default:v.type==='enum'?v.default:v.type==='boolean'?v.default==='true':w.eval(v.default)};
-        if(v.type==='boolean'&&!['true','false'].includes(v.default))throw new Error('Boolean default must be true or false');
-        if(d.parameters.some(p=>p.name===v.name))throw new Error('Duplicate parameter');if(v.values)p.values=JSON.parse(v.values);if(v.expression)p.expression=v.expression;if(v.min)p.min=w.eval(v.min);if(v.max)p.max=w.eval(v.max);
-        if(['distance','angle'].includes(p.type))p.grip={base:{x:0,y:0},direction:{x:1,y:0},radius:40};d.version=2;d.parameters.push(p);
-    });
-    w.modal.querySelector('#author-add-action').onclick=()=>save(d=>{
-        const v=readFields(w),type=w.modal.querySelector('#author-action').value,parameter=w.modal.querySelector('#author-parameter').value;
-        if(!parameter)throw new Error('Add a parameter first');if(!w.selection.size&&type!=='lookup')throw new Error('Select the geometry affected by this action before opening authoring');
-        const a={type,parameter,entities:[...w.selection],direction:{x:w.eval(v.dx),y:w.eval(v.dy)},base:clone(w.doc.blockEditing.base)};
-        if(type==='stretch'){let points=[];for(const e of w.selected()){const b=entityBounds(e,w.doc);points.push({x:b.minX,y:b.minY},{x:b.maxX,y:b.maxY});}const b=bounds(points);a.box={minX:(b.minX+b.maxX)/2,minY:b.minY-1,maxX:b.maxX+1,maxY:b.maxY+1};}
-        if(type==='array')a.step={x:w.eval(v.dx),y:w.eval(v.dy)};if(type==='visibility')a.states=JSON.parse(v.states);if(type==='lookup'){a.rows=JSON.parse(v.states);delete a.entities;}d.actions.push(a);
-    });
-}
-function blockManager(w){
-    if(w.blockSession)throw new Error('Save or close the active block editor first');
-    const names=Object.keys(w.doc.blocks).filter(n=>!w.doc.blocks[n].dimensionPicture&&!w.doc.blocks[n].dynamicInstance).sort();
-    w.openModal('Block definitions',`<label class="field">Definition<select id="block-name">${names.map(n=>`<option>${E(n)}</option>`).join('')}</select></label><div class="operation-grid"><button class="btn" id="manager-insert">Insert at view center</button><button class="btn" id="manager-delete">Delete unused definition</button></div><hr><label class="field">New block name<input id="manager-name" value="NewBlock"></label><button class="btn" id="manager-create">Create and edit block</button><p>Edit geometry, constrain sketches, define ports and attributes. Save refreshes every placement. Referenced definitions cannot be deleted; all operations are undoable.</p><div class="error-text"></div>`,{confirm:'Edit definition',onConfirm:()=>startBlockEditor(w,w.modal.querySelector('#block-name').value)});
-    const guarded=action=>{try{action();}catch(e){w.modal.querySelector('.error-text').textContent=e.message;}};
-    w.modal.querySelector('#manager-create').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#manager-name').value.trim();w.edit('Create block '+name,()=>createBlockDefinition(w.doc,name));startBlockEditor(w,name);});
-    w.modal.querySelector('#manager-insert').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#block-name').value;w.edit('Insert block '+name,()=>{const e=entity('INSERT',{block:name,x:w.camera.x,y:w.camera.y,sx:1,sy:1,layer:w.currentLayer,layout:w.doc.activeLayout});syncInsertAttributes(e,w.doc);w.doc.entities.push(e);w.selection=new Set([e.id]);});w.closeModal();});
-    w.modal.querySelector('#manager-delete').onclick=()=>guarded(()=>{const name=w.modal.querySelector('#block-name').value;w.edit('Delete unused block',()=>deleteBlockDefinition(w.doc,name));blockManager(w);});
-}
-const constraintTypes=['horizontal','vertical','length','radius','diameter','angle','angle-between','coincident','concentric','parallel','perpendicular','collinear','equal','distance','distance-x','distance-y','point-on-line','point-on-circle','midpoint','tangent','symmetric','fixed','fixed-point'];
-const unaryTypes=new Set(['horizontal','vertical','length','radius','diameter','angle','fixed','fixed-point']);
-const numericTypes=new Set(['length','radius','diameter','angle','angle-between','distance','distance-x','distance-y']);
-function constraintAuthor(w){
-    const selected=[...w.selection].map(id=>w.doc.entities.find(e=>e.id===id)).filter(Boolean);if(!selected.length)throw new Error('Select sketch geometry first');
-    const options=e=>['a','b','c','p'].filter(k=>e?.[k]).concat((e?.points||[]).map((_,i)=>`points.${i}`)).map(k=>`<option>${k}</option>`).join('');
-    w.openModal('Constrain sketch',`<p>${selected.length} objects in selection order. Dimensions are driving unless marked Reference. Angular expressions use degrees.</p><label class="field">Constraint<select id="constraint-type">${constraintTypes.map(t=>`<option>${t}</option>`).join('')}</select></label><div class="author-grid"><label class="field">First point<select id="constraint-point-a">${options(selected[0])}</select></label><label class="field">Second point<select id="constraint-point-b">${options(selected[1])}</select></label></div><div class="author-grid"><label class="field">First polyline segment (0-based)<input id="constraint-segment-a" value="0"></label><label class="field">Second polyline segment<input id="constraint-segment-b" value="0"></label></div><label class="field">Value or parameter expression<input id="constraint-value" value="100"></label><label class="field">Name (optional)<input id="constraint-name" placeholder="d1"></label><label><input id="constraint-reference" type="checkbox"> Reference measurement (does not constrain geometry)</label><div class="error-text"></div>`,{confirm:'Apply constraint',onConfirm:()=>{
-        const type=w.modal.querySelector('#constraint-type').value,reference=w.modal.querySelector('#constraint-reference').checked,name=w.modal.querySelector('#constraint-name').value.trim(),value=w.modal.querySelector('#constraint-value').value;
-        if(name&&(!/^[A-Za-z_]\w*$/.test(name)||reservedParameterNames().includes(name)||w.doc.constraints.some(c=>c.name===name)||Object.hasOwn(w.doc.parameters,name)))throw new Error('Constraint name must be unique and not shadow parameters');
-        if(reference&&!numericTypes.has(type))throw new Error('Reference mode requires a measurable dimensional constraint');
-        const count=unaryTypes.has(type)?1:type==='symmetric'?3:2;if(!unaryTypes.has(type)&&selected.length!==count)throw new Error(`This constraint requires ${count} objects`);
-        const pa=w.modal.querySelector('#constraint-point-a').value,pb=w.modal.querySelector('#constraint-point-b').value,segmentA=Number(w.modal.querySelector('#constraint-segment-a').value),segmentB=Number(w.modal.querySelector('#constraint-segment-b').value);
-        w.edit('Add '+type+' constraint',()=>{
-            const groups=unaryTypes.has(type)?selected.map(e=>[e]):[selected];
-            for(const [index,es]of groups.entries())w.doc.constraints.push({id:uid('constraint'),type,entities:es.map(e=>e.id),...(name?{name:groups.length>1?`${name}_${index+1}`:name}:{}),...(numericTypes.has(type)?{value}:{}),reference,segmentA,segmentB,pointA:pa||undefined,pointB:pb||undefined,...(type==='fixed'?{target:clone(es[0])}:{}),...(type==='fixed-point'?{target:clone(es[0][pa]||es[0].points?.[Number(pa.slice(7))])}:{})});
-            w.solveConstraints();w.showConstraintAnnotations=true;
-        });w.closeModal();w.toast('Constraint applied');
-    }});
-    const a=w.modal.querySelector('#constraint-point-a');if([...a.options].some(o=>o.value==='b'))a.value='b';
-}
-function parameterManager(w){
-    const descriptors=describeParameters(w.doc.parameters);
-    const row=(name,expression,value)=>`<div class="param-row"><input class="param-name" aria-label="Parameter name" value="${E(name)}"><input class="param-expression" aria-label="Expression for ${E(name)}" value="${E(typeof expression==='object'?expression.expression:expression)}"><output class="param-result">${number(value)}</output><button class="remove-param" aria-label="Remove parameter">×</button></div>`;
-    w.openModal('Parameters & solved calculations',`<p>Dependency-aware expressions. Functions include sqrt, hypot, sin, cos, atan2, min/max, clamp, rad and deg. Trigonometry uses radians; dimensional angle constraints use degrees.</p><div class="param-head"><span>Name</span><span>Expression</span><span>Calculated</span></div><div id="parameter-rows">${descriptors.map(p=>row(p.name,p.expression,p.value)).join('')}</div><button class="btn" id="add-parameter">Add parameter</button><div class="error-text" role="status"></div><h3>Constraint measurements</h3><div class="calculation-table">${constraintAnnotations(w.doc.entities,w.doc.constraints,w.doc.parameters).map(a=>`<div><b>${E(a.text)}</b><small>${a.reference?'Reference only':`Expression: ${E(a.expression??'geometric')}`}</small></div>`).join('')||'No constrained measurements.'}</div>`,{wide:true,confirm:'Apply parameters',onConfirm:()=>{
-        const values=read();resolveParameters(values);w.edit('Apply parametric calculations',()=>{w.doc.parameters=values;for(const e of w.doc.entities)w.evaluateParametric(e);if(w.doc.blockEditing?.dynamic)for(const p of w.doc.blockEditing.dynamic.parameters){if(!Object.hasOwn(values,p.name))throw new Error('Block parameter must be edited through Parameters & actions');if(p.expression!==undefined)p.expression=values[p.name];else if(typeof p.default==='number')p.default=evaluateExpression(values[p.name],values);}
-            w.solveConstraints();w.reroute();});w.closeModal();
-    }});
-    function read(){const next={};for(const r of w.modal.querySelectorAll('.param-row')){const name=r.querySelector('.param-name').value.trim();if(!/^[A-Za-z_]\w*$/.test(name)||reservedParameterNames().includes(name)||Object.hasOwn(next,name))throw new Error('Invalid, reserved or duplicate parameter: '+name);next[name]=r.querySelector('.param-expression').value;}return next;}
-    w.modal.querySelector('#add-parameter').onclick=()=>w.modal.querySelector('#parameter-rows').insertAdjacentHTML('beforeend',row('size'+w.modal.querySelectorAll('.param-row').length,'100',100));
-    w.modal.addEventListener('click',event=>event.target.closest('.remove-param')?.closest('.param-row')?.remove());
-    w.modal.addEventListener('input',()=>{try{const values=resolveParameters(read());for(const r of w.modal.querySelectorAll('.param-row'))r.querySelector('output').textContent=number(values[r.querySelector('.param-name').value.trim()]);w.modal.querySelector('.error-text').textContent='';}catch(error){w.modal.querySelector('.error-text').textContent=error.message;}});
-}
-function solverReport(w){
-    const report=w.solver.analyze(w.doc.entities,w.constraintsForSolve(),w.doc.parameters);w.lastSolve=report;
-    const measured=new Map(report.annotations.map(a=>[a.id,a]));
-    w.openModal('Parametric solve diagnostics',`<div class="solve-summary"><strong>${E(report.status)}</strong><p>${report.degreesOfFreedom} free scalar variables · rank ${report.rank} / ${report.variables}<br>${report.equations} equations in ${report.components.length} connected components · ${report.redundantEquations} dependent equations<br>Residual ${number(report.residual)}</p></div><p class="muted-note">Rank describes the supported planar variables at this configuration; it is not a proof of global uniqueness. Highlighted residuals are implicated constraints, not a minimal conflicting set.</p><div class="solver-list">${w.doc.constraints.map(c=>{const d=report.constraints.find(x=>x.id===c.id),a=measured.get(c.id);return `<section data-constraint-row="${E(c.id)}"><strong>${E(c.name||c.type)}</strong><span>${E(a?.text||c.type)}</span><small>${c.suppressed?'Suppressed':c.reference?'Reference':d?.satisfied?d.redundant?'Satisfied · dependent equation':'Satisfied':`Residual ${number(d?.residual)}`}</small><div><button class="btn" data-constraint-operation="edit" data-id="${E(c.id)}">Edit</button><button class="btn" data-constraint-operation="suppress" data-id="${E(c.id)}">${c.suppressed?'Enable':'Suppress'}</button><button class="btn" data-constraint-operation="remove" data-id="${E(c.id)}">Remove</button></div></section>`;}).join('')}</div>${B('solver-run','Solve now')}${B('constraint-display','Show / hide annotations')}${B('calculated-text','Calculated annotation')}`,{wide:true});
-    w.modal.addEventListener('click',event=>{const t=event.target.closest('[data-constraint-operation]');if(!t)return;const c=w.doc.constraints.find(c=>c.id===t.dataset.id);if(!c)return;
-        try{if(t.dataset.constraintOperation==='edit'){w.ask('Edit constraint',[{name:'name',label:'Name',value:c.name||''},{name:'value',label:'Expression (dimensional constraints)',value:c.value??''},{name:'reference',label:'Reference only · true / false',value:String(!!c.reference)}],v=>w.edit('Edit constraint',()=>{if(v.reference==='true'&&!numericTypes.has(c.type))throw new Error('Only dimensional constraints can be reference measurements');c.name=v.name;if(numericTypes.has(c.type))c.value=v.value;c.reference=v.reference==='true';}));return;}
-            w.edit('Edit constraint set',()=>{if(t.dataset.constraintOperation==='remove')w.doc.constraints=w.doc.constraints.filter(x=>x!==c);else c.suppressed=!c.suppressed;});solverReport(w);
-        }catch(e){w.toast(e.message,true);}
-    });
-}
-function refreshCalculations(w){
-    const annotations=constraintAnnotations(w.doc.entities,w.doc.constraints||[],w.doc.parameters||{});w.constraintLabels=annotations;
-    evaluateCalculations(w.doc.entities,w.doc.constraints||[],w.doc.parameters||{});
-}
-function calculatedText(w){w.ask('Calculated annotation',[{name:'expression',label:'Expression · user parameters and named measured constraints',value:Object.keys(w.doc.parameters)[0]||'100'},{name:'prefix',label:'Prefix',value:'Size = '},{name:'suffix',label:'Suffix',value:' '+w.doc.units},{name:'precision',label:'Decimal precision',value:3}],v=>w.edit('Create calculated annotation',()=>{const e=entity('TEXT',{p:{x:w.camera.x,y:w.camera.y},height:12,layer:'Annotations',text:'',layout:w.doc.activeLayout,calculation:{version:1,expression:v.expression,prefix:v.prefix,suffix:v.suffix,precision:Number(v.precision)}});w.doc.entities.push(e);w.selection=new Set([e.id]);refreshCalculations(w);}));}
-function drawParametricOverlay(w,ctx,cam){
-    if(w.showConstraintAnnotations){const seen=new Map();ctx.save();ctx.font='11px ui-monospace,monospace';ctx.textBaseline='middle';
-        for(const a of w.constraintLabels||[]){if(!a.visible||!a.entityIds.some(id=>w.doc.entities.some(e=>e.id===id&&(e.layout||'Model')===(w.doc.activeLayout||'Model'))))continue;const p=cam.screen(a.position),key=a.entityIds[0],offset=seen.get(key)||0;seen.set(key,offset+1);const x=p.x+12,y=p.y-18-offset*20;if(x<24||y<24||x>cam.width-24||y>cam.height-24)continue;const width=ctx.measureText(a.text).width+12;ctx.fillStyle=a.reference?'#f0f3fb':'#e4f3ed';ctx.strokeStyle='#65a48b';ctx.lineWidth=1;ctx.fillRect(x,y-9,width,18);ctx.strokeRect(x,y-9,width,18);ctx.fillStyle='#265547';ctx.fillText(a.text,x+6,y);}
-        ctx.restore();
-    }
-    if(w.doc.blockEditing){ctx.save();const base=cam.screen(w.doc.blockEditing.base);ctx.strokeStyle='#9252b8';ctx.beginPath();ctx.moveTo(base.x-10,base.y);ctx.lineTo(base.x+10,base.y);ctx.moveTo(base.x,base.y-10);ctx.lineTo(base.x,base.y+10);ctx.stroke();ctx.font='11px sans-serif';
-        for(const port of w.doc.blockEditing.ports){const p=cam.screen(port);ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle='#f9f3ff';ctx.fill();ctx.stroke();ctx.fillStyle='#674280';ctx.fillText(port.name,p.x+9,p.y-7);}ctx.restore();
-    }
-}
-function parametricDemo(w){w.edit('Create constrained bracket',()=>{
-    const base={x:w.camera.x,y:w.camera.y},a=entity('LINE',{a:base,b:{x:base.x+120,y:base.y},layer:'0'}),b=entity('LINE',{a:{x:base.x+120,y:base.y},b:{x:base.x+120,y:base.y+70},layer:'0'}),hole=entity('CIRCLE',{c:{x:base.x+60,y:base.y+35},r:12,layer:'0'});
-    w.doc.entities.push(a,b,hole);Object.assign(w.doc.parameters,{bracketWidth:120,bracketHeight:70,holeDiameter:'bracketHeight/3'});
-    const cs=[{type:'fixed-point',entities:[a.id],pointA:'a',target:base},{type:'horizontal',entities:[a.id]},{type:'length',entities:[a.id],value:'bracketWidth',name:'widthMeasured'},{type:'coincident',entities:[a.id,b.id]},{type:'vertical',entities:[b.id]},{type:'length',entities:[b.id],value:'bracketHeight'},{type:'diameter',entities:[hole.id],value:'holeDiameter'},{type:'length',entities:[a.id],reference:true,name:'spanReference'}];
-    w.doc.constraints.push(...cs.map(c=>({id:uid('constraint'),...c})));w.selection=new Set([a.id,b.id,hole.id]);w.showConstraintAnnotations=true;
-});w.closeModal();w.renderer.fit();}
-function parametricAction(w,action){
-    if(w.blockSession&&['new','open','export','save-project','rename','library-guide'].includes(action))throw new Error('Save or close the block editor before changing or exporting the drawing');
-    if(action==='block-edit'){const e=w.selected()[0];if(!e||e.type!=='INSERT'||isLocked(e,w.doc))throw new Error('Select an unlocked block insert');startBlockEditor(w,e.block);return true;}
-    if(action==='blocks'){blockManager(w);return true;}
-    if(action==='block-save'||action==='block-save-close'){finishBlockEditor(w,true,action==='block-save');return true;}
-    if(action==='block-close'){w.openModal('Discard block edits?','<p>The drawing and its inserts keep the last saved definition.</p>',{confirm:'Discard edits',onConfirm:()=>{w.closeModal();finishBlockEditor(w,false);}});return true;}
-    if(action==='block-test'){testBlock(w);return true;}if(action==='block-test-close'){endBlockTest(w);return true;}
-    if(action==='block-settings'){settings(w);return true;}if(action==='block-port'){addPort(w);return true;}if(action==='block-attribute'){addAttribute(w);return true;}if(action==='block-author'){blockAuthor(w);return true;}
-    if(action==='block-save-as'){w.ask('Save block as',[{name:'name',label:'New block name',value:w.blockSession.name+'_copy'}],v=>finishBlockEditor(w,true,false,v.name));return true;}
-    if(action==='block-sync-attributes'){const e=w.selected()[0];if(e?.type!=='INSERT')throw new Error('Select a block insert');w.edit('Synchronize block attributes',()=>{const report=updateBlockDefinition(w.doc,e.block,w.doc.blocks[e.block]);w.reroute(new Set(report.inserts));});return true;}
-    if(action==='block-copy'||action==='block-rename'){const e=w.selected()[0];if(e?.type!=='INSERT')throw new Error('Select a block insert');w.ask(action==='block-copy'?'Make insert unique':'Rename shared block',[{name:'name',label:'New definition name',value:e.block+'_copy'}],v=>w.edit('Change block identity',()=>{if(action==='block-copy'){duplicateBlockDefinition(w.doc,e.block,v.name);w.doc.entities.find(x=>x.id===e.id).block=v.name;}else renameBlockDefinition(w.doc,e.block,v.name);}));return true;}
-    if(action==='auto-constrain'){const selected=w.selected();if(!selected.length)throw new Error('Select sketch geometry first');w.edit('Auto constrain sketch',()=>{w.doc.constraints.push(...inferSketchConstraints(selected,w.doc.constraints));w.showConstraintAnnotations=true;});return true;}
-    if(action==='constraint'){constraintAuthor(w);return true;}if(action==='parameters'){parameterManager(w);return true;}if(action==='solver-report'){solverReport(w);return true;}
-    if(action==='solver-run'){w.edit('Solve parametric sketch',()=>w.solveConstraints());solverReport(w);return true;}
-    if(action==='constraint-display'){w.showConstraintAnnotations=!w.showConstraintAnnotations;refreshCalculations(w);w.renderer.invalidate();return true;}
-    if(action==='calculation-bake'){const e=w.selected()[0];if(!e?.calculation)throw new Error('Select calculated text');w.edit('Convert calculation to static text',()=>{delete e.calculation;});return true;}
-    if(action==='calculated-text'){calculatedText(w);return true;}if(action==='parametric-demo'){parametricDemo(w);return true;}
-    return false;
-}
-
-return {startBlockEditor,finishBlockEditor,renderParametricInspector,constraintAuthor,parameterManager,refreshCalculations,drawParametricOverlay,parametricAction};
 })();
 // packages/workbench/src/cad-editing.js
 __modules["packages/workbench/src/cad-editing.js"]=(()=>{
@@ -6200,6 +6795,14 @@ class PointerController {
         catch { }
     }
     clearLong() { clearTimeout(this.longTimer); this.longTimer = null; }
+    reset() {
+        this.clearLong();
+        for (const id of this.pointers.keys()) {
+            try { if (this.element.hasPointerCapture(id)) this.element.releasePointerCapture(id); } catch {}
+        }
+        this.pointers.clear(); this.gesture = null;
+        this.handlers.cancel?.('document-switch');
+    }
     dispose() { this.clearLong(); this.abort.abort(); this.pointers.clear(); }
 }
 
@@ -6209,7 +6812,7 @@ return {PointerController};
 __modules["packages/storage/src/index.js"]=(()=>{
 /** Local-only recovery store. No accounts, telemetry, network upload, or cloud persistence. */
 class ProjectStore {
-    constructor({ database = 'conduit-cad', onStatus = () => { } } = {}) { this.database = database; this.onStatus = onStatus; this.timer = null; this.ready = this.open(); }
+    constructor({ database = 'conduit-cad', onStatus = () => { } } = {}) { this.database = database; this.onStatus = onStatus; this.timer = null; this.ready = this.open().catch(() => null); }
     async open() {
         if (!globalThis.indexedDB)
             return null;
@@ -6260,7 +6863,95 @@ class ProjectStore {
             const saved = await this.load();
             return saved ? [saved] : [];
         }
-        return new Promise((resolve, reject) => { const r = db.transaction('projects', 'readonly').objectStore('projects').getAll(); r.onsuccess = () => resolve(r.result.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))); r.onerror = () => reject(r.error); });
+        return new Promise((resolve, reject) => { const r = db.transaction('projects', 'readonly').objectStore('projects').getAll(); r.onsuccess = () => resolve(r.result.filter(record => record.kind !== 'workspace').sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))); r.onerror = () => reject(r.error); });
+    }
+    /** Atomically checkpoint open drawing records and their ordered workspace manifest. */
+    async saveWorkspace(records, manifest, key = 'default') {
+        const id = 'workspace:' + key;
+        if (!Array.isArray(records) || records.some(record => !record.document || !Array.isArray(record.document.entities))) throw new TypeError('Invalid workspace document');
+        const ids = records.map(record => record.id);
+        if (ids.length > 128 || ids.some(value => typeof value !== 'string' || !/^[a-zA-Z0-9_-]{1,128}$/.test(value)) || new Set(ids).size !== ids.length
+            || manifest?.version !== 1 || !Array.isArray(manifest.ids) || manifest.ids.length !== ids.length || new Set(manifest.ids).size !== ids.length
+            || manifest.ids.some(value => !ids.includes(value)) || (ids.length ? !ids.includes(manifest.activeId) : manifest.activeId !== null)) {
+            throw new TypeError('Invalid workspace manifest or session IDs');
+        }
+        const snapshot = JSON.parse(JSON.stringify({ records, manifest }));
+        const updatedAt = new Date().toISOString();
+        const db = await this.ready;
+        if (!db) {
+            // One localStorage value is atomic; never publish a manifest before its documents.
+            const previous = JSON.parse(localStorage.getItem(this.database + ':' + id) || 'null');
+            const all = new Map((previous?.records || []).map(record => [record.id, record]));
+            for (const record of snapshot.records) all.set(record.id, { ...record, updatedAt });
+            localStorage.setItem(this.database + ':' + id, JSON.stringify({ ...snapshot, records: [...all.values()], updatedAt }));
+            return;
+        }
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction('projects', 'readwrite'), store = tx.objectStore('projects');
+            tx.oncomplete = resolve;
+            tx.onerror = () => reject(tx.error || new Error('Recovery write failed'));
+            tx.onabort = () => reject(tx.error || new Error('Recovery transaction aborted'));
+            try {
+                store.put({ id, kind: 'workspace', updatedAt, manifest: snapshot.manifest });
+                for (const record of snapshot.records) store.put({
+                    ...record, id: id + ':' + record.id, sessionId: record.id,
+                    kind: 'drawing-session', name: record.document.name, updatedAt
+                });
+            } catch (error) {
+                // A synchronous DataError must not let an already-enqueued manifest commit.
+                try { tx.abort(); } catch { /* Transaction may already have aborted. */ }
+                reject(error);
+            }
+        });
+    }
+    async loadWorkspace(key = 'default') {
+        const id = 'workspace:' + key, db = await this.ready;
+        if (!db) {
+            const saved = JSON.parse(localStorage.getItem(this.database + ':' + id) || 'null');
+            if (!saved) return null;
+            return { ...saved, records: saved.manifest.ids.map(sessionId => saved.records.find(record => record.id === sessionId)) };
+        }
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction('projects', 'readonly'), store = tx.objectStore('projects');
+            let result = null;
+            tx.onerror = () => reject(tx.error || new Error('Recovery read failed'));
+            tx.onabort = () => reject(tx.error || new Error('Recovery read aborted'));
+            tx.oncomplete = () => resolve(result);
+            const request = store.get(id);
+            request.onsuccess = () => {
+                const manifest = request.result?.manifest;
+                if (!manifest) return;
+                if (manifest.version !== 1 || !Array.isArray(manifest.ids) || manifest.ids.length > 128) {
+                    tx.abort(); return;
+                }
+                result = { manifest, records: new Array(manifest.ids.length) };
+                manifest.ids.forEach((sessionId, index) => {
+                    const record = store.get(id + ':' + sessionId);
+                    record.onsuccess = () => { if (record.result) result.records[index] = { ...record.result, id: sessionId }; };
+                });
+            };
+        });
+    }
+    async listWorkspace(key = 'default') {
+        const prefix = 'workspace:' + key + ':', db = await this.ready;
+        let records;
+        if (!db) records = JSON.parse(localStorage.getItem(this.database + ':workspace:' + key) || 'null')?.records || [];
+        else records = await new Promise((resolve, reject) => {
+            const request = db.transaction('projects', 'readonly').objectStore('projects').getAll(IDBKeyRange.bound(prefix, prefix + '\uffff'));
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+        return records.map(record => ({ id: record.sessionId || record.id, name: record.document?.name || record.name,
+            entities: record.document?.entities?.length || 0, updatedAt: record.updatedAt, blockDraft: !!record.state?.block
+        })).sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+    }
+    async loadWorkspaceRecord(sessionId, key = 'default') {
+        const db = await this.ready;
+        if (db) {
+            const record = await this.load('workspace:' + key + ':' + sessionId);
+            return record ? { ...record, id: sessionId } : null;
+        }
+        return JSON.parse(localStorage.getItem(this.database + ':workspace:' + key) || 'null')?.records?.find(record => record.id === sessionId) || null;
     }
     dispose() { clearTimeout(this.timer); this.ready.then(db => db?.close()); }
 }
@@ -6342,6 +7033,9 @@ return {writeSVG,renderPNG,writeBOM};
 })();
 // packages/workbench/src/index.js
 __modules["packages/workbench/src/index.js"]=(()=>{
+const {initializeDocuments, claimWorkspace, createDocumentHistory, recoverDocuments, forkRecoveryWorkspace, captureActiveDocument, activateDocument, openDocument, renderDocuments, documentAction, documentKeyDown, documentChanged, scheduleRecovery, requestCloseDocument, disposeDocuments} = __modules["packages/workbench/src/document-workbench.js"];
+const {bindMobileWorkspace, updateMobilePanels} = __modules["packages/workbench/src/mobile-workspace.js"];
+const {mergeClipboardBlocks} = __modules["packages/workspace/src/index.js"];
 const {DRAWING_TOOLS, drawingTool} = __modules["packages/drawing/src/index.js"];
 const {beginDrawing, acceptDrawingPoint, drawingPointerUp, drawingPreview, updateDrawingControls, finishDrawing, drawingToolSections, bindDrawingSearch, drawingAction, drawingCommand, nativeGrips, changeNativeGrip, renderDrawingInspector, nativePropertyChange} = __modules["packages/workbench/src/drawing-workbench.js"];
 const {parametricAction, renderParametricInspector, refreshCalculations, drawParametricOverlay, startBlockEditor, finishBlockEditor, parameterManager, constraintAuthor} = __modules["packages/workbench/src/parametric-workbench.js"];
@@ -6381,6 +7075,7 @@ class Workbench {
             throw new Error('A host element is required');
         this.root = root;
         this.options = options;
+        this.initializing = true;
         this.doc = options.document || createDemo('pid');
         this.selection = new Set();
         this.tool = 'select';
@@ -6407,14 +7102,15 @@ class Workbench {
         this.renderer.drawOverlay = (ctx, cam) => this.drawOverlay(ctx, cam);
         this.renderer.onFrame = stats => this.updateFrame(stats);
         this.renderer.setDocument(this.doc);
-        this.store = new ProjectStore({ onStatus: (s, error) => {
+        this.store = options.store || new ProjectStore({ onStatus: (s, error) => {
                 const el = this.$('.save-status');
                 if (el)
                     el.innerHTML = s === 'saved' ? `${icon('check')} Saved on device` : s === 'saving' ? 'Saving…' : 'Storage unavailable';
                 if (error)
                     this.toast('Autosave unavailable. Export a project copy to keep your work.', true);
             } });
-        this.history = new History({ capture: () => this.doc, restore: d => { this.doc = d; this.selection = new Set([...this.selection].filter(id => d.entities.some(e => e.id === id))); refreshCalculations(this); this.lastSolve=null; this.renderer.setDocument(d); this.updateUI(); }, onChange: () => { this.updateHistory(); this.store.schedule(this.doc); this.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: this.doc } })); } });
+        this.history = createDocumentHistory(this);
+        initializeDocuments(this);
         this.input = new PointerController(this.$('.viewport'), { down: p => this.pointerDown(p), move: p => {try{this.pointerMove(p);}catch(error){this.cancelGesture();this.toast(error.message,true);}}, up: p => this.pointerUp(p), hover: p => this.pointerHover(p), cancel: () => this.cancelGesture(), gesture: ({ previous, current, scale, dx, dy }) => { this.camera.zoom(scale, { x: previous.x, y: previous.y }); this.camera.pan(dx, dy); this.renderer.invalidate(); }, wheel: p => {
                 if (p.original.shiftKey)
                     this.camera.pan(-p.deltaY, 0);
@@ -6423,27 +7119,37 @@ class Workbench {
                 this.renderer.invalidate();
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.bindEvents();
+        bindMobileWorkspace(this);
         this.updateUI();
         this.ready = this.initialize(params);
     }
     $(selector) { return this.root.querySelector(selector); }
     async initialize(params) {
         await this.renderer.ready;
+        if (this.disposed) return this;
+        await claimWorkspace(this);
+        let recovered = false;
         if (!this.options.document && params.get('fresh') !== '1') {
-            const saved = await this.store.load();
-            if (saved?.document) {
-                try {
-                    this.doc = validateDocument(saved.document);
-                    this.renderer.setDocument(this.doc);
-                    this.updateUI();
-                    this.toast('Recovered your last drawing from this device.');
+            recovered = await recoverDocuments(this);
+            if (this.recoveryIncomplete) await forkRecoveryWorkspace(this);
+            if (!recovered) {
+                const saved = await this.store.load();
+                if (saved?.document) {
+                    try {
+                        const document = validateDocument(saved.document);
+                        const session = this.documents.active;
+                        session.document = document; session.context.doc = document;
+                        this.doc = document; this.renderer.setDocument(document); this.updateUI();
+                        this.toast('Recovered your previous drawing in a document tab.');
+                    } catch {}
                 }
-                catch { }
             }
         }
         this.renderer.resize();
-        this.renderer.fit();
+        if (!recovered) this.renderer.fit();
         this.renderer.invalidate();
+        this.initializing = false;
+        captureActiveDocument(this); scheduleRecovery(this);
         return this;
     }
     renderShell() {
@@ -6455,7 +7161,7 @@ class Workbench {
  ${this.toolButton('select', 'Select', 'select')}${this.toolButton('pan', 'Pan', 'pan', 'mobile-hidden')}${this.toolButton('line', 'Line', 'line')}${this.toolButton('connect', 'Connect', 'connect')}<span class="dock-divider"></span>${this.toolButton('rect', 'Rectangle', 'rect', 'mobile-hidden')}${this.toolButton('circle', 'Circle', 'circle', 'mobile-hidden')}${this.toolButton('text', 'Text', 'text', 'mobile-hidden')}${this.toolButton('dimension', 'Measure', 'dimension', 'desktop-only')}${btn('shapes', 'Shapes', 'rect', 'mobile-only')}${btn('toggle-library', 'Symbols', 'symbols', 'mobile-only')}${btn('toggle-inspector', 'Edit', 'properties', 'mobile-only')}<span class="dock-divider"></span>${btn('more', 'More', 'more', '')}
  </nav></section>
  <aside class="inspector" aria-label="Drawing properties"><div class="inspector-tabs"><button data-inspector="properties" class="active">Properties</button><button data-inspector="layers">Layers</button><button data-inspector="qa">Check</button>${iconButton('toggle-inspector', 'close', 'Close properties', 'mobile-only')}</div><div class="inspector-content"></div></aside><div class="sheet-backdrop" data-action="close-panels"></div></main>
- <footer class="statusbar"><div class="left"><select class="layout-select" aria-label="Drawing layout"></select><span class="status-document"></span><span class="coords">X 0.0   Y 0.0</span></div><div class="right"><button data-action="toggle-grid">GRID</button><button data-action="toggle-snap">SNAP</button><button data-action="toggle-ortho">ORTHO</button><span class="status-extra">1:1</span><span class="stats"></span>${btn('command', 'Command', 'code', 'desktop-only')}</div></footer><input class="file-input hide" type="file" accept=".dxf,.json,.conduit" aria-label="Open DXF or Conduit project"><div class="toast" role="status" aria-live="polite"></div></div>`;
+ <footer class="statusbar"><div class="left"><select class="layout-select" aria-label="Drawing layout"></select><span class="status-document"></span><span class="coords">X 0.0   Y 0.0</span></div><div class="right"><button data-action="toggle-grid">GRID</button><button data-action="toggle-snap">SNAP</button><button data-action="toggle-ortho">ORTHO</button><span class="status-extra">1:1</span><span class="stats"></span>${btn('command', 'Command', 'code', 'desktop-only')}</div></footer><input class="file-input hide" type="file" multiple accept=".dxf,.json,.conduit" aria-label="Open DXF or Conduit project"><div class="toast" role="status" aria-live="polite"></div></div>`;
     }
     toolButton(tool, label, ic, cls = '') { return `<button data-tool="${tool}" class="${tool === 'select' ? 'active ' : ''}${cls}" title="${E(label)}" aria-label="${E(label)}" aria-pressed="${tool === 'select'}">${icon(ic)}<span>${E(label)}</span></button>`; }
     bindEvents() {
@@ -6464,9 +7170,7 @@ class Workbench {
         this.root.addEventListener('change', e => this.onChange(e), opt);
         this.$('#symbol-search').addEventListener('input', e => { this.librarySearch = e.target.value; this.renderLibrary(); }, opt);
         this.$('.file-input').addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (file)
-                this.openFile(file);
+            this.openFiles([...e.target.files]);
             e.target.value = '';
         }, opt);
         this.$('.library-scroll').addEventListener('pointerdown', e => this.libraryPointerDown(e), opt);
@@ -6485,9 +7189,7 @@ class Workbench {
         this.$('.viewport').addEventListener('dragover', e => { e.preventDefault(); }, opt);
         this.$('.viewport').addEventListener('drop', e => {
             e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file)
-                this.openFile(file);
+            this.openFiles([...e.dataTransfer.files]);
         }, opt);
         document.addEventListener('keydown', e => this.keyDown(e), opt);
         document.addEventListener('keyup', e => {
@@ -6496,16 +7198,24 @@ class Workbench {
         }, opt);
         window.addEventListener('blur', () => { this.space = false; this.cancelGesture(); }, opt);
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden)
-                this.store.save(this.blockSession?.parentDocument || this.doc).catch(() => { });
+            if (document.hidden && !this.initializing)
+                this.documents.saveAll().catch(() => { });
         }, opt);
     }
     async onClick(event) {
+        if (this.initializing || this.disposed) return;
         const target = event.target.closest('button,[data-action]');
         if (!target)
             return;
         if (target.disabled)
             return;
+        if (target.dataset.documentId) {
+            try {
+                if (target.dataset.documentOperation === 'close') await requestCloseDocument(this, target.dataset.documentId);
+                else activateDocument(this, target.dataset.documentId);
+            } catch (error) { this.toast(error.message, true); }
+            return;
+        }
         if (target.dataset.tool) {
             this.setTool(target.dataset.tool);
             return;
@@ -6571,6 +7281,9 @@ class Workbench {
         }
     }
     async action(action) {
+        if (action.startsWith('document-')) { await documentAction(this, action); return; }
+        if (action === 'new') { this.newDialog(); return; }
+        if (action === 'open') { this.closeModal(); this.$('.file-input').click(); return; }
         if(drawingAction(this,action))return;
         if(parametricAction(this,action))return;
         if(cadEditingAction(this,action))return;
@@ -6760,7 +7473,7 @@ class Workbench {
         }
         this.hideContext();
     }
-    updateUI() { this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); }
+    updateUI() { this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -6813,7 +7526,7 @@ class Workbench {
         this.updateStatus();
     }
     edit(label, action) { this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
-    updateSelection() { this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
+    updateSelection() { scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
         if (focus) {
@@ -6848,6 +7561,7 @@ class Workbench {
         this.renderer.invalidate();
     }
     updateTools() {
+        scheduleRecovery(this);
         this.root.querySelectorAll('[data-tool]').forEach(b => { b.classList.toggle('active', b.dataset.tool === this.tool); b.setAttribute('aria-pressed', String(b.dataset.tool === this.tool)); });
         this.$('.viewport')?.classList.toggle('drawing', !['select', 'pan'].includes(this.tool));
         this.$('.viewport')?.classList.toggle('panning', this.tool === 'pan');
@@ -6864,12 +7578,13 @@ class Workbench {
         updateDrawingControls(this);
         this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
     }
-    isMobile() { return matchMedia('(max-width:720px)').matches; }
+    isMobile() { return this.mobileMedia?.matches ?? matchMedia('(max-width:720px), (max-height:540px) and (pointer:coarse)').matches; }
     togglePanel(name) {
         const panel = this.$('.' + name);
         if (panel.classList.contains('open')) {
             panel.classList.remove('open');
             this.$('.sheet-backdrop').classList.remove('visible');
+            updateMobilePanels(this);
         }
         else
             this.openPanel(name);
@@ -6883,8 +7598,9 @@ class Workbench {
         this.$('.' + name).classList.add('open');
         if (name === 'inspector')
             this.renderInspector();
+        updateMobilePanels(this, name);
     }
-    closePanels() { this.$('.library').classList.remove('open'); this.$('.inspector').classList.remove('open'); this.$('.sheet-backdrop').classList.remove('visible'); }
+    closePanels() { const panelFocused = document.activeElement?.closest('.library,.inspector'); this.$('.library').classList.remove('open'); this.$('.inspector').classList.remove('open'); this.$('.sheet-backdrop').classList.remove('visible'); updateMobilePanels(this); if(panelFocused)this.panelPreviousFocus?.focus?.({preventScroll:true}); }
     symbolName(id) { return SYMBOLS.find(s => s.id === id)?.name || this.doc.blocks[id]?.symbol?.name || id || 'symbol'; }
     renderLibrary() {
         this.$('.library-count').textContent = String(SYMBOLS.length);
@@ -7931,16 +8647,18 @@ class Workbench {
             this.reroute(this.selection);
         });
     }
-    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es), blocks: clone(this.doc.blocks) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied to the app clipboard`); }
+    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es), blocks: clone(this.doc.blocks), layers: clone(this.doc.layers) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied to the app clipboard`); }
     pasteSelection() {
         if (!this.clipboard)
             throw new Error('Copy objects in this workspace first');
         const cb = this.clipboard;
         this.edit('Paste', () => {
-            Object.assign(this.doc.blocks, clone(cb.blocks));
-            const map = new Map(cb.entities.map(e => [e.id, uid()])), es = clone(cb.entities);
+            const merged = mergeClipboardBlocks(this.doc.blocks, cb.blocks, cb.entities);
+            for(const [name,block] of Object.entries(merged.blocks))Object.defineProperty(this.doc.blocks,name,{value:block,writable:true,enumerable:true,configurable:true});
+            const map = new Map(merged.entities.map(e => [e.id, uid()])), es = merged.entities;
             for (const e of es) {
                 e.id = map.get(e.id);
+                e.layout = this.doc.activeLayout;
                 delete e._dxf;
                 moveEntity(e, 40, -40);
                 if (e.tag)
@@ -7951,6 +8669,7 @@ class Workbench {
                         e.connector[key] = ref && map.has(ref.entityId) ? { ...ref, entityId: map.get(ref.entityId) } : null;
                     }
             }
+            for(const layer of cb.layers || [])if(!this.doc.layers.some(l=>l.name===layer.name))this.doc.layers.push(clone(layer));
             this.doc.entities.push(...es);
             this.selection = new Set(es.map(e => e.id));
         });
@@ -8130,7 +8849,7 @@ class Workbench {
         backdrop.addEventListener('change', e => this.onChange(e));
         backdrop.addEventListener('keydown', e => {
             if (e.key === 'Tab') {
-                const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')], first = focus[0], last = focus.at(-1);
+                const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'), first = focus[0], last = focus.at(-1);
                 if (e.shiftKey && document.activeElement === first) {
                     e.preventDefault();
                     last.focus();
@@ -8145,7 +8864,10 @@ class Workbench {
                 this.modalConfirm?.();
             }
         });
-        setTimeout(() => backdrop.querySelector('input,textarea,select,button')?.focus(), 30);
+        setTimeout(() => {
+            if (this.modal !== backdrop || backdrop.contains(document.activeElement)) return;
+            (backdrop.querySelector('input:not([type="checkbox"]),textarea,select') || backdrop.querySelector('button'))?.focus({ preventScroll: true });
+        }, 30);
     }
     closeModal() {
         if (this.modal) {
@@ -8156,9 +8878,9 @@ class Workbench {
         }
     }
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }
-    toast(message, error = false) { const el = this.$('.toast'); el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
+    toast(message, error = false) { const el = this.$('.toast'); if (this.disposed || !el) return; el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
     newDialog() {
-        this.openModal('Create a drawing', `<p>Your current drawing is saved before switching. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
+        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
         const input = this.modal.querySelector('#template-search');
         input.addEventListener('input', () => {
             const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -8168,22 +8890,20 @@ class Workbench {
         });
     }
     async newDocument(kind) {
-        if(this.blockSession)throw new Error('Close the block editor before creating another drawing');
-        if (this.switchingDocument) return;
-        this.switchingDocument = true;
-        try {
-            const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
-            try { await this.store.save(this.doc, uid('project')); }
-            catch { this.toast('Previous project could not be saved. Export it before starting a new drawing.', true); return; }
-            const profile = DRAWING_TYPES.find(p => p.id === kind);
-            this.closeModal(); this.closePanels(); this.cancelGesture();
-            this.doc = next; this.selection.clear(); this.history.clear();
-            this.category = profile?.categories[0] || 'P&ID'; this.lineStyle = profile?.defaultLineStyle || 'process';
-            this.currentLayer = LINE_STYLES.find(s => s.id === this.lineStyle)?.layer || 'Process';
-            this.librarySearch = ''; this.$('#symbol-search').value = '';
-            this.renderer.setDocument(this.doc); this.setTool('select'); this.updateUI(); this.renderer.fit(); this.store.schedule(this.doc);
-        } finally { this.switchingDocument = false; }
+        if (this.initializing) await this.ready;
+        const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
+        const profile = DRAWING_TYPES.find(p => p.id === kind), style = profile?.defaultLineStyle || 'process';
+        return openDocument(this, next, { context: {
+            category: profile?.categories[0] || 'P&ID', lineStyle: style,
+            currentLayer: LINE_STYLES.find(s => s.id === style)?.layer || 'Process'
+        } });
     }
+    openDocument(document, options = {}) { return openDocument(this, document, options); }
+    activateDocument(id) { return activateDocument(this, id); }
+    closeDocument(id = this.documents.activeId) { return requestCloseDocument(this, id); }
+    saveAllDocuments() { return this.documents.saveAll(); }
+    scheduleRecovery() { scheduleRecovery(this); }
+    documentChanged() { documentChanged(this); }
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
     exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
     async doExport(format) {
@@ -8225,8 +8945,22 @@ class Workbench {
         else
             throw new Error('Unknown export format');
     }
-    async openFile(file) {
-        if(this.blockSession)throw new Error('Close the block editor before opening another drawing');
+    openFiles(files) {
+        return Promise.all(files.map(file => this.openFile(file)));
+    }
+    openFile(file) {
+        const operation = this.documentImportQueue.catch(() => {}).then(async () => {
+            if (this.initializing) await this.ready;
+            if (this.disposed) return null;
+            return this.importFile(file);
+        });
+        this.documentImportQueue = operation;
+        return operation;
+    }
+    async importFile(file) {
+        if (this.documents.sessions.length >= this.documents.maxDocuments) {
+            this.toast('Document limit reached. Close a drawing before importing more files.', true); return null;
+        }
         if (file.size > 128 * 1024 * 1024) {
             this.toast('The import limit is 128 MiB.', true);
             return;
@@ -8251,22 +8985,8 @@ class Workbench {
                 await new Promise(r => setTimeout(r, 0));
                 doc = parseDXF(buffer, { name: file.name.replace(/\.dxf$/i, '') });
             }
-            try {
-                await this.store.save(this.doc, uid('project'));
-            }
-            catch {
-                throw new Error('Current drawing could not be backed up locally. Export it before replacing it.');
-            }
-            this.cancelGesture();
-            this.doc = doc;
-            this.selection.clear();
-            this.history.clear();
-            this.currentLayer = this.doc.layers.find(l => l.visible && !l.locked)?.name || '0';
-            this.renderer.setDocument(this.doc);
-            this.setTool('select');
-            this.updateUI();
-            this.renderer.fit();
-            this.store.schedule(this.doc);
+            if (this.disposed) return null;
+            openDocument(this, doc, { context: { currentLayer: doc.layers.find(l => l.visible && !l.locked)?.name || '0' } });
             const warnings = (doc.importDiagnostics || []).filter(i => i.severity === 'warning');
             this.toast(`${file.name} opened · ${doc.entities.length} entities${warnings.length ? ' · ' + warnings.length + ' import warnings (Check)' : ''}`, warnings.length > 0);
             if (warnings.length) {
@@ -8360,6 +9080,7 @@ class Workbench {
         this.toast(cmd + ' completed');
     }
     keyDown(e) {
+        if (this.initializing || this.disposed) return;        if (documentKeyDown(this, e)) return;
         const input = e.target.closest?.('input,textarea,select,[contenteditable=true]');
         if (e.key === 'Escape') {
             e.preventDefault();
@@ -8463,8 +9184,8 @@ class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.6.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>14</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.7.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>15</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    dispose() { this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 function mountWorkbench(element, options = {}) { return new Workbench(element, options); }
 
