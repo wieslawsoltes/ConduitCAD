@@ -54,9 +54,9 @@ test('rational spline hatch preserves native knots, controls, weights and edge t
  for(const key of ['knots','controlPoints','weights','degree','rational'])assert.deepEqual(b[key],a[key]);
  assert.ok(hatchContours(get('spline'),.01)[0].length>20);
 });
-test('gradient DXF data survives native export while preview limitation remains explicit',()=>{
+test('gradient DXF data survives native export and supported LINEAR preview is exposed',()=>{
  assert.deepEqual(regenerated('gradient').gradient,get('gradient').gradient);
- assert.ok(doc.importDiagnostics.some(d=>/Gradient/.test(d.message)));
+ assert.ok(entityGeometry(get('gradient'),doc).paths[0].gradient);
 });
 test('variable-width bulge polyline emits a filled ribbon and retains per-vertex widths',()=>{
  const e=get('wide-polyline'),g=entityGeometry(e,doc);assert.equal(g.paths[0].stroke,false);assert.ok(g.paths[0].fill);assert.ok(g.paths[0].points.length>12);

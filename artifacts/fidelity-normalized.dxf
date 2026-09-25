@@ -491,7 +491,7 @@ AcDbBlockBegin
 2
 *Model_Space
 70
-0
+1
 10
 0
 20
@@ -533,7 +533,7 @@ AcDbBlockBegin
 2
 *Paper_Space
 70
-0
+1
 10
 0
 20

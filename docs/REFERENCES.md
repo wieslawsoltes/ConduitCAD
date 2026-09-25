@@ -65,3 +65,21 @@ absence of certification are documented separately in SYMBOLS.md.
 
 These references guide the implemented subset. They do not establish universal
 AutoCAD rendering equivalence or proprietary application-object evaluation.
+
+## Dimension editing and hatch paints (0.4.0)
+
+- Autodesk, common DIMENSION group codes and native type/text flags:
+  https://help.autodesk.com/cloudhelp/2016/ENU/AutoCAD-DXF/files/GUID-EDD54EAC-A339-4EBA-AEA6-EC8066505E2B.htm
+- Autodesk, aligned dimension witness-point group codes:
+  https://help.autodesk.com/cloudhelp/2018/ENU/AutoCAD-DXF/files/GUID-7A123D5D-AC98-4A9A-A8CF-1A7EF5030418.htm
+- Autodesk, native dimension style override encoding:
+  https://help.autodesk.com/cloudhelp/2024/ENU/AutoCAD-DXF/files/GUID-6A4C31C0-4988-499C-B5A4-15582E433B0F.htm
+- Autodesk, dimension-variable XDATA group/type mapping:
+  https://help.autodesk.com/cloudhelp/2018/ENU/OARXMAC-RefGuide/files/OREFMAC-Dimension_Style_Overrides.html
+- Autodesk, HATCH gradient angle/shift/color tags:
+  https://help.autodesk.com/cloudhelp/2018/ENU/AutoCAD-DXF/files/GUID-C6C71CED-CE0F-4184-82A5-07AD6241F15B.htm
+
+Conduit's parameter/action schema is independently defined, not an implementation
+of a proprietary Autodesk object graph. Native export deliberately evaluates it
+into ordinary DXF BLOCK/INSERT geometry. Public terminology does not imply binary
+or evaluator equivalence.

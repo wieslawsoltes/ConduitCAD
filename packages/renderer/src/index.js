@@ -335,7 +335,14 @@ function drawFillUnclipped(ctx, path, camera) {
     for (const contour of path.contours || [path.points]) {
         contour.forEach((p, i) => { const q = camera.screen(p); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); }); ctx.closePath();
     }
-    ctx.fillStyle = path.fill; ctx.globalAlpha = path.opacity ?? 1; ctx.fill(path.fillRule || 'evenodd'); ctx.restore();
+    let fill=path.fill;
+    if(path.gradient?.kind==='linear') {
+        const g=path.gradient,[a,b,c,d,x,y]=g.frame,z=camera.scale,p=camera.screen({x,y});
+        ctx.transform(a*z,-b*z,c*z,-d*z,p.x,p.y);
+        fill=ctx.createLinearGradient(g.start.x,g.start.y,g.end.x,g.end.y);
+        fill.addColorStop(0,g.colors[0]);fill.addColorStop(1,g.colors[1]);
+    }
+    ctx.fillStyle = fill; ctx.globalAlpha = path.opacity ?? 1; ctx.fill(path.fillRule || 'evenodd'); ctx.restore();
 }
 function cadFont(name) {
     const clean = String(name || '').replace(/["'\\;{}]/g, '').replace(/\.(ttf|otf)$/i, '');

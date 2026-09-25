@@ -1,3 +1,5 @@
+import { renderCadEditing, changeCadEditing, cadEditingAction } from './cad-editing.js';
+import { editDimension, dimensionGrips, regenerateDimensions, setDynamicParameters, dynamicParameterGrips, dynamicGripValue } from '@conduitcad/model';
 import { bounds, inflate, contains, distance, distanceToSegment, lerp, union, emptyBounds, center, validBounds, snapCandidates, lineIntersection, offsetPolyline, filletLines, matrix, compose, TAU, clamp } from '@conduitcad/geometry';
 import { createDocument, validateDocument, entity, line, polyline, rect, circle, text, clone, uid, entityBounds, entityGeometry, documentBounds, layerFor, isVisible, isLocked, ports, moveEntity, transformEntity, explodeEntity, detachReferences } from '@conduitcad/model';
 import { History } from '@conduitcad/history';
@@ -66,7 +68,7 @@ export class Workbench {
                     this.toast('Autosave unavailable. Export a project copy to keep your work.', true);
             } });
         this.history = new History({ capture: () => this.doc, restore: d => { this.doc = d; this.selection = new Set([...this.selection].filter(id => d.entities.some(e => e.id === id))); this.renderer.setDocument(d); this.updateUI(); }, onChange: () => { this.updateHistory(); this.store.schedule(this.doc); this.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: this.doc } })); } });
-        this.input = new PointerController(this.$('.viewport'), { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), hover: p => this.pointerHover(p), cancel: () => this.cancelGesture(), gesture: ({ previous, current, scale, dx, dy }) => { this.camera.zoom(scale, { x: previous.x, y: previous.y }); this.camera.pan(dx, dy); this.renderer.invalidate(); }, wheel: p => {
+        this.input = new PointerController(this.$('.viewport'), { down: p => this.pointerDown(p), move: p => {try{this.pointerMove(p);}catch(error){this.cancelGesture();this.toast(error.message,true);}}, up: p => this.pointerUp(p), hover: p => this.pointerHover(p), cancel: () => this.cancelGesture(), gesture: ({ previous, current, scale, dx, dy }) => { this.camera.zoom(scale, { x: previous.x, y: previous.y }); this.camera.pan(dx, dy); this.renderer.invalidate(); }, wheel: p => {
                 if (p.original.shiftKey)
                     this.camera.pan(-p.deltaY, 0);
                 else
@@ -221,6 +223,7 @@ export class Workbench {
         }
     }
     async action(action) {
+        if(cadEditingAction(this,action))return;
         switch (action) {
             case 'library-guide':
                 this.libraryGuide();
@@ -445,6 +448,8 @@ export class Workbench {
     selected() { return this.doc.entities.filter(e => this.selection.has(e.id)); }
     eval(source) { return evaluateExpression(source, this.doc.parameters); }
     touch(changed = null) {
+        const regenerated=regenerateDimensions(this.doc);
+        if(changed&&regenerated.length)changed=new Set([...changed,...regenerated]);
         this.doc.version = (this.doc.version || 0) + 1;
         if (changed)
             this.renderer.updateEntities(new Set([...changed, ...(this.lastRoutedIds || [])]));
@@ -688,12 +693,14 @@ export class Workbench {
             section.innerHTML = `<h3>Symbol convention</h3><p>${E(block.symbol.standardRefs?.join(' / ') || block.symbol.convention || 'Custom block')}</p><p class="muted-note">Saved geometry revision ${E(block.symbol.geometryRevision || 'custom')} · ${E(block.symbol.review?.dimensionalConformance || 'not-verified')} dimensions</p>${btn('library-guide', 'Conventions & updates', 'help', 'btn')}`;
             host.append(section);
         }
+        renderCadEditing(this,e,host);
         host.scrollTop = scroll;
     }
     constraintsHTML(selected) { const ids = new Set(selected.map(e => e.id)), cs = this.doc.constraints.filter(c => (c.entities || [c.entityId]).some(id => ids.has(id))); return cs.length ? `<div class="inspector-section"><h3>Sketch constraints</h3>${cs.map(c => `<div class="constraint-item">${icon('param')}<span>${E(c.type)}${c.value !== undefined ? ' = ' + E(c.value) : ''}</span><button data-constraint-delete="${E(c.id)}" title="Remove constraint">${icon('close')}</button></div>`).join('')}</div>` : ''; }
     onChange(event) {
         const t = event.target;
         try {
+            if(changeCadEditing(this,t))return;
             if(t.id==='dxf-mode'){this.modal.querySelector('#dxf-version').disabled=t.value==='preserve';this.modal.querySelector('#dxf-strict').disabled=t.value==='preserve';return;}
             if (t.id === 'symbol-category') {
                 this.category = t.value; this.librarySearch = ''; this.$('#symbol-search').value = '';
@@ -992,12 +999,13 @@ export class Workbench {
         // OCS points cannot be exposed as WCS grips. Projected body dragging is handled by moveEntity.
         const n = e.extrusion;
         if (n && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'INSERT', 'HATCH', 'SOLID', 'TRACE'].includes(e.type) && (Math.abs(n.x || 0) > 1e-12 || Math.abs(n.y || 0) > 1e-12 || Math.abs((n.z ?? 1) - 1) > 1e-12)) return [];
-        if(e.type==='DIMENSION'&&e.block)return [];
+        if(e.type==='DIMENSION')return e.dimension?.version===1?dimensionGrips(e,this.doc):e.block?[]:[{...e.a,key:'a'},{...e.b,key:'b'}];
         if (e.type === 'LINE' || e.type === 'DIMENSION')
             return [{ ...e.a, key: 'a' }, { ...e.b, key: 'b' }];
         if (e.type === 'CIRCLE' || e.type === 'ARC')
             return [{ ...e.c, key: 'c' }, { x: e.c.x + e.r, y: e.c.y, key: 'radius' }];
         if (e.type === 'INSERT') {
+            const custom=dynamicParameterGrips(e,this.doc);if(custom.length)return custom;
             const b = bounds(entityGeometry(e, this.doc, { tolerance: 1 }).paths.flatMap(p => p.points));
             return validBounds(b) ? [{ x: b.maxX, y: b.minY, key: 'scale' }, { x: (b.minX + b.maxX) / 2, y: b.maxY + 25 / this.camera.scale, key: 'rotate' }] : [];
         }
@@ -1129,7 +1137,9 @@ export class Workbench {
         }
         if (drag.kind === 'grip') {
             const i = this.doc.entities.findIndex(e => e.id === drag.id), e = clone(drag.original), g = drag.grip, q = this.snapPoint(raw, this.selection);
-            if (g.key === 'radius') {
+            if(g.key.startsWith('dyn:')) {const name=g.key.slice(4);setDynamicParameters(e,this.doc,{[name]:dynamicGripValue(e,this.doc,name,q)});}
+            else if(g.key.startsWith('dim:')) {editDimension(e,this.doc,{[g.key.slice(4)]:q});}
+            else if (g.key === 'radius') {
                 e.r = Math.max(.001, distance(e.c, q));
                 e.parametric = { ...e.parametric, radius: String(e.r) };
             }
@@ -1335,8 +1345,7 @@ export class Workbench {
                 return;
             added.parametric = { kind: 'rectangle', width: String(box.maxX - box.minX), height: String(box.maxY - box.minY) };
         }
-        if (added.type === 'DIMENSION')
-            added.layer = 'Annotations';
+        if (added.type === 'DIMENSION') {added.layer='Annotations';editDimension(added,this.doc);}
         this.edit('Draw ' + TOOL_INFO[this.tool][0], () => { this.doc.entities.push(added); this.selection = new Set([added.id]); });
         this.updateSelection();
     }
@@ -1762,7 +1771,7 @@ export class Workbench {
             } });
     }
     lineStylesDialog() { this.openModal('Line & connection library', `<p>Choose a line type, then connect symbol ports or free points. Every connector is a native DXF polyline with optional application metadata.</p><div class="line-style-list">${LINE_STYLES.map(s => `<button data-style="${s.id}"><svg viewBox="0 0 90 20"><path d="M3 10h84" stroke="${s.color}" stroke-width="${s.width}" ${s.dash.length ? `stroke-dasharray="${s.dash.join(' ')}"` : ''}/>${s.arrow === 'end' ? `<path d="m77 5 9 5-9 5" fill="none" stroke="${s.color}" stroke-width="${s.width}"/>` : ''}</svg><span>${E(s.name)}</span>${s.id === this.lineStyle ? icon('check') : ''}</button>`).join('')}</div>`); }
-    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); }
+    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); }
     editText(e) { this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false } = {}) {
         this.closeModal();

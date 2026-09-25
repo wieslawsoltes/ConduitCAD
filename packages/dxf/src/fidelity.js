@@ -118,7 +118,7 @@ export function readEntityFidelity(e, raw, diagnostics, options = {}) {
     }
     if (e.type === 'HATCH') {
         Object.assign(e, parseHatchData(raw));
-        if (e.gradient) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'Gradient records retained; preview uses the entity color, not a gradient shader.' });
+        if (e.gradient && ((get(e.gradient,470,'LINEAR')!=='LINEAR') || +get(e.gradient,461,0)!==0 || e.gradient.filter(p=>p[0]===421).length!==2)) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'This gradient distribution is retained but not rendered; the preview supports unshifted two-stop LINEAR gradients.' });
     }
     if (e.type === '3DFACE') { e.points = [point(raw), point(raw, 11), point(raw, 12), point(raw, 13)]; e.edgeFlags = +get(raw, 70); }
     if (e.type === 'LEADER') {

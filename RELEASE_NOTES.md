@@ -1,3 +1,39 @@
+# Conduit CAD 0.4.0 — dimensions, parameterized blocks and gradient rendering
+
+- Pure planar decimal dimension regeneration for native subtypes 0–6. Generated
+  LINE/ARC/SOLID/TEXT pictures remain native anonymous DXF BLOCKs. Existing foreign
+  pictures are preserved until the user explicitly opts in to regeneration.
+- Undoable text/precision/size/arrow/gap/offset edits, witness/line/text grips,
+  reset text placement, and source-point associations for lines and radii.
+  Regeneration prepares every associated update before applying any of them.
+- Native ACAD/DSTYLE override read/write and stable app metadata in ASCII/binary
+  round-trips. Referenced source changes update managed dimensions; deleting a
+  source detaches its references. Unsafe planes, invalid numbers and shears fail.
+- Conduit dynamic schema v1: numeric, distance, angle, integer, Boolean and enum
+  parameters; move, stretch, rotate, scale, flip, array, visibility and topological
+  lookup actions. Crossings/partial arcs and unsupported mirrors are rejected.
+- Pristine per-instance evaluation with bounded variant caching, named-port
+  updates, route refresh, parameter/visibility inspector, linear/angle grips,
+  private-master JSON authoring and a working parameterized duct example.
+- Normalized DXF exports evaluated native anonymous blocks; app metadata recovers
+  editable masters on reimport. No proprietary Autodesk action-graph execution is
+  claimed. Unreachable generated pictures are pruned without deleting statically
+  referenced variants. Oversized XDATA is refused instead of silently corrupting DXF.
+- Unshifted two-explicit-color LINEAR HATCH gradients render in Canvas and SVG/PNG
+  with affine block transforms, clipping and islands. Other distributions retain
+  their native tags and explicit flat-preview warnings. Native rotation updates
+  the gradient angle; no gradient shader/GPU-equivalence claim is added.
+- All thirteen packages are 0.4.0. Typed public APIs, tests, browser downloads,
+  independent native-field validation, sources and reproduced artifacts included.
+
+Validation: 249 Node tests, 125 integrated browser checks (101 existing + 24 new),
+66 new independent native dimension/variant audit checks, existing 110 interop
+checks and symbol/fidelity audits. Browser execution uses Canvas 2D, with a
+standalone test-memory store locally and localhost delivery in CI. No physical
+GPU, production-storage durability or universal AutoCAD certification is implied.
+
+---
+
 # Conduit CAD 0.3.0 — native DXF interoperability
 
 - Shared bounded ASCII/binary tag codec: explicit scalar types, exact decimal

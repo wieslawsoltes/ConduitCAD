@@ -183,3 +183,32 @@ export function readDocumentInterop(doc,sections) {
         if(rec)try{const value=JSON.parse(all(subclassTags(rec,'AcDbXrecord'),1).join(''));for(const k of ['parameters','constraints','metadata'])if(value[k]!==undefined)doc[k]=value[k];}catch{doc.importDiagnostics.push({severity:'warning',message:'Invalid Conduit XRECORD metadata.'});}
     }
 }
+
+/** ACAD/DSTYLE data uses dimvar IDs followed by correctly typed XDATA values. */
+export function readDimensionOverrides(raw) {
+    const names=new Map(Object.entries(DIMSTYLE_FIELDS).map(([k,c])=>[c,k]));
+    const result={};let app='',active=false;
+    for(let i=0;i<raw.length;i++) {
+        const [c,v]=raw[i];
+        if(c===1001){app=v;active=false;}
+        if(app!=='ACAD')continue;
+        if(c===1000&&v==='DSTYLE'&&raw[i+1]?.[0]===1002&&raw[i+1][1]==='{'){active=true;i++;continue;}
+        if(active&&c===1002&&v==='}'){active=false;continue;}
+        if(active&&c===1070&&raw[i+1]) {
+            const [type,value]=raw[++i],name=names.get(v);
+            if(name&&type===(v===3||v===4?1000:v>=40&&v<=48||v>=140&&v<=148?1040:1070))result[name]=value;
+        }
+    }
+    return result;
+}
+export function writeDimensionOverrides(style,pair) {
+    const entries=Object.entries(style||{}).filter(([k])=>DIMSTYLE_FIELDS[k]!==undefined);
+    if(!entries.length)return;
+    pair(1001,'ACAD');pair(1000,'DSTYLE');pair(1002,'{');
+    for(const [name,value]of entries) {
+        const code=DIMSTYLE_FIELDS[name],type=code===3||code===4?1000:code>=40&&code<=48||code>=140&&code<=148?1040:1070;
+        if(type!==1000&&(!Number.isFinite(value)||type===1070&&!Number.isInteger(value)))throw new Error('Invalid dimension override '+name);
+        pair(1070,code);pair(type,value);
+    }
+    pair(1002,'}');
+}

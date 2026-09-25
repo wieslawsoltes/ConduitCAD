@@ -246,3 +246,51 @@ safety checks are part of the API contract and must not be bypassed by a host.
 Native dimension, viewport, mesh, helix and wipeout interfaces are exported by
 `@conduitcad/model`. `RenderPath`/`RenderText` carry `clipPolygons` for use by host
 renderers. A custom renderer must intersect all these clip polygons before paint.
+
+## Managed dimensions and block parameters (0.4.0)
+
+```js
+import {
+  createDocument, entity, line, editDimension, dimensionPicture,
+  regenerateDimensions, evaluateDynamicBlock, setDynamicParameters
+} from '@conduitcad/model';
+import { writeDXFBinary } from '@conduitcad/dxf';
+
+const doc = createDocument('Parametric example');
+const source = line({x:0,y:0}, {x:100,y:0});
+const dimension = entity('DIMENSION', {
+  a: {...source.a}, b: {...source.b}, offset: 25,
+  dimension: {version:1, references:{
+    a:{entityId:source.id,point:'a'}, b:{entityId:source.id,point:'b'}
+  }}
+});
+editDimension(dimension, doc, {style:{dimtxt:4, dimdec:2}, text:'<> mm'});
+doc.entities.push(source, dimension);
+source.b.x = 180;
+regenerateDimensions(doc); // Prepare/validate all associated updates atomically.
+console.assert(dimensionPicture(dimension,doc).measurement === 180);
+
+const master = {
+  name:'VariableLine', entities:[line({x:0,y:0},{x:100,y:0})], ports:[],
+  dynamic:{version:1,
+    parameters:[{name:'Length',type:'distance',default:100,min:10,max:1000,
+      grip:{base:{x:0,y:20},direction:{x:1,y:0}}}],
+    actions:[{type:'stretch',parameter:'Length',direction:{x:1,y:0},
+      box:{minX:50,minY:-30,maxX:1000,maxY:30}}]
+  }
+};
+doc.blocks[master.name] = master;
+const insert = entity('INSERT',{block:master.name,x:200,y:100});
+doc.entities.push(insert);
+setDynamicParameters(insert,doc,{Length:240});
+const evaluated = evaluateDynamicBlock(master,insert.dynamicParameters);
+console.assert(evaluated.entities[0].b.x === 240);
+const bytes = writeDXFBinary(doc); // Native evaluated pictures + editable app metadata.
+```
+
+Host integrations should wrap source mutation, `regenerateDimensions`, connector
+rerouting and rendering invalidation in one history transaction. The evaluator
+itself is atomic for dependent dimensions, not for earlier caller mutations.
+`dimensionGrips`, `dynamicParameterGrips`, `dynamicGripValue`, `dynamicValues` and
+`validateDynamicBlock` support alternative editors. See CAD_EDITING.md for precise
+supported action geometry and interoperability boundaries.

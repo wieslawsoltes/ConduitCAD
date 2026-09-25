@@ -62,3 +62,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 /* Keep checkbox geometry distinct from full-width touch text inputs. */
 .dxf-strict-option {display:flex;align-items:center;gap:10px;min-height:44px;margin:8px 0;cursor:pointer;}
 .dxf-strict-option input[type="checkbox"] {width:20px;height:20px;min-height:20px;flex:0 0 20px;margin:0;accent-color:#167c70;}
+
+/* CAD editing controls remain reachable above generic object properties. */
+.cad-editing{padding:12px 0 15px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.cad-editing .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cad-editing .field{min-width:0}.cad-editing input,.cad-editing select{width:100%;min-width:0}
+.cad-editing .btn{min-height:44px;white-space:normal;width:100%;margin-top:8px}
+.cad-editing .muted-note{color:#64775d}.modal-body textarea{min-height:150px}
+@media(max-width:720px),(pointer:coarse){.cad-editing input,.cad-editing select{min-height:44px;font-size:16px}.cad-editing .field span{font-size:11px}}

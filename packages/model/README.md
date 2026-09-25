@@ -32,3 +32,11 @@ The full source workspace contains `docs/API.md` with integration examples,
 `docs/ARCHITECTURE.md`, `docs/DXF_COMPATIBILITY.md`, and `docs/VALIDATION.md`.
 Tests and raw validation reports are included there. These are original reusable
 2D engineering components, not a claim of complete AutoCAD/Visio compatibility.
+
+## 0.4.0 editing APIs
+
+Planar native dimension pictures, atomic dimension edits and authored point
+associations; bounded declarative parameter-action evaluation, instance variants,
+parameter grips and named-port updates. Public TypeScript definitions describe
+all eight action types. See `docs/CAD_EDITING.md` in the source repository for
+native interoperability, unsupported geometry and host history integration.

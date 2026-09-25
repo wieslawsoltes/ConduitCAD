@@ -1,7 +1,7 @@
 # @conduitcad/dxf
 
 Native DXF reader/writer, binary tag transport, conservative record preservation,
-and source-object graph inspection. Package version 0.3.0; MIT licensed.
+and source-object graph inspection. Package version 0.4.0; MIT licensed.
 
 ```js
 import {parseDXF,writeDXF,writeDXFBinary,inspectObjectGraph,exportReport} from '@conduitcad/dxf';

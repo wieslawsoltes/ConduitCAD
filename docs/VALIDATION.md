@@ -1,3 +1,57 @@
+# Validation record — Conduit CAD 0.4.0
+
+## Dimension and parameter-action release
+
+`npm test`: **249 passing tests**, including the prior 206 plus 43 tests for all
+seven managed dimension subtypes, atomic failure, text/reset/witness edits,
+associations, similarity transforms, native DSTYLE, eight actions, lookup cycles,
+port/grip transforms, malformed values, metadata budgets, repeat-export pruning,
+native-block preservation and LINEAR gradient angle/descriptor exchange.
+
+`python tests/browser_cad_editing.py`: **24 passing checks**. Real inspector
+changes, mouse text/parameter grips, source edits with undo/redo, visibility,
+binary downloads reopened by ezdxf, red/blue gradient pixels, a transparent island,
+nonuniform rotated block gradient transforms, SVG gradients and mobile controls.
+The earlier 29+14+33+25 checks also pass: **125 integrated checks total**. Backend
+smoke checks remain separate and report the actual fallback rather than counting
+requested GPU backend names as hardware execution.
+
+`python tests/audit_cad_editing.py`: **66 passing independent checks**. ASCII and
+binary files contain seven native dimension subtypes with expected geometry,
+DSTYLE fields and populated picture blocks, and two distinct evaluated native
+block widths. Both files audit with zero errors/repairs. For aligned subtype 1,
+the audit computes distance between the native witness points: its DXF definition
+does not require code 50, while ezdxf 1.4.4's generic measurement helper projects
+using a default angle. Other subtypes use the independent native helper.
+
+Existing 110-field interoperability, 37-entity fidelity, 223-master/20-starter
+library and original sample audits are retained. Strict TypeScript consumers and
+clean offline package installation/import cover all 13 version-0.4.0 packages.
+
+Run the commands below after bootstrap/catalog/build. Other 0.3.0 validation
+commands still apply. Reports and screenshots in `artifacts/` are regenerated.
+
+```sh
+npm test
+npm run catalog
+npm run build
+npm run pack:packages
+node scripts/verify-packages.mjs
+tsc -p tests/tsconfig.json
+python tests/browser_cad_editing.py
+python tests/audit_cad_editing.py
+```
+
+The local browser suite uses the standalone build and a **test-only memory store**;
+CI sets `CONDUIT_TEST_ORIGIN=localhost` for HTTP delivery and the existing File/Blob
+and binary-download path. The new editing suite intentionally stubs save/schedule
+for deterministic history checks in either origin. This does not qualify storage
+or PWA durability. Browser pixels use **Canvas 2D**, not physical GPU execution.
+Neither these fixtures nor ezdxf audit results certify universal Autodesk behavior.
+No font, arbitrary ACIS or proprietary dynamic-block engine is asserted.
+
+---
+
 # Validation record — Conduit CAD 0.3.0
 
 ## Native interchange release checks

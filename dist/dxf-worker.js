@@ -1,6 +1,1350 @@
 'use strict';
 (()=>{
 const __modules=Object.create(null);
+// packages/model/src/gradients.js
+__modules["packages/model/src/gradients.js"]=(()=>{
+/** Portable native LINEAR gradient descriptor. Unknown distributions are not approximated silently. */
+function linearHatchGradient(tags,contours,frame) {
+    if(!Array.isArray(tags))return null;
+    const value=(code,fallback)=>tags.find(p=>p[0]===code)?.[1]??fallback;
+    if(value(450,0)!==1||value(470,'LINEAR')!=='LINEAR'||value(461,0)!==0||value(453,2)!==2)return null;
+    const colors=tags.filter(p=>p[0]===421).map(p=>p[1]);
+    if(colors.length!==2||colors.some(c=>!Number.isInteger(c)||c<0||c>0xffffff))return null;
+    const rotation=value(460,0);if(!Number.isFinite(rotation))return null;
+    const u={x:Math.cos(rotation),y:Math.sin(rotation)};
+    let lo=Infinity,hi=-Infinity;
+    for(const polygon of contours)for(const p of polygon){const t=p.x*u.x+p.y*u.y;lo=Math.min(lo,t);hi=Math.max(hi,t);}
+    if(!Number.isFinite(lo)||hi-lo<1e-12)return null;
+    return {kind:'linear',start:{x:u.x*lo,y:u.y*lo},end:{x:u.x*hi,y:u.y*hi},frame:frame.slice(),colors:colors.map(c=>'#'+c.toString(16).padStart(6,'0'))};
+}
+
+return {linearHatchGradient};
+})();
+// packages/geometry/src/index.js
+__modules["packages/geometry/src/index.js"]=(()=>{
+/** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */
+const EPS = 1e-9;
+const TAU = Math.PI * 2;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const point = (x = 0, y = 0) => ({ x, y });
+const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
+const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });
+const mul = (a, s) => ({ x: a.x * s, y: a.y * s });
+const dot = (a, b) => a.x * b.x + a.y * b.y;
+const cross = (a, b) => a.x * b.y - a.y * b.x;
+const length = a => Math.hypot(a.x, a.y);
+const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+const normalize = a => mul(a, 1 / (length(a) || 1));
+const lerp = (a, b, t) => add(a, mul(sub(b, a), t));
+const almost = (a, b, tolerance = EPS) => Math.abs(a - b) <= tolerance;
+const equalPoint = (a, b, tolerance = EPS) => distance(a, b) <= tolerance;
+const identity = () => [1, 0, 0, 1, 0, 0];
+const transform = (p, m) => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });
+function matrix({ x = 0, y = 0, rotation = 0, sx = 1, sy = sx } = {}) { const a = rotation * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [c * sx, s * sx, -s * sy, c * sy, x, y]; }
+function compose(a, b) { return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]]; }
+function inverse(m) {
+    const d = m[0] * m[3] - m[1] * m[2];
+    if (Math.abs(d) < EPS)
+        throw new Error('Singular transform');
+    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d, (m[2] * m[5] - m[3] * m[4]) / d, (m[1] * m[4] - m[0] * m[5]) / d];
+}
+function bounds(points) {
+    const b = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+    for (const p of points) {
+        if (!Number.isFinite(p.x) || !Number.isFinite(p.y))
+            continue;
+        b.minX = Math.min(b.minX, p.x);
+        b.minY = Math.min(b.minY, p.y);
+        b.maxX = Math.max(b.maxX, p.x);
+        b.maxY = Math.max(b.maxY, p.y);
+    }
+    return b;
+}
+const emptyBounds = () => bounds([]);
+const validBounds = b => Number.isFinite(b.minX) && b.minX <= b.maxX && b.minY <= b.maxY;
+const inflate = (b, n) => ({ minX: b.minX - n, minY: b.minY - n, maxX: b.maxX + n, maxY: b.maxY + n });
+const intersects = (a, b) => a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY;
+const contains = (b, p) => p.x >= b.minX && p.x <= b.maxX && p.y >= b.minY && p.y <= b.maxY;
+const union = (a, b) => ({ minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) });
+const center = b => ({ x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 });
+function projectPoint(p, a, b, segment = true) { const v = sub(b, a), n = dot(v, v); const t = n < EPS * EPS ? 0 : dot(sub(p, a), v) / n; return lerp(a, b, segment ? clamp(t, 0, 1) : t); }
+const distanceToSegment = (p, a, b) => distance(p, projectPoint(p, a, b));
+function lineIntersection(a, b, c, d, segments = true) {
+    const r = sub(b, a), s = sub(d, c), det = cross(r, s);
+    if (Math.abs(det) <= EPS * Math.max(1, length(r) * length(s)))
+        return null;
+    const q = sub(c, a), t = cross(q, s) / det, u = cross(q, r) / det;
+    if (segments && (t < -EPS || t > 1 + EPS || u < -EPS || u > 1 + EPS))
+        return null;
+    return { ...lerp(a, b, t), t, u };
+}
+function segmentIntersectsBox(a, b, box) {
+    if (contains(box, a) || contains(box, b))
+        return true;
+    const p = [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.minY }, { x: box.maxX, y: box.maxY }, { x: box.minX, y: box.maxY }];
+    return p.some((v, i) => lineIntersection(a, b, v, p[(i + 1) % 4]));
+}
+function polygonContains(p, points) {
+    let inside = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+        const a = points[i], b = points[j];
+        if (distanceToSegment(p, a, b) < EPS)
+            return true;
+        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)
+            inside = !inside;
+    }
+    return inside;
+}
+function polygonArea(points) {
+    let n = 0;
+    for (let i = 0; i < points.length; i++)
+        n += cross(points[i], points[(i + 1) % points.length]);
+    return n / 2;
+}
+function polylineLength(points, closed = false) {
+    let n = 0;
+    for (let i = 1; i < points.length; i++)
+        n += distance(points[i - 1], points[i]);
+    if (closed && points.length > 1)
+        n += distance(points.at(-1), points[0]);
+    return n;
+}
+function simplifyOrthogonal(points) {
+    const r = [];
+    for (const p of points) {
+        if (r.length && equalPoint(r.at(-1), p))
+            continue;
+        if (r.length > 1) {
+            const a = r.at(-2), b = r.at(-1);
+            if (Math.abs(cross(sub(b, a), sub(p, b))) < EPS && dot(sub(b, a), sub(p, b)) >= 0)
+                r.pop();
+        }
+        r.push({ ...p });
+    }
+    return r;
+}
+function arcPoints(c, r, start = 0, end = TAU, tolerance = .2, clockwise = false) {
+    if (!Number.isFinite(r) || r <= 0)
+        return [c];
+    let sweep = end - start;
+    if (clockwise) {
+        while (sweep > 0)
+            sweep -= TAU;
+    }
+    else {
+        while (sweep < 0)
+            sweep += TAU;
+    }
+    if (Math.abs(sweep) < EPS)
+        sweep = clockwise ? -TAU : TAU;
+    const step = 2 * Math.acos(clamp(1 - Math.max(tolerance, 1e-7) / r, -1, 1));
+    const n = clamp(Math.ceil(Math.abs(sweep) / Math.max(step, .0005)), 2, 8192);
+    return Array.from({ length: n + 1 }, (_, i) => ({ x: c.x + r * Math.cos(start + sweep * i / n), y: c.y + r * Math.sin(start + sweep * i / n) }));
+}
+function bulgeArc(a, b, bulge) {
+    if (Math.abs(bulge) < EPS || distance(a, b) < EPS)
+        return null;
+    const chord = sub(b, a), mid = lerp(a, b, .5), c = add(mid, mul({ x: -chord.y, y: chord.x }, (1 - bulge * bulge) / (4 * bulge)));
+    return { c, r: distance(a, c), start: Math.atan2(a.y - c.y, a.x - c.x), sweep: 4 * Math.atan(bulge), clockwise: bulge < 0 };
+}
+function tessellatePolyline(points, closed = false, tolerance = .2) {
+    if (!points.length)
+        return [];
+    const out = [];
+    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {
+        const a = points[i], b = points[(i + 1) % points.length], arc = bulgeArc(a, b, a.bulge || 0);
+        if (arc)
+            out.push(...arcPoints(arc.c, arc.r, arc.start, arc.start + arc.sweep, tolerance, arc.clockwise).slice(0, -1));
+        else
+            out.push(a);
+    }
+    out.push(closed ? points[0] : points.at(-1));
+    return out;
+}
+/** Rational de Boor evaluation; input is never mutated. */
+function nurbsPoint(control, degree, knots, t, weights = []) {
+    const n = control.length - 1, p = Math.min(degree, n);
+    if (n < 0)
+        return point();
+    if (p < 1)
+        return { ...control[0] };
+    if (knots.length < n + p + 2)
+        throw new Error('Invalid NURBS knot vector');
+    const lo = knots[p], hi = knots[n + 1];
+    t = clamp(t, lo, hi);
+    let k = n;
+    if (t < hi) {
+        k = p;
+        while (k < n && !(t >= knots[k] && t < knots[k + 1]))
+            k++;
+    }
+    const d = [];
+    for (let j = 0; j <= p; j++) {
+        const i = k - p + j, w = weights[i] ?? 1;
+        d.push([control[i].x * w, control[i].y * w, w]);
+    }
+    for (let r = 1; r <= p; r++)
+        for (let j = p; j >= r; j--) {
+            const i = k - p + j, den = knots[i + p - r + 1] - knots[i], a = Math.abs(den) < EPS ? 0 : (t - knots[i]) / den;
+            d[j] = d[j].map((v, q) => (1 - a) * d[j - 1][q] + a * v);
+        }
+    const w = d[p][2];
+    return Math.abs(w) > EPS ? { x: d[p][0] / w, y: d[p][1] / w } : { ...control[Math.min(n, k)] };
+}
+function splinePoints(e, tolerance = .2) {
+    const cp = e.controlPoints || [];
+    if (cp.length < 2)
+        return cp;
+    const p = Math.min(e.degree || 3, cp.length - 1), n = cp.length;
+    let knots = e.knots;
+    if (!knots || knots.length < n + p + 1) {
+        knots = [];
+        for (let i = 0; i < n + p + 1; i++)
+            knots.push(i <= p ? 0 : i >= n ? 1 : (i - p) / (n - p));
+    }
+    const start = knots[p], end = knots[n], out = [nurbsPoint(cp, p, knots, start, e.weights)];
+    function split(t0, a, t1, b, depth) {
+        const tm = (t0 + t1) / 2, m = nurbsPoint(cp, p, knots, tm, e.weights), q1 = nurbsPoint(cp, p, knots, (t0 + tm) / 2, e.weights), q3 = nurbsPoint(cp, p, knots, (tm + t1) / 2, e.weights);
+        if (depth < 12 && Math.max(distanceToSegment(m, a, b), distanceToSegment(q1, a, b), distanceToSegment(q3, a, b)) > tolerance) {
+            split(t0, a, tm, m, depth + 1);
+            split(tm, m, t1, b, depth + 1);
+        }
+        else
+            out.push(b);
+    }
+    for (let i = p; i < n; i++) {
+        if (knots[i + 1] > knots[i])
+            split(knots[i], out.at(-1), knots[i + 1], nurbsPoint(cp, p, knots, knots[i + 1], e.weights), 0);
+    }
+    return out;
+}
+/** Planar polyline offset with bounded miters; not a polygon Boolean engine. */
+function offsetPolyline(points, amount, closed = false, miterLimit = 6) {
+    if (points.length < 2)
+        throw new Error('Offset requires two vertices');
+    const seg = [];
+    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {
+        const a = points[i], b = points[(i + 1) % points.length], v = normalize(sub(b, a)), o = mul({ x: -v.y, y: v.x }, amount);
+        seg.push([add(a, o), add(b, o)]);
+    }
+    const out = [];
+    for (let i = 0; i < points.length; i++) {
+        if (!closed && i === 0) {
+            out.push(seg[0][0]);
+            continue;
+        }
+        if (!closed && i === points.length - 1) {
+            out.push(seg.at(-1)[1]);
+            continue;
+        }
+        const prev = seg[(i - 1 + seg.length) % seg.length], next = seg[i % seg.length], hit = lineIntersection(...prev, ...next, false);
+        if (hit && distance(hit, points[i]) <= Math.abs(amount) * miterLimit + EPS)
+            out.push({ x: hit.x, y: hit.y });
+        else
+            out.push(prev[1], next[0]);
+    }
+    return out;
+}
+function filletLines(a, b, c, d, radius) {
+    const hit = lineIntersection(a, b, c, d, false);
+    if (!hit || radius <= 0)
+        throw new Error('Fillet needs intersecting nonparallel lines and positive radius');
+    const u = normalize(sub(distance(a, hit) > distance(b, hit) ? a : b, hit)), v = normalize(sub(distance(c, hit) > distance(d, hit) ? c : d, hit)), theta = Math.acos(clamp(dot(u, v), -1, 1));
+    if (theta < EPS || Math.abs(theta - Math.PI) < EPS)
+        throw new Error('Degenerate fillet');
+    const t = radius / Math.tan(theta / 2), p = add(hit, mul(u, t)), q = add(hit, mul(v, t)), cen = add(hit, mul(normalize(add(u, v)), radius / Math.sin(theta / 2)));
+    return { p, q, c: cen, r: radius, start: Math.atan2(p.y - cen.y, p.x - cen.x), end: Math.atan2(q.y - cen.y, q.x - cen.x), clockwise: cross(sub(p, cen), sub(q, cen)) < 0 };
+}
+function snapCandidates(entity) {
+    switch (entity.type) {
+        case 'LINE': return [{ ...entity.a, kind: 'endpoint' }, { ...entity.b, kind: 'endpoint' }, { ...lerp(entity.a, entity.b, .5), kind: 'midpoint' }];
+        case 'CIRCLE':
+        case 'ARC': {
+            const onArc = a => {
+                if (entity.type === 'CIRCLE')
+                    return true;
+                const norm = x => ((x % TAU) + TAU) % TAU;
+                return entity.clockwise ? norm(entity.start - a) <= norm(entity.start - entity.end) + EPS : norm(a - entity.start) <= norm(entity.end - entity.start) + EPS;
+            };
+            const at = a => ({ x: entity.c.x + entity.r * Math.cos(a), y: entity.c.y + entity.r * Math.sin(a) });
+            return [{ ...entity.c, kind: 'center' }, ...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].filter(onArc).map(a => ({ ...at(a), kind: 'quadrant' })), ...(entity.type === 'ARC' ? [{ ...at(entity.start), kind: 'endpoint' }, { ...at(entity.end), kind: 'endpoint' }] : [])];
+        }
+        case 'LWPOLYLINE': return entity.points.flatMap((p, i) => [{ ...p, kind: 'endpoint' }, ...(i < entity.points.length - 1 || entity.closed ? [{ ...lerp(p, entity.points[(i + 1) % entity.points.length], .5), kind: 'midpoint' }] : [])]);
+        case 'INSERT': return [{ x: entity.x, y: entity.y, kind: 'insertion' }];
+        default: return [];
+    }
+}
+
+return {EPS,TAU,clamp,point,add,sub,mul,dot,cross,length,distance,normalize,lerp,almost,equalPoint,identity,transform,matrix,compose,inverse,bounds,emptyBounds,validBounds,inflate,intersects,contains,union,center,projectPoint,distanceToSegment,lineIntersection,segmentIntersectsBox,polygonContains,polygonArea,polylineLength,simplifyOrthogonal,arcPoints,bulgeArc,tessellatePolyline,nurbsPoint,splinePoints,offsetPolyline,filletLines,snapCandidates};
+})();
+// packages/model/src/dimensions.js
+__modules["packages/model/src/dimensions.js"]=(()=>{
+const {arcPoints, distance, matrix, transform, TAU} = __modules["packages/geometry/src/index.js"];
+const EPS = 1e-9;
+const copy = v => JSON.parse(JSON.stringify(v));
+const add = (a,b) => ({x:a.x+b.x,y:a.y+b.y});
+const sub = (a,b) => ({x:a.x-b.x,y:a.y-b.y});
+const mul = (a,s) => ({x:a.x*s,y:a.y*s});
+const normal = a => ({x:-a.y,y:a.x});
+const dot = (a,b) => a.x*b.x+a.y*b.y;
+const unit = a => { const l=Math.hypot(a.x,a.y); if(l<EPS)throw new Error('Coincident dimension definition points'); return mul(a,1/l); };
+const finite = (v,label) => { if(typeof v!=='number'||!Number.isFinite(v)||Math.abs(v)>1e12)throw new Error(`Invalid dimension ${label}`); return v; };
+const point = (p,label) => { if(!p)throw new Error(`Missing dimension ${label}`); finite(p.x,label);finite(p.y,label);if(Math.abs(p.z||0)>EPS)throw new Error('Dimension regeneration currently requires the XY plane at Z=0');return {x:p.x,y:p.y}; };
+const angle = (a,b) => Math.atan2(b.y-a.y,b.x-a.x);
+const positiveAngle = x => (x%TAU+TAU)%TAU;
+const STYLE_KEYS = new Set(['dimtxt','dimasz','dimexe','dimexo','dimgap','dimscale','dimlfac','dimdec','dimrnd','dimpost','dimzin','dimdsep']);
+const POINT_KEYS = ['a','b','definitionPoint','defpoint4','defpoint5','textMidpoint'];
+
+/** Declarative dimension picture generator. It never mutates the document. */
+function dimensionPicture(e,doc={}) {
+    if(e.type!=='DIMENSION')throw new Error('Expected DIMENSION');
+    const n=e.extrusion||{x:0,y:0,z:1};
+    if(Math.abs(n.x||0)>EPS||Math.abs(n.y||0)>EPS||Math.abs((n.z??1)-1)>EPS)throw new Error('Non-default dimension OCS cannot be regenerated in the planar editor');
+    if(e.dimensionInsert && Math.hypot(e.dimensionInsert.x||0,e.dimensionInsert.y||0,e.dimensionInsert.z||0)>EPS)throw new Error('Translated dimension pictures require conversion before regeneration');
+    if(e.obliqueAngle || e.horizontalDirection)throw new Error('Oblique or rotated-UCS dimension regeneration is not supported');
+    finite(e.dimtype??33,'subtype');if(!Number.isInteger(e.dimtype??33))throw new Error('Dimension subtype must be an integer');
+    finite(e.dimensionAngle??0,'angle');
+    const type=(e.dimtype??33)&15;
+    if(type>6)throw new Error('Unknown dimension subtype');
+    const style={dimtxt:e.height||12,dimasz:5,dimexe:5,dimexo:1,dimgap:3,dimscale:1,dimlfac:1,dimdec:1,dimrnd:0,dimpost:'<>',dimzin:0,...doc.dimstyles?.[e.dimstyle||'STANDARD'],...e.dimstyleOverrides,...e.dimension?.style};
+    for(const k of ['dimtxt','dimasz','dimexe','dimexo','dimgap','dimscale','dimlfac','dimrnd']) {
+        finite(style[k],k); if(style[k]<0)throw new Error(`Dimension ${k} cannot be negative`);
+    }
+    if(style.dimtxt<=0||style.dimscale<=0||style.dimlfac<=0)throw new Error('Dimension text, scale and measurement factor must be positive');
+    if(!Number.isInteger(style.dimdec)||style.dimdec<0||style.dimdec>8)throw new Error('Dimension precision must be an integer from 0 to 8');
+    if(typeof style.dimpost!=='string'||style.dimpost.length>1000||!Number.isInteger(style.dimzin)||style.dimzin<0||style.dimzin>15)throw new Error('Invalid dimension text formatting');
+    if(style.dimdsep!==undefined&&(!Number.isInteger(style.dimdsep)||style.dimdsep<1||style.dimdsep>255))throw new Error('Invalid dimension decimal separator');
+    if(e.text!==undefined&&(typeof e.text!=='string'||e.text.length>1000))throw new Error('Invalid dimension text');
+    const scale=style.dimscale,h=style.dimtxt*scale,arrow=style.dimasz*scale,gap=style.dimgap*scale;
+    const entities=[];let measurement,definitionPoint=e.definitionPoint,textMidpoint,textRotation=0;
+    const put=(type,props) => entities.push({id:`${e.id||'dimension'}:picture:${entities.length}`,type,layer:'0',color:'BYBLOCK',linetype:'CONTINUOUS',...props});
+    const line=(a,b) => {if(distance(a,b)>EPS)put('LINE',{a,b});};
+    const head=(tip,inside) => {if(!arrow)return;const u=unit(inside),n=normal(u);put('SOLID',{points:[tip,add(tip,add(mul(u,arrow),mul(n,arrow*.28))),add(tip,add(mul(u,arrow),mul(n,-arrow*.28)))]});};
+    const extension=(origin,end,outward) => {if(distance(origin,end)>EPS)line(add(origin,mul(outward,style.dimexo*scale)),add(end,mul(outward,style.dimexe*scale)));};
+    if(type===0||type===1) {
+        const a=point(e.a,'first endpoint'),b=point(e.b,'second endpoint');
+        const u=type===0?{x:Math.cos((e.dimensionAngle||0)*Math.PI/180),y:Math.sin((e.dimensionAngle||0)*Math.PI/180)}:unit(sub(b,a)),n=normal(u);
+        const off=e.offset!==undefined?finite(e.offset,'offset'):e.definitionPoint?dot(sub(point(e.definitionPoint,'dimension line'),a),n):30;
+        const p=add(a,mul(n,off)),q=add(p,mul(u,dot(sub(b,a),u)));
+        measurement=Math.abs(dot(sub(b,a),u));if(measurement<EPS)throw new Error('Zero projected dimension length');
+        const side=mul(n,off<0?-1:1);extension(a,p,side);extension(b,q,mul(n,dot(sub(q,b),n)<0?-1:1));
+        line(p,q);const inside=unit(sub(q,p));head(p,inside);head(q,mul(inside,-1));
+        textMidpoint=add(mul(add(p,q),.5),mul(side,gap+h*.5));textRotation=Math.atan2(u.y,u.x)*180/Math.PI;
+        if(textRotation>90||textRotation<=-90)textRotation+=180;
+        definitionPoint=q;
+    } else if(type===3||type===4) {
+        const a=point(e.definitionPoint,'radial origin'),b=point(e.defpoint4,'radial endpoint'),u=unit(sub(b,a));
+        measurement=distance(a,b);line(a,b);head(b,mul(u,-1));if(type===3)head(a,u);
+        const lead=Math.max(0,finite(e.leaderLength??0,'leader length'));
+        if(lead>0)line(b,add(b,mul(u,lead)));
+        textMidpoint=add(type===3?mul(add(a,b),.5):add(b,mul(u,lead)),mul(normal(u),gap+h*.5));
+    } else if(type===2||type===5) {
+        let center,a,b,location;
+        if(type===5){center=point(e.defpoint4,'angle center');a=point(e.a,'first ray');b=point(e.b,'second ray');location=point(e.definitionPoint,'angle location');}
+        else {
+            const p=point(e.a,'line 1 start'),q=point(e.b,'line 1 end'),r=point(e.defpoint4,'line 2 start'),s=point(e.definitionPoint,'line 2 end');
+            const u=sub(q,p),v=sub(s,r),det=u.x*v.y-u.y*v.x;
+            if(Math.abs(det)<EPS)throw new Error('Parallel angular dimension lines');
+            const w=sub(r,p),f=(w.x*v.y-w.y*v.x)/det;center=add(p,mul(u,f));
+            a=distance(center,q)>EPS?q:p;b=distance(center,s)>EPS?s:r;location=point(e.defpoint5,'angle location');
+        }
+        let start=angle(center,a),end=angle(center,b),sweep=positiveAngle(end-start),loc=positiveAngle(angle(center,location)-start);
+        if(loc>sweep+EPS){[a,b]=[b,a];[start,end]=[end,start];sweep=positiveAngle(end-start);}
+        if(sweep<EPS)throw new Error('Zero angular dimension');
+        const radius=distance(center,location);if(radius<EPS)throw new Error('Angular dimension arc must have a positive radius');
+        const p=add(center,{x:Math.cos(start)*radius,y:Math.sin(start)*radius}),q=add(center,{x:Math.cos(start+sweep)*radius,y:Math.sin(start+sweep)*radius});
+        extension(a,p,unit(sub(p,center)));extension(b,q,unit(sub(q,center)));
+        put('ARC',{c:center,r:radius,start,end:start+sweep});head(p,{x:-Math.sin(start),y:Math.cos(start)});head(q,{x:Math.sin(end),y:-Math.cos(end)});
+        const mid=start+sweep/2;textMidpoint=add(center,{x:Math.cos(mid)*(radius+gap+h*.5),y:Math.sin(mid)*(radius+gap+h*.5)});measurement=sweep*180/Math.PI;
+    } else {
+        const origin=point(e.definitionPoint,'ordinate origin'),a=point(e.a,'ordinate feature'),b=point(e.b,'ordinate leader'),x=!!((e.dimtype||0)&64);
+        measurement=x?a.x-origin.x:a.y-origin.y;
+        const elbow=x?{x:a.x,y:b.y}:{x:b.x,y:a.y};line(a,elbow);line(elbow,b);textMidpoint=add(b,{x:gap+h*.5,y:gap+h*.5});
+    }
+    let value=measurement*([2,5].includes(type)?1:style.dimlfac);
+    if(style.dimrnd>0)value=Math.round(value/style.dimrnd)*style.dimrnd;
+    let content=value.toFixed(style.dimdec);if(style.dimzin&8)content=content.replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');
+    if(style.dimzin&4)content=content.replace(/^(-?)0\./,'$1.');
+    if(style.dimdsep)content=content.replace('.',String.fromCharCode(style.dimdsep));
+    content=(type===3?'⌀':type===4?'R':'')+content+([2,5].includes(type)?'°':'');
+    content=String(style.dimpost||'<>').replace(/<>/g,content);
+    if(e.text && e.text!=='<>')content=String(e.text).replace(/<>/g,content);
+    if(e.dimension?.manualText && e.textMidpoint)textMidpoint=point(e.textMidpoint,'text midpoint');
+    textRotation=e.textRotation??textRotation;
+    finite(textRotation,'text rotation');
+    if(e.text!==' ')put('TEXT',{p:textMidpoint,text:content,height:h,rotation:textRotation,align:'center',halign:1,valign:2,alignPoint:textMidpoint});
+    finite(measurement,'measurement');point(textMidpoint,'generated text midpoint');
+    for(const entity of entities)for(const p of [entity.a,entity.b,entity.p,entity.c,...entity.points||[]])if(p)point(p,'generated coordinate');
+    return {entities,measurement,definitionPoint,textMidpoint,style};
+}
+
+/** Atomic opt-in adoption or edit. Imported pictures are left untouched until this succeeds. */
+function editDimension(e,doc,patch={}) {
+    if(e.dimension&&e.dimension.version!==1)throw new Error('Unsupported Conduit dimension schema');
+    const next=copy(e);next.dimension={version:1,manualText:!!((next.dimtype||0)&128),...next.dimension};
+    for(const [key,value] of Object.entries(patch)) {
+        if(key==='style') {
+            if(!value||typeof value!=='object')throw new Error('Invalid dimension style');
+            for(const k of Object.keys(value))if(!STYLE_KEYS.has(k))throw new Error(`Unsupported dimension style field: ${k}`);
+            next.dimension.style={...next.dimension.style,...value};
+        } else if(POINT_KEYS.includes(key))next[key]=point(value,key);
+        else if(['offset','text','textRotation','dimensionAngle','leaderLength','dimstyle','dimtype'].includes(key))next[key]=value;
+        else if(key==='manualText')next.dimension.manualText=!!value;
+        else throw new Error(`Unsupported dimension edit: ${key}`);
+    }
+    for(const key of POINT_KEYS)if(key in patch && next.dimension.references)delete next.dimension.references[key];
+    // A moved dimension line supersedes its authored signed offset.
+    if('definitionPoint' in patch && !('offset' in patch))delete next.offset;
+    if('textMidpoint' in patch)next.dimension.manualText=true;
+    const picture=dimensionPicture(next,doc);
+    next.dimension.resolvedScale=picture.style.dimscale;
+    next.definitionPoint=picture.definitionPoint;next.textMidpoint=picture.textMidpoint;next.measurement=picture.measurement;
+    next.dimtype=(next.dimtype??33)|32;
+    if(next.dimension.manualText)next.dimtype|=128;else next.dimtype&=~128;
+    delete next.block;next.dirty=true;for(const key of Object.keys(e))if(!(key in next))delete e[key];Object.assign(e,next);
+    return e;
+}
+function dimensionGrips(e,doc) {
+    if(e.type!=='DIMENSION'||e.dimension?.version!==1)return [];
+    const picture=dimensionPicture(e,doc),type=(e.dimtype??33)&15;
+    const keys=type===0||type===1?['a','b','definitionPoint']:type===3||type===4?['definitionPoint','defpoint4']:type===2?['a','b','definitionPoint','defpoint4','defpoint5']:['a','b','definitionPoint',...(type===5?['defpoint4']:[])];
+    return [...keys.filter(k=>e[k]).map(k=>({...e[k],key:'dim:'+k})),{...picture.textMidpoint,key:'dim:textMidpoint'}];
+}
+/** Refresh authored point associations without mutating anything on failure. */
+function regenerateDimensions(doc) {
+    const map=new Map(doc.entities.map(e=>[e.id,e])),changes=[];
+    for(const e of doc.entities) {
+        if(e.type!=='DIMENSION'||e.dimension?.version!==1)continue;
+        const refs=e.dimension.references;if(!refs)continue;
+        const next=copy(e);
+        for(const [key,ref]of Object.entries(refs)) {
+            if(!POINT_KEYS.includes(key))throw new Error('Invalid dimension reference slot');
+            const source=map.get(ref.entityId);
+            if(!source||source.type==='DIMENSION')throw new Error('Missing or cyclic dimension reference');
+            const p=ref.point==='circle'&&['CIRCLE','ARC'].includes(source.type)?{x:source.c.x+source.r*Math.cos(ref.angle||0),y:source.c.y+source.r*Math.sin(ref.angle||0),z:source.c.z||0}:ref.point==='vertex'?source.points?.[ref.index]:['a','b','c','p'].includes(ref.point)?source[ref.point]:null;
+            next[key]=point(p,'associated point');
+        }
+        editDimension(next,doc);if(JSON.stringify(next)!==JSON.stringify(e))changes.push([e,next]);
+    }
+    for(const [e,next]of changes){Object.assign(e,next);delete e.block;}
+    return changes.map(([e])=>e.id);
+}
+
+return {dimensionPicture,editDimension,dimensionGrips,regenerateDimensions};
+})();
+// packages/model/src/dynamic.js
+__modules["packages/model/src/dynamic.js"]=(()=>{
+const {matrix, compose, transform} = __modules["packages/geometry/src/index.js"];
+const clone=v=>JSON.parse(JSON.stringify(v));
+const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+const forbidden=new Set(['__proto__','prototype','constructor']);
+const finite=(x,name)=>{if(typeof x!=='number'||!Number.isFinite(x)||Math.abs(x)>1e12)throw new Error(`Invalid dynamic ${name}`);return x;};
+const inside=(p,b)=>p.x>=b.minX&&p.x<=b.maxX&&p.y>=b.minY&&p.y<=b.maxY;
+const pivot=(m,p={x:0,y:0})=>compose(matrix({x:p.x,y:p.y}),compose(m,matrix({x:-p.x,y:-p.y})));
+const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+
+function validateDynamicDefinition(block) {
+    const d=block.dynamic;
+    if(!d||d.version!==1||!Array.isArray(d.parameters)||!Array.isArray(d.actions))throw new Error('Expected Conduit dynamic-block schema version 1');
+    if(d.parameters.length>64||d.actions.length>256||!Array.isArray(block.entities)||block.entities.length>10000)throw new Error('Dynamic block complexity limit exceeded');
+    const names=new Set(),ids=new Set();
+    for(const p of d.parameters){if(!/^[A-Za-z][\w-]{0,63}$/.test(p.name)||forbidden.has(p.name)||names.has(p.name))throw new Error('Invalid or duplicate parameter name');names.add(p.name);valueOf(p,p.default);
+        if(p.grip){for(const key of ['base','direction'])if(p.grip[key]){finite(p.grip[key].x,'grip '+key);finite(p.grip[key].y,'grip '+key);}
+            if(p.grip.direction&&Math.hypot(p.grip.direction.x,p.grip.direction.y)<1e-9)throw new Error('Grip direction must be nonzero');
+            if(p.grip.radius!==undefined&&finite(p.grip.radius,'grip radius')<=0)throw new Error('Grip radius must be positive');}
+    }
+    for(const e of block.entities){if(!e.id||ids.has(e.id))throw new Error('Dynamic geometry needs unique entity IDs');ids.add(e.id);}
+    const portNames=new Set();for(const port of block.ports||[]){if(!port.name||portNames.has(port.name))throw new Error('Dynamic ports need unique names');portNames.add(port.name);for(const k of ['x','y','dx','dy'])finite(port[k],'port '+k);}
+    const types=new Set(['move','stretch','rotate','scale','flip','visibility','array','lookup']);
+    for(const a of d.actions){
+        if(!types.has(a.type)||!names.has(a.parameter))throw new Error('Unknown dynamic action or parameter');
+        if(a.entities && (!Array.isArray(a.entities)||a.entities.some(id=>!ids.has(id))))throw new Error('Dynamic action references missing geometry');
+        if(a.ports && (!Array.isArray(a.ports)||a.ports.some(n=>!(block.ports||[]).some(p=>p.name===n))))throw new Error('Dynamic action references missing port');
+        for(const k of ['base','direction','step'])if(a[k]){finite(a[k].x,k);finite(a[k].y,k);}
+        const parameter= d.parameters.find(p=>p.name===a.parameter);
+        if(['move','stretch','rotate','scale','array'].includes(a.type)&&!['number','distance','angle','integer'].includes(parameter.type))throw new Error('Geometric action requires a numeric parameter');
+        if(a.type==='flip'&&parameter.type!=='boolean')throw new Error('Flip requires a boolean parameter');
+        if(a.type==='stretch') {
+            if(!a.box)throw new Error('Stretch requires a crossing box');
+            for(const k of ['minX','minY','maxX','maxY'])finite(a.box[k],k);
+            if(a.box.minX>a.box.maxX||a.box.minY>a.box.maxY)throw new Error('Invalid stretch box');
+        }
+        if(a.type==='visibility'&&(!a.states||typeof a.states!=='object'||Object.values(a.states).some(v=>!Array.isArray(v)||v.some(id=>!ids.has(id)))))throw new Error('Invalid visibility state');
+    }
+    return block;
+}
+function valueOf(p,v) {
+    if(p.type==='boolean'){if(typeof v!=='boolean')throw new Error(`Parameter ${p.name} requires a boolean`);}
+    else if(p.type==='enum'){if(!Array.isArray(p.values)||!p.values.some(x=>equal(x,v)))throw new Error(`Unknown ${p.name} option`);if(typeof v!=='string'&&typeof v!=='number')throw new Error('Enum values must be scalar');if(typeof v==='number')finite(v,p.name);}
+    else {
+        if(!['number','distance','angle','integer'].includes(p.type))throw new Error(`Unknown parameter type: ${p.type}`);
+        finite(v,p.name);if(p.type==='integer'&&!Number.isInteger(v))throw new Error(`${p.name} must be an integer`);
+        if(p.min!==undefined&&(finite(p.min,'minimum'),v<p.min)||p.max!==undefined&&(finite(p.max,'maximum'),v>p.max))throw new Error(`${p.name} is outside its allowed range`);
+        if(p.values && !p.values.includes(v))throw new Error(`${p.name} must be a listed value`);
+    }
+    return v;
+}
+function resolveDynamicValues(block,input={}) {
+    validateDynamicDefinition(block);
+    if(!input||Array.isArray(input)||typeof input!=='object')throw new Error('Invalid dynamic parameter values');
+    const definitions=new Map(block.dynamic.parameters.map(p=>[p.name,p])),values=Object.create(null),writers=new Map();
+    for(const key of Object.keys(input))if(!definitions.has(key))throw new Error(`Unknown dynamic parameter: ${key}`);
+    for(const p of definitions.values())values[p.name]=valueOf(p,own(input,p.name)?input[p.name]:p.default);
+    const lookups=block.dynamic.actions.filter(a=>a.type==='lookup');
+    for(const a of lookups){
+        if(!a.rows||typeof a.rows!=='object')throw new Error('Lookup action requires rows');
+        for(const row of Object.values(a.rows))for(const key of Object.keys(row)) {
+            if(!definitions.has(key)||key===a.parameter||writers.has(key)&&writers.get(key)!==a)throw new Error('Invalid or ambiguous lookup dependency');
+            writers.set(key,a);valueOf(definitions.get(key),row[key]);
+        }
+    }
+    const visited=new Set(),active=new Set();
+    const run=a=>{
+        if(visited.has(a))return;if(active.has(a))throw new Error('Dynamic lookup cycle');active.add(a);
+        if(writers.has(a.parameter))run(writers.get(a.parameter));
+        const key=String(values[a.parameter]);if(!own(a.rows,key))throw new Error('No lookup row for selected value');
+        for(const [k,v]of Object.entries(a.rows[key]))values[k]=valueOf(definitions.get(k),v);
+        active.delete(a);visited.add(a);
+    };
+    lookups.forEach(run);return values;
+}
+/** Pure bounded evaluation. Geometric transforms are supplied by the host model. */
+function evaluateDynamicDefinition(block,input,transformEntity,{maxEntities=10000}={}) {
+    if(!Number.isSafeInteger(maxEntities)||maxEntities<1||maxEntities>100000||block.entities.length>maxEntities)throw new Error('Invalid dynamic entity budget');
+    const values=resolveDynamicValues(block,input),definitions=new Map(block.dynamic.parameters.map(p=>[p.name,p]));
+    const result={...block,entities:clone(block.entities),ports:clone(block.ports||[])};
+    delete result.dynamic;
+    for(const a of block.dynamic.actions) {
+        if(a.type==='lookup')continue;
+        const p=definitions.get(a.parameter),value=values[a.parameter],delta=typeof value==='number'?value-p.default:0;
+        const selected=e=>!a.entities||a.entities.includes(e.id),portSelected=p=>!a.ports||a.ports.includes(p.name);
+        if(a.type==='visibility'){
+            const key=String(value);if(!own(a.states,key))throw new Error('No visibility state for selected value');
+            const scope=new Set(a.entities||Object.values(a.states).flat());
+            for(const e of result.entities)if(scope.has(e.id))e.hidden=!!e.hidden||!a.states[key].includes(e.id);
+            continue;
+        }
+        if(a.type==='stretch') {
+            const direction=a.direction||{x:1,y:0},m=matrix({x:direction.x*delta,y:direction.y*delta});
+            for(const e of result.entities.filter(selected)){
+                if(e.extrusion && (e.extrusion.x||e.extrusion.y||e.extrusion.z!==1))throw new Error('Stretch requires default OCS');
+                const points=e.type==='LINE'?[e.a,e.b]:['LWPOLYLINE','POLYLINE'].includes(e.type)?e.points:e.type==='SPLINE'?e.controlPoints:null;
+                if(points){
+                    const chosen=points.filter(p=>inside(p,a.box));
+                    if(chosen.length===0)continue;
+                    if(chosen.length===points.length)transformEntity(e,m);
+                    else {
+                        if(points.some(p=>p.bulge)||e.type==='POLYLINE'&&(e.flags&(16|64)))throw new Error('Partial stretch would invalidate curved or mesh topology');
+                        for(const p of chosen)Object.assign(p,transform(p,m));
+                    }
+                } else if(['CIRCLE','ARC','TEXT','MTEXT','POINT'].includes(e.type)){
+                    if(inside(e.c||e.p,a.box))transformEntity(e,m);
+                } else throw new Error(`Stretch is not supported for ${e.type}`);
+            }
+            for(const p of result.ports)if(portSelected(p)&&inside(p,a.box))Object.assign(p,transform(p,m));
+            continue;
+        }
+        if(a.type==='array'){
+            if(!Number.isInteger(value)||value<1||value>256)throw new Error('Array count must be 1–256');
+            const originals=result.entities.filter(selected);if(result.entities.length+originals.length*(value-1)>maxEntities)throw new Error('Dynamic array entity budget exceeded');
+            const step=a.step||{x:10,y:0};
+            for(let i=1;i<value;i++)for(const e of originals){const c=clone(e);c.id=`${e.id}:array:${i}`;transformEntity(c,matrix({x:step.x*i,y:step.y*i}));result.entities.push(c);}
+            continue; // Named terminals describe the original cell; no implicit port duplication.
+        }
+        let m;
+        if(a.type==='move'){const d=a.direction||{x:1,y:0};m=matrix({x:d.x*delta,y:d.y*delta});}
+        if(a.type==='rotate')m=pivot(matrix({rotation:delta}),a.base);
+        if(a.type==='scale'){const ratio=value/p.default;if(!(ratio>0)||!Number.isFinite(ratio))throw new Error('Dynamic scale requires positive nonzero reference and value');m=pivot(matrix({sx:ratio,sy:ratio}),a.base);}
+        if(a.type==='flip'){
+            if(typeof value!=='boolean')throw new Error('Flip needs a boolean parameter');if(value===p.default)continue;
+            const d=a.direction||{x:0,y:1},len=Math.hypot(d.x,d.y);if(len<1e-9)throw new Error('Flip axis must be nonzero');
+            const x=d.x/len,y=d.y/len;m=pivot([2*x*x-1,2*x*y,2*x*y,2*y*y-1,0,0],a.base);
+        }
+        if(!m||!m.every(Number.isFinite))throw new Error('Invalid dynamic transform');
+        for(const e of result.entities.filter(selected)){
+            if(a.type==='flip'&&['INSERT','TEXT','MTEXT','ELLIPSE','HATCH'].includes(e.type))throw new Error(`Mirrored ${e.type} needs a specialized transform`);
+            transformEntity(e,m);
+        }
+        for(const p of result.ports.filter(portSelected)){
+            const q=transform(p,m),v=transform({x:p.x+(p.dx||0),y:p.y+(p.dy||0)},m);Object.assign(p,q,{dx:v.x-q.x,dy:v.y-q.y});
+        }
+    }
+    // Guard every coordinate, not only parameters. Prevent invalid buffers downstream.
+    const check=v=>{if(typeof v==='number')finite(v,'geometry');else if(v&&typeof v==='object')for(const x of Object.values(v))check(x);};
+    for(const e of result.entities)check(e);for(const p of result.ports)check(p);result.dynamicValues=values;return result;
+}
+
+return {validateDynamicDefinition,resolveDynamicValues,evaluateDynamicDefinition};
+})();
+// packages/model/src/fidelity.js
+__modules["packages/model/src/fidelity.js"]=(()=>{
+const {arcPoints, tessellatePolyline, splinePoints, bounds, distance, TAU} = __modules["packages/geometry/src/index.js"];
+const EPS = 1e-9;
+/** XY projection of Autodesk's arbitrary-axis OCS basis. */
+function ocsTransform(normal = { x: 0, y: 0, z: 1 }, elevation = 0) {
+    const length = Math.hypot(normal.x || 0, normal.y || 0, normal.z ?? 1);
+    if (length < EPS) throw new Error('Invalid zero-length DXF extrusion normal');
+    const n = { x: (normal.x || 0) / length, y: (normal.y || 0) / length, z: (normal.z ?? 1) / length };
+    const a = Math.abs(n.x) < 1 / 64 && Math.abs(n.y) < 1 / 64 ? { x: n.z, y: 0, z: -n.x } : { x: -n.y, y: n.x, z: 0 };
+    const l = Math.hypot(a.x, a.y, a.z); a.x /= l; a.y /= l; a.z /= l;
+    const b = { x: n.y * a.z - n.z * a.y, y: n.z * a.x - n.x * a.z };
+    return [a.x, a.y, b.x, b.y, n.x * elevation, n.y * elevation];
+}
+function ellipseEdgePoints(edge, tolerance = .25) {
+    const a = edge.major, ratio = edge.ratio ?? 1;
+    let start = edge.start ?? 0, end = edge.end ?? TAU;
+    // Hatch ellipse group 50/51 use geometric angles, unlike ELLIPSE parameters.
+    if (edge.type === 3) {
+        const convert = v => Math.atan2(Math.sin(v) / Math.max(Math.abs(ratio), EPS), Math.cos(v));
+        start = convert(start); end = convert(end);
+    }
+    let sweep = end - start;
+    if (edge.ccw === false) { while (sweep >= 0) sweep -= TAU; }
+    else { while (sweep <= 0) sweep += TAU; }
+    const n = Math.min(8192, Math.max(8, Math.ceil(Math.abs(sweep) * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(tolerance, 1e-8)))));
+    return Array.from({ length: n + 1 }, (_, i) => {
+        const t = start + sweep * i / n;
+        return { x: edge.c.x + a.x * Math.cos(t) - a.y * ratio * Math.sin(t), y: edge.c.y + a.y * Math.cos(t) + a.x * ratio * Math.sin(t) };
+    });
+}
+function hatchContours(e, tolerance = .25) {
+    return (e.loops || []).map(loop => {
+        if (!loop.edges?.length) return tessellatePolyline(loop.points || [], true, tolerance);
+        const result = [];
+        for (const edge of loop.edges) {
+            let points = [];
+            if (edge.type === 1) points = [edge.a, edge.b];
+            if (edge.type === 2) points = arcPoints(edge.c, edge.r, edge.start, edge.end, tolerance, edge.ccw === false);
+            if (edge.type === 3) points = ellipseEdgePoints(edge, tolerance);
+            if (edge.type === 4) points = splinePoints(edge, tolerance);
+            if (result.length && points.length && distance(result.at(-1), points[0]) < EPS) points = points.slice(1);
+            result.push(...points);
+        }
+        return result;
+    }).filter(p => p.length >= 3);
+}
+function inPolygon(p, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const a = polygon[i], b = polygon[j];
+        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+    }
+    return inside;
+}
+function hatchRegionContours(e, tolerance) {
+    const contours = hatchContours(e, tolerance);
+    if (!e.hatchStyle) return contours;
+    return contours.filter((p, i) => {
+        const depth = contours.reduce((n, q, j) => n + (i !== j && inPolygon(p[0], q) ? 1 : 0), 0);
+        return e.hatchStyle === 2 ? depth === 0 : depth <= 1;
+    });
+}
+/** Scanline hatch clipping with half-open crossings and parity across islands.
+ * Definitions are already transformed by the DXF producer: do not apply scale twice.
+ */
+function hatchPatternSegments(e, contours, { maxLines = 20000, maxSegments = 100000 } = {}) {
+    const segments = [], vertices = contours.flat(), bb = bounds(vertices);
+    if (!vertices.length) return { segments, limited: false };
+    let lines = 0;
+    for (const definition of e.patternLines || []) {
+        const u = { x: Math.cos(definition.angle), y: Math.sin(definition.angle) }, n = { x: -u.y, y: u.x }, base = definition.base, offset = definition.offset;
+        const step = offset.x * n.x + offset.y * n.y, origin = base.x * n.x + base.y * n.y;
+        if (Math.abs(step) < EPS) continue;
+        const corners = [{ x: bb.minX, y: bb.minY }, { x: bb.maxX, y: bb.minY }, { x: bb.minX, y: bb.maxY }, { x: bb.maxX, y: bb.maxY }];
+        const projections = corners.map(p => (p.x * n.x + p.y * n.y - origin) / step);
+        const first = Math.ceil(Math.min(...projections) - EPS), last = Math.floor(Math.max(...projections) + EPS);
+        if (!Number.isSafeInteger(first) || last - first + lines > maxLines) return { segments: [], limited: true };
+        for (let k = first; k <= last; k++) {
+            lines++;
+            const b = { x: base.x + k * offset.x, y: base.y + k * offset.y }, hits = [];
+            for (const polygon of contours) for (let i = 0; i < polygon.length; i++) {
+                const a = polygon[i], z = polygon[(i + 1) % polygon.length];
+                const da = (a.x - b.x) * n.x + (a.y - b.y) * n.y, dz = (z.x - b.x) * n.x + (z.y - b.y) * n.y;
+                if ((da > 0) === (dz > 0)) continue;
+                const t = da / (da - dz), x = a.x + (z.x - a.x) * t - b.x, y = a.y + (z.y - a.y) * t - b.y;
+                hits.push(x * u.x + y * u.y);
+            }
+            hits.sort((a, b) => a - b);
+            for (let i = 0; i + 1 < hits.length; i += 2) {
+                const lo = hits[i], hi = hits[i + 1];
+                if (hi - lo <= EPS) continue;
+                const emit = (a, z) => segments.push([{ x: b.x + a * u.x, y: b.y + a * u.y }, { x: b.x + z * u.x, y: b.y + z * u.y }]);
+                const dashes = definition.dashes || [], cycle = dashes.reduce((a, d) => a + Math.abs(d), 0);
+                if (cycle < EPS) emit(lo, hi);
+                else {
+                    if ((hi - lo) / cycle * dashes.length > maxSegments) return { segments: [], limited: true };
+                    for (let c = Math.floor(lo / cycle) * cycle; c < hi; c += cycle) {
+                        let p = c;
+                        for (const dash of dashes) {
+                            if (dash >= 0 && p + dash >= lo && p <= hi) emit(Math.max(lo, p), Math.min(hi, p + Math.max(dash, EPS)));
+                            p += Math.abs(dash);
+                        }
+                        if (segments.length > maxSegments) return { segments: [], limited: true };
+                    }
+                }
+                if (segments.length > maxSegments) return { segments: [], limited: true };
+            }
+        }
+    }
+    return { segments, limited: false };
+}
+/** Variable width arc/polyline ribbons, retaining original analytic model data. */
+function widePolylineContours(e, tolerance = .25) {
+    const result = [], points = e.points || [], n = points.length - (e.closed ? 0 : 1);
+    for (let i = 0; i < n; i++) {
+        const a = points[i], b = points[(i + 1) % points.length];
+        const w0 = e.constantWidth || (a.startWidth ?? e.startWidth ?? 0), w1 = e.constantWidth || (a.endWidth ?? e.endWidth ?? w0);
+        if (!(w0 > 0 || w1 > 0)) continue;
+        const center = tessellatePolyline([a, b], false, tolerance), left = [], right = [];
+        for (let j = 0; j < center.length; j++) {
+            const prev = center[Math.max(0, j - 1)], next = center[Math.min(center.length - 1, j + 1)], len = Math.hypot(next.x - prev.x, next.y - prev.y);
+            if (len < EPS) continue;
+            const w = (w0 + (w1 - w0) * j / (center.length - 1)) / 2, nx = -(next.y - prev.y) / len * w, ny = (next.x - prev.x) / len * w;
+            left.push({ x: center[j].x + nx, y: center[j].y + ny }); right.push({ x: center[j].x - nx, y: center[j].y - ny });
+        }
+        if (left.length >= 2) result.push([...left, ...right.reverse()]);
+    }
+    return result;
+}
+function signedDashPattern(pattern = []) {
+    if (!pattern.length) return [];
+    const result = []; let ink = true;
+    for (const value of pattern) {
+        const nextInk = value >= 0, size = Math.abs(value);
+        if (nextInk !== ink) { if (!result.length) result.push(0); ink = nextInk; result.push(size); }
+        else if (!result.length) result.push(size); else result[result.length - 1] += size;
+    }
+    if (result.length % 2) result.push(0);
+    return result;
+}
+const plainText = s => String(s).replace(/\\U\+([\da-f]{4})/gi, (_, v) => String.fromCharCode(parseInt(v, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀');
+/** Bounded, no-eval MTEXT formatting lexer with group-local formatting state. */
+function cadTextRuns(value, initial = {}) {
+    const source = plainText(value), result = [], stack = [];
+    let style = { scale: 1, width: 1, underline: false, overline: false, ...initial }, text = '';
+    const flush = () => { if (text) result.push({ text, ...style }); text = ''; };
+    for (let i = 0; i < source.length; i++) {
+        const ch = source[i];
+        if (ch === '{') { flush(); if (stack.length < 64) stack.push({ ...style }); continue; }
+        if (ch === '}') { flush(); style = stack.pop() || style; continue; }
+        if (ch !== '\\') { text += ch; continue; }
+        const command = source[++i];
+        if (command === undefined) break;
+        if (['\\', '{', '}'].includes(command)) { text += command; continue; }
+        if (command === 'P' || command === 'X') { text += '\n'; continue; }
+        if (command === '~') { text += '\u00a0'; continue; }
+        if ('LlOoKk'.includes(command)) { flush(); const key = /[Ll]/.test(command) ? 'underline' : /[Oo]/.test(command) ? 'overline' : 'strike'; style[key] = command === command.toUpperCase(); continue; }
+        if ('ACcFfHhQqTtWwSs'.includes(command)) {
+            const end = source.indexOf(';', i + 1); if (end < 0) { text += '\\' + command; continue; }
+            const arg = source.slice(i + 1, end); i = end; flush(); const num = parseFloat(arg);
+            if (/[Hh]/.test(command) && num > 0 && Number.isFinite(num)) style.scale = /x$/i.test(arg) ? num : num / (initial.height || 1);
+            else if (/[Ww]/.test(command) && num > 0 && Number.isFinite(num)) style.width = num;
+            else if (/[Qq]/.test(command) && Number.isFinite(num)) style.oblique = Math.max(-85, Math.min(85, num));
+            else if (/[Ff]/.test(command)) { style.font = arg.split('|')[0]; style.bold = /\|b1/i.test(arg); style.italic = /\|i1/i.test(arg); }
+            else if (command === 'c' && Number.isFinite(num)) style.color = '#' + (num & 0xffffff).toString(16).padStart(6, '0');
+            else if (command === 'C' && num >= 1 && num <= 7) style.color = ['','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#000000'][num];
+            else if (/[Ss]/.test(command)) result.push({ text: arg.replace(/[\/#^]/g, '/'), ...style, scale: style.scale * .8 });
+            continue;
+        }
+        text += '\\' + command;
+    }
+    flush(); return result;
+}
+/** Deterministic text layout; canvas may supply measured glyph advances. */
+function layoutCadText(t, measure) {
+    const h = t.nominalHeight || t.height || 12, multiline = !!t.mtext;
+    const runs = multiline ? cadTextRuns(t.rawText ?? t.text, { height: h }) : [{ text: plainText(t.text), scale: 1, width: 1 }];
+    const width = multiline && t.mtextWidth > 0 ? t.mtextWidth : Infinity;
+    const lines = [{ runs: [], width: 0, height: h }];
+    let line = lines[0];
+    const add = (text, style) => {
+        if (!text) return;
+        const height = h * style.scale, w = (measure ? measure(text, height, style) : [...text].reduce((n, c) => n + (/\s/.test(c) ? .33 : /[ilI.,'!:;]/.test(c) ? .28 : /[MW@%]/.test(c) ? .9 : .6), 0) * height) * style.width;
+        if (w > width && Number.isFinite(width) && [...text].length > 1) {
+            for (const ch of text) add(ch, style);
+            return;
+        }
+        if (line.width > 0 && line.width + w > width && !/^\s+$/.test(text)) { line = { runs: [], width: 0, height: h }; lines.push(line); }
+        line.runs.push({ ...style, text, x: line.width, width: w, height }); line.width += w; line.height = Math.max(line.height, height);
+    };
+    for (const run of runs) for (const token of run.text.split(/(\n|[ \t]+)/)) {
+        if (token === '\n') { line = { runs: [], width: 0, height: h }; lines.push(line); }
+        else add(token, run);
+    }
+    const lineFactor = multiline ? (5 / 3) * Math.max(.25, Math.min(4, t.lineSpacing || 1)) : 1.3;
+    let y = 0;
+    for (const line of lines) { line.y = y; y += (t.lineSpacingStyle === 2 ? h : line.height) * lineFactor; }
+    const height = lines.at(-1).y + lines.at(-1).height, w = lines.reduce((n, l) => Math.max(n, l.width), 0);
+    const vertical = multiline ? Math.floor(((t.attachment || 1) - 1) / 3) : t.valign === 3 ? 0 : t.valign === 2 ? 1 : t.valign === 1 ? 2 : -1;
+    const baseline = vertical === 0 ? h * .8 : vertical === 1 ? h * .8 - height / 2 : vertical === 2 ? h * .8 - height : 0;
+    const boxWidth = Number.isFinite(width) ? width : w;
+    const align = t.align || 'left', offsetX = align === 'center' ? -boxWidth / 2 : align === 'right' ? -boxWidth : 0;
+    for (const line of lines) {
+        const start = offsetX + (align === 'center' ? (boxWidth - line.width) / 2 : align === 'right' ? boxWidth - line.width : 0);
+        for (const r of line.runs) { r.x += start; r.y = baseline + line.y; }
+    }
+    return { lines, width: boxWidth, height, minX: offsetX, minY: baseline - h * .8, maxX: offsetX + boxWidth, maxY: baseline + height - h * .8 };
+}
+
+return {ocsTransform,ellipseEdgePoints,hatchContours,inPolygon,hatchRegionContours,hatchPatternSegments,widePolylineContours,signedDashPattern,cadTextRuns,layoutCadText};
+})();
+// packages/model/src/interop.js
+__modules["packages/model/src/interop.js"]=(()=>{
+const {matrix, compose, bounds, splinePoints} = __modules["packages/geometry/src/index.js"];
+const {inPolygon} = __modules["packages/model/src/fidelity.js"];
+/** Top-view WCS -> paper DCS. Twist is applied before the DCS center offset. */
+function viewportTransform(e) {
+    const d=e.viewDirection||{x:0,y:0,z:1};
+    if((e.viewportFlags&7)||Math.abs(d.x)>1e-9||Math.abs(d.y)>1e-9||d.z<=0) return null;
+    const s=e.viewportHeight/e.viewHeight;
+    if(!(s>0)||!Number.isFinite(s))return null;
+    const c=e.viewCenter||{x:0,y:0},target=e.viewTarget||{x:0,y:0};
+    return compose(matrix({x:e.c.x-c.x*s,y:e.c.y-c.y*s}),compose(matrix({sx:s,sy:s,rotation:e.viewTwist||0}),matrix({x:-target.x,y:-target.y})));
+}
+function viewportRectangle(e) {
+    const {x,y}=e.c,w=e.viewportWidth/2,h=e.viewportHeight/2;
+    return [{x:x-w,y:y-h},{x:x+w,y:y-h},{x:x+w,y:y+h},{x:x-w,y:y+h}];
+}
+function insideClips(p,clips) {
+    return !clips || clips.every(polygon=>inPolygon(p,polygon));
+}
+function wipeoutPoints(e) {
+    let vertices=e.boundary||[];
+    if(e.boundaryType===1&&vertices.length===2) {
+        const [a,b]=vertices;vertices=[a,{x:b.x,y:a.y},b,{x:a.x,y:b.y}];
+    }
+    const p=e.p,u=e.uPixel,v=e.vPixel,height=e.imageSize?.y??1;
+    return vertices.map(q=>({x:p.x+u.x*(q.x+.5)+v.x*(height-q.y-.5),y:p.y+u.y*(q.x+.5)+v.y*(height-q.y-.5)}));
+}
+function helixPoints(e,tolerance=.25) {
+    const spline=e.helixSpline;
+    if(spline?.controlPoints?.length && spline.knots?.length)return splinePoints(spline,tolerance);
+    const a=e.axis||{x:0,y:0,z:1},l=Math.hypot(a.x,a.y,a.z);if(!l)return [];
+    const n={x:a.x/l,y:a.y/l,z:a.z/l},b=e.axisBase,s=e.startPoint;
+    if(!b||!s||!(e.radius>0)||!Number.isFinite(e.turns)||!Number.isFinite(e.turnHeight))return [];
+    const v={x:s.x-b.x,y:s.y-b.y,z:(s.z||0)-(b.z||0)},dot=v.x*n.x+v.y*n.y+v.z*n.z;
+    const radial={x:v.x-dot*n.x,y:v.y-dot*n.y,z:v.z-dot*n.z},r=Math.hypot(radial.x,radial.y,radial.z);if(!r)return [];
+    const u={x:radial.x/r*e.radius,y:radial.y/r*e.radius,z:radial.z/r*e.radius};
+    const w={x:n.y*u.z-n.z*u.y,y:n.z*u.x-n.x*u.z,z:n.x*u.y-n.y*u.x};
+    const steps=Math.min(8192,Math.max(16,Math.ceil(Math.abs(e.turns)*Math.PI*2*Math.sqrt(e.radius/Math.max(tolerance,1e-8))))),sign=e.handedness===false?-1:1;
+    return Array.from({length:steps+1},(_,i)=>{const f=i/steps,theta=sign*f*e.turns*Math.PI*2,z=f*e.turns*e.turnHeight;return {x:s.x-u.x+u.x*Math.cos(theta)+w.x*Math.sin(theta)+n.x*z,y:s.y-u.y+u.y*Math.cos(theta)+w.y*Math.sin(theta)+n.y*z,z:(s.z||0)-u.z+u.z*Math.cos(theta)+w.z*Math.sin(theta)+n.z*z};});
+}
+
+return {viewportTransform,viewportRectangle,insideClips,wipeoutPoints,helixPoints};
+})();
+// packages/model/src/index.js
+__modules["packages/model/src/index.js"]=(()=>{
+const {linearHatchGradient} = __modules["packages/model/src/gradients.js"];
+const {dimensionPicture:buildDimensionPicture, editDimension:applyDimensionEdit, dimensionGrips:getDimensionGrips, regenerateDimensions:refreshDimensions} = __modules["packages/model/src/dimensions.js"];
+const {validateDynamicDefinition, resolveDynamicValues, evaluateDynamicDefinition} = __modules["packages/model/src/dynamic.js"];
+const {viewportTransform, viewportRectangle, wipeoutPoints, helixPoints} = __modules["packages/model/src/interop.js"];
+const {ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText} = __modules["packages/model/src/fidelity.js"];
+const {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules["packages/geometry/src/index.js"];
+function textLayout(text, measure) { return layoutCadText(text, measure); }
+function objectCoordinateTransform(normal, elevation) { return ocsTransform(normal, elevation); }
+let sequence = 0;
+const uid = (prefix = 'e') => `${prefix}-${Date.now().toString(36)}-${(++sequence).toString(36)}`;
+const clone = value => JSON.parse(JSON.stringify(value));
+function createDocument(name = 'Untitled drawing') { return { schema: 'conduitcad/1', name, units: 'mm', version: 0, entities: [], blocks: {}, layers: [{ name: '0', color: '#344755', visible: true, locked: false }, { name: 'Equipment', color: '#355463', visible: true, locked: false }, { name: 'Process', color: '#147c77', visible: true, locked: false }, { name: 'Instruments', color: '#9b7246', visible: true, locked: false, dash: [5, 4] }, { name: 'Electrical', color: '#6477ba', visible: true, locked: false }, { name: 'Annotations', color: '#71808a', visible: true, locked: false }], linetypes: { CONTINUOUS: [], DASHED: [8, 4], CENTER: [12, 3, 2, 3], HIDDEN: [4, 3] }, parameters: { grid: '10', pipeWidth: '2', valveSize: '64' }, constraints: [], metadata: { author: '', description: '' }, activeLayout: 'Model', layouts: ['Model'], importDiagnostics: [] }; }
+function validateDocument(doc) {
+    if (!doc || doc.schema !== 'conduitcad/1' || !Array.isArray(doc.entities) || !doc.blocks || !Array.isArray(doc.layers))
+        throw new Error('Not a Conduit CAD project');
+    if (doc.entities.length > 1000000)
+        throw new Error('Entity safety limit exceeded');
+    const ids = new Set();
+    for (const e of doc.entities) {
+        if (!e.id || ids.has(e.id))
+            throw new Error('Missing or duplicate entity ID');
+        ids.add(e.id);
+        if (!e.type)
+            throw new Error('Missing entity type');
+    }
+    return doc;
+}
+function entity(type, props = {}) { return { id: uid(), type, layer: '0', ...props }; }
+const line = (a, b, props = {}) => entity('LINE', { a: { ...a }, b: { ...b }, ...props });
+const polyline = (points, closed = false, props = {}) => entity('LWPOLYLINE', { points: points.map(p => ({ ...p })), closed, ...props });
+const circle = (c, r, props = {}) => entity('CIRCLE', { c: { ...c }, r, ...props });
+const text = (p, value, height = 14, props = {}) => entity('TEXT', { p: { ...p }, text: value, height, rotation: 0, ...props });
+const rect = (x, y, w, h, props = {}) => polyline([{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }], true, props);
+function layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '0')) || doc.layers[0]; }
+function isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }
+function isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }
+function cleanText(value = '') { return String(value).replace(/\\P/g, '\n').replace(/\\U\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\[ACFHQTW][^;]*;/g, '').replace(/\\[LlOoKk]/g, '').replace(/\\S([^;]+);/g, (_, s) => s.replace(/[\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\~/g, ' '); }
+function resolveStyle(e, doc, parentStyle = null, parentLayer = null) {
+    const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc);
+    const lineweight = e.lineweight === -2 ? parentStyle?.lineweight : e.lineweight == null || e.lineweight === -1 ? layer?.lineweight : e.lineweight;
+    const type = e.linetype === 'BYBLOCK' ? null : (!e.linetype || e.linetype === 'BYLAYER' ? layer?.linetype : e.linetype);
+    const raw = doc.linetypes?.[type];
+    const dash = e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? (raw ? (doc.signedLinetypes ? signedDashPattern(raw) : raw) : null) ?? layer?.dash ?? [];
+    const factor = (e.linetypeScale ?? 1) * (e.dash || e.linetype === 'BYBLOCK' ? 1 : doc.linetypeScale ?? 1);
+    return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color),
+        width: e.width ?? (lineweight >= 0 ? Math.max(.5, lineweight * 96 / 2540) : 1.5), lineweight,
+        dash: dash.map(v => Math.max(0, v * factor)), opacity: e.transparency === 0x01000000 ? parentStyle?.opacity ?? 1 : e.opacity ?? 1 };
+}
+/** Returns portable paths/text. Blocks retain their native definitions in the model. */
+function entityGeometry(e, doc, options = {}) {
+    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options;
+    let m = options.matrix || identity();
+    if (e.extrusion && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'ATTRIB', 'ATTDEF', 'SOLID', 'TRACE', 'HATCH', 'INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64))))
+        m = compose(m, ocsTransform(e.extrusion, e.elevation ?? e.c?.z ?? e.p?.z ?? e.z ?? 0));
+    if (depth > 24)
+        return { paths: [], texts: [] };
+    const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));
+    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];
+    const path = (pts, closed = false, fill = null, extra = {}) => {
+        if (pts.length > 1)
+            paths.push({ points: pts.map(p => transform(p, m)), closed, fill: fill === 'BYBLOCK' || fill === 'BYLAYER' ? style.color : fill, ...style, ...extra, entityId: e.id });
+    };
+    const label = (p, value, height, rotation = 0, align = 'left') => {
+        const textStyle = doc.textStyles?.[e.styleName] || {}, q = transform(p, m), angle = rotation * Math.PI / 180;
+        const sx = (e.textFlags & 2) ? -1 : 1, sy = (e.textFlags & 4) ? -1 : 1;
+        const width = e.widthFactor ?? textStyle.widthFactor ?? 1, oblique = (e.oblique || textStyle.oblique || 0) * Math.PI / 180;
+        const local = compose(matrix({ rotation }), [sx * width, 0, Math.tan(oblique) * sy, sy, 0, 0]);
+        const affine = compose(m, local), frame = affine.slice(0, 4);
+        texts.push({ p: q, text: cleanText(value), rawText: value, height: height * Math.hypot(frame[2], frame[3]), nominalHeight: height,
+            rotation: Math.atan2(frame[1], frame[0]) * 180 / Math.PI, align, color: style.color, opacity: style.opacity, entityId: e.id,
+            font: e.font || textStyle.font || 'sans-serif', frame, widthFactor: width,
+            mtext: e.type === 'MTEXT', mtextWidth: e.mtextWidth, attachment: e.attachment, valign: e.valign,
+            lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });
+    };
+    switch (e.type) {
+        case 'MESH': {
+            const edges=new Set();
+            const edge=(a,b)=>{const id=a<b?a+':'+b:b+':'+a;if(edges.has(id))return;edges.add(id);if(e.points?.[a]&&e.points?.[b])path([e.points[a],e.points[b]]);};
+            for(const face of e.faces||[])for(let i=0;i<face.length;i++)edge(face[i],face[(i+1)%face.length]);
+            for(const [a,b] of e.edges||[])edge(a,b);
+            break;
+        }
+        case 'HELIX': path(helixPoints(e,curveTolerance)); break;
+        case 'WIPEOUT': path(wipeoutPoints(e),true,'#fbfcfb',{stroke:false}); break;
+        case 'VIEWPORT': {
+            if(e.viewportId===1)break;
+            const rectangle=viewportRectangle(e);
+            path(rectangle,true);
+            if(e.viewportStatus===0||(e.viewportFlags&131072))break;
+            const projection=viewportTransform(e);
+            if(!projection){warnings.push({severity:'warning',type:'VIEWPORT',message:'Only top-view orthographic viewport contents can be rendered.'});break;}
+            let clip=rectangle;
+            if(e.clipHandle) {
+                const boundary=doc.entities.find(q=>String(q._dxf?.handle||'').toUpperCase()===String(e.clipHandle).toUpperCase());
+                const candidate=boundary && boundary.type!=='VIEWPORT' ? entityGeometry(boundary,doc,{tolerance:curveTolerance,depth:depth+1}).paths.find(p=>p.closed):null;
+                if(!candidate){warnings.push({severity:'warning',type:'VIEWPORT',message:'Unresolved or unsupported viewport clipping boundary; content is not drawn.'});break;}
+                clip=candidate.points;
+            }
+            const worldClip=clip.map(p=>transform(p,m)), rectangularClip=rectangle.map(p=>transform(p,m));
+            const frozen=new Set((e.frozenLayers||[]).map(n=>n.toUpperCase()));
+            const model={...doc,activeLayout:'Model',layers:doc.layers.map(l=>frozen.has(l.name.toUpperCase())?{...l,visible:false}:l)};
+            for(const child of doc.entities) {
+                if(child.type==='VIEWPORT'||!isVisible(child,model))continue;
+                const g=entityGeometry(child,model,{matrix:compose(m,projection),tolerance,depth:depth+1});
+                warnings.push(...(g.warnings||[]));
+                const clips=[rectangularClip,worldClip];
+                for(const p of g.paths)paths.push({...p,clips:[...(p.clips||[]),...clips],entityId:e.id});
+                for(const t of g.texts)texts.push({...t,clips:[...(t.clips||[]),...clips],entityId:e.id});
+            }
+            break;
+        }
+        case 'LINE':
+            path([e.a, e.b]);
+            break;
+        case 'LWPOLYLINE':
+        case 'POLYLINE':
+            if(e.type==='POLYLINE' && (e.flags & 64)) {
+                for(const face of e.faces || []) for(let i=0;i<face.length;i++) { const a=e.points[Math.abs(face[i])-1], b=e.points[Math.abs(face[(i+1)%face.length])-1]; if(face[i]>0&&a&&b)path([a,b]); }
+                break;
+            }
+            if(e.type==='POLYLINE' && (e.flags & 16)) {
+                const mCount=e.mCount || 0,nCount=e.nCount || 0;
+                if(mCount*nCount===e.points.length)for(let m=0;m<mCount;m++)for(let n=0;n<nCount;n++) {
+                    const a=e.points[m*nCount+n];
+                    if(m+1<mCount || (e.flags&1))path([a,e.points[((m+1)%mCount)*nCount+n]]);
+                    if(n+1<nCount || (e.flags&32))path([a,e.points[m*nCount+(n+1)%nCount]]);
+                }
+                break;
+            }
+            { const ribbons = widePolylineContours(e, curveTolerance);
+              if (ribbons.length) { for (const ribbon of ribbons) path(ribbon, true, style.color, { stroke: false }); }
+              else path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill); }
+            break;
+        case 'CIRCLE':
+            path(arcPoints(e.c, e.r, 0, TAU, curveTolerance), true, e.fill);
+            break;
+        case 'ARC':
+            path(arcPoints(e.c, e.r, e.start, e.end, curveTolerance, !!e.clockwise));
+            break;
+        case 'ELLIPSE': {
+            const a = e.major || { x: e.rx || 1, y: 0 }, r = e.ratio ?? 1, s = e.start ?? 0;
+            const normal=e.extrusion || {x:0,y:0,z:1}, minor={x:(normal.y || 0)*(a.z || 0)-(normal.z ?? 1)*a.y,y:(normal.z ?? 1)*a.x-(normal.x || 0)*(a.z || 0),z:(normal.x || 0)*a.y-(normal.y || 0)*a.x};
+            const factor=Math.hypot(a.x,a.y,a.z || 0)*r/(Math.hypot(minor.x,minor.y,minor.z) || 1); minor.x*=factor;minor.y*=factor;
+            let sweep = (e.end ?? TAU) - s;
+            while (sweep <= 0)
+                sweep += TAU;
+            const n = Math.min(4096, Math.max(24, Math.ceil(sweep * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(curveTolerance, .0000001)))));
+            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) + minor.x * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + minor.y * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);
+            break;
+        }
+        case 'SPLINE':
+            path(splinePoints(e, curveTolerance), !!e.closed);
+            break;
+        case 'TEXT':
+        case 'MTEXT':
+        case 'ATTRIB':
+        case 'ATTDEF':
+            if (!e.invisible) {
+                let p = ((e.halign || e.valign) && e.alignPoint) ? e.alignPoint : e.p, height = e.height || doc.textStyles?.[e.styleName]?.height || 12, rotation = e.rotation || 0;
+                let value = e.text || '', alignment = e.halign === 4 ? 'center' : e.align || 'left';
+                if ([3, 5].includes(e.halign) && e.alignPoint) {
+                    const target = distance(e.p, e.alignPoint), measured = layoutCadText({ text: cleanText(value), height }).width || 1;
+                    rotation = Math.atan2(e.alignPoint.y - e.p.y, e.alignPoint.x - e.p.x) * 180 / Math.PI;
+                    p = e.p; alignment = 'left';
+                    label(p, value, height, rotation, alignment);
+                    const t = texts.at(-1), factor = target / measured; t.frame[0] *= factor; t.frame[1] *= factor;
+                    if (e.halign === 3) { t.frame[2] *= factor; t.frame[3] *= factor; t.height *= factor; }
+                } else label(p, value, height, rotation, alignment);
+            }
+            break;
+        case 'POINT': {
+            const r = 1.5;
+            path([{ x: e.p.x - r, y: e.p.y }, { x: e.p.x + r, y: e.p.y }]);
+            path([{ x: e.p.x, y: e.p.y - r }, { x: e.p.x, y: e.p.y + r }]);
+            break;
+        }
+        case 'SOLID':
+        case 'TRACE':
+            path(e.points || [], true, style.color, { stroke: false });
+            break;
+        case '3DFACE':
+            for (let i = 0; i < (e.points?.length || 0); i++) if (!(e.edgeFlags & (1 << i))) path([e.points[i], e.points[(i + 1) % e.points.length]]);
+            break;
+        case 'HATCH': {
+            const contours = hatchRegionContours(e, curveTolerance);
+            if (e.solid || e.gradient) {
+                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd', gradient: linearHatchGradient(e.gradient,contours,m) });
+            } else {
+                const pattern = hatchPatternSegments(e, contours);
+                if (pattern.limited || !e.patternLines?.length) {
+                    for (const contour of contours) path(contour, true);
+                    warnings.push({ entityId: e.id, message: pattern.limited ? 'Hatch density exceeds bounded tessellation budget; showing boundaries.' : 'Hatch has no pattern line definitions; showing boundaries.' });
+                } else for (const points of pattern.segments) path(points, false, null, { dash: [] });
+            }
+            break;
+        }
+        case 'LEADER': {
+            path(e.points || []);
+            if (e.arrow !== false && e.points?.length > 1) {
+                const tip = e.points[0], d = normalize(sub(e.points[1], tip)), n = { x: -d.y, y: d.x }, length = e.arrowSize || 6;
+                path([tip, add(tip, add(mul(d, length), mul(n, length / 3))), add(tip, add(mul(d, length), mul(n, -length / 3)))], true, style.color, { stroke: false });
+            }
+            break;
+        }
+        case 'RAY':
+        case 'XLINE': {
+            const p = transform(e.p, m), q = transform(add(e.p, e.direction), m), d = sub(q, p), v = options.view || { minX: p.x - 10000, maxX: p.x + 10000, minY: p.y - 10000, maxY: p.y + 10000 };
+            let lo = e.type === 'RAY' ? 0 : -Infinity, hi = Infinity;
+            for (const axis of ['x', 'y']) {
+                const min = v[axis === 'x' ? 'minX' : 'minY'], max = v[axis === 'x' ? 'maxX' : 'maxY'];
+                if (Math.abs(d[axis]) < 1e-12) { if (p[axis] < min || p[axis] > max) hi = -Infinity; }
+                else { const a = (min - p[axis]) / d[axis], b = (max - p[axis]) / d[axis]; lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b)); }
+            }
+            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, entityId: e.id });
+            break;
+        }
+        case 'DIMENSION': {
+            if (e.dimension?.version === 1) {
+                try {
+                    const picture = buildDimensionPicture(e,doc);
+                    for (const child of picture.entities) {
+                        const g=entityGeometry(child,doc,{...options,matrix:m,depth:depth+1,parentStyle:style,parentLayer:layerFor(e,doc)});
+                        paths.push(...g.paths.map(p=>({...p,entityId:e.id})));texts.push(...g.texts.map(t=>({...t,entityId:e.id})));
+                    }
+                } catch(error) { warnings.push({entityId:e.id,message:error.message}); }
+                break;
+            }
+            if (e.block && doc.blocks[e.block]) {
+                const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
+                for (const p of g.paths)
+                    paths.push(p);
+                for (const t of g.texts)
+                    texts.push(t);
+                break;
+            }
+            const a = e.a, b = e.b;
+            if (!a || !b)
+                break;
+            const n = normalize({ x: -(b.y - a.y), y: b.x - a.x }), off = e.offset ?? 30, p = add(a, mul(n, off)), q = add(b, mul(n, off));
+            path([a, add(p, mul(n, 6))]);
+            path([b, add(q, mul(n, 6))]);
+            path([p, q]);
+            const u = normalize(sub(q, p));
+            for (const [v, dir] of [[p, 1], [q, -1]]) {
+                path([add(v, add(mul(u, dir * 7), mul(n, 3))), v, add(v, add(mul(u, dir * 7), mul(n, -3)))]);
+            }
+            label(add(lerp(p, q, .5), mul(n, 5)), e.text && e.text !== '<>' ? e.text : distance(a, b).toFixed(1), e.height || 12, Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, 'center');
+            break;
+        }
+        case 'INSERT': {
+            let block;try{block=effectiveBlock(e,doc);}catch(error){warnings.push({entityId:e.id,message:error.message});break;}
+            if (!block)
+                break;
+            const base = block.base || { x: 0, y: 0 }, rows = Math.min(1000, e.rows || 1), cols = Math.min(1000, e.columns || 1);
+            if (rows * cols > 10000)
+                break;
+            // MINSERT spacing belongs to the rotated placement grid, not the scaled block.
+            const placement = matrix({ x: e.x || 0, y: e.y || 0, rotation: e.rotation || 0 });
+            const shape = compose(matrix({ sx: e.sx ?? 1, sy: e.sy ?? e.sx ?? 1 }), matrix({ x: -base.x, y: -base.y }));
+            const gridRotation = matrix({ rotation: e.rotation || 0 }), locations = new Set();
+            for (let row = 0; row < rows; row++)
+                for (let col = 0; col < cols; col++) {
+                    const offset = { x: col * (e.columnSpacing || 0), y: row * (e.rowSpacing || 0) };
+                    const key = offset.x + ':' + offset.y;
+                    if (locations.has(key))
+                        continue;
+                    locations.add(key);
+                    const mm = compose(m, compose(placement, compose(matrix(offset), shape)));
+                    const attributeOffset = transform(offset, gridRotation);
+                    for (const attribute of e.attributes || []) {
+                        if (attribute.invisible)
+                            continue;
+                        const g = entityGeometry(attribute, doc, { ...options, matrix: compose(m, matrix(attributeOffset)), depth: depth + 1 });
+                        for (const t of g.texts)
+                            texts.push({ ...t, entityId: e.id });
+                    }
+                    for (const child of block.entities || []) {
+                        if (child.type === 'ATTDEF' || child.hidden)
+                            continue;
+                        const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);
+                        if (cl?.visible === false)
+                            continue;
+                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl, view: options.view });
+                        warnings.push(...(g.warnings || []));
+                        for (const p of g.paths)
+                            paths.push({ ...p, entityId: e.id });
+                        for (const t of g.texts)
+                            texts.push({ ...t, entityId: e.id });
+                    }
+                }
+            if (e.tag && block.symbol) {
+                const p = { x: e.x || 0, y: (e.y || 0) - Math.abs((e.sy ?? e.sx ?? 1) * (block.symbol.labelOffset || 55)) };
+                label(p, e.tag, e.tagHeight || 12, 0, 'center');
+            }
+            break;
+        }
+    }
+    if (e.connector && e.points?.length > 1) {
+        const ps = e.points;
+        const b = ps.at(-1), a = ps.at(-2), u = normalize(sub(a, b)), n = { x: -u.y, y: u.x };
+        if (e.connector.arrow !== 'none')
+            path([add(b, add(mul(u, 9), mul(n, 4))), b, add(b, add(mul(u, 9), mul(n, -4)))]);
+        if (e.label) {
+            const mid = ps[Math.floor((ps.length - 1) / 2)], next = ps[Math.min(ps.length - 1, Math.floor((ps.length - 1) / 2) + 1)];
+            label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');
+        }
+    }
+    return warnings.length ? { paths, texts, warnings } : { paths, texts };
+}
+function entityBounds(e, doc) {
+    if(e.type==='VIEWPORT')return e.viewportId===1?emptyBounds():bounds(viewportRectangle(e));
+    if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
+    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
+    for (const t of g.texts) {
+        const layout = layoutCadText(t), frame = t.frame || matrix({ rotation: t.rotation }).slice(0, 4), tm = [...frame, t.p.x, t.p.y];
+        // Layout coordinates are font coordinates (Y down); model coordinates are Y up.
+        for (const x of [layout.minX, layout.maxX]) for (const y of [layout.minY, layout.maxY]) pts.push(transform({ x, y: -y }, tm));
+    }
+    if (!pts.length && e.type === 'INSERT') pts.push({ x: e.x, y: e.y });
+    return bounds(pts);
+}
+function documentBounds(doc) {
+    let b = emptyBounds();
+    for (const e of doc.entities)
+        if (isVisible(e, doc))
+            b = union(b, entityBounds(e, doc));
+    return validBounds(b) ? b : { minX: -100, minY: -100, maxX: 100, maxY: 100 };
+}
+function ports(e, doc) {
+    if (e.type !== 'INSERT')
+        return [];
+    const block = effectiveBlock(e,doc), base = block?.base || { x: 0, y: 0 };
+    const m = compose(matrix(e), matrix({ x: -base.x, y: -base.y }));
+    return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
+}
+function moveEntity(e, dx, dy) {
+    if(e.type==='VIEWPORT'&&e.clipHandle)throw new Error('Moving a clipped viewport requires moving its boundary in the same transaction; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.block&&e.dimension?.version!==1)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.dimension?.version===1){delete e.block;delete e.dimension.references;}
+    const worldDX = dx, worldDY = dy;
+    if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
+        const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
+        if (Math.abs(det) < 1e-10) throw new Error('Cannot drag an edge-on OCS plane in the top view.');
+        dx = (m[3]*worldDX-m[2]*worldDY)/det; dy = (-m[1]*worldDX+m[0]*worldDY)/det;
+    }
+    const mv = p => {
+        if (p) {
+            p.x += dx;
+            p.y += dy;
+        }
+    };
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint', 'axisBase', 'startPoint', 'definitionPoint', 'textMidpoint', 'dimensionInsert', 'defpoint4', 'defpoint5'])
+        mv(e[key]);
+    for (const key of ['points', 'controlPoints', 'fitPoints'])
+        for (const p of e[key] || [])
+            mv(p);
+    for (const l of e.loops || [])
+        for (const p of l.points || [])
+            mv(p);
+    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
+        for (const key of ['a', 'b', 'c']) mv(edge[key]);
+        for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);
+    }
+    for (const definition of e.patternLines || []) mv(definition.base);
+    if(e.type==='HELIX')for(const key of ['controlPoints','fitPoints'])for(const p of e.helixSpline?.[key]||[])mv(p);
+    if (e.type === 'INSERT') {
+        e.x += dx;
+        e.y += dy;
+        for (const a of e.attributes || [])
+            moveEntity(a, worldDX, worldDY);
+    }
+    e.dirty = true;
+}
+function transformEntity(e, m) {
+    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block&&e.dimension?.version!==1))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
+    const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
+    if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
+    if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
+        throw new Error('Rotation of non-default OCS geometry requires a 3D transform; coordinates were not modified.');
+    if (['HATCH','CIRCLE','ARC','INSERT'].includes(e.type) && (Math.abs(sx-sy) > 1e-8*Math.max(sx,sy) || Math.abs(m[0]*m[2]+m[1]*m[3]) > 1e-8*sx*sy))
+        throw new Error('This entity requires a similarity transform; nonuniform scale would change its native type.');
+    if (e.type === 'HATCH' && determinant < 0) throw new Error('Mirroring native hatch edge paths is not supported; coordinates were not modified.');
+    if(e.type==='DIMENSION' && e.dimension?.version===1) {
+        if(determinant<=0||Math.abs(sx-sy)>1e-8*Math.max(sx,sy)||Math.abs(m[0]*m[2]+m[1]*m[3])>1e-8*sx*sy)throw new Error('Dimensions require an orientation-preserving similarity transform');
+        for(const k of ['a','b','definitionPoint','defpoint4','defpoint5','textMidpoint'])if(e[k])Object.assign(e[k],transform(e[k],m));
+        if(e.offset!==undefined)e.offset*=sx;
+        if(((e.dimtype??33)&15)===0)e.dimensionAngle=(e.dimensionAngle||0)+Math.atan2(m[1],m[0])*180/Math.PI;
+        if(e.textRotation!==undefined)e.textRotation+=Math.atan2(m[1],m[0])*180/Math.PI;
+        e.dimension.style={...e.dimension.style,dimscale:(e.dimension.style?.dimscale??e.dimension.resolvedScale??e.dimstyleOverrides?.dimscale??1)*sx};
+        delete e.block;delete e.dimension.references;e.dirty=true;return;
+    }
+    const vector = p => ({x:m[0]*p.x+m[2]*p.y,y:m[1]*p.x+m[3]*p.y});
+    if (e.direction) Object.assign(e.direction, vector(e.direction));
+    if (e.major) Object.assign(e.major, vector(e.major));
+    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
+        for (const key of ['a','b','c']) if (edge[key]) Object.assign(edge[key], transform(edge[key], m));
+        for (const key of ['controlPoints','fitPoints']) for (const p of edge[key] || []) Object.assign(p, transform(p, m));
+        for (const key of ['major','startTangent','endTangent']) if (edge[key]) Object.assign(edge[key], vector(edge[key]));
+        if (edge.r) edge.r *= sx;
+        if (edge.type === 2) { const angle = Math.atan2(m[1],m[0]); edge.start += angle; edge.end += angle; }
+    }
+    for (const definition of e.patternLines || []) {
+        Object.assign(definition.base, transform(definition.base, m)); Object.assign(definition.offset, vector(definition.offset));
+        definition.angle += Math.atan2(m[1],m[0]); definition.dashes = (definition.dashes || []).map(v=>v*sx);
+    }
+    if(e.type==='HATCH' && e.gradient){const rotation=Math.atan2(m[1],m[0]);const angle=e.gradient.find(p=>p[0]===460);if(angle)angle[1]+=rotation;else e.gradient.push([460,rotation]);}
+    if (e.type === 'HATCH') { e.patternScale = (e.patternScale || 1)*sx; e.patternAngle = (e.patternAngle || 0) + Math.atan2(m[1],m[0])*180/Math.PI; }
+    for (const p of e.points || []) { if (p.bulge && determinant < 0) p.bulge *= -1; for (const k of ['startWidth','endWidth']) if (p[k]) p[k] *= sx; }
+    for (const k of ['constantWidth','startWidth','endWidth','mtextWidth']) if (e[k]) e[k] *= sx;
+    const apply = p => {
+        if (p)
+            Object.assign(p, transform(p, m));
+    };
+    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
+        apply(e[key]);
+    for (const key of ['points', 'controlPoints', 'fitPoints'])
+        for (const p of e[key] || [])
+            apply(p);
+    for (const l of e.loops || [])
+        for (const p of l.points || [])
+            apply(p);
+    const scale = Math.hypot(m[0], m[1]), rot = Math.atan2(m[1], m[0]) * 180 / Math.PI;
+    if (e.r)
+        e.r *= scale;
+    if (e.height)
+        e.height *= scale;
+    if (e.type === 'ARC') {
+        const angle = a => { const v=vector({x:Math.cos(a),y:Math.sin(a)}); return Math.atan2(v.y,v.x); };
+        e.start = angle(e.start); e.end = angle(e.end);
+        if (determinant < 0) e.clockwise = !e.clockwise;
+    }
+    if (e.type === 'INSERT') {
+        const p = transform({ x: e.x, y: e.y }, m);
+        e.x = p.x;
+        e.y = p.y;
+        e.sx = (e.sx ?? 1) * scale;
+        e.sy = (e.sy ?? 1) * scale;
+        e.rotation = (e.rotation || 0) + rot;
+    }
+    if (['TEXT', 'MTEXT'].includes(e.type))
+        e.rotation = (e.rotation || 0) + rot;
+    e.dirty = true;
+}
+function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); if(g.paths.some(p=>p.gradient))throw new Error('Gradient hatch explosion requires retaining native fill semantics'); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
+function detachReferences(doc, deleted) {
+    for (const e of doc.entities) {
+        if(e.dimension?.references)for(const [key,ref]of Object.entries(e.dimension.references))if(deleted.has(ref.entityId))delete e.dimension.references[key];
+        const c = e.connector;
+        if (!c)
+            continue;
+        for (const end of ['from', 'to'])
+            if (c[end] && deleted.has(c[end].entityId))
+                c[end] = null;
+    }
+    doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));
+}
+
+// Reusable editing/evaluation APIs. Cyclic module imports are intentionally avoided.
+function dimensionPicture(e,doc) { return buildDimensionPicture(e,doc); }
+function editDimension(e,doc,patch) { return applyDimensionEdit(e,doc,patch); }
+function dimensionGrips(e,doc) { return getDimensionGrips(e,doc); }
+function regenerateDimensions(doc) { return refreshDimensions(doc); }
+function validateDynamicBlock(block) { return validateDynamicDefinition(block); }
+function dynamicValues(block,values={}) { return resolveDynamicValues(block,values); }
+function evaluateDynamicBlock(block,values={},options={}) { return evaluateDynamicDefinition(block,values,transformEntity,options); }
+function setDynamicParameters(e,doc,patch) {
+    if(e.type!=='INSERT'||!doc.blocks[e.block]?.dynamic)throw new Error('Select a Conduit parameterized block');
+    const values={...e.dynamicParameters,...patch};
+    const evaluated=evaluateDynamicBlock(doc.blocks[e.block],values);
+    e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
+}
+const dynamicCache=new WeakMap();
+function effectiveBlock(e,doc) {
+    const block=doc.blocks[e.block];if(!block?.dynamic)return block;
+    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base]);
+    let cache=dynamicCache.get(block);
+    if(!cache||cache.signature!==signature){cache={signature,values:new Map()};dynamicCache.set(block,cache);}
+    const key=JSON.stringify(e.dynamicParameters||{});
+    if(!cache.values.has(key)){
+        const evaluated=evaluateDynamicBlock(block,e.dynamicParameters||{});
+        if(cache.values.size>=64)cache.values.delete(cache.values.keys().next().value);
+        cache.values.set(key,evaluated);
+    }
+    return cache.values.get(key);
+}
+
+function dynamicParameterGrips(e,doc) {
+    const b=doc.blocks[e.block];if(!b?.dynamic)return [];
+    const values=dynamicValues(b,e.dynamicParameters||{}),m=compose(matrix(e),matrix({x:-(b.base?.x||0),y:-(b.base?.y||0)}));
+    return b.dynamic.parameters.filter(p=>p.grip&&['distance','number','angle'].includes(p.type)).map(p=>{
+        const g=p.grip,base=g.base||{x:0,y:0},d=g.direction||{x:1,y:0},v=values[p.name];
+        const q=p.type==='angle'?{x:base.x+Math.cos(v*Math.PI/180)*(g.radius||40),y:base.y+Math.sin(v*Math.PI/180)*(g.radius||40)}:{x:base.x+d.x*v,y:base.y+d.y*v};
+        return {...transform(q,m),key:'dyn:'+p.name};
+    });
+}
+function dynamicGripValue(e,doc,name,world) {
+    const b=doc.blocks[e.block],p=b?.dynamic?.parameters.find(p=>p.name===name),g=p?.grip;
+    if(!g)throw new Error('Missing dynamic parameter grip');
+    const m=compose(matrix(e),matrix({x:-(b.base?.x||0),y:-(b.base?.y||0)})),det=m[0]*m[3]-m[1]*m[2];
+    if(Math.abs(det)<1e-12)throw new Error('Singular block transform');
+    const dx=world.x-m[4],dy=world.y-m[5],q={x:(m[3]*dx-m[2]*dy)/det,y:(-m[1]*dx+m[0]*dy)/det};
+    const base=g.base||{x:0,y:0},d=g.direction||{x:1,y:0},length=d.x*d.x+d.y*d.y;
+    if(length<1e-12)throw new Error('Invalid grip direction');
+    let value=p.type==='angle'?Math.atan2(q.y-base.y,q.x-base.x)*180/Math.PI:((q.x-base.x)*d.x+(q.y-base.y)*d.y)/length;
+    value=Math.max(p.min??-Infinity,Math.min(p.max??Infinity,value));
+    if(p.values?.length)value=p.values.reduce((a,b)=>Math.abs(b-value)<Math.abs(a-value)?b:a);
+    return value;
+}
+
+return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences,dimensionPicture,editDimension,dimensionGrips,regenerateDimensions,validateDynamicBlock,dynamicValues,evaluateDynamicBlock,setDynamicParameters,dynamicParameterGrips,dynamicGripValue};
+})();
 // packages/dxf/src/codec.js
 __modules["packages/dxf/src/codec.js"]=(()=>{
 /** Lossless tag values and bounded ASCII/binary transport. DXF R13+ uses
@@ -314,7 +1658,36 @@ function readDocumentInterop(doc,sections) {
     }
 }
 
-return {subclassTags,graphicalTags,DIMSTYLE_FIELDS,readInteropEntity,writeInteropEntity,readDocumentInterop};
+/** ACAD/DSTYLE data uses dimvar IDs followed by correctly typed XDATA values. */
+function readDimensionOverrides(raw) {
+    const names=new Map(Object.entries(DIMSTYLE_FIELDS).map(([k,c])=>[c,k]));
+    const result={};let app='',active=false;
+    for(let i=0;i<raw.length;i++) {
+        const [c,v]=raw[i];
+        if(c===1001){app=v;active=false;}
+        if(app!=='ACAD')continue;
+        if(c===1000&&v==='DSTYLE'&&raw[i+1]?.[0]===1002&&raw[i+1][1]==='{'){active=true;i++;continue;}
+        if(active&&c===1002&&v==='}'){active=false;continue;}
+        if(active&&c===1070&&raw[i+1]) {
+            const [type,value]=raw[++i],name=names.get(v);
+            if(name&&type===(v===3||v===4?1000:v>=40&&v<=48||v>=140&&v<=148?1040:1070))result[name]=value;
+        }
+    }
+    return result;
+}
+function writeDimensionOverrides(style,pair) {
+    const entries=Object.entries(style||{}).filter(([k])=>DIMSTYLE_FIELDS[k]!==undefined);
+    if(!entries.length)return;
+    pair(1001,'ACAD');pair(1000,'DSTYLE');pair(1002,'{');
+    for(const [name,value]of entries) {
+        const code=DIMSTYLE_FIELDS[name],type=code===3||code===4?1000:code>=40&&code<=48||code>=140&&code<=148?1040:1070;
+        if(type!==1000&&(!Number.isFinite(value)||type===1070&&!Number.isInteger(value)))throw new Error('Invalid dimension override '+name);
+        pair(1070,code);pair(type,value);
+    }
+    pair(1002,'}');
+}
+
+return {subclassTags,graphicalTags,DIMSTYLE_FIELDS,readInteropEntity,writeInteropEntity,readDocumentInterop,readDimensionOverrides,writeDimensionOverrides};
 })();
 // packages/dxf/src/structure.js
 __modules["packages/dxf/src/structure.js"]=(()=>{
@@ -617,7 +1990,7 @@ function readEntityFidelity(e, raw, diagnostics, options = {}) {
     }
     if (e.type === 'HATCH') {
         Object.assign(e, parseHatchData(raw));
-        if (e.gradient) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'Gradient records retained; preview uses the entity color, not a gradient shader.' });
+        if (e.gradient && ((get(e.gradient,470,'LINEAR')!=='LINEAR') || +get(e.gradient,461,0)!==0 || e.gradient.filter(p=>p[0]===421).length!==2)) diagnostics.push({ severity: 'warning', type: 'HATCH', message: 'This gradient distribution is retained but not rendered; the preview supports unshifted two-stop LINEAR gradients.' });
     }
     if (e.type === '3DFACE') { e.points = [point(raw), point(raw, 11), point(raw, 12), point(raw, 13)]; e.edgeFlags = +get(raw, 70); }
     if (e.type === 'LEADER') {
@@ -675,959 +2048,11 @@ function writeHatchData(e, pair) {
 
 return {parseHatchData,readEntityFidelity,writeHatchData};
 })();
-// packages/geometry/src/index.js
-__modules["packages/geometry/src/index.js"]=(()=>{
-/** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */
-const EPS = 1e-9;
-const TAU = Math.PI * 2;
-const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-const point = (x = 0, y = 0) => ({ x, y });
-const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
-const sub = (a, b) => ({ x: a.x - b.x, y: a.y - b.y });
-const mul = (a, s) => ({ x: a.x * s, y: a.y * s });
-const dot = (a, b) => a.x * b.x + a.y * b.y;
-const cross = (a, b) => a.x * b.y - a.y * b.x;
-const length = a => Math.hypot(a.x, a.y);
-const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-const normalize = a => mul(a, 1 / (length(a) || 1));
-const lerp = (a, b, t) => add(a, mul(sub(b, a), t));
-const almost = (a, b, tolerance = EPS) => Math.abs(a - b) <= tolerance;
-const equalPoint = (a, b, tolerance = EPS) => distance(a, b) <= tolerance;
-const identity = () => [1, 0, 0, 1, 0, 0];
-const transform = (p, m) => ({ x: m[0] * p.x + m[2] * p.y + m[4], y: m[1] * p.x + m[3] * p.y + m[5] });
-function matrix({ x = 0, y = 0, rotation = 0, sx = 1, sy = sx } = {}) { const a = rotation * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return [c * sx, s * sx, -s * sy, c * sy, x, y]; }
-function compose(a, b) { return [a[0] * b[0] + a[2] * b[1], a[1] * b[0] + a[3] * b[1], a[0] * b[2] + a[2] * b[3], a[1] * b[2] + a[3] * b[3], a[0] * b[4] + a[2] * b[5] + a[4], a[1] * b[4] + a[3] * b[5] + a[5]]; }
-function inverse(m) {
-    const d = m[0] * m[3] - m[1] * m[2];
-    if (Math.abs(d) < EPS)
-        throw new Error('Singular transform');
-    return [m[3] / d, -m[1] / d, -m[2] / d, m[0] / d, (m[2] * m[5] - m[3] * m[4]) / d, (m[1] * m[4] - m[0] * m[5]) / d];
-}
-function bounds(points) {
-    const b = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
-    for (const p of points) {
-        if (!Number.isFinite(p.x) || !Number.isFinite(p.y))
-            continue;
-        b.minX = Math.min(b.minX, p.x);
-        b.minY = Math.min(b.minY, p.y);
-        b.maxX = Math.max(b.maxX, p.x);
-        b.maxY = Math.max(b.maxY, p.y);
-    }
-    return b;
-}
-const emptyBounds = () => bounds([]);
-const validBounds = b => Number.isFinite(b.minX) && b.minX <= b.maxX && b.minY <= b.maxY;
-const inflate = (b, n) => ({ minX: b.minX - n, minY: b.minY - n, maxX: b.maxX + n, maxY: b.maxY + n });
-const intersects = (a, b) => a.minX <= b.maxX && a.maxX >= b.minX && a.minY <= b.maxY && a.maxY >= b.minY;
-const contains = (b, p) => p.x >= b.minX && p.x <= b.maxX && p.y >= b.minY && p.y <= b.maxY;
-const union = (a, b) => ({ minX: Math.min(a.minX, b.minX), minY: Math.min(a.minY, b.minY), maxX: Math.max(a.maxX, b.maxX), maxY: Math.max(a.maxY, b.maxY) });
-const center = b => ({ x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 });
-function projectPoint(p, a, b, segment = true) { const v = sub(b, a), n = dot(v, v); const t = n < EPS * EPS ? 0 : dot(sub(p, a), v) / n; return lerp(a, b, segment ? clamp(t, 0, 1) : t); }
-const distanceToSegment = (p, a, b) => distance(p, projectPoint(p, a, b));
-function lineIntersection(a, b, c, d, segments = true) {
-    const r = sub(b, a), s = sub(d, c), det = cross(r, s);
-    if (Math.abs(det) <= EPS * Math.max(1, length(r) * length(s)))
-        return null;
-    const q = sub(c, a), t = cross(q, s) / det, u = cross(q, r) / det;
-    if (segments && (t < -EPS || t > 1 + EPS || u < -EPS || u > 1 + EPS))
-        return null;
-    return { ...lerp(a, b, t), t, u };
-}
-function segmentIntersectsBox(a, b, box) {
-    if (contains(box, a) || contains(box, b))
-        return true;
-    const p = [{ x: box.minX, y: box.minY }, { x: box.maxX, y: box.minY }, { x: box.maxX, y: box.maxY }, { x: box.minX, y: box.maxY }];
-    return p.some((v, i) => lineIntersection(a, b, v, p[(i + 1) % 4]));
-}
-function polygonContains(p, points) {
-    let inside = false;
-    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-        const a = points[i], b = points[j];
-        if (distanceToSegment(p, a, b) < EPS)
-            return true;
-        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)
-            inside = !inside;
-    }
-    return inside;
-}
-function polygonArea(points) {
-    let n = 0;
-    for (let i = 0; i < points.length; i++)
-        n += cross(points[i], points[(i + 1) % points.length]);
-    return n / 2;
-}
-function polylineLength(points, closed = false) {
-    let n = 0;
-    for (let i = 1; i < points.length; i++)
-        n += distance(points[i - 1], points[i]);
-    if (closed && points.length > 1)
-        n += distance(points.at(-1), points[0]);
-    return n;
-}
-function simplifyOrthogonal(points) {
-    const r = [];
-    for (const p of points) {
-        if (r.length && equalPoint(r.at(-1), p))
-            continue;
-        if (r.length > 1) {
-            const a = r.at(-2), b = r.at(-1);
-            if (Math.abs(cross(sub(b, a), sub(p, b))) < EPS && dot(sub(b, a), sub(p, b)) >= 0)
-                r.pop();
-        }
-        r.push({ ...p });
-    }
-    return r;
-}
-function arcPoints(c, r, start = 0, end = TAU, tolerance = .2, clockwise = false) {
-    if (!Number.isFinite(r) || r <= 0)
-        return [c];
-    let sweep = end - start;
-    if (clockwise) {
-        while (sweep > 0)
-            sweep -= TAU;
-    }
-    else {
-        while (sweep < 0)
-            sweep += TAU;
-    }
-    if (Math.abs(sweep) < EPS)
-        sweep = clockwise ? -TAU : TAU;
-    const step = 2 * Math.acos(clamp(1 - Math.max(tolerance, 1e-7) / r, -1, 1));
-    const n = clamp(Math.ceil(Math.abs(sweep) / Math.max(step, .0005)), 2, 8192);
-    return Array.from({ length: n + 1 }, (_, i) => ({ x: c.x + r * Math.cos(start + sweep * i / n), y: c.y + r * Math.sin(start + sweep * i / n) }));
-}
-function bulgeArc(a, b, bulge) {
-    if (Math.abs(bulge) < EPS || distance(a, b) < EPS)
-        return null;
-    const chord = sub(b, a), mid = lerp(a, b, .5), c = add(mid, mul({ x: -chord.y, y: chord.x }, (1 - bulge * bulge) / (4 * bulge)));
-    return { c, r: distance(a, c), start: Math.atan2(a.y - c.y, a.x - c.x), sweep: 4 * Math.atan(bulge), clockwise: bulge < 0 };
-}
-function tessellatePolyline(points, closed = false, tolerance = .2) {
-    if (!points.length)
-        return [];
-    const out = [];
-    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {
-        const a = points[i], b = points[(i + 1) % points.length], arc = bulgeArc(a, b, a.bulge || 0);
-        if (arc)
-            out.push(...arcPoints(arc.c, arc.r, arc.start, arc.start + arc.sweep, tolerance, arc.clockwise).slice(0, -1));
-        else
-            out.push(a);
-    }
-    out.push(closed ? points[0] : points.at(-1));
-    return out;
-}
-/** Rational de Boor evaluation; input is never mutated. */
-function nurbsPoint(control, degree, knots, t, weights = []) {
-    const n = control.length - 1, p = Math.min(degree, n);
-    if (n < 0)
-        return point();
-    if (p < 1)
-        return { ...control[0] };
-    if (knots.length < n + p + 2)
-        throw new Error('Invalid NURBS knot vector');
-    const lo = knots[p], hi = knots[n + 1];
-    t = clamp(t, lo, hi);
-    let k = n;
-    if (t < hi) {
-        k = p;
-        while (k < n && !(t >= knots[k] && t < knots[k + 1]))
-            k++;
-    }
-    const d = [];
-    for (let j = 0; j <= p; j++) {
-        const i = k - p + j, w = weights[i] ?? 1;
-        d.push([control[i].x * w, control[i].y * w, w]);
-    }
-    for (let r = 1; r <= p; r++)
-        for (let j = p; j >= r; j--) {
-            const i = k - p + j, den = knots[i + p - r + 1] - knots[i], a = Math.abs(den) < EPS ? 0 : (t - knots[i]) / den;
-            d[j] = d[j].map((v, q) => (1 - a) * d[j - 1][q] + a * v);
-        }
-    const w = d[p][2];
-    return Math.abs(w) > EPS ? { x: d[p][0] / w, y: d[p][1] / w } : { ...control[Math.min(n, k)] };
-}
-function splinePoints(e, tolerance = .2) {
-    const cp = e.controlPoints || [];
-    if (cp.length < 2)
-        return cp;
-    const p = Math.min(e.degree || 3, cp.length - 1), n = cp.length;
-    let knots = e.knots;
-    if (!knots || knots.length < n + p + 1) {
-        knots = [];
-        for (let i = 0; i < n + p + 1; i++)
-            knots.push(i <= p ? 0 : i >= n ? 1 : (i - p) / (n - p));
-    }
-    const start = knots[p], end = knots[n], out = [nurbsPoint(cp, p, knots, start, e.weights)];
-    function split(t0, a, t1, b, depth) {
-        const tm = (t0 + t1) / 2, m = nurbsPoint(cp, p, knots, tm, e.weights), q1 = nurbsPoint(cp, p, knots, (t0 + tm) / 2, e.weights), q3 = nurbsPoint(cp, p, knots, (tm + t1) / 2, e.weights);
-        if (depth < 12 && Math.max(distanceToSegment(m, a, b), distanceToSegment(q1, a, b), distanceToSegment(q3, a, b)) > tolerance) {
-            split(t0, a, tm, m, depth + 1);
-            split(tm, m, t1, b, depth + 1);
-        }
-        else
-            out.push(b);
-    }
-    for (let i = p; i < n; i++) {
-        if (knots[i + 1] > knots[i])
-            split(knots[i], out.at(-1), knots[i + 1], nurbsPoint(cp, p, knots, knots[i + 1], e.weights), 0);
-    }
-    return out;
-}
-/** Planar polyline offset with bounded miters; not a polygon Boolean engine. */
-function offsetPolyline(points, amount, closed = false, miterLimit = 6) {
-    if (points.length < 2)
-        throw new Error('Offset requires two vertices');
-    const seg = [];
-    for (let i = 0; i < points.length - (closed ? 0 : 1); i++) {
-        const a = points[i], b = points[(i + 1) % points.length], v = normalize(sub(b, a)), o = mul({ x: -v.y, y: v.x }, amount);
-        seg.push([add(a, o), add(b, o)]);
-    }
-    const out = [];
-    for (let i = 0; i < points.length; i++) {
-        if (!closed && i === 0) {
-            out.push(seg[0][0]);
-            continue;
-        }
-        if (!closed && i === points.length - 1) {
-            out.push(seg.at(-1)[1]);
-            continue;
-        }
-        const prev = seg[(i - 1 + seg.length) % seg.length], next = seg[i % seg.length], hit = lineIntersection(...prev, ...next, false);
-        if (hit && distance(hit, points[i]) <= Math.abs(amount) * miterLimit + EPS)
-            out.push({ x: hit.x, y: hit.y });
-        else
-            out.push(prev[1], next[0]);
-    }
-    return out;
-}
-function filletLines(a, b, c, d, radius) {
-    const hit = lineIntersection(a, b, c, d, false);
-    if (!hit || radius <= 0)
-        throw new Error('Fillet needs intersecting nonparallel lines and positive radius');
-    const u = normalize(sub(distance(a, hit) > distance(b, hit) ? a : b, hit)), v = normalize(sub(distance(c, hit) > distance(d, hit) ? c : d, hit)), theta = Math.acos(clamp(dot(u, v), -1, 1));
-    if (theta < EPS || Math.abs(theta - Math.PI) < EPS)
-        throw new Error('Degenerate fillet');
-    const t = radius / Math.tan(theta / 2), p = add(hit, mul(u, t)), q = add(hit, mul(v, t)), cen = add(hit, mul(normalize(add(u, v)), radius / Math.sin(theta / 2)));
-    return { p, q, c: cen, r: radius, start: Math.atan2(p.y - cen.y, p.x - cen.x), end: Math.atan2(q.y - cen.y, q.x - cen.x), clockwise: cross(sub(p, cen), sub(q, cen)) < 0 };
-}
-function snapCandidates(entity) {
-    switch (entity.type) {
-        case 'LINE': return [{ ...entity.a, kind: 'endpoint' }, { ...entity.b, kind: 'endpoint' }, { ...lerp(entity.a, entity.b, .5), kind: 'midpoint' }];
-        case 'CIRCLE':
-        case 'ARC': {
-            const onArc = a => {
-                if (entity.type === 'CIRCLE')
-                    return true;
-                const norm = x => ((x % TAU) + TAU) % TAU;
-                return entity.clockwise ? norm(entity.start - a) <= norm(entity.start - entity.end) + EPS : norm(a - entity.start) <= norm(entity.end - entity.start) + EPS;
-            };
-            const at = a => ({ x: entity.c.x + entity.r * Math.cos(a), y: entity.c.y + entity.r * Math.sin(a) });
-            return [{ ...entity.c, kind: 'center' }, ...[0, Math.PI / 2, Math.PI, Math.PI * 1.5].filter(onArc).map(a => ({ ...at(a), kind: 'quadrant' })), ...(entity.type === 'ARC' ? [{ ...at(entity.start), kind: 'endpoint' }, { ...at(entity.end), kind: 'endpoint' }] : [])];
-        }
-        case 'LWPOLYLINE': return entity.points.flatMap((p, i) => [{ ...p, kind: 'endpoint' }, ...(i < entity.points.length - 1 || entity.closed ? [{ ...lerp(p, entity.points[(i + 1) % entity.points.length], .5), kind: 'midpoint' }] : [])]);
-        case 'INSERT': return [{ x: entity.x, y: entity.y, kind: 'insertion' }];
-        default: return [];
-    }
-}
-
-return {EPS,TAU,clamp,point,add,sub,mul,dot,cross,length,distance,normalize,lerp,almost,equalPoint,identity,transform,matrix,compose,inverse,bounds,emptyBounds,validBounds,inflate,intersects,contains,union,center,projectPoint,distanceToSegment,lineIntersection,segmentIntersectsBox,polygonContains,polygonArea,polylineLength,simplifyOrthogonal,arcPoints,bulgeArc,tessellatePolyline,nurbsPoint,splinePoints,offsetPolyline,filletLines,snapCandidates};
-})();
-// packages/model/src/fidelity.js
-__modules["packages/model/src/fidelity.js"]=(()=>{
-const {arcPoints, tessellatePolyline, splinePoints, bounds, distance, TAU} = __modules["packages/geometry/src/index.js"];
-const EPS = 1e-9;
-/** XY projection of Autodesk's arbitrary-axis OCS basis. */
-function ocsTransform(normal = { x: 0, y: 0, z: 1 }, elevation = 0) {
-    const length = Math.hypot(normal.x || 0, normal.y || 0, normal.z ?? 1);
-    if (length < EPS) throw new Error('Invalid zero-length DXF extrusion normal');
-    const n = { x: (normal.x || 0) / length, y: (normal.y || 0) / length, z: (normal.z ?? 1) / length };
-    const a = Math.abs(n.x) < 1 / 64 && Math.abs(n.y) < 1 / 64 ? { x: n.z, y: 0, z: -n.x } : { x: -n.y, y: n.x, z: 0 };
-    const l = Math.hypot(a.x, a.y, a.z); a.x /= l; a.y /= l; a.z /= l;
-    const b = { x: n.y * a.z - n.z * a.y, y: n.z * a.x - n.x * a.z };
-    return [a.x, a.y, b.x, b.y, n.x * elevation, n.y * elevation];
-}
-function ellipseEdgePoints(edge, tolerance = .25) {
-    const a = edge.major, ratio = edge.ratio ?? 1;
-    let start = edge.start ?? 0, end = edge.end ?? TAU;
-    // Hatch ellipse group 50/51 use geometric angles, unlike ELLIPSE parameters.
-    if (edge.type === 3) {
-        const convert = v => Math.atan2(Math.sin(v) / Math.max(Math.abs(ratio), EPS), Math.cos(v));
-        start = convert(start); end = convert(end);
-    }
-    let sweep = end - start;
-    if (edge.ccw === false) { while (sweep >= 0) sweep -= TAU; }
-    else { while (sweep <= 0) sweep += TAU; }
-    const n = Math.min(8192, Math.max(8, Math.ceil(Math.abs(sweep) * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(tolerance, 1e-8)))));
-    return Array.from({ length: n + 1 }, (_, i) => {
-        const t = start + sweep * i / n;
-        return { x: edge.c.x + a.x * Math.cos(t) - a.y * ratio * Math.sin(t), y: edge.c.y + a.y * Math.cos(t) + a.x * ratio * Math.sin(t) };
-    });
-}
-function hatchContours(e, tolerance = .25) {
-    return (e.loops || []).map(loop => {
-        if (!loop.edges?.length) return tessellatePolyline(loop.points || [], true, tolerance);
-        const result = [];
-        for (const edge of loop.edges) {
-            let points = [];
-            if (edge.type === 1) points = [edge.a, edge.b];
-            if (edge.type === 2) points = arcPoints(edge.c, edge.r, edge.start, edge.end, tolerance, edge.ccw === false);
-            if (edge.type === 3) points = ellipseEdgePoints(edge, tolerance);
-            if (edge.type === 4) points = splinePoints(edge, tolerance);
-            if (result.length && points.length && distance(result.at(-1), points[0]) < EPS) points = points.slice(1);
-            result.push(...points);
-        }
-        return result;
-    }).filter(p => p.length >= 3);
-}
-function inPolygon(p, polygon) {
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const a = polygon[i], b = polygon[j];
-        if ((a.y > p.y) !== (b.y > p.y) && p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x) inside = !inside;
-    }
-    return inside;
-}
-function hatchRegionContours(e, tolerance) {
-    const contours = hatchContours(e, tolerance);
-    if (!e.hatchStyle) return contours;
-    return contours.filter((p, i) => {
-        const depth = contours.reduce((n, q, j) => n + (i !== j && inPolygon(p[0], q) ? 1 : 0), 0);
-        return e.hatchStyle === 2 ? depth === 0 : depth <= 1;
-    });
-}
-/** Scanline hatch clipping with half-open crossings and parity across islands.
- * Definitions are already transformed by the DXF producer: do not apply scale twice.
- */
-function hatchPatternSegments(e, contours, { maxLines = 20000, maxSegments = 100000 } = {}) {
-    const segments = [], vertices = contours.flat(), bb = bounds(vertices);
-    if (!vertices.length) return { segments, limited: false };
-    let lines = 0;
-    for (const definition of e.patternLines || []) {
-        const u = { x: Math.cos(definition.angle), y: Math.sin(definition.angle) }, n = { x: -u.y, y: u.x }, base = definition.base, offset = definition.offset;
-        const step = offset.x * n.x + offset.y * n.y, origin = base.x * n.x + base.y * n.y;
-        if (Math.abs(step) < EPS) continue;
-        const corners = [{ x: bb.minX, y: bb.minY }, { x: bb.maxX, y: bb.minY }, { x: bb.minX, y: bb.maxY }, { x: bb.maxX, y: bb.maxY }];
-        const projections = corners.map(p => (p.x * n.x + p.y * n.y - origin) / step);
-        const first = Math.ceil(Math.min(...projections) - EPS), last = Math.floor(Math.max(...projections) + EPS);
-        if (!Number.isSafeInteger(first) || last - first + lines > maxLines) return { segments: [], limited: true };
-        for (let k = first; k <= last; k++) {
-            lines++;
-            const b = { x: base.x + k * offset.x, y: base.y + k * offset.y }, hits = [];
-            for (const polygon of contours) for (let i = 0; i < polygon.length; i++) {
-                const a = polygon[i], z = polygon[(i + 1) % polygon.length];
-                const da = (a.x - b.x) * n.x + (a.y - b.y) * n.y, dz = (z.x - b.x) * n.x + (z.y - b.y) * n.y;
-                if ((da > 0) === (dz > 0)) continue;
-                const t = da / (da - dz), x = a.x + (z.x - a.x) * t - b.x, y = a.y + (z.y - a.y) * t - b.y;
-                hits.push(x * u.x + y * u.y);
-            }
-            hits.sort((a, b) => a - b);
-            for (let i = 0; i + 1 < hits.length; i += 2) {
-                const lo = hits[i], hi = hits[i + 1];
-                if (hi - lo <= EPS) continue;
-                const emit = (a, z) => segments.push([{ x: b.x + a * u.x, y: b.y + a * u.y }, { x: b.x + z * u.x, y: b.y + z * u.y }]);
-                const dashes = definition.dashes || [], cycle = dashes.reduce((a, d) => a + Math.abs(d), 0);
-                if (cycle < EPS) emit(lo, hi);
-                else {
-                    if ((hi - lo) / cycle * dashes.length > maxSegments) return { segments: [], limited: true };
-                    for (let c = Math.floor(lo / cycle) * cycle; c < hi; c += cycle) {
-                        let p = c;
-                        for (const dash of dashes) {
-                            if (dash >= 0 && p + dash >= lo && p <= hi) emit(Math.max(lo, p), Math.min(hi, p + Math.max(dash, EPS)));
-                            p += Math.abs(dash);
-                        }
-                        if (segments.length > maxSegments) return { segments: [], limited: true };
-                    }
-                }
-                if (segments.length > maxSegments) return { segments: [], limited: true };
-            }
-        }
-    }
-    return { segments, limited: false };
-}
-/** Variable width arc/polyline ribbons, retaining original analytic model data. */
-function widePolylineContours(e, tolerance = .25) {
-    const result = [], points = e.points || [], n = points.length - (e.closed ? 0 : 1);
-    for (let i = 0; i < n; i++) {
-        const a = points[i], b = points[(i + 1) % points.length];
-        const w0 = e.constantWidth || (a.startWidth ?? e.startWidth ?? 0), w1 = e.constantWidth || (a.endWidth ?? e.endWidth ?? w0);
-        if (!(w0 > 0 || w1 > 0)) continue;
-        const center = tessellatePolyline([a, b], false, tolerance), left = [], right = [];
-        for (let j = 0; j < center.length; j++) {
-            const prev = center[Math.max(0, j - 1)], next = center[Math.min(center.length - 1, j + 1)], len = Math.hypot(next.x - prev.x, next.y - prev.y);
-            if (len < EPS) continue;
-            const w = (w0 + (w1 - w0) * j / (center.length - 1)) / 2, nx = -(next.y - prev.y) / len * w, ny = (next.x - prev.x) / len * w;
-            left.push({ x: center[j].x + nx, y: center[j].y + ny }); right.push({ x: center[j].x - nx, y: center[j].y - ny });
-        }
-        if (left.length >= 2) result.push([...left, ...right.reverse()]);
-    }
-    return result;
-}
-function signedDashPattern(pattern = []) {
-    if (!pattern.length) return [];
-    const result = []; let ink = true;
-    for (const value of pattern) {
-        const nextInk = value >= 0, size = Math.abs(value);
-        if (nextInk !== ink) { if (!result.length) result.push(0); ink = nextInk; result.push(size); }
-        else if (!result.length) result.push(size); else result[result.length - 1] += size;
-    }
-    if (result.length % 2) result.push(0);
-    return result;
-}
-const plainText = s => String(s).replace(/\\U\+([\da-f]{4})/gi, (_, v) => String.fromCharCode(parseInt(v, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀');
-/** Bounded, no-eval MTEXT formatting lexer with group-local formatting state. */
-function cadTextRuns(value, initial = {}) {
-    const source = plainText(value), result = [], stack = [];
-    let style = { scale: 1, width: 1, underline: false, overline: false, ...initial }, text = '';
-    const flush = () => { if (text) result.push({ text, ...style }); text = ''; };
-    for (let i = 0; i < source.length; i++) {
-        const ch = source[i];
-        if (ch === '{') { flush(); if (stack.length < 64) stack.push({ ...style }); continue; }
-        if (ch === '}') { flush(); style = stack.pop() || style; continue; }
-        if (ch !== '\\') { text += ch; continue; }
-        const command = source[++i];
-        if (command === undefined) break;
-        if (['\\', '{', '}'].includes(command)) { text += command; continue; }
-        if (command === 'P' || command === 'X') { text += '\n'; continue; }
-        if (command === '~') { text += '\u00a0'; continue; }
-        if ('LlOoKk'.includes(command)) { flush(); const key = /[Ll]/.test(command) ? 'underline' : /[Oo]/.test(command) ? 'overline' : 'strike'; style[key] = command === command.toUpperCase(); continue; }
-        if ('ACcFfHhQqTtWwSs'.includes(command)) {
-            const end = source.indexOf(';', i + 1); if (end < 0) { text += '\\' + command; continue; }
-            const arg = source.slice(i + 1, end); i = end; flush(); const num = parseFloat(arg);
-            if (/[Hh]/.test(command) && num > 0 && Number.isFinite(num)) style.scale = /x$/i.test(arg) ? num : num / (initial.height || 1);
-            else if (/[Ww]/.test(command) && num > 0 && Number.isFinite(num)) style.width = num;
-            else if (/[Qq]/.test(command) && Number.isFinite(num)) style.oblique = Math.max(-85, Math.min(85, num));
-            else if (/[Ff]/.test(command)) { style.font = arg.split('|')[0]; style.bold = /\|b1/i.test(arg); style.italic = /\|i1/i.test(arg); }
-            else if (command === 'c' && Number.isFinite(num)) style.color = '#' + (num & 0xffffff).toString(16).padStart(6, '0');
-            else if (command === 'C' && num >= 1 && num <= 7) style.color = ['','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#000000'][num];
-            else if (/[Ss]/.test(command)) result.push({ text: arg.replace(/[\/#^]/g, '/'), ...style, scale: style.scale * .8 });
-            continue;
-        }
-        text += '\\' + command;
-    }
-    flush(); return result;
-}
-/** Deterministic text layout; canvas may supply measured glyph advances. */
-function layoutCadText(t, measure) {
-    const h = t.nominalHeight || t.height || 12, multiline = !!t.mtext;
-    const runs = multiline ? cadTextRuns(t.rawText ?? t.text, { height: h }) : [{ text: plainText(t.text), scale: 1, width: 1 }];
-    const width = multiline && t.mtextWidth > 0 ? t.mtextWidth : Infinity;
-    const lines = [{ runs: [], width: 0, height: h }];
-    let line = lines[0];
-    const add = (text, style) => {
-        if (!text) return;
-        const height = h * style.scale, w = (measure ? measure(text, height, style) : [...text].reduce((n, c) => n + (/\s/.test(c) ? .33 : /[ilI.,'!:;]/.test(c) ? .28 : /[MW@%]/.test(c) ? .9 : .6), 0) * height) * style.width;
-        if (w > width && Number.isFinite(width) && [...text].length > 1) {
-            for (const ch of text) add(ch, style);
-            return;
-        }
-        if (line.width > 0 && line.width + w > width && !/^\s+$/.test(text)) { line = { runs: [], width: 0, height: h }; lines.push(line); }
-        line.runs.push({ ...style, text, x: line.width, width: w, height }); line.width += w; line.height = Math.max(line.height, height);
-    };
-    for (const run of runs) for (const token of run.text.split(/(\n|[ \t]+)/)) {
-        if (token === '\n') { line = { runs: [], width: 0, height: h }; lines.push(line); }
-        else add(token, run);
-    }
-    const lineFactor = multiline ? (5 / 3) * Math.max(.25, Math.min(4, t.lineSpacing || 1)) : 1.3;
-    let y = 0;
-    for (const line of lines) { line.y = y; y += (t.lineSpacingStyle === 2 ? h : line.height) * lineFactor; }
-    const height = lines.at(-1).y + lines.at(-1).height, w = lines.reduce((n, l) => Math.max(n, l.width), 0);
-    const vertical = multiline ? Math.floor(((t.attachment || 1) - 1) / 3) : t.valign === 3 ? 0 : t.valign === 2 ? 1 : t.valign === 1 ? 2 : -1;
-    const baseline = vertical === 0 ? h * .8 : vertical === 1 ? h * .8 - height / 2 : vertical === 2 ? h * .8 - height : 0;
-    const boxWidth = Number.isFinite(width) ? width : w;
-    const align = t.align || 'left', offsetX = align === 'center' ? -boxWidth / 2 : align === 'right' ? -boxWidth : 0;
-    for (const line of lines) {
-        const start = offsetX + (align === 'center' ? (boxWidth - line.width) / 2 : align === 'right' ? boxWidth - line.width : 0);
-        for (const r of line.runs) { r.x += start; r.y = baseline + line.y; }
-    }
-    return { lines, width: boxWidth, height, minX: offsetX, minY: baseline - h * .8, maxX: offsetX + boxWidth, maxY: baseline + height - h * .8 };
-}
-
-return {ocsTransform,ellipseEdgePoints,hatchContours,inPolygon,hatchRegionContours,hatchPatternSegments,widePolylineContours,signedDashPattern,cadTextRuns,layoutCadText};
-})();
-// packages/model/src/interop.js
-__modules["packages/model/src/interop.js"]=(()=>{
-const {matrix, compose, bounds, splinePoints} = __modules["packages/geometry/src/index.js"];
-const {inPolygon} = __modules["packages/model/src/fidelity.js"];
-/** Top-view WCS -> paper DCS. Twist is applied before the DCS center offset. */
-function viewportTransform(e) {
-    const d=e.viewDirection||{x:0,y:0,z:1};
-    if((e.viewportFlags&7)||Math.abs(d.x)>1e-9||Math.abs(d.y)>1e-9||d.z<=0) return null;
-    const s=e.viewportHeight/e.viewHeight;
-    if(!(s>0)||!Number.isFinite(s))return null;
-    const c=e.viewCenter||{x:0,y:0},target=e.viewTarget||{x:0,y:0};
-    return compose(matrix({x:e.c.x-c.x*s,y:e.c.y-c.y*s}),compose(matrix({sx:s,sy:s,rotation:e.viewTwist||0}),matrix({x:-target.x,y:-target.y})));
-}
-function viewportRectangle(e) {
-    const {x,y}=e.c,w=e.viewportWidth/2,h=e.viewportHeight/2;
-    return [{x:x-w,y:y-h},{x:x+w,y:y-h},{x:x+w,y:y+h},{x:x-w,y:y+h}];
-}
-function insideClips(p,clips) {
-    return !clips || clips.every(polygon=>inPolygon(p,polygon));
-}
-function wipeoutPoints(e) {
-    let vertices=e.boundary||[];
-    if(e.boundaryType===1&&vertices.length===2) {
-        const [a,b]=vertices;vertices=[a,{x:b.x,y:a.y},b,{x:a.x,y:b.y}];
-    }
-    const p=e.p,u=e.uPixel,v=e.vPixel,height=e.imageSize?.y??1;
-    return vertices.map(q=>({x:p.x+u.x*(q.x+.5)+v.x*(height-q.y-.5),y:p.y+u.y*(q.x+.5)+v.y*(height-q.y-.5)}));
-}
-function helixPoints(e,tolerance=.25) {
-    const spline=e.helixSpline;
-    if(spline?.controlPoints?.length && spline.knots?.length)return splinePoints(spline,tolerance);
-    const a=e.axis||{x:0,y:0,z:1},l=Math.hypot(a.x,a.y,a.z);if(!l)return [];
-    const n={x:a.x/l,y:a.y/l,z:a.z/l},b=e.axisBase,s=e.startPoint;
-    if(!b||!s||!(e.radius>0)||!Number.isFinite(e.turns)||!Number.isFinite(e.turnHeight))return [];
-    const v={x:s.x-b.x,y:s.y-b.y,z:(s.z||0)-(b.z||0)},dot=v.x*n.x+v.y*n.y+v.z*n.z;
-    const radial={x:v.x-dot*n.x,y:v.y-dot*n.y,z:v.z-dot*n.z},r=Math.hypot(radial.x,radial.y,radial.z);if(!r)return [];
-    const u={x:radial.x/r*e.radius,y:radial.y/r*e.radius,z:radial.z/r*e.radius};
-    const w={x:n.y*u.z-n.z*u.y,y:n.z*u.x-n.x*u.z,z:n.x*u.y-n.y*u.x};
-    const steps=Math.min(8192,Math.max(16,Math.ceil(Math.abs(e.turns)*Math.PI*2*Math.sqrt(e.radius/Math.max(tolerance,1e-8))))),sign=e.handedness===false?-1:1;
-    return Array.from({length:steps+1},(_,i)=>{const f=i/steps,theta=sign*f*e.turns*Math.PI*2,z=f*e.turns*e.turnHeight;return {x:s.x-u.x+u.x*Math.cos(theta)+w.x*Math.sin(theta)+n.x*z,y:s.y-u.y+u.y*Math.cos(theta)+w.y*Math.sin(theta)+n.y*z,z:(s.z||0)-u.z+u.z*Math.cos(theta)+w.z*Math.sin(theta)+n.z*z};});
-}
-
-return {viewportTransform,viewportRectangle,insideClips,wipeoutPoints,helixPoints};
-})();
-// packages/model/src/index.js
-__modules["packages/model/src/index.js"]=(()=>{
-const {viewportTransform, viewportRectangle, wipeoutPoints, helixPoints} = __modules["packages/model/src/interop.js"];
-const {ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText} = __modules["packages/model/src/fidelity.js"];
-const {matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds} = __modules["packages/geometry/src/index.js"];
-function textLayout(text, measure) { return layoutCadText(text, measure); }
-function objectCoordinateTransform(normal, elevation) { return ocsTransform(normal, elevation); }
-let sequence = 0;
-const uid = (prefix = 'e') => `${prefix}-${Date.now().toString(36)}-${(++sequence).toString(36)}`;
-const clone = value => JSON.parse(JSON.stringify(value));
-function createDocument(name = 'Untitled drawing') { return { schema: 'conduitcad/1', name, units: 'mm', version: 0, entities: [], blocks: {}, layers: [{ name: '0', color: '#344755', visible: true, locked: false }, { name: 'Equipment', color: '#355463', visible: true, locked: false }, { name: 'Process', color: '#147c77', visible: true, locked: false }, { name: 'Instruments', color: '#9b7246', visible: true, locked: false, dash: [5, 4] }, { name: 'Electrical', color: '#6477ba', visible: true, locked: false }, { name: 'Annotations', color: '#71808a', visible: true, locked: false }], linetypes: { CONTINUOUS: [], DASHED: [8, 4], CENTER: [12, 3, 2, 3], HIDDEN: [4, 3] }, parameters: { grid: '10', pipeWidth: '2', valveSize: '64' }, constraints: [], metadata: { author: '', description: '' }, activeLayout: 'Model', layouts: ['Model'], importDiagnostics: [] }; }
-function validateDocument(doc) {
-    if (!doc || doc.schema !== 'conduitcad/1' || !Array.isArray(doc.entities) || !doc.blocks || !Array.isArray(doc.layers))
-        throw new Error('Not a Conduit CAD project');
-    if (doc.entities.length > 1000000)
-        throw new Error('Entity safety limit exceeded');
-    const ids = new Set();
-    for (const e of doc.entities) {
-        if (!e.id || ids.has(e.id))
-            throw new Error('Missing or duplicate entity ID');
-        ids.add(e.id);
-        if (!e.type)
-            throw new Error('Missing entity type');
-    }
-    return doc;
-}
-function entity(type, props = {}) { return { id: uid(), type, layer: '0', ...props }; }
-const line = (a, b, props = {}) => entity('LINE', { a: { ...a }, b: { ...b }, ...props });
-const polyline = (points, closed = false, props = {}) => entity('LWPOLYLINE', { points: points.map(p => ({ ...p })), closed, ...props });
-const circle = (c, r, props = {}) => entity('CIRCLE', { c: { ...c }, r, ...props });
-const text = (p, value, height = 14, props = {}) => entity('TEXT', { p: { ...p }, text: value, height, rotation: 0, ...props });
-const rect = (x, y, w, h, props = {}) => polyline([{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }], true, props);
-function layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '0')) || doc.layers[0]; }
-function isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }
-function isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }
-function cleanText(value = '') { return String(value).replace(/\\P/g, '\n').replace(/\\U\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\[ACFHQTW][^;]*;/g, '').replace(/\\[LlOoKk]/g, '').replace(/\\S([^;]+);/g, (_, s) => s.replace(/[\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\~/g, ' '); }
-function resolveStyle(e, doc, parentStyle = null, parentLayer = null) {
-    const layer = (e.layer === '0' && parentLayer) ? parentLayer : layerFor(e, doc);
-    const lineweight = e.lineweight === -2 ? parentStyle?.lineweight : e.lineweight == null || e.lineweight === -1 ? layer?.lineweight : e.lineweight;
-    const type = e.linetype === 'BYBLOCK' ? null : (!e.linetype || e.linetype === 'BYLAYER' ? layer?.linetype : e.linetype);
-    const raw = doc.linetypes?.[type];
-    const dash = e.dash ?? (e.linetype === 'BYBLOCK' ? parentStyle?.dash : null) ?? (raw ? (doc.signedLinetypes ? signedDashPattern(raw) : raw) : null) ?? layer?.dash ?? [];
-    const factor = (e.linetypeScale ?? 1) * (e.dash || e.linetype === 'BYBLOCK' ? 1 : doc.linetypeScale ?? 1);
-    return { color: e.color === 'BYBLOCK' ? parentStyle?.color || layer?.color || '#344755' : (!e.color || e.color === 'BYLAYER' ? layer?.color || '#344755' : e.color),
-        width: e.width ?? (lineweight >= 0 ? Math.max(.5, lineweight * 96 / 2540) : 1.5), lineweight,
-        dash: dash.map(v => Math.max(0, v * factor)), opacity: e.transparency === 0x01000000 ? parentStyle?.opacity ?? 1 : e.opacity ?? 1 };
-}
-/** Returns portable paths/text. Blocks retain their native definitions in the model. */
-function entityGeometry(e, doc, options = {}) {
-    const { tolerance = .25, depth = 0, parentStyle = null, parentLayer = null } = options;
-    let m = options.matrix || identity();
-    if (e.extrusion && ['CIRCLE', 'ARC', 'LWPOLYLINE', 'POLYLINE', 'TEXT', 'ATTRIB', 'ATTDEF', 'SOLID', 'TRACE', 'HATCH', 'INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64))))
-        m = compose(m, ocsTransform(e.extrusion, e.elevation ?? e.c?.z ?? e.p?.z ?? e.z ?? 0));
-    if (depth > 24)
-        return { paths: [], texts: [] };
-    const curveTolerance = tolerance / Math.max(1e-9, Math.hypot(m[0], m[1]), Math.hypot(m[2], m[3]));
-    const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];
-    const path = (pts, closed = false, fill = null, extra = {}) => {
-        if (pts.length > 1)
-            paths.push({ points: pts.map(p => transform(p, m)), closed, fill: fill === 'BYBLOCK' || fill === 'BYLAYER' ? style.color : fill, ...style, ...extra, entityId: e.id });
-    };
-    const label = (p, value, height, rotation = 0, align = 'left') => {
-        const textStyle = doc.textStyles?.[e.styleName] || {}, q = transform(p, m), angle = rotation * Math.PI / 180;
-        const sx = (e.textFlags & 2) ? -1 : 1, sy = (e.textFlags & 4) ? -1 : 1;
-        const width = e.widthFactor ?? textStyle.widthFactor ?? 1, oblique = (e.oblique || textStyle.oblique || 0) * Math.PI / 180;
-        const local = compose(matrix({ rotation }), [sx * width, 0, Math.tan(oblique) * sy, sy, 0, 0]);
-        const affine = compose(m, local), frame = affine.slice(0, 4);
-        texts.push({ p: q, text: cleanText(value), rawText: value, height: height * Math.hypot(frame[2], frame[3]), nominalHeight: height,
-            rotation: Math.atan2(frame[1], frame[0]) * 180 / Math.PI, align, color: style.color, opacity: style.opacity, entityId: e.id,
-            font: e.font || textStyle.font || 'sans-serif', frame, widthFactor: width,
-            mtext: e.type === 'MTEXT', mtextWidth: e.mtextWidth, attachment: e.attachment, valign: e.valign,
-            lineSpacing: e.lineSpacing, lineSpacingStyle: e.lineSpacingStyle, backgroundFill: e.backgroundFill, backgroundColor: e.backgroundColor, backgroundScale: e.backgroundScale });
-    };
-    switch (e.type) {
-        case 'MESH': {
-            const edges=new Set();
-            const edge=(a,b)=>{const id=a<b?a+':'+b:b+':'+a;if(edges.has(id))return;edges.add(id);if(e.points?.[a]&&e.points?.[b])path([e.points[a],e.points[b]]);};
-            for(const face of e.faces||[])for(let i=0;i<face.length;i++)edge(face[i],face[(i+1)%face.length]);
-            for(const [a,b] of e.edges||[])edge(a,b);
-            break;
-        }
-        case 'HELIX': path(helixPoints(e,curveTolerance)); break;
-        case 'WIPEOUT': path(wipeoutPoints(e),true,'#fbfcfb',{stroke:false}); break;
-        case 'VIEWPORT': {
-            if(e.viewportId===1)break;
-            const rectangle=viewportRectangle(e);
-            path(rectangle,true);
-            if(e.viewportStatus===0||(e.viewportFlags&131072))break;
-            const projection=viewportTransform(e);
-            if(!projection){warnings.push({severity:'warning',type:'VIEWPORT',message:'Only top-view orthographic viewport contents can be rendered.'});break;}
-            let clip=rectangle;
-            if(e.clipHandle) {
-                const boundary=doc.entities.find(q=>String(q._dxf?.handle||'').toUpperCase()===String(e.clipHandle).toUpperCase());
-                const candidate=boundary && boundary.type!=='VIEWPORT' ? entityGeometry(boundary,doc,{tolerance:curveTolerance,depth:depth+1}).paths.find(p=>p.closed):null;
-                if(!candidate){warnings.push({severity:'warning',type:'VIEWPORT',message:'Unresolved or unsupported viewport clipping boundary; content is not drawn.'});break;}
-                clip=candidate.points;
-            }
-            const worldClip=clip.map(p=>transform(p,m)), rectangularClip=rectangle.map(p=>transform(p,m));
-            const frozen=new Set((e.frozenLayers||[]).map(n=>n.toUpperCase()));
-            const model={...doc,activeLayout:'Model',layers:doc.layers.map(l=>frozen.has(l.name.toUpperCase())?{...l,visible:false}:l)};
-            for(const child of doc.entities) {
-                if(child.type==='VIEWPORT'||!isVisible(child,model))continue;
-                const g=entityGeometry(child,model,{matrix:compose(m,projection),tolerance,depth:depth+1});
-                warnings.push(...(g.warnings||[]));
-                const clips=[rectangularClip,worldClip];
-                for(const p of g.paths)paths.push({...p,clips:[...(p.clips||[]),...clips],entityId:e.id});
-                for(const t of g.texts)texts.push({...t,clips:[...(t.clips||[]),...clips],entityId:e.id});
-            }
-            break;
-        }
-        case 'LINE':
-            path([e.a, e.b]);
-            break;
-        case 'LWPOLYLINE':
-        case 'POLYLINE':
-            if(e.type==='POLYLINE' && (e.flags & 64)) {
-                for(const face of e.faces || []) for(let i=0;i<face.length;i++) { const a=e.points[Math.abs(face[i])-1], b=e.points[Math.abs(face[(i+1)%face.length])-1]; if(face[i]>0&&a&&b)path([a,b]); }
-                break;
-            }
-            if(e.type==='POLYLINE' && (e.flags & 16)) {
-                const mCount=e.mCount || 0,nCount=e.nCount || 0;
-                if(mCount*nCount===e.points.length)for(let m=0;m<mCount;m++)for(let n=0;n<nCount;n++) {
-                    const a=e.points[m*nCount+n];
-                    if(m+1<mCount || (e.flags&1))path([a,e.points[((m+1)%mCount)*nCount+n]]);
-                    if(n+1<nCount || (e.flags&32))path([a,e.points[m*nCount+(n+1)%nCount]]);
-                }
-                break;
-            }
-            { const ribbons = widePolylineContours(e, curveTolerance);
-              if (ribbons.length) { for (const ribbon of ribbons) path(ribbon, true, style.color, { stroke: false }); }
-              else path(tessellatePolyline(e.points || [], !!e.closed, curveTolerance), !!e.closed, e.fill); }
-            break;
-        case 'CIRCLE':
-            path(arcPoints(e.c, e.r, 0, TAU, curveTolerance), true, e.fill);
-            break;
-        case 'ARC':
-            path(arcPoints(e.c, e.r, e.start, e.end, curveTolerance, !!e.clockwise));
-            break;
-        case 'ELLIPSE': {
-            const a = e.major || { x: e.rx || 1, y: 0 }, r = e.ratio ?? 1, s = e.start ?? 0;
-            const normal=e.extrusion || {x:0,y:0,z:1}, minor={x:(normal.y || 0)*(a.z || 0)-(normal.z ?? 1)*a.y,y:(normal.z ?? 1)*a.x-(normal.x || 0)*(a.z || 0),z:(normal.x || 0)*a.y-(normal.y || 0)*a.x};
-            const factor=Math.hypot(a.x,a.y,a.z || 0)*r/(Math.hypot(minor.x,minor.y,minor.z) || 1); minor.x*=factor;minor.y*=factor;
-            let sweep = (e.end ?? TAU) - s;
-            while (sweep <= 0)
-                sweep += TAU;
-            const n = Math.min(4096, Math.max(24, Math.ceil(sweep * Math.sqrt(Math.hypot(a.x, a.y) / Math.max(curveTolerance, .0000001)))));
-            path(Array.from({ length: n + 1 }, (_, i) => { const t = s + sweep * i / n; return { x: e.c.x + a.x * Math.cos(t) + minor.x * Math.sin(t), y: e.c.y + a.y * Math.cos(t) + minor.y * Math.sin(t) }; }), Math.abs(sweep - TAU) < 1e-6);
-            break;
-        }
-        case 'SPLINE':
-            path(splinePoints(e, curveTolerance), !!e.closed);
-            break;
-        case 'TEXT':
-        case 'MTEXT':
-        case 'ATTRIB':
-        case 'ATTDEF':
-            if (!e.invisible) {
-                let p = ((e.halign || e.valign) && e.alignPoint) ? e.alignPoint : e.p, height = e.height || doc.textStyles?.[e.styleName]?.height || 12, rotation = e.rotation || 0;
-                let value = e.text || '', alignment = e.halign === 4 ? 'center' : e.align || 'left';
-                if ([3, 5].includes(e.halign) && e.alignPoint) {
-                    const target = distance(e.p, e.alignPoint), measured = layoutCadText({ text: cleanText(value), height }).width || 1;
-                    rotation = Math.atan2(e.alignPoint.y - e.p.y, e.alignPoint.x - e.p.x) * 180 / Math.PI;
-                    p = e.p; alignment = 'left';
-                    label(p, value, height, rotation, alignment);
-                    const t = texts.at(-1), factor = target / measured; t.frame[0] *= factor; t.frame[1] *= factor;
-                    if (e.halign === 3) { t.frame[2] *= factor; t.frame[3] *= factor; t.height *= factor; }
-                } else label(p, value, height, rotation, alignment);
-            }
-            break;
-        case 'POINT': {
-            const r = 1.5;
-            path([{ x: e.p.x - r, y: e.p.y }, { x: e.p.x + r, y: e.p.y }]);
-            path([{ x: e.p.x, y: e.p.y - r }, { x: e.p.x, y: e.p.y + r }]);
-            break;
-        }
-        case 'SOLID':
-        case 'TRACE':
-            path(e.points || [], true, style.color, { stroke: false });
-            break;
-        case '3DFACE':
-            for (let i = 0; i < (e.points?.length || 0); i++) if (!(e.edgeFlags & (1 << i))) path([e.points[i], e.points[(i + 1) % e.points.length]]);
-            break;
-        case 'HATCH': {
-            const contours = hatchRegionContours(e, curveTolerance);
-            if (e.solid || e.gradient) {
-                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd' });
-            } else {
-                const pattern = hatchPatternSegments(e, contours);
-                if (pattern.limited || !e.patternLines?.length) {
-                    for (const contour of contours) path(contour, true);
-                    warnings.push({ entityId: e.id, message: pattern.limited ? 'Hatch density exceeds bounded tessellation budget; showing boundaries.' : 'Hatch has no pattern line definitions; showing boundaries.' });
-                } else for (const points of pattern.segments) path(points, false, null, { dash: [] });
-            }
-            break;
-        }
-        case 'LEADER': {
-            path(e.points || []);
-            if (e.arrow !== false && e.points?.length > 1) {
-                const tip = e.points[0], d = normalize(sub(e.points[1], tip)), n = { x: -d.y, y: d.x }, length = e.arrowSize || 6;
-                path([tip, add(tip, add(mul(d, length), mul(n, length / 3))), add(tip, add(mul(d, length), mul(n, -length / 3)))], true, style.color, { stroke: false });
-            }
-            break;
-        }
-        case 'RAY':
-        case 'XLINE': {
-            const p = transform(e.p, m), q = transform(add(e.p, e.direction), m), d = sub(q, p), v = options.view || { minX: p.x - 10000, maxX: p.x + 10000, minY: p.y - 10000, maxY: p.y + 10000 };
-            let lo = e.type === 'RAY' ? 0 : -Infinity, hi = Infinity;
-            for (const axis of ['x', 'y']) {
-                const min = v[axis === 'x' ? 'minX' : 'minY'], max = v[axis === 'x' ? 'maxX' : 'maxY'];
-                if (Math.abs(d[axis]) < 1e-12) { if (p[axis] < min || p[axis] > max) hi = -Infinity; }
-                else { const a = (min - p[axis]) / d[axis], b = (max - p[axis]) / d[axis]; lo = Math.max(lo, Math.min(a, b)); hi = Math.min(hi, Math.max(a, b)); }
-            }
-            if (hi >= lo && Number.isFinite(lo) && Number.isFinite(hi)) paths.push({ points: [add(p, mul(d, lo)), add(p, mul(d, hi))], ...style, entityId: e.id });
-            break;
-        }
-        case 'DIMENSION': {
-            if (e.block && doc.blocks[e.block]) {
-                const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
-                for (const p of g.paths)
-                    paths.push(p);
-                for (const t of g.texts)
-                    texts.push(t);
-                break;
-            }
-            const a = e.a, b = e.b;
-            if (!a || !b)
-                break;
-            const n = normalize({ x: -(b.y - a.y), y: b.x - a.x }), off = e.offset ?? 30, p = add(a, mul(n, off)), q = add(b, mul(n, off));
-            path([a, add(p, mul(n, 6))]);
-            path([b, add(q, mul(n, 6))]);
-            path([p, q]);
-            const u = normalize(sub(q, p));
-            for (const [v, dir] of [[p, 1], [q, -1]]) {
-                path([add(v, add(mul(u, dir * 7), mul(n, 3))), v, add(v, add(mul(u, dir * 7), mul(n, -3)))]);
-            }
-            label(add(lerp(p, q, .5), mul(n, 5)), e.text && e.text !== '<>' ? e.text : distance(a, b).toFixed(1), e.height || 12, Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI, 'center');
-            break;
-        }
-        case 'INSERT': {
-            const block = doc.blocks[e.block];
-            if (!block)
-                break;
-            const base = block.base || { x: 0, y: 0 }, rows = Math.min(1000, e.rows || 1), cols = Math.min(1000, e.columns || 1);
-            if (rows * cols > 10000)
-                break;
-            // MINSERT spacing belongs to the rotated placement grid, not the scaled block.
-            const placement = matrix({ x: e.x || 0, y: e.y || 0, rotation: e.rotation || 0 });
-            const shape = compose(matrix({ sx: e.sx ?? 1, sy: e.sy ?? e.sx ?? 1 }), matrix({ x: -base.x, y: -base.y }));
-            const gridRotation = matrix({ rotation: e.rotation || 0 }), locations = new Set();
-            for (let row = 0; row < rows; row++)
-                for (let col = 0; col < cols; col++) {
-                    const offset = { x: col * (e.columnSpacing || 0), y: row * (e.rowSpacing || 0) };
-                    const key = offset.x + ':' + offset.y;
-                    if (locations.has(key))
-                        continue;
-                    locations.add(key);
-                    const mm = compose(m, compose(placement, compose(matrix(offset), shape)));
-                    const attributeOffset = transform(offset, gridRotation);
-                    for (const attribute of e.attributes || []) {
-                        if (attribute.invisible)
-                            continue;
-                        const g = entityGeometry(attribute, doc, { ...options, matrix: compose(m, matrix(attributeOffset)), depth: depth + 1 });
-                        for (const t of g.texts)
-                            texts.push({ ...t, entityId: e.id });
-                    }
-                    for (const child of block.entities || []) {
-                        if (child.type === 'ATTDEF' || child.hidden)
-                            continue;
-                        const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);
-                        if (cl?.visible === false)
-                            continue;
-                        const g = entityGeometry(child, doc, { matrix: mm, tolerance, depth: depth + 1, parentStyle: style, parentLayer: cl, view: options.view });
-                        warnings.push(...(g.warnings || []));
-                        for (const p of g.paths)
-                            paths.push({ ...p, entityId: e.id });
-                        for (const t of g.texts)
-                            texts.push({ ...t, entityId: e.id });
-                    }
-                }
-            if (e.tag && block.symbol) {
-                const p = { x: e.x || 0, y: (e.y || 0) - Math.abs((e.sy ?? e.sx ?? 1) * (block.symbol.labelOffset || 55)) };
-                label(p, e.tag, e.tagHeight || 12, 0, 'center');
-            }
-            break;
-        }
-    }
-    if (e.connector && e.points?.length > 1) {
-        const ps = e.points;
-        const b = ps.at(-1), a = ps.at(-2), u = normalize(sub(a, b)), n = { x: -u.y, y: u.x };
-        if (e.connector.arrow !== 'none')
-            path([add(b, add(mul(u, 9), mul(n, 4))), b, add(b, add(mul(u, 9), mul(n, -4)))]);
-        if (e.label) {
-            const mid = ps[Math.floor((ps.length - 1) / 2)], next = ps[Math.min(ps.length - 1, Math.floor((ps.length - 1) / 2) + 1)];
-            label(add(lerp(mid, next, .5), { x: 0, y: 8 }), e.label, 11, 0, 'center');
-        }
-    }
-    return warnings.length ? { paths, texts, warnings } : { paths, texts };
-}
-function entityBounds(e, doc) {
-    if(e.type==='VIEWPORT')return e.viewportId===1?emptyBounds():bounds(viewportRectangle(e));
-    if (['RAY', 'XLINE'].includes(e.type)) return bounds([e.p]);
-    const g = entityGeometry(e, doc, { tolerance: 1 }), pts = g.paths.flatMap(p => p.contours ? p.contours.flat() : p.points);
-    for (const t of g.texts) {
-        const layout = layoutCadText(t), frame = t.frame || matrix({ rotation: t.rotation }).slice(0, 4), tm = [...frame, t.p.x, t.p.y];
-        // Layout coordinates are font coordinates (Y down); model coordinates are Y up.
-        for (const x of [layout.minX, layout.maxX]) for (const y of [layout.minY, layout.maxY]) pts.push(transform({ x, y: -y }, tm));
-    }
-    if (!pts.length && e.type === 'INSERT') pts.push({ x: e.x, y: e.y });
-    return bounds(pts);
-}
-function documentBounds(doc) {
-    let b = emptyBounds();
-    for (const e of doc.entities)
-        if (isVisible(e, doc))
-            b = union(b, entityBounds(e, doc));
-    return validBounds(b) ? b : { minX: -100, minY: -100, maxX: 100, maxY: 100 };
-}
-function ports(e, doc) {
-    if (e.type !== 'INSERT')
-        return [];
-    const block = doc.blocks[e.block], base = block?.base || { x: 0, y: 0 };
-    const m = compose(matrix(e), matrix({ x: -base.x, y: -base.y }));
-    return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
-}
-function moveEntity(e, dx, dy) {
-    if(e.type==='VIEWPORT'&&e.clipHandle)throw new Error('Moving a clipped viewport requires moving its boundary in the same transaction; no coordinates were changed.');
-    if(e.type==='DIMENSION'&&e.block)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
-    const worldDX = dx, worldDY = dy;
-    if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
-        const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
-        if (Math.abs(det) < 1e-10) throw new Error('Cannot drag an edge-on OCS plane in the top view.');
-        dx = (m[3]*worldDX-m[2]*worldDY)/det; dy = (-m[1]*worldDX+m[0]*worldDY)/det;
-    }
-    const mv = p => {
-        if (p) {
-            p.x += dx;
-            p.y += dy;
-        }
-    };
-    for (const key of ['a', 'b', 'c', 'p', 'alignPoint', 'axisBase', 'startPoint', 'definitionPoint', 'textMidpoint', 'dimensionInsert', 'defpoint4', 'defpoint5'])
-        mv(e[key]);
-    for (const key of ['points', 'controlPoints', 'fitPoints'])
-        for (const p of e[key] || [])
-            mv(p);
-    for (const l of e.loops || [])
-        for (const p of l.points || [])
-            mv(p);
-    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
-        for (const key of ['a', 'b', 'c']) mv(edge[key]);
-        for (const key of ['controlPoints', 'fitPoints']) for (const p of edge[key] || []) mv(p);
-    }
-    for (const definition of e.patternLines || []) mv(definition.base);
-    if(e.type==='HELIX')for(const key of ['controlPoints','fitPoints'])for(const p of e.helixSpline?.[key]||[])mv(p);
-    if (e.type === 'INSERT') {
-        e.x += dx;
-        e.y += dy;
-        for (const a of e.attributes || [])
-            moveEntity(a, worldDX, worldDY);
-    }
-    e.dirty = true;
-}
-function transformEntity(e, m) {
-    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
-    const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
-    if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
-    if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
-        throw new Error('Rotation of non-default OCS geometry requires a 3D transform; coordinates were not modified.');
-    if (['HATCH','CIRCLE','ARC','INSERT'].includes(e.type) && (Math.abs(sx-sy) > 1e-8*Math.max(sx,sy) || Math.abs(m[0]*m[2]+m[1]*m[3]) > 1e-8*sx*sy))
-        throw new Error('This entity requires a similarity transform; nonuniform scale would change its native type.');
-    if (e.type === 'HATCH' && determinant < 0) throw new Error('Mirroring native hatch edge paths is not supported; coordinates were not modified.');
-    const vector = p => ({x:m[0]*p.x+m[2]*p.y,y:m[1]*p.x+m[3]*p.y});
-    if (e.direction) Object.assign(e.direction, vector(e.direction));
-    if (e.major) Object.assign(e.major, vector(e.major));
-    for (const loop of e.loops || []) for (const edge of loop.edges || []) {
-        for (const key of ['a','b','c']) if (edge[key]) Object.assign(edge[key], transform(edge[key], m));
-        for (const key of ['controlPoints','fitPoints']) for (const p of edge[key] || []) Object.assign(p, transform(p, m));
-        for (const key of ['major','startTangent','endTangent']) if (edge[key]) Object.assign(edge[key], vector(edge[key]));
-        if (edge.r) edge.r *= sx;
-        if (edge.type === 2) { const angle = Math.atan2(m[1],m[0]); edge.start += angle; edge.end += angle; }
-    }
-    for (const definition of e.patternLines || []) {
-        Object.assign(definition.base, transform(definition.base, m)); Object.assign(definition.offset, vector(definition.offset));
-        definition.angle += Math.atan2(m[1],m[0]); definition.dashes = (definition.dashes || []).map(v=>v*sx);
-    }
-    if (e.type === 'HATCH') { e.patternScale = (e.patternScale || 1)*sx; e.patternAngle = (e.patternAngle || 0) + Math.atan2(m[1],m[0])*180/Math.PI; }
-    for (const p of e.points || []) { if (p.bulge && determinant < 0) p.bulge *= -1; for (const k of ['startWidth','endWidth']) if (p[k]) p[k] *= sx; }
-    for (const k of ['constantWidth','startWidth','endWidth','mtextWidth']) if (e[k]) e[k] *= sx;
-    const apply = p => {
-        if (p)
-            Object.assign(p, transform(p, m));
-    };
-    for (const key of ['a', 'b', 'c', 'p', 'alignPoint'])
-        apply(e[key]);
-    for (const key of ['points', 'controlPoints', 'fitPoints'])
-        for (const p of e[key] || [])
-            apply(p);
-    for (const l of e.loops || [])
-        for (const p of l.points || [])
-            apply(p);
-    const scale = Math.hypot(m[0], m[1]), rot = Math.atan2(m[1], m[0]) * 180 / Math.PI;
-    if (e.r)
-        e.r *= scale;
-    if (e.height)
-        e.height *= scale;
-    if (e.type === 'ARC') {
-        const angle = a => { const v=vector({x:Math.cos(a),y:Math.sin(a)}); return Math.atan2(v.y,v.x); };
-        e.start = angle(e.start); e.end = angle(e.end);
-        if (determinant < 0) e.clockwise = !e.clockwise;
-    }
-    if (e.type === 'INSERT') {
-        const p = transform({ x: e.x, y: e.y }, m);
-        e.x = p.x;
-        e.y = p.y;
-        e.sx = (e.sx ?? 1) * scale;
-        e.sy = (e.sy ?? 1) * scale;
-        e.rotation = (e.rotation || 0) + rot;
-    }
-    if (['TEXT', 'MTEXT'].includes(e.type))
-        e.rotation = (e.rotation || 0) + rot;
-    e.dirty = true;
-}
-function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
-function detachReferences(doc, deleted) {
-    for (const e of doc.entities) {
-        const c = e.connector;
-        if (!c)
-            continue;
-        for (const end of ['from', 'to'])
-            if (c[end] && deleted.has(c[end].entityId))
-                c[end] = null;
-    }
-    doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));
-}
-
-return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences};
-})();
 // packages/dxf/src/index.js
 __modules["packages/dxf/src/index.js"]=(()=>{
+const {dimensionPicture, evaluateDynamicBlock} = __modules["packages/model/src/index.js"];
 const {readAsciiTags, readBinaryTags, writeBinaryTags, splitSections, decodeCodePage, decodeTextEscapes} = __modules["packages/dxf/src/codec.js"];
-const {readInteropEntity, writeInteropEntity, readDocumentInterop, graphicalTags} = __modules["packages/dxf/src/interop.js"];
+const {readInteropEntity, writeInteropEntity, readDocumentInterop, graphicalTags, readDimensionOverrides, writeDimensionOverrides} = __modules["packages/dxf/src/interop.js"];
 const {completeDXFStructure} = __modules["packages/dxf/src/structure.js"];
 const {capturePreservation, writePreservedDXF, inspectDXFGraph} = __modules["packages/dxf/src/preservation.js"];
 const {readEntityFidelity, writeHatchData} = __modules["packages/dxf/src/fidelity.js"];
@@ -1830,10 +2255,11 @@ function parseEntity(original, diagnostics, options = {}) {
             diagnostics.push({ severity: 'warning', type, message: `${type}: retained in original source; no editable display implementation.` });
     }
     readInteropEntity(e, raw);
+    if(type==='DIMENSION')e.dimstyleOverrides=readDimensionOverrides(original);
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
         if (k in meta)
             e[k] = meta[k];
     readEntityFidelity(e, raw, diagnostics, options);
@@ -1949,7 +2375,7 @@ function parseDXF(input, options = {}) {
     for (const raw of records(sections.BLOCKS || [])) {
         const t = get(raw, 0);
         if (t === 'BLOCK') {
-            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol };
+            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
             blockRecords = [];
         }
         else if (t === 'ENDBLK') {
@@ -1992,20 +2418,53 @@ function parseDXF(input, options = {}) {
         if (!['HEADER', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(name))
             doc.rawSections[name] = p;
     doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; normalized export rebuilds represented objects. Record-preserving export retains foreign graphs but rejects unsafe edits.' });
+    for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) {
+        if(e.type==='INSERT' && e.dynamicSource && doc.blocks[e.dynamicSource]?.dynamic)e.block=e.dynamicSource;
+    }
     capturePreservation(doc,pairs);
+    return doc;
+}
+/** Remove only unreachable app-generated evaluation pictures in normalized copies. */
+function pruneGeneratedPictures(document) {
+    const blocks={...document.blocks},candidates=new Set(Object.entries(blocks).filter(([name,b])=>b.dynamicInstance||b.dimensionPicture).map(([name])=>name));
+    const keep=new Set(),queue=[];
+    const visit=e=>{if(e.type==='INSERT'||e.type==='DIMENSION'&&e.dimension?.version!==1){if(e.block&&!keep.has(e.block)){keep.add(e.block);queue.push(e.block);}}};
+    document.entities.forEach(visit);
+    for(const [name,b]of Object.entries(blocks))if(!candidates.has(name))(b.entities||[]).forEach(visit);
+    for(let i=0;i<queue.length;i++)(blocks[queue[i]]?.entities||[]).forEach(visit);
+    for(const name of candidates)if(!keep.has(name))delete blocks[name];
+    return {...document,blocks};
+}
+function prepareDynamicBlocks(document) {
+    const doc={...document,blocks:{...document.blocks},entities:document.entities.slice()},cache=new Map();let serial=0;
+    const bake=(e,stack=[])=>{
+        if(e.type!=='INSERT')return e;
+        const master=doc.blocks[e.block];if(!master)return e;
+        if(stack.includes(e.block))throw new Error('Cyclic dynamic block nesting');
+        if(stack.length>24)throw new Error('Dynamic block nesting limit exceeded');
+        if(!master.dynamic)return e;
+        const key=JSON.stringify([e.block,e.dynamicParameters||{}]);let name=cache.get(key);
+        if(!name){
+            const evaluated=evaluateDynamicBlock(master,e.dynamicParameters||{});
+            do{name='*UCC'+(++serial);}while(doc.blocks[name]);
+            cache.set(key,name);
+            doc.blocks[name]={...evaluated,name,entities:evaluated.entities.filter(c=>!c.hidden).map(c=>bake(c,[...stack,e.block])),dynamicInstance:{master:e.block,values:evaluated.dynamicValues}};
+        }
+        return {...e,block:name,dynamicSource:e.block};
+    };
+    doc.entities=doc.entities.map(e=>bake(e));
+    // Static parents may contain dynamic references. Retain each original master for metadata-aware editors.
+    for(const [name,b]of Object.entries(document.blocks))if(!b.dynamic)doc.blocks[name]={...b,entities:(b.entities||[]).map(e=>bake(e))};
     return doc;
 }
 function prepareNativeDimensions(document) {
     const doc={...document,blocks:{...document.blocks},entities:document.entities.slice()};let serial=0;
     const prepare=e=>{
-        if(e.type!=='DIMENSION' || (e.block&&doc.blocks[e.block]))return e;
-        if(e.dimtype!==undefined&&(e.dimtype&15)!==1)throw new Error('Imported dimension has no graphics block; its type requires a native dimension evaluator');
-        if(!e.a||!e.b)throw new Error('DIMENSION is missing definition points');
-        const dx=e.b.x-e.a.x,dy=e.b.y-e.a.y,length=Math.hypot(dx,dy);if(length<1e-12)throw new Error('Zero-length DIMENSION');
-        const off=e.offset??30,p={x:e.a.x-dy/length*off,y:e.a.y+dx/length*off,z:e.a.z||0};
+        if(e.type!=='DIMENSION'||(e.block&&doc.blocks[e.block]&&e.dimension?.version!==1))return e;
+        const picture=dimensionPicture(e,doc);
         let name;do{name='*DCC'+(++serial);}while(doc.blocks[name]);
-        const g=entityGeometry(e,doc);doc.blocks[name]={name,base:{x:0,y:0},entities:[...g.paths.map(p=>({type:'LWPOLYLINE',points:p.points,closed:p.closed,layer:e.layer,color:p.color})),...g.texts.map(t=>({type:'TEXT',p:t.p,text:t.text,height:t.height,rotation:t.rotation,align:t.align,color:t.color,layer:e.layer}))]};
-        return {...e,block:name,dimtype:33,definitionPoint:p,textMidpoint:g.texts[0]?.p||p};
+        doc.blocks[name]={name,base:{x:0,y:0},entities:picture.entities,dimensionPicture:{version:1,ownerId:e.id}};
+        return {...e,block:name,dimtype:(e.dimtype??33)|32,definitionPoint:picture.definitionPoint,textMidpoint:picture.textMidpoint,measurement:picture.measurement,dimstyleOverrides:picture.style};
     };
     doc.entities=doc.entities.map(prepare);for(const [name,b]of Object.entries(document.blocks))doc.blocks[name]={...b,entities:(b.entities||[]).map(prepare)};
     return doc;
@@ -2017,7 +2476,7 @@ function writeDXF(doc, options = {}) {
     if(mode === 'preserve')return writePreservedDXF(doc,{version});
     if(mode !== 'normalized')throw new Error('Unknown DXF export mode');
     if(strict && exportReport(doc).warnings.length)throw new Error(exportReport(doc).warnings.join(' '));
-    doc = prepareNativeDimensions(doc);
+    doc = prepareNativeDimensions(prepareDynamicBlocks(pruneGeneratedPictures(doc)));
     for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) {
         if(e.type==='MESH' && version<'AC1024')throw new Error('MESH requires DXF R2010 or newer');
         if(e.type==='HELIX' && version<'AC1021')throw new Error('HELIX requires DXF R2007 or newer');
@@ -2047,6 +2506,8 @@ function writeDXF(doc, options = {}) {
             return;
         pair(1001, 'CONDUITCAD');
         const s = asciiJson(data);
+        // Leave room for group/app overhead within the native 16 KiB XDATA limit.
+        if(s.length>15000)throw new Error('Conduit metadata exceeds the safe DXF XDATA budget; save the native project or export without metadata.');
         for (let i = 0; i < s.length; i += 200)
             pair(1000, s.slice(i, i + 200));
     };
@@ -2360,9 +2821,10 @@ function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
             if (e[k] !== undefined)
                 m[k] = e[k];
+        if(e.type==='DIMENSION')writeDimensionOverrides(e.dimstyleOverrides,pair);
         meta(m);
         if (type === 'POLYLINE') {
             for (const p of e.points || []) {
@@ -2400,11 +2862,11 @@ function writeDXF(doc, options = {}) {
         pair(8, '0');
         pair(100, 'AcDbBlockBegin');
         pair(2, name);
-        pair(70, 0);
+        pair(70, name.startsWith('*') ? 1 : 0);
         pp(10, b.base);
         pair(3, name);
         pair(1, '');
-        meta({ ports: b.ports || [], symbol: b.symbol });
+        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
         for (const e of b.entities)
             emit(e, blockRecords[name]);
         pair(0, 'ENDBLK');

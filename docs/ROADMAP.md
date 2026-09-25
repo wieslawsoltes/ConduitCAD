@@ -9,6 +9,14 @@ regression tests, verify actual mobile/pen behavior, storage quota recovery,
 service-worker/offline flows and downloaded exchange files. Expand the independent
 DXF corpus beyond self-generated examples. Fuzz parser and project-model inputs.
 
+## Delivered 0.4.0 boundary
+
+Planar decimal dimension editing/regeneration, authored line/radius references,
+Conduit parameter-action blocks and unshifted LINEAR gradients are now implemented.
+Extend these toward custom arrow/tolerance/annotative styles, imported native
+association graphs, richer WYSIWYG action authoring and additional gradient shapes.
+Do not confuse evaluated native-block export with Autodesk dynamic evaluation.
+
 ## CAD interoperability
 
 Extend projected OCS into complete UCS/grip editing, exact per-entity conservative bounds, complete

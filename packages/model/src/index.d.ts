@@ -260,3 +260,64 @@ export interface WipeoutEntity extends CadEntity {
     type: 'WIPEOUT'; p: Point3D; uPixel: Point3D; vPixel: Point3D; imageSize: Point;
     boundary: Point[]; boundaryType?: 1 | 2; clipping?: boolean;
 }
+
+/** Declarative, versioned Conduit behaviors; not Autodesk evaluation-graph execution. */
+export type DynamicValue = number | string | boolean;
+export interface DynamicGrip { base?: Point; direction?: Point; radius?: number; }
+export type DynamicParameter =
+    | {name: string; label?: string; type: 'number' | 'distance' | 'angle' | 'integer'; default: number; min?: number; max?: number; values?: number[]; grip?: DynamicGrip}
+    | {name: string; label?: string; type: 'boolean'; default: boolean}
+    | {name: string; label?: string; type: 'enum'; default: string | number; values: Array<string | number>};
+export type DynamicAction = {parameter: string; entities?: string[]; ports?: string[]} & (
+    | {type: 'move'; direction?: Point}
+    | {type: 'stretch'; box: Bounds; direction?: Point}
+    | {type: 'rotate' | 'scale'; base?: Point}
+    | {type: 'flip'; base?: Point; direction?: Point}
+    | {type: 'array'; step?: Point}
+    | {type: 'visibility'; states: Record<string, string[]>}
+    | {type: 'lookup'; rows: Record<string, Record<string, DynamicValue>>}
+);
+export interface DynamicDefinition {version: 1; parameters: DynamicParameter[]; actions: DynamicAction[];}
+export interface Block {dynamic?: DynamicDefinition; dynamicInstance?: {master: string; values: Record<string, DynamicValue>};}
+export interface EvaluatedBlock extends Block {dynamicValues: Record<string, DynamicValue>;}
+export interface CadEntity {dynamicParameters?: Record<string, DynamicValue>; dynamicSource?: string; dimension?: DimensionState;}
+export function validateDynamicBlock(block: Block): Block;
+export function dynamicValues(block: Block, values?: Record<string, DynamicValue>): Record<string, DynamicValue>;
+/** Starts from the pristine master. Throws before mutation on invalid actions or budgets. */
+export function evaluateDynamicBlock(block: Block, values?: Record<string, DynamicValue>, options?: {maxEntities?: number}): EvaluatedBlock;
+export function setDynamicParameters(instance: CadEntity, document: CadDocument, values: Record<string, DynamicValue>): EvaluatedBlock;
+export function dynamicParameterGrips(instance: CadEntity, document: CadDocument): Array<Point & {key: string}>;
+export function dynamicGripValue(instance: CadEntity, document: CadDocument, parameter: string, world: Point): number;
+
+export interface DimensionStyle {
+    dimtxt?: number; dimasz?: number; dimexe?: number; dimexo?: number; dimgap?: number;
+    dimscale?: number; dimlfac?: number; dimdec?: number; dimrnd?: number;
+    dimpost?: string; dimzin?: number; dimdsep?: number;
+}
+export type DimensionPointKey = 'a' | 'b' | 'definitionPoint' | 'defpoint4' | 'defpoint5' | 'textMidpoint';
+export type DimensionPointReference = {entityId: string} & (
+    | {point: 'a' | 'b' | 'c' | 'p'}
+    | {point: 'vertex'; index: number}
+    | {point: 'circle'; angle?: number}
+);
+export interface DimensionState {
+    version: 1; manualText?: boolean; style?: DimensionStyle; resolvedScale?: number;
+    references?: Partial<Record<DimensionPointKey, DimensionPointReference>>;
+}
+export type DimensionEdit = Partial<Record<DimensionPointKey, Point>> & {
+    style?: DimensionStyle; offset?: number; text?: string; textRotation?: number;
+    dimensionAngle?: number; leaderLength?: number; dimstyle?: string; dimtype?: number; manualText?: boolean;
+};
+export interface DimensionPicture {
+    entities: CadEntity[]; measurement: number; definitionPoint?: Point; textMidpoint: Point;
+    style: Required<Omit<DimensionStyle, 'dimdsep'>> & {dimdsep?: number};
+}
+/** Planar decimal evaluator for native subtypes 0–6; angles are DXF degrees. */
+export function dimensionPicture(dimension: CadEntity, document: Pick<CadDocument, 'dimstyles'>): DimensionPicture;
+/** Atomic explicit opt-in: removes a stale picture only after the new picture validates. */
+export function editDimension<T extends CadEntity>(dimension: T, document: Pick<CadDocument, 'dimstyles'>, patch?: DimensionEdit): T;
+export function dimensionGrips(dimension: CadEntity, document: Pick<CadDocument, 'dimstyles'>): Array<Point & {key: string}>;
+/** Resolve authored witness-point associations atomically. Returns changed dimension IDs. */
+export function regenerateDimensions(document: CadDocument): string[];
+export interface LinearGradientPaint {kind: 'linear'; start: Point; end: Point; frame: Matrix2D; colors: [string, string];}
+export interface RenderPath {gradient?: LinearGradientPaint | null;}

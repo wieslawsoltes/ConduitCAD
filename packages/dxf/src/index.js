@@ -1,5 +1,6 @@
+import { dimensionPicture, evaluateDynamicBlock } from '@conduitcad/model';
 import { readAsciiTags, readBinaryTags, writeBinaryTags, splitSections, decodeCodePage, decodeTextEscapes } from './codec.js';
-import { readInteropEntity, writeInteropEntity, readDocumentInterop, graphicalTags } from './interop.js';
+import { readInteropEntity, writeInteropEntity, readDocumentInterop, graphicalTags, readDimensionOverrides, writeDimensionOverrides } from './interop.js';
 import { completeDXFStructure } from './structure.js';
 import { capturePreservation, writePreservedDXF, inspectDXFGraph } from './preservation.js';
 import { readEntityFidelity, writeHatchData } from './fidelity.js';
@@ -202,10 +203,11 @@ function parseEntity(original, diagnostics, options = {}) {
             diagnostics.push({ severity: 'warning', type, message: `${type}: retained in original source; no editable display implementation.` });
     }
     readInteropEntity(e, raw);
+    if(type==='DIMENSION')e.dimstyleOverrides=readDimensionOverrides(original);
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
         if (k in meta)
             e[k] = meta[k];
     readEntityFidelity(e, raw, diagnostics, options);
@@ -321,7 +323,7 @@ export function parseDXF(input, options = {}) {
     for (const raw of records(sections.BLOCKS || [])) {
         const t = get(raw, 0);
         if (t === 'BLOCK') {
-            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol };
+            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
             blockRecords = [];
         }
         else if (t === 'ENDBLK') {
@@ -364,20 +366,53 @@ export function parseDXF(input, options = {}) {
         if (!['HEADER', 'TABLES', 'BLOCKS', 'ENTITIES'].includes(name))
             doc.rawSections[name] = p;
     doc.importDiagnostics.push({ severity: 'info', message: 'Original input remains available unchanged. Edited DXF export normalizes supported planar entities; normalized export rebuilds represented objects. Record-preserving export retains foreign graphs but rejects unsafe edits.' });
+    for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) {
+        if(e.type==='INSERT' && e.dynamicSource && doc.blocks[e.dynamicSource]?.dynamic)e.block=e.dynamicSource;
+    }
     capturePreservation(doc,pairs);
+    return doc;
+}
+/** Remove only unreachable app-generated evaluation pictures in normalized copies. */
+function pruneGeneratedPictures(document) {
+    const blocks={...document.blocks},candidates=new Set(Object.entries(blocks).filter(([name,b])=>b.dynamicInstance||b.dimensionPicture).map(([name])=>name));
+    const keep=new Set(),queue=[];
+    const visit=e=>{if(e.type==='INSERT'||e.type==='DIMENSION'&&e.dimension?.version!==1){if(e.block&&!keep.has(e.block)){keep.add(e.block);queue.push(e.block);}}};
+    document.entities.forEach(visit);
+    for(const [name,b]of Object.entries(blocks))if(!candidates.has(name))(b.entities||[]).forEach(visit);
+    for(let i=0;i<queue.length;i++)(blocks[queue[i]]?.entities||[]).forEach(visit);
+    for(const name of candidates)if(!keep.has(name))delete blocks[name];
+    return {...document,blocks};
+}
+function prepareDynamicBlocks(document) {
+    const doc={...document,blocks:{...document.blocks},entities:document.entities.slice()},cache=new Map();let serial=0;
+    const bake=(e,stack=[])=>{
+        if(e.type!=='INSERT')return e;
+        const master=doc.blocks[e.block];if(!master)return e;
+        if(stack.includes(e.block))throw new Error('Cyclic dynamic block nesting');
+        if(stack.length>24)throw new Error('Dynamic block nesting limit exceeded');
+        if(!master.dynamic)return e;
+        const key=JSON.stringify([e.block,e.dynamicParameters||{}]);let name=cache.get(key);
+        if(!name){
+            const evaluated=evaluateDynamicBlock(master,e.dynamicParameters||{});
+            do{name='*UCC'+(++serial);}while(doc.blocks[name]);
+            cache.set(key,name);
+            doc.blocks[name]={...evaluated,name,entities:evaluated.entities.filter(c=>!c.hidden).map(c=>bake(c,[...stack,e.block])),dynamicInstance:{master:e.block,values:evaluated.dynamicValues}};
+        }
+        return {...e,block:name,dynamicSource:e.block};
+    };
+    doc.entities=doc.entities.map(e=>bake(e));
+    // Static parents may contain dynamic references. Retain each original master for metadata-aware editors.
+    for(const [name,b]of Object.entries(document.blocks))if(!b.dynamic)doc.blocks[name]={...b,entities:(b.entities||[]).map(e=>bake(e))};
     return doc;
 }
 function prepareNativeDimensions(document) {
     const doc={...document,blocks:{...document.blocks},entities:document.entities.slice()};let serial=0;
     const prepare=e=>{
-        if(e.type!=='DIMENSION' || (e.block&&doc.blocks[e.block]))return e;
-        if(e.dimtype!==undefined&&(e.dimtype&15)!==1)throw new Error('Imported dimension has no graphics block; its type requires a native dimension evaluator');
-        if(!e.a||!e.b)throw new Error('DIMENSION is missing definition points');
-        const dx=e.b.x-e.a.x,dy=e.b.y-e.a.y,length=Math.hypot(dx,dy);if(length<1e-12)throw new Error('Zero-length DIMENSION');
-        const off=e.offset??30,p={x:e.a.x-dy/length*off,y:e.a.y+dx/length*off,z:e.a.z||0};
+        if(e.type!=='DIMENSION'||(e.block&&doc.blocks[e.block]&&e.dimension?.version!==1))return e;
+        const picture=dimensionPicture(e,doc);
         let name;do{name='*DCC'+(++serial);}while(doc.blocks[name]);
-        const g=entityGeometry(e,doc);doc.blocks[name]={name,base:{x:0,y:0},entities:[...g.paths.map(p=>({type:'LWPOLYLINE',points:p.points,closed:p.closed,layer:e.layer,color:p.color})),...g.texts.map(t=>({type:'TEXT',p:t.p,text:t.text,height:t.height,rotation:t.rotation,align:t.align,color:t.color,layer:e.layer}))]};
-        return {...e,block:name,dimtype:33,definitionPoint:p,textMidpoint:g.texts[0]?.p||p};
+        doc.blocks[name]={name,base:{x:0,y:0},entities:picture.entities,dimensionPicture:{version:1,ownerId:e.id}};
+        return {...e,block:name,dimtype:(e.dimtype??33)|32,definitionPoint:picture.definitionPoint,textMidpoint:picture.textMidpoint,measurement:picture.measurement,dimstyleOverrides:picture.style};
     };
     doc.entities=doc.entities.map(prepare);for(const [name,b]of Object.entries(document.blocks))doc.blocks[name]={...b,entities:(b.entities||[]).map(prepare)};
     return doc;
@@ -389,7 +424,7 @@ export function writeDXF(doc, options = {}) {
     if(mode === 'preserve')return writePreservedDXF(doc,{version});
     if(mode !== 'normalized')throw new Error('Unknown DXF export mode');
     if(strict && exportReport(doc).warnings.length)throw new Error(exportReport(doc).warnings.join(' '));
-    doc = prepareNativeDimensions(doc);
+    doc = prepareNativeDimensions(prepareDynamicBlocks(pruneGeneratedPictures(doc)));
     for(const e of [...doc.entities,...Object.values(doc.blocks).flatMap(b=>b.entities||[])]) {
         if(e.type==='MESH' && version<'AC1024')throw new Error('MESH requires DXF R2010 or newer');
         if(e.type==='HELIX' && version<'AC1021')throw new Error('HELIX requires DXF R2007 or newer');
@@ -419,6 +454,8 @@ export function writeDXF(doc, options = {}) {
             return;
         pair(1001, 'CONDUITCAD');
         const s = asciiJson(data);
+        // Leave room for group/app overhead within the native 16 KiB XDATA limit.
+        if(s.length>15000)throw new Error('Conduit metadata exceeds the safe DXF XDATA budget; save the native project or export without metadata.');
         for (let i = 0; i < s.length; i += 200)
             pair(1000, s.slice(i, i + 200));
     };
@@ -732,9 +769,10 @@ export function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
             if (e[k] !== undefined)
                 m[k] = e[k];
+        if(e.type==='DIMENSION')writeDimensionOverrides(e.dimstyleOverrides,pair);
         meta(m);
         if (type === 'POLYLINE') {
             for (const p of e.points || []) {
@@ -772,11 +810,11 @@ export function writeDXF(doc, options = {}) {
         pair(8, '0');
         pair(100, 'AcDbBlockBegin');
         pair(2, name);
-        pair(70, 0);
+        pair(70, name.startsWith('*') ? 1 : 0);
         pp(10, b.base);
         pair(3, name);
         pair(1, '');
-        meta({ ports: b.ports || [], symbol: b.symbol });
+        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
         for (const e of b.entities)
             emit(e, blockRecords[name]);
         pair(0, 'ENDBLK');

@@ -57,3 +57,18 @@ const binary: Uint8Array = writeDXFBinary(native, preservingOptions);
 const graphTags: DXFPair[] = inspectObjectGraph(native).nodes.flatMap(node => node.tags);
 const mesh: MeshEntity = {id:'mesh',type:'MESH',layer:'0',points:[{x:0,y:0,z:0},{x:1,y:0,z:0},{x:0,y:1,z:0}],faces:[[0,1,2]]};
 void [binary, graphTags, mesh];
+
+import {editDimension, dimensionPicture, regenerateDimensions, dimensionGrips, evaluateDynamicBlock, setDynamicParameters, dynamicValues, dynamicGripValue, dynamicParameterGrips, validateDynamicBlock, type Block, type DynamicDefinition, type DimensionEdit} from '@conduitcad/model';
+const dimensionPatch: DimensionEdit = {offset: 24, text: '<> mm', style: {dimtxt: 4, dimdec: 2}};
+const managed = entity('DIMENSION', {a:{x:0,y:0},b:{x:100,y:0}});
+editDimension(managed, documentModel, dimensionPatch);
+const picture = dimensionPicture(managed, documentModel);
+const behavior: DynamicDefinition = {
+    version: 1,
+    parameters: [{name:'Length',type:'distance',default:100,min:10,max:1000,grip:{base:{x:0,y:20},direction:{x:1,y:0}}}],
+    actions: [{type:'stretch',parameter:'Length',box:{minX:50,minY:-50,maxX:1000,maxY:50}}]
+};
+const dynamicBlock: Block = {name:'Editable',entities:[line({x:0,y:0},{x:100,y:0})],dynamic:behavior};
+validateDynamicBlock(dynamicBlock);
+const variant = evaluateDynamicBlock(dynamicBlock,{Length:200},{maxEntities:100});
+void [variant.dynamicValues, dynamicValues(dynamicBlock), picture.entities, regenerateDimensions(documentModel), dimensionGrips(managed, documentModel), setDynamicParameters, dynamicGripValue, dynamicParameterGrips];

@@ -605,7 +605,7 @@ AcDbBlockBegin
 2
 *Model_Space
 70
-0
+1
 10
 0
 20
@@ -647,7 +647,7 @@ AcDbBlockBegin
 2
 *Paper_Space
 70
-0
+1
 10
 0
 20
@@ -689,7 +689,7 @@ AcDbBlockBegin
 2
 *D1
 70
-0
+1
 10
 0
 20
@@ -1211,7 +1211,7 @@ AcDbBlockBegin
 2
 *D2
 70
-0
+1
 10
 0
 20
@@ -1637,7 +1637,7 @@ AcDbBlockBegin
 2
 *D3
 70
-0
+1
 10
 0
 20
@@ -2131,7 +2131,7 @@ AcDbBlockBegin
 2
 *D4
 70
-0
+1
 10
 0
 20
@@ -2449,7 +2449,7 @@ AcDbBlockBegin
 2
 *D5
 70
-0
+1
 10
 0
 20
@@ -2725,7 +2725,7 @@ AcDbBlockBegin
 2
 *D6
 70
-0
+1
 10
 0
 20
@@ -3187,7 +3187,7 @@ AcDbBlockBegin
 2
 *D7
 70
-0
+1
 10
 0
 20

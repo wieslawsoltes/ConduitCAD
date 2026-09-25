@@ -11,8 +11,14 @@ export function writeSVG(doc, { padding = 24, background = '#ffffff' } = {}) {
     for (const span of scene.spans.values()) {
         for (const p of scene.paths.slice(span.pathStart, span.pathStart + span.pathCount)) {
             beginClip(p);
+            let fill=p.fill?esc(p.fill):'none';
+            if(p.gradient?.kind==='linear') {
+                const g=p.gradient,[a,b,c,d,x,y]=g.frame,id='cc-gradient-'+(++serial);
+                parts.push(`<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${g.start.x}" y1="${g.start.y}" x2="${g.end.x}" y2="${g.end.y}" gradientTransform="matrix(${a} ${-b} ${c} ${-d} ${x} ${-y})"><stop offset="0" stop-color="${g.colors[0]}"/><stop offset="1" stop-color="${g.colors[1]}"/></linearGradient></defs>`);
+                fill=`url(#${id})`;
+            }
             const d = (p.contours || [p.points]).map(points => points.map((p, i) => `${i ? 'L' : 'M'}${p.x.toFixed(6)} ${(-p.y).toFixed(6)}`).join(' ') + (p.closed || p.contours ? ' Z' : '')).join(' ');
-            parts.push(`<path d="${d}" fill="${p.fill ? esc(p.fill) : 'none'}" fill-rule="evenodd" opacity="${p.opacity ?? 1}" stroke="${p.stroke === false ? 'none' : esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
+            parts.push(`<path d="${d}" fill="${fill}" fill-rule="evenodd" opacity="${p.opacity ?? 1}" stroke="${p.stroke === false ? 'none' : esc(p.color)}" stroke-width="${p.width || 1.5}" stroke-linecap="round" stroke-linejoin="round" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''}/>`);
             endClip(p);
         }
         for (const t of scene.texts.slice(span.textStart, span.textStart + span.textCount)) {

@@ -1,1250 +1,1508 @@
 
-> conduit-cad-workspace@0.3.0 test
+> conduit-cad-workspace@0.4.0 test
 > node --test tests/*.test.mjs
 
 TAP version 13
-# Subtest: all 223 symbol masters have finite geometry and valid named ports
-ok 1 - all 223 symbol masters have finite geometry and valid named ports
+# Subtest: dimension subtype 0: regenerate native picture and ASCII/binary metadata
+ok 1 - dimension subtype 0: regenerate native picture and ASCII/binary metadata
   ---
-  duration_ms: 31.681912
+  duration_ms: 27.443647
+  type: 'test'
+  ...
+# Subtest: dimension subtype 1: regenerate native picture and ASCII/binary metadata
+ok 2 - dimension subtype 1: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 14.240476
+  type: 'test'
+  ...
+# Subtest: dimension subtype 2: regenerate native picture and ASCII/binary metadata
+ok 3 - dimension subtype 2: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 19.974327
+  type: 'test'
+  ...
+# Subtest: dimension subtype 3: regenerate native picture and ASCII/binary metadata
+ok 4 - dimension subtype 3: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 10.912716
+  type: 'test'
+  ...
+# Subtest: dimension subtype 4: regenerate native picture and ASCII/binary metadata
+ok 5 - dimension subtype 4: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 9.314634
+  type: 'test'
+  ...
+# Subtest: dimension subtype 5: regenerate native picture and ASCII/binary metadata
+ok 6 - dimension subtype 5: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 9.111705
+  type: 'test'
+  ...
+# Subtest: dimension subtype 6: regenerate native picture and ASCII/binary metadata
+ok 7 - dimension subtype 6: regenerate native picture and ASCII/binary metadata
+  ---
+  duration_ms: 9.004063
+  type: 'test'
+  ...
+# Subtest: dimension preserves decimal override, prefix and manual midpoint across regeneration
+ok 8 - dimension preserves decimal override, prefix and manual midpoint across regeneration
+  ---
+  duration_ms: 1.676529
+  type: 'test'
+  ...
+# Subtest: definition-point grip supersedes original authored offset
+ok 9 - definition-point grip supersedes original authored offset
+  ---
+  duration_ms: 0.947979
+  type: 'test'
+  ...
+# Subtest: one space suppresses dimension text without suppressing linework
+ok 10 - one space suppresses dimension text without suppressing linework
+  ---
+  duration_ms: 0.727267
+  type: 'test'
+  ...
+# Subtest: invalid dimension edit is atomic {"a":{"x":80,"y":60}}
+ok 11 - invalid dimension edit is atomic {"a":{"x":80,"y":60}}
+  ---
+  duration_ms: 0.531162
+  type: 'test'
+  ...
+# Subtest: invalid dimension edit is atomic {"style":{"dimtxt":-1}}
+ok 12 - invalid dimension edit is atomic {"style":{"dimtxt":-1}}
+  ---
+  duration_ms: 0.197068
+  type: 'test'
+  ...
+# Subtest: invalid dimension edit is atomic {"style":{"dimdec":20}}
+ok 13 - invalid dimension edit is atomic {"style":{"dimdec":20}}
+  ---
+  duration_ms: 0.164858
+  type: 'test'
+  ...
+# Subtest: invalid dimension edit is atomic {"style":{"unknown":1}}
+ok 14 - invalid dimension edit is atomic {"style":{"unknown":1}}
+  ---
+  duration_ms: 0.156462
+  type: 'test'
+  ...
+# Subtest: non-planar and unsupported dimension frames are refused without mutation
+ok 15 - non-planar and unsupported dimension frames are refused without mutation
+  ---
+  duration_ms: 0.405747
+  type: 'test'
+  ...
+# Subtest: all associated dimensions refresh atomically and keep signed offsets
+ok 16 - all associated dimensions refresh atomically and keep signed offsets
+  ---
+  duration_ms: 0.97553
+  type: 'test'
+  ...
+# Subtest: manual witness edit detaches only its own reference
+ok 17 - manual witness edit detaches only its own reference
+  ---
+  duration_ms: 0.260957
+  type: 'test'
+  ...
+# Subtest: managed dimensions rotate without stale anonymous pictures
+ok 18 - managed dimensions rotate without stale anonymous pictures
+  ---
+  duration_ms: 0.865265
+  type: 'test'
+  ...
+# Subtest: dynamic stretch preserves analytic line/polyline and moves connector ports
+ok 19 - dynamic stretch preserves analytic line/polyline and moves connector ports
+  ---
+  duration_ms: 1.815468
+  type: 'test'
+  ...
+# Subtest: dynamic move action evaluates a pristine instance
+ok 20 - dynamic move action evaluates a pristine instance
+  ---
+  duration_ms: 0.679037
+  type: 'test'
+  ...
+# Subtest: dynamic rotate action evaluates a pristine instance
+ok 21 - dynamic rotate action evaluates a pristine instance
+  ---
+  duration_ms: 1.424589
+  type: 'test'
+  ...
+# Subtest: dynamic scale action evaluates a pristine instance
+ok 22 - dynamic scale action evaluates a pristine instance
+  ---
+  duration_ms: 0.522796
+  type: 'test'
+  ...
+# Subtest: dynamic flip action evaluates a pristine instance
+ok 23 - dynamic flip action evaluates a pristine instance
+  ---
+  duration_ms: 0.326159
+  type: 'test'
+  ...
+# Subtest: dynamic array action evaluates a pristine instance
+ok 24 - dynamic array action evaluates a pristine instance
+  ---
+  duration_ms: 0.369159
+  type: 'test'
+  ...
+# Subtest: visibility hides selected geometry without discarding named terminals
+ok 25 - visibility hides selected geometry without discarding named terminals
+  ---
+  duration_ms: 0.443437
+  type: 'test'
+  ...
+# Subtest: lookup actions are topologically evaluated and validate dependent ranges
+ok 26 - lookup actions are topologically evaluated and validate dependent ranges
+  ---
+  duration_ms: 0.588308
+  type: 'test'
+  ...
+# Subtest: lookup cycles fail before changing document
+ok 27 - lookup cycles fail before changing document
+  ---
+  duration_ms: 0.601362
+  type: 'test'
+  ...
+# Subtest: dynamic mutation rejects invalid values and array resource explosions
+ok 28 - dynamic mutation rejects invalid values and array resource explosions
+  ---
+  duration_ms: 0.55735
+  type: 'test'
+  ...
+# Subtest: partial bulge stretch is rejected instead of silently changing arc geometry
+ok 29 - partial bulge stretch is rejected instead of silently changing arc geometry
+  ---
+  duration_ms: 0.339373
+  type: 'test'
+  ...
+# Subtest: dynamic block geometry is rendered and connector points use evaluated dimensions
+ok 30 - dynamic block geometry is rendered and connector points use evaluated dimensions
+  ---
+  duration_ms: 0.954211
+  type: 'test'
+  ...
+# Subtest: dynamic DXF exports baked variants and recovers editable master metadata
+ok 31 - dynamic DXF exports baked variants and recovers editable master metadata
+  ---
+  duration_ms: 29.891522
+  type: 'test'
+  ...
+# Subtest: dynamic authored definition is preserved through repeat exports
+ok 32 - dynamic authored definition is preserved through repeat exports
+  ---
+  duration_ms: 19.242323
+  type: 'test'
+  ...
+# Subtest: unshifted LINEAR gradient reaches scene and SVG without replacing native DXF tags
+ok 33 - unshifted LINEAR gradient reaches scene and SVG without replacing native DXF tags
+  ---
+  duration_ms: 7.639246
+  type: 'test'
+  ...
+# Subtest: dynamic grip inverses preserve scaled rotated nonzero-base coordinates
+ok 34 - dynamic grip inverses preserve scaled rotated nonzero-base coordinates
+  ---
+  duration_ms: 0.692121
+  type: 'test'
+  ...
+# Subtest: invalid dynamic grip, port, parameter/action type and entity budgets fail explicitly
+ok 35 - invalid dynamic grip, port, parameter/action type and entity budgets fail explicitly
+  ---
+  duration_ms: 0.476509
+  type: 'test'
+  ...
+# Subtest: circle radius associations track size and detach safely when source is removed
+ok 36 - circle radius associations track size and detach safely when source is removed
+  ---
+  duration_ms: 0.896793
+  type: 'test'
+  ...
+# Subtest: oversized native XDATA is refused rather than writing an invalid DXF
+ok 37 - oversized native XDATA is refused rather than writing an invalid DXF
+  ---
+  duration_ms: 1.642926
+  type: 'test'
+  ...
+# Subtest: invalid dimension formatting and overflowing geometry remain atomic
+ok 38 - invalid dimension formatting and overflowing geometry remain atomic
+  ---
+  duration_ms: 0.420375
+  type: 'test'
+  ...
+# Subtest: repeated native export does not accumulate unreachable generated pictures
+ok 39 - repeated native export does not accumulate unreachable generated pictures
+  ---
+  duration_ms: 14.626186
+  type: 'test'
+  ...
+# Subtest: explicit static references keep a previous generated native block
+ok 40 - explicit static references keep a previous generated native block
+  ---
+  duration_ms: 5.96885
+  type: 'test'
+  ...
+# Subtest: rotating a default-angle linear dimension updates its native angle and rejects shear
+ok 41 - rotating a default-angle linear dimension updates its native angle and rejects shear
+  ---
+  duration_ms: 0.512737
+  type: 'test'
+  ...
+# Subtest: dimension similarity scaling honors resolved document style scale
+ok 42 - dimension similarity scaling honors resolved document style scale
+  ---
+  duration_ms: 0.310199
+  type: 'test'
+  ...
+# Subtest: native hatch rotation updates gradient angle in radians
+ok 43 - native hatch rotation updates gradient angle in radians
+  ---
+  duration_ms: 0.329095
+  type: 'test'
+  ...
+# Subtest: all 223 symbol masters have finite geometry and valid named ports
+ok 44 - all 223 symbol masters have finite geometry and valid named ports
+  ---
+  duration_ms: 39.788455
   type: 'test'
   ...
 # Subtest: native block transform and port direction use base point, scale and rotation
-ok 2 - native block transform and port direction use base point, scale and rotation
+ok 45 - native block transform and port direction use base point, scale and rotation
   ---
-  duration_ms: 0.373721
+  duration_ms: 0.522996
   type: 'test'
   ...
 # Subtest: moving insert keeps imported attributes in world coordinates
-ok 3 - moving insert keeps imported attributes in world coordinates
+ok 46 - moving insert keeps imported attributes in world coordinates
   ---
-  duration_ms: 0.978575
+  duration_ms: 1.3286
   type: 'test'
   ...
 # Subtest: layer, by-layer and by-block dash inheritance
-ok 4 - layer, by-layer and by-block dash inheritance
+ok 47 - layer, by-layer and by-block dash inheritance
   ---
-  duration_ms: 0.290836
+  duration_ms: 0.301993
   type: 'test'
   ...
 # Subtest: recursive blocks terminate at explicit recursion budget
-ok 5 - recursive blocks terminate at explicit recursion budget
+ok 48 - recursive blocks terminate at explicit recursion budget
   ---
-  duration_ms: 0.772308
+  duration_ms: 0.654922
   type: 'test'
   ...
 # Subtest: text cleanup handles Unicode, paragraphs and formatting without HTML execution
-ok 6 - text cleanup handles Unicode, paragraphs and formatting without HTML execution
+ok 49 - text cleanup handles Unicode, paragraphs and formatting without HTML execution
   ---
-  duration_ms: 4.980841
+  duration_ms: 4.694511
   type: 'test'
   ...
 # Subtest: pid DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
-ok 7 - pid DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
+ok 50 - pid DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 530.04183
+  duration_ms: 583.397185
   type: 'test'
   ...
 # Subtest: electrical DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
-ok 8 - electrical DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
+ok 51 - electrical DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 376.516903
+  duration_ms: 401.337174
   type: 'test'
   ...
 # Subtest: flow DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
-ok 9 - flow DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
+ok 52 - flow DXF round trip preserves identity, ports, tags, connector graph and parameter metadata
   ---
-  duration_ms: 220.696455
+  duration_ms: 304.27605
   type: 'test'
   ...
 # Subtest: DXF writer AC1015
-ok 10 - DXF writer AC1015
+ok 53 - DXF writer AC1015
   ---
-  duration_ms: 1.917576
+  duration_ms: 1.969706
   type: 'test'
   ...
 # Subtest: DXF writer AC1018
-ok 11 - DXF writer AC1018
+ok 54 - DXF writer AC1018
   ---
-  duration_ms: 1.513548
+  duration_ms: 1.268848
   type: 'test'
   ...
 # Subtest: DXF writer AC1021
-ok 12 - DXF writer AC1021
+ok 55 - DXF writer AC1021
   ---
-  duration_ms: 1.81324
+  duration_ms: 1.387699
   type: 'test'
   ...
 # Subtest: DXF writer AC1024
-ok 13 - DXF writer AC1024
+ok 56 - DXF writer AC1024
   ---
-  duration_ms: 1.655245
+  duration_ms: 1.722535
   type: 'test'
   ...
 # Subtest: DXF writer AC1027
-ok 14 - DXF writer AC1027
+ok 57 - DXF writer AC1027
   ---
-  duration_ms: 1.024651
+  duration_ms: 9.157773
   type: 'test'
   ...
 # Subtest: DXF writer AC1032
-ok 15 - DXF writer AC1032
+ok 58 - DXF writer AC1032
   ---
-  duration_ms: 0.986119
+  duration_ms: 1.045361
   type: 'test'
   ...
 # Subtest: bulges, splines, ellipses and text retain numeric data in normalized round trip
-ok 16 - bulges, splines, ellipses and text retain numeric data in normalized round trip
+ok 59 - bulges, splines, ellipses and text retain numeric data in normalized round trip
   ---
-  duration_ms: 3.961369
+  duration_ms: 3.526592
   type: 'test'
   ...
 # Subtest: legacy R2000 Unicode escapes render correctly
-ok 17 - legacy R2000 Unicode escapes render correctly
+ok 60 - legacy R2000 Unicode escapes render correctly
   ---
-  duration_ms: 1.282045
+  duration_ms: 1.286792
   type: 'test'
   ...
 # Subtest: original ASCII byte preservation includes code page bytes and line endings
-ok 18 - original ASCII byte preservation includes code page bytes and line endings
+ok 61 - original ASCII byte preservation includes code page bytes and line endings
   ---
-  duration_ms: 1.334553
+  duration_ms: 1.145247
   type: 'test'
   ...
 # Subtest: unsupported DXF entity and opaque sections are retained and export is transparent
-ok 19 - unsupported DXF entity and opaque sections are retained and export is transparent
+ok 62 - unsupported DXF entity and opaque sections are retained and export is transparent
   ---
-  duration_ms: 1.097318
+  duration_ms: 1.701996
   type: 'test'
   ...
 # Subtest: non-default OCS projects an edge-on circle to the top view
-ok 20 - non-default OCS projects an edge-on circle to the top view
+ok 63 - non-default OCS projects an edge-on circle to the top view
   ---
-  duration_ms: 1.041704
+  duration_ms: 1.584717
   type: 'test'
   ...
 # Subtest: old POLYLINE VERTEX and SEQEND import as one path
-ok 21 - old POLYLINE VERTEX and SEQEND import as one path
+ok 64 - old POLYLINE VERTEX and SEQEND import as one path
   ---
-  duration_ms: 0.296827
+  duration_ms: 0.319126
   type: 'test'
   ...
 # Subtest: native HATCH export retains loops and pattern definitions
-ok 22 - native HATCH export retains loops and pattern definitions
+ok 65 - native HATCH export retains loops and pattern definitions
   ---
-  duration_ms: 8.113686
+  duration_ms: 2.522768
   type: 'test'
   ...
 # Subtest: authored dimension exports native DIMENSION and a complete graphics block
-ok 23 - authored dimension exports native DIMENSION and a complete graphics block
+ok 66 - authored dimension exports native DIMENSION and a complete graphics block
   ---
-  duration_ms: 3.019022
+  duration_ms: 4.161296
   type: 'test'
   ...
 # Subtest: malformed or truncated ASCII DXF is rejected
-ok 24 - malformed or truncated ASCII DXF is rejected
+ok 67 - malformed or truncated ASCII DXF is rejected
   ---
-  duration_ms: 0.752993
+  duration_ms: 0.502638
   type: 'test'
   ...
 # Subtest: binary DXF modern word codes imports and preserves exact source
-ok 25 - binary DXF modern word codes imports and preserves exact source
+ok 68 - binary DXF modern word codes imports and preserves exact source
   ---
-  duration_ms: 1.756874
+  duration_ms: 1.281382
   type: 'test'
   ...
 # Subtest: binary DXF R12 byte codes imports and preserves exact source
-ok 26 - binary DXF R12 byte codes imports and preserves exact source
+ok 69 - binary DXF R12 byte codes imports and preserves exact source
   ---
-  duration_ms: 0.709621
+  duration_ms: 0.505333
   type: 'test'
   ...
 # Subtest: scene compiles with Float64 source and rebased Float32 uploads
-ok 27 - scene compiles with Float64 source and rebased Float32 uploads
+ok 70 - scene compiles with Float64 source and rebased Float32 uploads
   ---
-  duration_ms: 0.452669
+  duration_ms: 0.341357
   type: 'test'
   ...
 # Subtest: hidden layers and layouts do not compile
-ok 28 - hidden layers and layouts do not compile
+ok 71 - hidden layers and layouts do not compile
   ---
-  duration_ms: 0.359594
+  duration_ms: 0.263181
   type: 'test'
   ...
 # Subtest: camera zoom anchors and inverse transforms are exact
-ok 29 - camera zoom anchors and inverse transforms are exact
+ok 72 - camera zoom anchors and inverse transforms are exact
   ---
-  duration_ms: 9.985426
+  duration_ms: 13.723669
   type: 'test'
   ...
 # Subtest: WebGPU sources contain compute culling and instanced stroke entry points
-ok 30 - WebGPU sources contain compute culling and instanced stroke entry points
+ok 73 - WebGPU sources contain compute culling and instanced stroke entry points
   ---
-  duration_ms: 0.210145
+  duration_ms: 0.20402
   type: 'test'
   ...
 # Subtest: BOM emits quoted tag and coordinate records
-ok 31 - BOM emits quoted tag and coordinate records
+ok 74 - BOM emits quoted tag and coordinate records
   ---
-  duration_ms: 5.123859
+  duration_ms: 5.198662
   type: 'test'
   ...
 # Subtest: symbol installs are isolated between documents and factory masters
-ok 32 - symbol installs are isolated between documents and factory masters
+ok 75 - symbol installs are isolated between documents and factory masters
   ---
-  duration_ms: 12.027517
+  duration_ms: 8.20348
   type: 'test'
   ...
 # Subtest: DXF preserves int64 group values as decimal strings
-ok 33 - DXF preserves int64 group values as decimal strings
+ok 76 - DXF preserves int64 group values as decimal strings
   ---
-  duration_ms: 0.237094
+  duration_ms: 0.147996
   type: 'test'
   ...
 # Subtest: ACI import retains standard red, cyan and green rather than theme substitutions
-ok 34 - ACI import retains standard red, cyan and green rather than theme substitutions
+ok 77 - ACI import retains standard red, cyan and green rather than theme substitutions
   ---
-  duration_ms: 0.588053
+  duration_ms: 0.469326
   type: 'test'
   ...
 # Subtest: MINSERT grid spacing rotates but is not scaled with block geometry
-ok 35 - MINSERT grid spacing rotates but is not scaled with block geometry
+ok 78 - MINSERT grid spacing rotates but is not scaled with block geometry
   ---
-  duration_ms: 0.413486
+  duration_ms: 0.341317
   type: 'test'
   ...
 # Subtest: MINSERT attributes repeat at rotated unscaled grid offsets
-ok 36 - MINSERT attributes repeat at rotated unscaled grid offsets
+ok 79 - MINSERT attributes repeat at rotated unscaled grid offsets
   ---
-  duration_ms: 0.322555
+  duration_ms: 0.277408
   type: 'test'
   ...
 # Subtest: MINSERT zero spacing does not emit duplicate occurrences
-ok 37 - MINSERT zero spacing does not emit duplicate occurrences
+ok 80 - MINSERT zero spacing does not emit duplicate occurrences
   ---
-  duration_ms: 0.19168
+  duration_ms: 0.180346
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 160
-ok 38 - typed ASCII/binary transport roundtrip group 160
+ok 81 - typed ASCII/binary transport roundtrip group 160
   ---
-  duration_ms: 4.547665
+  duration_ms: 4.460575
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 169
-ok 39 - typed ASCII/binary transport roundtrip group 169
+ok 82 - typed ASCII/binary transport roundtrip group 169
   ---
-  duration_ms: 2.139631
+  duration_ms: 0.947198
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 1071
-ok 40 - typed ASCII/binary transport roundtrip group 1071
+ok 83 - typed ASCII/binary transport roundtrip group 1071
   ---
-  duration_ms: 0.668052
+  duration_ms: 0.693404
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 90
-ok 41 - typed ASCII/binary transport roundtrip group 90
+ok 84 - typed ASCII/binary transport roundtrip group 90
   ---
-  duration_ms: 0.376716
+  duration_ms: 0.3806
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 370
-ok 42 - typed ASCII/binary transport roundtrip group 370
+ok 85 - typed ASCII/binary transport roundtrip group 370
   ---
-  duration_ms: 0.450204
+  duration_ms: 0.402671
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 290
-ok 43 - typed ASCII/binary transport roundtrip group 290
+ok 86 - typed ASCII/binary transport roundtrip group 290
   ---
-  duration_ms: 0.767109
+  duration_ms: 0.346737
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 40
-ok 44 - typed ASCII/binary transport roundtrip group 40
+ok 87 - typed ASCII/binary transport roundtrip group 40
   ---
-  duration_ms: 0.455294
+  duration_ms: 0.457173
   type: 'test'
   ...
 # Subtest: typed ASCII/binary transport roundtrip group 310
-ok 45 - typed ASCII/binary transport roundtrip group 310
+ok 88 - typed ASCII/binary transport roundtrip group 310
   ---
-  duration_ms: 0.419106
+  duration_ms: 0.448367
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 160:9223372036854775808
-ok 46 - reject malformed/overflow scalar 160:9223372036854775808
+ok 89 - reject malformed/overflow scalar 160:9223372036854775808
   ---
-  duration_ms: 0.776696
+  duration_ms: 0.698453
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 160:-9223372036854775809
-ok 47 - reject malformed/overflow scalar 160:-9223372036854775809
+ok 90 - reject malformed/overflow scalar 160:-9223372036854775809
   ---
-  duration_ms: 0.57644
+  duration_ms: 0.549626
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 290:2
-ok 48 - reject malformed/overflow scalar 290:2
+ok 91 - reject malformed/overflow scalar 290:2
   ---
-  duration_ms: 0.241452
+  duration_ms: 0.269152
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 70:32768
-ok 49 - reject malformed/overflow scalar 70:32768
+ok 92 - reject malformed/overflow scalar 70:32768
   ---
-  duration_ms: 0.158417
+  duration_ms: 0.137517
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 90:2147483648
-ok 50 - reject malformed/overflow scalar 90:2147483648
+ok 93 - reject malformed/overflow scalar 90:2147483648
   ---
-  duration_ms: 0.129673
+  duration_ms: 0.129271
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 40:NaN
-ok 51 - reject malformed/overflow scalar 40:NaN
+ok 94 - reject malformed/overflow scalar 40:NaN
   ---
-  duration_ms: 0.124373
+  duration_ms: 0.122258
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 310:FFF
-ok 52 - reject malformed/overflow scalar 310:FFF
+ok 95 - reject malformed/overflow scalar 310:FFF
   ---
-  duration_ms: 0.151484
+  duration_ms: 0.125644
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 40:
-ok 53 - reject malformed/overflow scalar 40:
+ok 96 - reject malformed/overflow scalar 40:
   ---
-  duration_ms: 0.124213
+  duration_ms: 0.111098
   type: 'test'
   ...
 # Subtest: reject malformed/overflow scalar 70:1.5
-ok 54 - reject malformed/overflow scalar 70:1.5
+ok 97 - reject malformed/overflow scalar 70:1.5
   ---
-  duration_ms: 0.128912
+  duration_ms: 0.178252
   type: 'test'
   ...
 # Subtest: reject incomplete pairs, trailing data and malformed section nesting
-ok 55 - reject incomplete pairs, trailing data and malformed section nesting
+ok 98 - reject incomplete pairs, trailing data and malformed section nesting
   ---
-  duration_ms: 0.376035
+  duration_ms: 0.377955
   type: 'test'
   ...
 # Subtest: R12 binary single-byte group codes and extended-code escape
-ok 56 - R12 binary single-byte group codes and extended-code escape
+ok 99 - R12 binary single-byte group codes and extended-code escape
   ---
-  duration_ms: 0.54427
+  duration_ms: 0.544666
   type: 'test'
   ...
 # Subtest: binary source signature, truncation and trailing bytes are guarded
-ok 57 - binary source signature, truncation and trailing bytes are guarded
+ok 100 - binary source signature, truncation and trailing bytes are guarded
   ---
-  duration_ms: 1.238342
+  duration_ms: 0.569583
   type: 'test'
   ...
 # Subtest: binary metadata and Unicode MTEXT survive all modern export versions
-ok 58 - binary metadata and Unicode MTEXT survive all modern export versions
+ok 101 - binary metadata and Unicode MTEXT survive all modern export versions
   ---
-  duration_ms: 75.990562
+  duration_ms: 76.544931
   type: 'test'
   ...
 # Subtest: modern MTEXT chunks never split Unicode scalars or exceed 250 UTF-8 bytes
-ok 59 - modern MTEXT chunks never split Unicode scalars or exceed 250 UTF-8 bytes
+ok 102 - modern MTEXT chunks never split Unicode scalars or exceed 250 UTF-8 bytes
   ---
-  duration_ms: 2.619493
+  duration_ms: 2.828759
   type: 'test'
   ...
 # Subtest: extension coordinate fields do not shadow entity coordinates
-ok 60 - extension coordinate fields do not shadow entity coordinates
+ok 103 - extension coordinate fields do not shadow entity coordinates
   ---
-  duration_ms: 0.872255
+  duration_ms: 0.894209
   type: 'test'
   ...
 # Subtest: unknown classes, object records, payload and handles survive preserving output
-ok 61 - unknown classes, object records, payload and handles survive preserving output
+ok 104 - unknown classes, object records, payload and handles survive preserving output
   ---
-  duration_ms: 63.001326
+  duration_ms: 86.568157
   type: 'test'
   ...
 # Subtest: preserving permits an unreferenced LINE endpoint edit and retains unknown entities
-ok 62 - preserving permits an unreferenced LINE endpoint edit and retains unknown entities
+ok 105 - preserving permits an unreferenced LINE endpoint edit and retains unknown entities
   ---
-  duration_ms: 1.245746
+  duration_ms: 1.295347
   type: 'test'
   ...
 # Subtest: preserving refuses dependency-sensitive, unrepresented and structural edits
-ok 63 - preserving refuses dependency-sensitive, unrepresented and structural edits
+ok 106 - preserving refuses dependency-sensitive, unrepresented and structural edits
   ---
-  duration_ms: 1.497368
+  duration_ms: 1.552518
   type: 'test'
   ...
 # Subtest: preserving rejects duplicate handles and modified raw payloads
-ok 64 - preserving rejects duplicate handles and modified raw payloads
+ok 107 - preserving rejects duplicate handles and modified raw payloads
   ---
-  duration_ms: 29.855441
+  duration_ms: 32.608673
   type: 'test'
   ...
 # Subtest: normalized 64-bit source handles cannot cause unsafe-number allocation loops
-ok 65 - normalized 64-bit source handles cannot cause unsafe-number allocation loops
+ok 108 - normalized 64-bit source handles cannot cause unsafe-number allocation loops
   ---
-  duration_ms: 2.369774
+  duration_ms: 2.259467
   type: 'test'
   ...
 # Subtest: model and all inactive paper-space contents are recovered once
-ok 66 - model and all inactive paper-space contents are recovered once
+ok 109 - model and all inactive paper-space contents are recovered once
   ---
-  duration_ms: 44.376914
+  duration_ms: 40.093624
   type: 'test'
   ...
 # Subtest: layout root dictionaries, block owners, table counts and HANDSEED are coherent
-ok 67 - layout root dictionaries, block owners, table counts and HANDSEED are coherent
+ok 110 - layout root dictionaries, block owners, table counts and HANDSEED are coherent
   ---
-  duration_ms: 52.785525
+  duration_ms: 44.792115
   type: 'test'
   ...
 # Subtest: viewport clip and frozen layer references are remapped without changing semantics
-ok 68 - viewport clip and frozen layer references are remapped without changing semantics
+ok 111 - viewport clip and frozen layer references are remapped without changing semantics
   ---
-  duration_ms: 31.245759
+  duration_ms: 18.557019
   type: 'test'
   ...
 # Subtest: viewport DCS transform applies target, twist, scale and view center
-ok 69 - viewport DCS transform applies target, twist, scale and view center
+ok 112 - viewport DCS transform applies target, twist, scale and view center
   ---
-  duration_ms: 0.498175
+  duration_ms: 0.443688
   type: 'test'
   ...
 # Subtest: paper layout geometry uses clip polygons and excludes frozen layers
-ok 70 - paper layout geometry uses clip polygons and excludes frozen layers
+ok 113 - paper layout geometry uses clip polygons and excludes frozen layers
   ---
-  duration_ms: 28.101762
+  duration_ms: 29.849086
   type: 'test'
   ...
 # Subtest: paper SVG uses nested scene-space clipping
-ok 71 - paper SVG uses nested scene-space clipping
+ok 114 - paper SVG uses nested scene-space clipping
   ---
-  duration_ms: 31.355466
+  duration_ms: 41.982209
   type: 'test'
   ...
 # Subtest: native mesh topology and helix fields survive ASCII and binary
-ok 72 - native mesh topology and helix fields survive ASCII and binary
+ok 115 - native mesh topology and helix fields survive ASCII and binary
   ---
-  duration_ms: 72.933378
+  duration_ms: 102.91411
   type: 'test'
   ...
 # Subtest: mesh invalid indices/counts and unsupported downgrades fail explicitly
-ok 73 - mesh invalid indices/counts and unsupported downgrades fail explicitly
+ok 116 - mesh invalid indices/counts and unsupported downgrades fail explicitly
   ---
-  duration_ms: 20.685995
+  duration_ms: 21.029176
   type: 'test'
   ...
 # Subtest: WIPEOUT converts normalized image boundary to the intended WCS mask
-ok 74 - WIPEOUT converts normalized image boundary to the intended WCS mask
+ok 117 - WIPEOUT converts normalized image boundary to the intended WCS mask
   ---
-  duration_ms: 8.690247
+  duration_ms: 9.193657
   type: 'test'
   ...
 # Subtest: native dimension edits cannot leave stale graphics blocks
-ok 75 - native dimension edits cannot leave stale graphics blocks
+ok 118 - native dimension edits cannot leave stale graphics blocks
   ---
-  duration_ms: 7.39959
+  duration_ms: 9.741399
   type: 'test'
   ...
 # Subtest: strict normalized mode reports foreign data loss; preservation remains available
-ok 76 - strict normalized mode reports foreign data loss; preservation remains available
+ok 119 - strict normalized mode reports foreign data loss; preservation remains available
   ---
-  duration_ms: 31.527014
+  duration_ms: 42.597627
   type: 'test'
   ...
 # Subtest: preservation refuses global line-pattern changes and arbitrary soft references
-ok 77 - preservation refuses global line-pattern changes and arbitrary soft references
+ok 120 - preservation refuses global line-pattern changes and arbitrary soft references
   ---
-  duration_ms: 26.566974
+  duration_ms: 28.628027
   type: 'test'
   ...
 # Subtest: normalized export retains insertion unit codes beyond the UI unit choices
-ok 78 - normalized export retains insertion unit codes beyond the UI unit choices
+ok 121 - normalized export retains insertion unit codes beyond the UI unit choices
   ---
-  duration_ms: 66.745037
+  duration_ms: 90.434575
   type: 'test'
   ...
 # Subtest: exploding a clipped viewport rejects before producing unclipped entities
-ok 79 - exploding a clipped viewport rejects before producing unclipped entities
+ok 122 - exploding a clipped viewport rejects before producing unclipped entities
   ---
-  duration_ms: 10.885174
+  duration_ms: 10.889342
   type: 'test'
   ...
 # Subtest: expression 2+3*4
-ok 80 - expression 2+3*4
+ok 123 - expression 2+3*4
   ---
-  duration_ms: 2.887714
+  duration_ms: 1.636805
   type: 'test'
   ...
 # Subtest: expression (2+3)*4
-ok 81 - expression (2+3)*4
+ok 124 - expression (2+3)*4
   ---
-  duration_ms: 0.280526
+  duration_ms: 0.188372
   type: 'test'
   ...
 # Subtest: expression 2^3^2
-ok 82 - expression 2^3^2
+ok 125 - expression 2^3^2
   ---
-  duration_ms: 0.302938
+  duration_ms: 0.175207
   type: 'test'
   ...
 # Subtest: expression -2^2
-ok 83 - expression -2^2
+ok 126 - expression -2^2
   ---
-  duration_ms: 0.214803
+  duration_ms: 0.11246
   type: 'test'
   ...
 # Subtest: expression 2^-2
-ok 84 - expression 2^-2
+ok 127 - expression 2^-2
   ---
-  duration_ms: 0.196418
+  duration_ms: 0.133159
   type: 'test'
   ...
 # Subtest: expression (-2)^2
-ok 85 - expression (-2)^2
+ok 128 - expression (-2)^2
   ---
-  duration_ms: 0.180889
+  duration_ms: 0.103663
   type: 'test'
   ...
 # Subtest: expression 2e3 / .5
-ok 86 - expression 2e3 / .5
+ok 129 - expression 2e3 / .5
   ---
-  duration_ms: 0.193743
+  duration_ms: 0.096169
   type: 'test'
   ...
 # Subtest: expression pi*2
-ok 87 - expression pi*2
+ok 130 - expression pi*2
   ---
-  duration_ms: 0.212539
+  duration_ms: 0.109925
   type: 'test'
   ...
 # Subtest: parameter dependency resolution and cycle diagnostics
-ok 88 - parameter dependency resolution and cycle diagnostics
+ok 131 - parameter dependency resolution and cycle diagnostics
   ---
-  duration_ms: 2.129131
+  duration_ms: 1.266674
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: globalThis.x=1
-ok 89 - unsafe or invalid expression rejected: globalThis.x=1
+ok 132 - unsafe or invalid expression rejected: globalThis.x=1
   ---
-  duration_ms: 0.643597
+  duration_ms: 0.457394
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: constructor
-ok 90 - unsafe or invalid expression rejected: constructor
+ok 133 - unsafe or invalid expression rejected: constructor
   ---
-  duration_ms: 0.251471
+  duration_ms: 0.156653
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 1/0
-ok 91 - unsafe or invalid expression rejected: 1/0
+ok 134 - unsafe or invalid expression rejected: 1/0
   ---
-  duration_ms: 0.162604
+  duration_ms: 0.089928
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: abc
-ok 92 - unsafe or invalid expression rejected: abc
+ok 135 - unsafe or invalid expression rejected: abc
   ---
-  duration_ms: 0.136667
+  duration_ms: 0.067667
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 1;2
-ok 93 - unsafe or invalid expression rejected: 1;2
+ok 136 - unsafe or invalid expression rejected: 1;2
   ---
-  duration_ms: 0.13364
+  duration_ms: 0.064461
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: Math.sin(2)
-ok 94 - unsafe or invalid expression rejected: Math.sin(2)
+ok 137 - unsafe or invalid expression rejected: Math.sin(2)
   ---
-  duration_ms: 0.118352
+  duration_ms: 0.093114
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 2 +
-ok 95 - unsafe or invalid expression rejected: 2 +
+ok 138 - unsafe or invalid expression rejected: 2 +
   ---
-  duration_ms: 0.123451
+  duration_ms: 0.076833
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: (2
-ok 96 - unsafe or invalid expression rejected: (2
+ok 139 - unsafe or invalid expression rejected: (2
   ---
-  duration_ms: 0.111689
+  duration_ms: 0.069139
   type: 'test'
   ...
 # Subtest: unsafe or invalid expression rejected: 2**3
-ok 97 - unsafe or invalid expression rejected: 2**3
+ok 140 - unsafe or invalid expression rejected: 2**3
   ---
-  duration_ms: 0.121288
+  duration_ms: 0.954021
   type: 'test'
   ...
 # Subtest: constraint horizontal and length solve together
-ok 98 - constraint horizontal and length solve together
+ok 141 - constraint horizontal and length solve together
   ---
-  duration_ms: 2.416881
+  duration_ms: 1.554361
   type: 'test'
   ...
 # Subtest: radius constraint uses named expressions
-ok 99 - radius constraint uses named expressions
+ok 142 - radius constraint uses named expressions
   ---
-  duration_ms: 1.660824
+  duration_ms: 0.372415
   type: 'test'
   ...
 # Subtest: coincidence and perpendicular constraints
-ok 100 - coincidence and perpendicular constraints
+ok 143 - coincidence and perpendicular constraints
   ---
-  duration_ms: 0.91224
+  duration_ms: 0.515872
   type: 'test'
   ...
 # Subtest: conflicting constraints roll back complete geometry
-ok 101 - conflicting constraints roll back complete geometry
+ok 144 - conflicting constraints roll back complete geometry
   ---
-  duration_ms: 1.611811
+  duration_ms: 0.951566
   type: 'test'
   ...
 # Subtest: stale, incompatible and negative-size constraints fail explicitly
-ok 102 - stale, incompatible and negative-size constraints fail explicitly
+ok 145 - stale, incompatible and negative-size constraints fail explicitly
   ---
-  duration_ms: 0.540213
+  duration_ms: 0.333473
   type: 'test'
   ...
 # Subtest: history atomically cancels exceptions and invalidates redo
-ok 103 - history atomically cancels exceptions and invalidates redo
+ok 146 - history atomically cancels exceptions and invalidates redo
   ---
-  duration_ms: 0.819196
+  duration_ms: 0.41795
   type: 'test'
   ...
 # Subtest: history suppresses no-op edits and enforces entry limit
-ok 104 - history suppresses no-op edits and enforces entry limit
+ok 147 - history suppresses no-op edits and enforces entry limit
   ---
-  duration_ms: 0.307827
+  duration_ms: 0.206525
   type: 'test'
   ...
 # Subtest: spatial queries agree with brute force over 10000 boxes
-ok 105 - spatial queries agree with brute force over 10000 boxes
+ok 148 - spatial queries agree with brute force over 10000 boxes
   ---
-  duration_ms: 61.368294
+  duration_ms: 66.824504
   type: 'test'
   ...
 # Subtest: routing has no obstacle collisions and returns orthogonal segments
-ok 106 - routing has no obstacle collisions and returns orthogonal segments
+ok 149 - routing has no obstacle collisions and returns orthogonal segments
   ---
-  duration_ms: 2.317424
+  duration_ms: 2.529801
   type: 'test'
   ...
 # Subtest: router reports blocked endpoints and safety limits, never claims successful fallback
-ok 107 - router reports blocked endpoints and safety limits, never claims successful fallback
+ok 150 - router reports blocked endpoints and safety limits, never claims successful fallback
   ---
-  duration_ms: 0.532318
+  duration_ms: 0.559875
   type: 'test'
   ...
 # Subtest: port leads and waypoints preserve exact endpoints
-ok 108 - port leads and waypoints preserve exact endpoints
+ok 151 - port leads and waypoints preserve exact endpoints
   ---
-  duration_ms: 0.934883
+  duration_ms: 1.020244
   type: 'test'
   ...
 # Subtest: directed graph preserves port references
-ok 109 - directed graph preserves port references
+ok 152 - directed graph preserves port references
   ---
-  duration_ms: 0.48501
+  duration_ms: 0.551149
   type: 'test'
   ...
 # Subtest: spatial updates remove stale hits and discover objects outside original tree bounds
-ok 110 - spatial updates remove stale hits and discover objects outside original tree bounds
+ok 153 - spatial updates remove stale hits and discover objects outside original tree bounds
   ---
-  duration_ms: 5.952152
+  duration_ms: 5.750432
   type: 'test'
   ...
 # Subtest: port routing does not re-enter the bodies of its own endpoint equipment
-ok 111 - port routing does not re-enter the bodies of its own endpoint equipment
+ok 154 - port routing does not re-enter the bodies of its own endpoint equipment
   ---
-  duration_ms: 0.951905
+  duration_ms: 1.018822
   type: 'test'
   ...
 # Subtest: a waypoint inside endpoint equipment is rejected rather than routed through its body
-ok 112 - a waypoint inside endpoint equipment is rejected rather than routed through its body
+ok 155 - a waypoint inside endpoint equipment is rejected rather than routed through its body
   ---
-  duration_ms: 0.717074
+  duration_ms: 0.67537
   type: 'test'
   ...
 # Subtest: port routing validates lead and clearance budgets
-ok 113 - port routing validates lead and clearance budgets
+ok 156 - port routing validates lead and clearance budgets
   ---
-  duration_ms: 0.264656
+  duration_ms: 0.266418
   type: 'test'
   ...
 # Subtest: all independently generated entities import without unsupported entities or nonfinite geometry
-ok 114 - all independently generated entities import without unsupported entities or nonfinite geometry
+ok 157 - all independently generated entities import without unsupported entities or nonfinite geometry
   ---
-  duration_ms: 7.169175
+  duration_ms: 7.880076
   type: 'test'
   ...
 # Subtest: native hatch arc-False agrees with independent analytic endpoints
-ok 115 - native hatch arc-False agrees with independent analytic endpoints
+ok 158 - native hatch arc-False agrees with independent analytic endpoints
   ---
-  duration_ms: 0.566632
+  duration_ms: 0.542031
   type: 'test'
   ...
 # Subtest: native hatch arc-True agrees with independent analytic endpoints
-ok 116 - native hatch arc-True agrees with independent analytic endpoints
+ok 159 - native hatch arc-True agrees with independent analytic endpoints
   ---
-  duration_ms: 0.258796
+  duration_ms: 0.251891
   type: 'test'
   ...
 # Subtest: native hatch ellipse-False agrees with independent analytic endpoints
-ok 117 - native hatch ellipse-False agrees with independent analytic endpoints
+ok 160 - native hatch ellipse-False agrees with independent analytic endpoints
   ---
-  duration_ms: 0.521027
+  duration_ms: 0.594449
   type: 'test'
   ...
 # Subtest: native hatch ellipse-True agrees with independent analytic endpoints
-ok 118 - native hatch ellipse-True agrees with independent analytic endpoints
+ok 161 - native hatch ellipse-True agrees with independent analytic endpoints
   ---
-  duration_ms: 2.376336
+  duration_ms: 3.05851
   type: 'test'
   ...
 # Subtest: normal, outer, and ignore hatch styles produce correct nested-island topology
-ok 119 - normal, outer, and ignore hatch styles produce correct nested-island topology
+ok 162 - normal, outer, and ignore hatch styles produce correct nested-island topology
   ---
-  duration_ms: 0.468368
+  duration_ms: 0.515031
   type: 'test'
   ...
 # Subtest: hatch pattern scanlines never bridge an island hole
-ok 120 - hatch pattern scanlines never bridge an island hole
+ok 163 - hatch pattern scanlines never bridge an island hole
   ---
-  duration_ms: 1.629486
+  duration_ms: 1.766847
   type: 'test'
   ...
 # Subtest: pathological hatch spacing terminates at the configured safety budget
-ok 121 - pathological hatch spacing terminates at the configured safety budget
+ok 164 - pathological hatch spacing terminates at the configured safety budget
   ---
-  duration_ms: 0.259036
+  duration_ms: 0.312403
   type: 'test'
   ...
 # Subtest: malformed hatch counts are rejected before allocation
-ok 122 - malformed hatch counts are rejected before allocation
+ok 165 - malformed hatch counts are rejected before allocation
   ---
-  duration_ms: 0.891743
+  duration_ms: 0.998924
   type: 'test'
   ...
 # Subtest: rational spline hatch preserves native knots, controls, weights and edge topology
-ok 123 - rational spline hatch preserves native knots, controls, weights and edge topology
+ok 166 - rational spline hatch preserves native knots, controls, weights and edge topology
   ---
-  duration_ms: 2.61787
+  duration_ms: 7.82865
   type: 'test'
   ...
-# Subtest: gradient DXF data survives native export while preview limitation remains explicit
-ok 124 - gradient DXF data survives native export while preview limitation remains explicit
+# Subtest: gradient DXF data survives native export and supported LINEAR preview is exposed
+ok 167 - gradient DXF data survives native export and supported LINEAR preview is exposed
   ---
-  duration_ms: 0.393969
+  duration_ms: 1.546576
   type: 'test'
   ...
 # Subtest: variable-width bulge polyline emits a filled ribbon and retains per-vertex widths
-ok 125 - variable-width bulge polyline emits a filled ribbon and retains per-vertex widths
+ok 168 - variable-width bulge polyline emits a filled ribbon and retains per-vertex widths
   ---
-  duration_ms: 0.394269
+  duration_ms: 0.374519
   type: 'test'
   ...
 # Subtest: 3D POLYLINE retains Z, vertex ordering, native record type, and closure
-ok 126 - 3D POLYLINE retains Z, vertex ordering, native record type, and closure
+ok 169 - 3D POLYLINE retains Z, vertex ordering, native record type, and closure
   ---
-  duration_ms: 0.296476
+  duration_ms: 0.299439
   type: 'test'
   ...
 # Subtest: polyface and polygon meshes remain native and render indexed edges
-ok 127 - polyface and polygon meshes remain native and render indexed edges
+ok 170 - polyface and polygon meshes remain native and render indexed edges
   ---
-  duration_ms: 0.564449
+  duration_ms: 0.554405
   type: 'test'
   ...
 # Subtest: 3DFACE uses native vertex order and respects hidden edge bitmask
-ok 128 - 3DFACE uses native vertex order and respects hidden edge bitmask
+ok 171 - 3DFACE uses native vertex order and respects hidden edge bitmask
   ---
-  duration_ms: 0.374041
+  duration_ms: 0.372455
   type: 'test'
   ...
 # Subtest: WCS ellipse minor axis respects reversed extrusion normal
-ok 129 - WCS ellipse minor axis respects reversed extrusion normal
+ok 172 - WCS ellipse minor axis respects reversed extrusion normal
   ---
-  duration_ms: 0.238417
+  duration_ms: 0.239517
   type: 'test'
   ...
 # Subtest: OCS arbitrary-axis basis normalizes vectors and includes projected elevation
-ok 130 - OCS arbitrary-axis basis normalizes vectors and includes projected elevation
+ok 173 - OCS arbitrary-axis basis normalizes vectors and includes projected elevation
   ---
-  duration_ms: 0.276408
+  duration_ms: 0.953867
   type: 'test'
   ...
 # Subtest: dragging reflected OCS entities follows the world-space pointer delta
-ok 131 - dragging reflected OCS entities follows the world-space pointer delta
+ok 174 - dragging reflected OCS entities follows the world-space pointer delta
   ---
-  duration_ms: 0.515517
+  duration_ms: 0.631408
   type: 'test'
   ...
 # Subtest: edge-on plane edits reject atomically instead of moving in the wrong coordinate frame
-ok 132 - edge-on plane edits reject atomically instead of moving in the wrong coordinate frame
+ok 175 - edge-on plane edits reject atomically instead of moving in the wrong coordinate frame
   ---
-  duration_ms: 0.228488
+  duration_ms: 0.255627
   type: 'test'
   ...
 # Subtest: MTEXT attachment 1 retains wrapping box, rotation and placement
-ok 133 - MTEXT attachment 1 retains wrapping box, rotation and placement
+ok 176 - MTEXT attachment 1 retains wrapping box, rotation and placement
   ---
-  duration_ms: 1.10371
+  duration_ms: 1.366513
   type: 'test'
   ...
 # Subtest: MTEXT attachment 2 retains wrapping box, rotation and placement
-ok 134 - MTEXT attachment 2 retains wrapping box, rotation and placement
+ok 177 - MTEXT attachment 2 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.688712
+  duration_ms: 0.703563
   type: 'test'
   ...
 # Subtest: MTEXT attachment 3 retains wrapping box, rotation and placement
-ok 135 - MTEXT attachment 3 retains wrapping box, rotation and placement
+ok 178 - MTEXT attachment 3 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.498094
+  duration_ms: 0.513288
   type: 'test'
   ...
 # Subtest: MTEXT attachment 4 retains wrapping box, rotation and placement
-ok 136 - MTEXT attachment 4 retains wrapping box, rotation and placement
+ok 179 - MTEXT attachment 4 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.499497
+  duration_ms: 1.787346
   type: 'test'
   ...
 # Subtest: MTEXT attachment 5 retains wrapping box, rotation and placement
-ok 137 - MTEXT attachment 5 retains wrapping box, rotation and placement
+ok 180 - MTEXT attachment 5 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.536917
+  duration_ms: 0.269293
   type: 'test'
   ...
 # Subtest: MTEXT attachment 6 retains wrapping box, rotation and placement
-ok 138 - MTEXT attachment 6 retains wrapping box, rotation and placement
+ok 181 - MTEXT attachment 6 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.583043
+  duration_ms: 0.314657
   type: 'test'
   ...
 # Subtest: MTEXT attachment 7 retains wrapping box, rotation and placement
-ok 139 - MTEXT attachment 7 retains wrapping box, rotation and placement
+ok 182 - MTEXT attachment 7 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.60277
+  duration_ms: 0.389717
   type: 'test'
   ...
 # Subtest: MTEXT attachment 8 retains wrapping box, rotation and placement
-ok 140 - MTEXT attachment 8 retains wrapping box, rotation and placement
+ok 183 - MTEXT attachment 8 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.505037
+  duration_ms: 0.334925
   type: 'test'
   ...
 # Subtest: MTEXT attachment 9 retains wrapping box, rotation and placement
-ok 141 - MTEXT attachment 9 retains wrapping box, rotation and placement
+ok 184 - MTEXT attachment 9 retains wrapping box, rotation and placement
   ---
-  duration_ms: 0.364433
+  duration_ms: 0.372115
   type: 'test'
   ...
 # Subtest: MTEXT background truecolor does not overwrite foreground ACI
-ok 142 - MTEXT background truecolor does not overwrite foreground ACI
+ok 185 - MTEXT background truecolor does not overwrite foreground ACI
   ---
-  duration_ms: 0.433693
+  duration_ms: 0.395619
   type: 'test'
   ...
 # Subtest: MTEXT formatter scopes styles, decodes escapes, and wraps long unbroken identifiers
-ok 143 - MTEXT formatter scopes styles, decodes escapes, and wraps long unbroken identifiers
+ok 186 - MTEXT formatter scopes styles, decodes escapes, and wraps long unbroken identifiers
   ---
-  duration_ms: 0.457258
+  duration_ms: 0.478473
   type: 'test'
   ...
 # Subtest: TEXT second alignment point, width factor, and style survive the native writer
-ok 144 - TEXT second alignment point, width factor, and style survive the native writer
+ok 187 - TEXT second alignment point, width factor, and style survive the native writer
   ---
-  duration_ms: 0.979066
+  duration_ms: 0.968126
   type: 'test'
   ...
 # Subtest: signed linetypes preserve leading gaps and dots with global/entity scale
-ok 145 - signed linetypes preserve leading gaps and dots with global/entity scale
+ok 188 - signed linetypes preserve leading gaps and dots with global/entity scale
   ---
-  duration_ms: 0.312085
+  duration_ms: 0.279902
   type: 'test'
   ...
 # Subtest: DXF transparency remains native rather than a synthetic hatch alpha
-ok 146 - DXF transparency remains native rather than a synthetic hatch alpha
+ok 189 - DXF transparency remains native rather than a synthetic hatch alpha
   ---
-  duration_ms: 0.398598
+  duration_ms: 0.380379
   type: 'test'
   ...
 # Subtest: rays and construction lines clip parametrically to the current view
-ok 147 - rays and construction lines clip parametrically to the current view
+ok 190 - rays and construction lines clip parametrically to the current view
   ---
-  duration_ms: 0.310442
+  duration_ms: 0.32676
   type: 'test'
   ...
 # Subtest: native leader keeps vertices and adds its arrow at the first vertex
-ok 148 - native leader keeps vertices and adds its arrow at the first vertex
+ok 191 - native leader keeps vertices and adds its arrow at the first vertex
   ---
-  duration_ms: 0.458951
+  duration_ms: 0.426606
   type: 'test'
   ...
 # Subtest: native hatch similarity transformation updates analytic edges and pattern definitions
-ok 149 - native hatch similarity transformation updates analytic edges and pattern definitions
+ok 192 - native hatch similarity transformation updates analytic edges and pattern definitions
   ---
-  duration_ms: 1.362575
+  duration_ms: 1.419719
   type: 'test'
   ...
 # Subtest: SVG exchange retains compound hole contours, opacity, and masked text
-ok 150 - SVG exchange retains compound hole contours, opacity, and masked text
+ok 193 - SVG exchange retains compound hole contours, opacity, and masked text
   ---
-  duration_ms: 19.523535
+  duration_ms: 21.183864
   type: 'test'
   ...
 # Subtest: all 223 original symbol masters have connection ports on actual terminal geometry
-ok 151 - all 223 original symbol masters have connection ports on actual terminal geometry
+ok 194 - all 223 original symbol masters have connection ports on actual terminal geometry
   ---
-  duration_ms: 70.91262
+  duration_ms: 78.452719
   type: 'test'
   ...
 # Subtest: affine inverse and composition retain double precision
-ok 152 - affine inverse and composition retain double precision
+ok 195 - affine inverse and composition retain double precision
   ---
-  duration_ms: 4.813436
+  duration_ms: 1.915906
   type: 'test'
   ...
 # Subtest: singular transforms fail explicitly
-ok 153 - singular transforms fail explicitly
+ok 196 - singular transforms fail explicitly
   ---
-  duration_ms: 0.724088
+  duration_ms: 0.72862
   type: 'test'
   ...
 # Subtest: zoom-independent segment projection clamps endpoints
-ok 154 - zoom-independent segment projection clamps endpoints
+ok 197 - zoom-independent segment projection clamps endpoints
   ---
-  duration_ms: 0.433353
+  duration_ms: 0.435933
   type: 'test'
   ...
 # Subtest: segment intersection and infinite-line extension
-ok 155 - segment intersection and infinite-line extension
+ok 198 - segment intersection and infinite-line extension
   ---
-  duration_ms: 0.361197
+  duration_ms: 0.337379
   type: 'test'
   ...
 # Subtest: parallel and degenerate lines do not produce NaNs
-ok 156 - parallel and degenerate lines do not produce NaNs
+ok 199 - parallel and degenerate lines do not produce NaNs
   ---
-  duration_ms: 1.043417
+  duration_ms: 0.245728
   type: 'test'
   ...
 # Subtest: box intersection checks crossing, contained and distant segments
-ok 157 - box intersection checks crossing, contained and distant segments
+ok 200 - box intersection checks crossing, contained and distant segments
   ---
-  duration_ms: 0.370725
+  duration_ms: 0.386421
   type: 'test'
   ...
 # Subtest: polygon area and inclusive edge containment
-ok 158 - polygon area and inclusive edge containment
+ok 201 - polygon area and inclusive edge containment
   ---
-  duration_ms: 0.617659
+  duration_ms: 0.615609
   type: 'test'
   ...
 # Subtest: orthogonal simplification removes duplicates but keeps reversal
-ok 159 - orthogonal simplification removes duplicates but keeps reversal
+ok 202 - orthogonal simplification removes duplicates but keeps reversal
   ---
-  duration_ms: 5.172431
+  duration_ms: 1.101876
   type: 'test'
   ...
 # Subtest: arc tessellation follows adaptive chord error budget
-ok 160 - arc tessellation follows adaptive chord error budget
+ok 203 - arc tessellation follows adaptive chord error budget
   ---
-  duration_ms: 0.964679
+  duration_ms: 2.618427
   type: 'test'
   ...
 # Subtest: positive and negative bulges interpolate intended semicircles
-ok 161 - positive and negative bulges interpolate intended semicircles
+ok 204 - positive and negative bulges interpolate intended semicircles
   ---
-  duration_ms: 3.326658
+  duration_ms: 0.988385
   type: 'test'
   ...
 # Subtest: rational quadratic NURBS quarter circle
-ok 162 - rational quadratic NURBS quarter circle
+ok 205 - rational quadratic NURBS quarter circle
   ---
-  duration_ms: 1.29022
+  duration_ms: 1.878997
   type: 'test'
   ...
 # Subtest: spline evaluation rejects malformed explicit knot vectors
-ok 163 - spline evaluation rejects malformed explicit knot vectors
+ok 206 - spline evaluation rejects malformed explicit knot vectors
   ---
-  duration_ms: 0.154731
+  duration_ms: 0.226402
   type: 'test'
   ...
 # Subtest: open and closed offsets and tangent fillet
-ok 164 - open and closed offsets and tangent fillet
+ok 207 - open and closed offsets and tangent fillet
   ---
-  duration_ms: 0.489879
+  duration_ms: 0.711287
   type: 'test'
   ...
 # Subtest: circle quadrant snaps are exactly cardinal, arc snaps are restricted
-ok 165 - circle quadrant snaps are exactly cardinal, arc snaps are restricted
+ok 208 - circle quadrant snaps are exactly cardinal, arc snaps are restricted
   ---
-  duration_ms: 0.834357
+  duration_ms: 0.511294
   type: 'test'
   ...
 # Subtest: closed polyline provides closing-segment midpoint snap
-ok 166 - closed polyline provides closing-segment midpoint snap
+ok 209 - closed polyline provides closing-segment midpoint snap
   ---
-  duration_ms: 0.284844
+  duration_ms: 0.257631
   type: 'test'
   ...
 # Subtest: incremental entity update retains buffer identity and leaves unrelated geometry unchanged
-ok 167 - incremental entity update retains buffer identity and leaves unrelated geometry unchanged
+ok 210 - incremental entity update retains buffer identity and leaves unrelated geometry unchanged
   ---
-  duration_ms: 213.33
+  duration_ms: 262.219201
   type: 'test'
   ...
 # Subtest: incremental update switches to rebuild atomically when topology changes
-ok 168 - incremental update switches to rebuild atomically when topology changes
+ok 211 - incremental update switches to rebuild atomically when topology changes
   ---
-  duration_ms: 1.125009
+  duration_ms: 0.817526
   type: 'test'
   ...
 # Subtest: incremental update relocates BVH hits after moving beyond previous scene bounds
-ok 169 - incremental update relocates BVH hits after moving beyond previous scene bounds
+ok 212 - incremental update relocates BVH hits after moving beyond previous scene bounds
   ---
-  duration_ms: 0.550242
+  duration_ms: 0.39136
   type: 'test'
   ...
 # Subtest: 223 masters are audited with explicit standard provenance and distinct family categories
-ok 170 - 223 masters are audited with explicit standard provenance and distinct family categories
+ok 213 - 223 masters are audited with explicit standard provenance and distinct family categories
   ---
-  duration_ms: 42.771043
+  duration_ms: 44.12312
   type: 'test'
   ...
 # Subtest: all 64 legacy IDs, DXF block names and named terminals remain available
-ok 171 - all 64 legacy IDs, DXF block names and named terminals remain available
+ok 214 - all 64 legacy IDs, DXF block names and named terminals remain available
   ---
-  duration_ms: 0.590187
+  duration_ms: 0.649272
   type: 'test'
   ...
 # Subtest: every original category grows and eight new categories have complete masters
-ok 172 - every original category grows and eight new categories have complete masters
+ok 215 - every original category grows and eight new categories have complete masters
   ---
-  duration_ms: 0.515877
+  duration_ms: 0.523568
   type: 'test'
   ...
 # Subtest: search supports family, category, aliases and multiword matching without hidden ISO labels
-ok 173 - search supports family, category, aliases and multiword matching without hidden ISO labels
+ok 216 - search supports family, category, aliases and multiword matching without hidden ISO labels
   ---
-  duration_ms: 5.046384
+  duration_ms: 4.040651
   type: 'test'
   ...
 # Subtest: liquid pump triangles are filled; gas compressor triangles are open
-ok 174 - liquid pump triangles are filled; gas compressor triangles are open
+ok 217 - liquid pump triangles are filled; gas compressor triangles are open
   ---
-  duration_ms: 0.258996
+  duration_ms: 0.3002
   type: 'test'
   ...
 # Subtest: flow document wave, inductor turns and vessel ends stay analytic in DXF
-ok 175 - flow document wave, inductor turns and vessel ends stay analytic in DXF
+ok 218 - flow document wave, inductor turns and vessel ends stay analytic in DXF
   ---
-  duration_ms: 210.814154
+  duration_ms: 216.930346
   type: 'test'
   ...
 # Subtest: panel-location dashes survive the catalogue preview without dashing the instrument body
-ok 176 - panel-location dashes survive the catalogue preview without dashing the instrument body
+ok 219 - panel-location dashes survive the catalogue preview without dashing the instrument body
   ---
-  duration_ms: 10.45084
+  duration_ms: 8.918314
   type: 'test'
   ...
 # Subtest: filled symbol components inherit instance colour rather than encoding BYBLOCK as an invalid SVG colour
-ok 177 - filled symbol components inherit instance colour rather than encoding BYBLOCK as an invalid SVG colour
+ok 220 - filled symbol components inherit instance colour rather than encoding BYBLOCK as an invalid SVG colour
   ---
-  duration_ms: 10.626018
+  duration_ms: 4.51168
   type: 'test'
   ...
 # Subtest: install and insert never overwrite existing custom or saved catalogue definitions
-ok 178 - install and insert never overwrite existing custom or saved catalogue definitions
+ok 221 - install and insert never overwrite existing custom or saved catalogue definitions
   ---
-  duration_ms: 8.565754
+  duration_ms: 4.692317
   type: 'test'
   ...
 # Subtest: explicit master migration validates all terminals before mutating any master
-ok 179 - explicit master migration validates all terminals before mutating any master
+ok 222 - explicit master migration validates all terminals before mutating any master
   ---
-  duration_ms: 17.890191
+  duration_ms: 11.15654
   type: 'test'
   ...
 # Subtest: explicit master migration supports one-step undo and preserves instance transforms and identity
-ok 180 - explicit master migration supports one-step undo and preserves instance transforms and identity
+ok 223 - explicit master migration supports one-step undo and preserves instance transforms and identity
   ---
-  duration_ms: 44.315337
+  duration_ms: 58.114656
   type: 'test'
   ...
 # Subtest: catalogue audit catches detached terminals and zero-length geometry
-ok 181 - catalogue audit catches detached terminals and zero-length geometry
+ok 224 - catalogue audit catches detached terminals and zero-length geometry
   ---
-  duration_ms: 0.519184
+  duration_ms: 0.719683
   type: 'test'
   ...
 # Subtest: all new category insertions create the correct category layer in a minimal imported document
-ok 182 - all new category insertions create the correct category layer in a minimal imported document
+ok 225 - all new category insertions create the correct category layer in a minimal imported document
   ---
-  duration_ms: 1.112676
+  duration_ms: 1.139576
   type: 'test'
   ...
 # Subtest: line style registry has unique identities and finite positive metrics
-ok 183 - line style registry has unique identities and finite positive metrics
+ok 226 - line style registry has unique identities and finite positive metrics
   ---
-  duration_ms: 0.297287
+  duration_ms: 0.496607
   type: 'test'
   ...
 # Subtest: pid starter: native blocks, attached connectors and independent identity survive DXF
-ok 184 - pid starter: native blocks, attached connectors and independent identity survive DXF
+ok 227 - pid starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 150.209373
+  duration_ms: 124.508862
   type: 'test'
   ...
 # Subtest: electrical starter: native blocks, attached connectors and independent identity survive DXF
-ok 185 - electrical starter: native blocks, attached connectors and independent identity survive DXF
+ok 228 - electrical starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 118.562875
+  duration_ms: 119.354274
   type: 'test'
   ...
 # Subtest: flow starter: native blocks, attached connectors and independent identity survive DXF
-ok 186 - flow starter: native blocks, attached connectors and independent identity survive DXF
+ok 229 - flow starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 84.694827
+  duration_ms: 107.590248
   type: 'test'
   ...
 # Subtest: water-treatment starter: native blocks, attached connectors and independent identity survive DXF
-ok 187 - water-treatment starter: native blocks, attached connectors and independent identity survive DXF
+ok 230 - water-treatment starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 112.778403
+  duration_ms: 108.41701
   type: 'test'
   ...
 # Subtest: chemical-batch starter: native blocks, attached connectors and independent identity survive DXF
-ok 188 - chemical-batch starter: native blocks, attached connectors and independent identity survive DXF
+ok 231 - chemical-batch starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 82.449518
+  duration_ms: 88.193193
   type: 'test'
   ...
 # Subtest: oil-gas starter: native blocks, attached connectors and independent identity survive DXF
-ok 189 - oil-gas starter: native blocks, attached connectors and independent identity survive DXF
+ok 232 - oil-gas starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 84.734622
+  duration_ms: 105.842035
   type: 'test'
   ...
 # Subtest: food-beverage starter: native blocks, attached connectors and independent identity survive DXF
-ok 190 - food-beverage starter: native blocks, attached connectors and independent identity survive DXF
+ok 233 - food-beverage starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 95.375488
+  duration_ms: 100.490271
   type: 'test'
   ...
 # Subtest: pharmaceutical starter: native blocks, attached connectors and independent identity survive DXF
-ok 191 - pharmaceutical starter: native blocks, attached connectors and independent identity survive DXF
+ok 234 - pharmaceutical starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 97.312991
+  duration_ms: 79.509483
   type: 'test'
   ...
 # Subtest: power-single-line starter: native blocks, attached connectors and independent identity survive DXF
-ok 192 - power-single-line starter: native blocks, attached connectors and independent identity survive DXF
+ok 235 - power-single-line starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 83.834441
+  duration_ms: 85.931108
   type: 'test'
   ...
 # Subtest: solar starter: native blocks, attached connectors and independent identity survive DXF
-ok 193 - solar starter: native blocks, attached connectors and independent identity survive DXF
+ok 236 - solar starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 97.583529
+  duration_ms: 77.861829
   type: 'test'
   ...
 # Subtest: hvac-air starter: native blocks, attached connectors and independent identity survive DXF
-ok 194 - hvac-air starter: native blocks, attached connectors and independent identity survive DXF
+ok 237 - hvac-air starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 99.084383
+  duration_ms: 81.460414
   type: 'test'
   ...
 # Subtest: hvac-hydronic starter: native blocks, attached connectors and independent identity survive DXF
-ok 195 - hvac-hydronic starter: native blocks, attached connectors and independent identity survive DXF
+ok 238 - hvac-hydronic starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 81.697558
+  duration_ms: 89.958402
   type: 'test'
   ...
 # Subtest: hydraulic-actuator starter: native blocks, attached connectors and independent identity survive DXF
-ok 196 - hydraulic-actuator starter: native blocks, attached connectors and independent identity survive DXF
+ok 239 - hydraulic-actuator starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 99.907447
+  duration_ms: 103.002727
   type: 'test'
   ...
 # Subtest: pneumatic-clamp starter: native blocks, attached connectors and independent identity survive DXF
-ok 197 - pneumatic-clamp starter: native blocks, attached connectors and independent identity survive DXF
+ok 240 - pneumatic-clamp starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 88.703204
+  duration_ms: 81.095343
   type: 'test'
   ...
 # Subtest: instrument-loop starter: native blocks, attached connectors and independent identity survive DXF
-ok 198 - instrument-loop starter: native blocks, attached connectors and independent identity survive DXF
+ok 241 - instrument-loop starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 79.446096
+  duration_ms: 78.739226
   type: 'test'
   ...
 # Subtest: automation-io starter: native blocks, attached connectors and independent identity survive DXF
-ok 199 - automation-io starter: native blocks, attached connectors and independent identity survive DXF
+ok 242 - automation-io starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 92.458697
+  duration_ms: 78.260393
   type: 'test'
   ...
 # Subtest: fire-alarm starter: native blocks, attached connectors and independent identity survive DXF
-ok 200 - fire-alarm starter: native blocks, attached connectors and independent identity survive DXF
+ok 243 - fire-alarm starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 91.217527
+  duration_ms: 94.652775
   type: 'test'
   ...
 # Subtest: network starter: native blocks, attached connectors and independent identity survive DXF
-ok 201 - network starter: native blocks, attached connectors and independent identity survive DXF
+ok 244 - network starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 77.557394
+  duration_ms: 83.027726
   type: 'test'
   ...
 # Subtest: plumbing starter: native blocks, attached connectors and independent identity survive DXF
-ok 202 - plumbing starter: native blocks, attached connectors and independent identity survive DXF
+ok 245 - plumbing starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 83.675626
+  duration_ms: 82.839578
   type: 'test'
   ...
 # Subtest: quality-workflow starter: native blocks, attached connectors and independent identity survive DXF
-ok 203 - quality-workflow starter: native blocks, attached connectors and independent identity survive DXF
+ok 246 - quality-workflow starter: native blocks, attached connectors and independent identity survive DXF
   ---
-  duration_ms: 94.298318
+  duration_ms: 78.299225
   type: 'test'
   ...
 # Subtest: all catalogue ellipses obey native DXF minor-to-major axis limits
-ok 204 - all catalogue ellipses obey native DXF minor-to-major axis limits
+ok 247 - all catalogue ellipses obey native DXF minor-to-major axis limits
   ---
-  duration_ms: 0.423323
+  duration_ms: 0.453777
   type: 'test'
   ...
 # Subtest: tall rupture-disc ellipse keeps its half-ellipse endpoints after axis normalization
-ok 205 - tall rupture-disc ellipse keeps its half-ellipse endpoints after axis normalization
+ok 248 - tall rupture-disc ellipse keeps its half-ellipse endpoints after axis normalization
   ---
-  duration_ms: 0.198122
+  duration_ms: 0.202938
   type: 'test'
   ...
 # Subtest: preview bounds include heat/cool and fire-damper functional marks above the body
-ok 206 - preview bounds include heat/cool and fire-damper functional marks above the body
+ok 249 - preview bounds include heat/cool and fire-damper functional marks above the body
   ---
-  duration_ms: 6.1375
+  duration_ms: 5.887407
   type: 'test'
   ...
-1..206
-# tests 206
+1..249
+# tests 249
 # suites 0
-# pass 206
+# pass 249
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 3300.224399
+# duration_ms 3545.546544

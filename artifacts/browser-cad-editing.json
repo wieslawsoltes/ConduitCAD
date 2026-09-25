@@ -1,0 +1,105 @@
+{
+  "checks": [
+    {
+      "name": "selected line creates a managed associated dimension",
+      "passed": true
+    },
+    {
+      "name": "dimension offset inspector updates picture immediately",
+      "passed": true
+    },
+    {
+      "name": "dimension text override is editable",
+      "passed": true
+    },
+    {
+      "name": "invalid dimension numeric edit rolls back",
+      "passed": true
+    },
+    {
+      "name": "source geometry change regenerates measurement",
+      "passed": true
+    },
+    {
+      "name": "undo restores associated dimension and source together",
+      "passed": true
+    },
+    {
+      "name": "mouse text grip sets manual text placement",
+      "passed": true
+    },
+    {
+      "name": "reset restores automatic text placement",
+      "passed": true
+    },
+    {
+      "name": "edited dimension binary download independently audits",
+      "passed": true
+    },
+    {
+      "name": "native DSTYLE carries updated dimension overrides",
+      "passed": true
+    },
+    {
+      "name": "dynamic sample exposes length and visibility controls",
+      "passed": true
+    },
+    {
+      "name": "dynamic inspector edits instance independently",
+      "passed": true
+    },
+    {
+      "name": "visibility state removes centerline from evaluated scene",
+      "passed": true
+    },
+    {
+      "name": "dynamic visibility is undoable",
+      "passed": true
+    },
+    {
+      "name": "dynamic linear grip updates block parameter",
+      "passed": true
+    },
+    {
+      "name": "dynamic binary download contains an evaluated native anonymous block",
+      "passed": true
+    },
+    {
+      "name": "LINEAR gradient displays distinct native color endpoints",
+      "passed": true
+    },
+    {
+      "name": "gradient hatch island remains transparent",
+      "passed": true
+    },
+    {
+      "name": "SVG uses a real linearGradient rather than flat-color fill",
+      "passed": true
+    },
+    {
+      "name": "rotated nonuniform block transform preserves gradient direction",
+      "passed": true
+    },
+    {
+      "name": "transformed gradient retains its island clip",
+      "passed": true
+    },
+    {
+      "name": "mobile property edit updates dynamic geometry",
+      "passed": true
+    },
+    {
+      "name": "mobile inspector avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser exceptions",
+      "passed": true
+    }
+  ],
+  "passed": 24,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "origin": "localhost"
+}

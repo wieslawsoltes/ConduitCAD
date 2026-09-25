@@ -1,4 +1,4 @@
-# DXF compatibility boundary — 0.3.0
+# DXF compatibility boundary — 0.4.0
 
 Recognizing a record, rendering its geometry and losslessly exporting all its
 semantics are different claims. This release is an expanded planar CAD editor,
@@ -42,16 +42,16 @@ Native Z data in supported records is retained during normalized exchange.
 | SPLINE | Rational control/knot evaluation and bounded adaptive subdivision | Native known spline data; not all fit-only semantics |
 | HATCH, solid | Polyline/bulge or line/arc/ellipse/rational-spline edges, clockwise/CCW paths; normal/outer/ignore island styles | Native HATCH boundaries and style |
 | HATCH, pattern | Signed dash/dot scanlines clipped against island topology with explicit density limits | Native pattern-line records, scale and angle metadata |
-| HATCH, gradient | Flat-color preview with warning, not a gradient shader | Native gradient tags retained |
+| HATCH, gradient | Unshifted two-explicit-color LINEAR gradients; other distributions use a warned flat preview | Native gradient tags retained |
 | TEXT | Second alignment point, fit/aligned, baseline/vertical placement, style width/oblique, generation flags, affine placement | Native known alignment and style data |
 | MTEXT | Nine attachments, measured wrapping, paragraphs, selected scoped formatting, browser fonts, background masks | Native text chunks, wrap width, direction, spacing, background data |
 | ATTRIB / ATTDEF | Tags and visibility; known text placement | Native attribute data |
-| BLOCK / INSERT | Nested reusable instances, base point, scales, rotation, bounded arrays and ports | Native blocks/inserts/attributes |
+| BLOCK / INSERT | Nested native instances plus Conduit declarative parameter/action evaluation, visibility and port updates | Native blocks/inserts/attributes |
 | SOLID / TRACE / 3DFACE | Correct corner order, projected fill/edges; 3DFACE hidden edges | Native known corners and visibility bits |
 | LEADER | Polyline and first-point arrow preview | Native vertices and known flags, not full dimension-style/annotation association |
 | RAY / XLINE | Bounded to current view rather than arbitrary huge endpoints | Native infinite-line records |
 | POINT | Cross marker | Native POINT |
-| DIMENSION | Native types 0–6 with flags, definition/text points, styles and existing anonymous pictures; authored aligned dimensions | Native DIMENSION and graphics BLOCK, not flattened; no general associative evaluator |
+| DIMENSION | Types 0–6; opt-in planar decimal regeneration, inspector and grips, authored line/radius point associations | Native DIMENSION, regenerated BLOCK, ACAD/DSTYLE overrides and app-specific associations; no generic vendor evaluator |
 | VIEWPORT | Top-view orthographic target/center/twist and scale; rectangular and supported closed curve/polygon clipping, frozen layers | Native viewport and remapped clipping/frozen-layer handles |
 | WIPEOUT | Ordered background masks from normalized image boundaries | Native WIPEOUT, not an external raster image |
 | MESH | Indexed wireframe; native Z, faces, edges, crease data and subdivision level retained | Native MESH; subdivision surfaces are not evaluated |
@@ -97,8 +97,11 @@ clipping and device-pixel GPU scissor bounds. This fixes application-canvas
 clipping. Paper-space VIEWPORT clipping and WIPEOUT masks are now implemented
 for the supported 2D cases. IMAGE resources and block XCLIP remain unsupported.
 Perspective, tilted and depth-clipped viewports show a diagnosed frame only.
-Existing native dimensions keep their block pictures: endpoint grips are disabled
-until a full regeneration engine can update those pictures safely. Clipped-viewport translation and explosion are rejected until their boundary
+Existing native dimensions retain their original pictures until **Enable dimension editing**
+is confirmed. The planar decimal evaluator then enables witness, dimension-line and
+text grips with transactional regeneration. Unsupported OCS/3D/oblique frames are
+refused; custom arrow shapes, tolerance layouts and annotative contexts are not
+reproduced by adoption. See CAD_EDITING.md for precise scope. Clipped-viewport translation and explosion are rejected until their boundary
 can be updated atomically. Translation of supported native geometry is distinct from associative regeneration.
 
 Curve explosion is a tessellating edit, not a lossless decomposition of rich
@@ -113,7 +116,7 @@ Three explicit contracts are exposed in the export dialog and API:
    objects and ownership. Unsupported fields and objects may be omitted. The
    report identifies known losses; strict mode refuses them. Handles are remapped,
    and supported viewport clip/frozen-layer references are updated. Unsupported
-   hatch associations and foreign application XDATA are detached rather than
+   hatch associations and unsupported foreign application XDATA are detached rather than
    left as dangling cross-document references.
 2. **Record-preserving** reads the original source tags and retains all original
    sections/records, ownership, classes, XDATA, binary chunks, field order and
@@ -145,11 +148,12 @@ systems are not expected to execute Conduit constraint/routing intelligence.
 ## Remaining semantic families
 
 Not implemented in this release: DWG; ACIS/SAT/SAB/B-rep solids and surface kernels;
-universal dynamic-block and associative evaluators; external XREF/IMAGE/underlay
+universal Autodesk dynamic-block and associative evaluators (the Conduit schema
+and authored dimension point associations are supported); external XREF/IMAGE/underlay
 resource resolution; full MTEXT/SHX/TTF/Bigfont parity; MLINE and all MLEADER/TABLE
 variants; complete plot settings/3D/perspective viewports; XCLIP; and arbitrary
-nested draw-order semantics. Gradient metadata is preserved but preview remains
-flat-color. Unknown records may be retained or inspected without having a drawing
+nested draw-order semantics. Only unshifted two-explicit-color LINEAR gradients are rendered; other gradient
+metadata is preserved with a warned flat preview. Unknown records may be retained or inspected without having a drawing
 or editing implementation. No claim of universal DXF or AutoCAD parity is made.
 
 See REFERENCES.md and the separate ezdxf-authored fixtures, native field audits,

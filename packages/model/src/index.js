@@ -1,3 +1,6 @@
+import { linearHatchGradient } from './gradients.js';
+import { dimensionPicture as buildDimensionPicture, editDimension as applyDimensionEdit, dimensionGrips as getDimensionGrips, regenerateDimensions as refreshDimensions } from './dimensions.js';
+import { validateDynamicDefinition, resolveDynamicValues, evaluateDynamicDefinition } from './dynamic.js';
 import { viewportTransform, viewportRectangle, wipeoutPoints, helixPoints } from './interop.js';
 import { ocsTransform, hatchRegionContours, hatchPatternSegments, widePolylineContours, signedDashPattern, layoutCadText } from './fidelity.js';
 import { matrix, compose, identity, transform, bounds, union, emptyBounds, arcPoints, tessellatePolyline, splinePoints, TAU, distance, lerp, add, mul, normalize, sub, validBounds } from '@conduitcad/geometry';
@@ -181,7 +184,7 @@ export function entityGeometry(e, doc, options = {}) {
         case 'HATCH': {
             const contours = hatchRegionContours(e, curveTolerance);
             if (e.solid || e.gradient) {
-                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd' });
+                if (contours.length) path(contours[0], true, style.color, { stroke: false, contours: contours.map(p => p.map(v => transform(v, m))), fillRule: 'evenodd', gradient: linearHatchGradient(e.gradient,contours,m) });
             } else {
                 const pattern = hatchPatternSegments(e, contours);
                 if (pattern.limited || !e.patternLines?.length) {
@@ -212,6 +215,16 @@ export function entityGeometry(e, doc, options = {}) {
             break;
         }
         case 'DIMENSION': {
+            if (e.dimension?.version === 1) {
+                try {
+                    const picture = buildDimensionPicture(e,doc);
+                    for (const child of picture.entities) {
+                        const g=entityGeometry(child,doc,{...options,matrix:m,depth:depth+1,parentStyle:style,parentLayer:layerFor(e,doc)});
+                        paths.push(...g.paths.map(p=>({...p,entityId:e.id})));texts.push(...g.texts.map(t=>({...t,entityId:e.id})));
+                    }
+                } catch(error) { warnings.push({entityId:e.id,message:error.message}); }
+                break;
+            }
             if (e.block && doc.blocks[e.block]) {
                 const g = entityGeometry({ ...e, type: 'INSERT', x: e.dimensionInsert?.x || 0, y: e.dimensionInsert?.y || 0, z: e.dimensionInsert?.z || 0 }, doc, { ...options, depth: depth + 1 });
                 for (const p of g.paths)
@@ -235,7 +248,7 @@ export function entityGeometry(e, doc, options = {}) {
             break;
         }
         case 'INSERT': {
-            const block = doc.blocks[e.block];
+            let block;try{block=effectiveBlock(e,doc);}catch(error){warnings.push({entityId:e.id,message:error.message});break;}
             if (!block)
                 break;
             const base = block.base || { x: 0, y: 0 }, rows = Math.min(1000, e.rows || 1), cols = Math.min(1000, e.columns || 1);
@@ -316,13 +329,14 @@ export function documentBounds(doc) {
 export function ports(e, doc) {
     if (e.type !== 'INSERT')
         return [];
-    const block = doc.blocks[e.block], base = block?.base || { x: 0, y: 0 };
+    const block = effectiveBlock(e,doc), base = block?.base || { x: 0, y: 0 };
     const m = compose(matrix(e), matrix({ x: -base.x, y: -base.y }));
     return (block?.ports || []).map(p => { const q = transform(p, m), v = transform({ x: p.x + (p.dx || 0), y: p.y + (p.dy || 0) }, m); return { ...p, ...q, dx: v.x - q.x, dy: v.y - q.y, entityId: e.id }; });
 }
 export function moveEntity(e, dx, dy) {
     if(e.type==='VIEWPORT'&&e.clipHandle)throw new Error('Moving a clipped viewport requires moving its boundary in the same transaction; no coordinates were changed.');
-    if(e.type==='DIMENSION'&&e.block)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.block&&e.dimension?.version!==1)throw new Error('Moving a dimension with a graphics block requires regeneration; no coordinates were changed.');
+    if(e.type==='DIMENSION'&&e.dimension?.version===1){delete e.block;delete e.dimension.references;}
     const worldDX = dx, worldDY = dy;
     if (e.extrusion && ['CIRCLE','ARC','LWPOLYLINE','POLYLINE','TEXT','ATTRIB','ATTDEF','SOLID','TRACE','HATCH','INSERT'].includes(e.type) && !(e.type === 'POLYLINE' && (e.flags & (8|16|64)))) {
         const m = ocsTransform(e.extrusion, 0), det = m[0]*m[3]-m[1]*m[2];
@@ -358,7 +372,7 @@ export function moveEntity(e, dx, dy) {
     e.dirty = true;
 }
 export function transformEntity(e, m) {
-    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
+    if(['VIEWPORT','HELIX','WIPEOUT'].includes(e.type)||(e.type==='DIMENSION'&&e.block&&e.dimension?.version!==1))throw new Error('This native entity requires a specialized transform; no coordinates were changed.');
     const sx = Math.hypot(m[0], m[1]), sy = Math.hypot(m[2], m[3]), determinant = m[0]*m[3]-m[1]*m[2];
     if (!m.every(Number.isFinite) || sx < 1e-12 || sy < 1e-12) throw new Error('Singular or nonfinite CAD transform.');
     if (e.extrusion && (Math.abs(e.extrusion.x || 0) > 1e-9 || Math.abs(e.extrusion.y || 0) > 1e-9 || e.extrusion.z < 0))
@@ -366,6 +380,15 @@ export function transformEntity(e, m) {
     if (['HATCH','CIRCLE','ARC','INSERT'].includes(e.type) && (Math.abs(sx-sy) > 1e-8*Math.max(sx,sy) || Math.abs(m[0]*m[2]+m[1]*m[3]) > 1e-8*sx*sy))
         throw new Error('This entity requires a similarity transform; nonuniform scale would change its native type.');
     if (e.type === 'HATCH' && determinant < 0) throw new Error('Mirroring native hatch edge paths is not supported; coordinates were not modified.');
+    if(e.type==='DIMENSION' && e.dimension?.version===1) {
+        if(determinant<=0||Math.abs(sx-sy)>1e-8*Math.max(sx,sy)||Math.abs(m[0]*m[2]+m[1]*m[3])>1e-8*sx*sy)throw new Error('Dimensions require an orientation-preserving similarity transform');
+        for(const k of ['a','b','definitionPoint','defpoint4','defpoint5','textMidpoint'])if(e[k])Object.assign(e[k],transform(e[k],m));
+        if(e.offset!==undefined)e.offset*=sx;
+        if(((e.dimtype??33)&15)===0)e.dimensionAngle=(e.dimensionAngle||0)+Math.atan2(m[1],m[0])*180/Math.PI;
+        if(e.textRotation!==undefined)e.textRotation+=Math.atan2(m[1],m[0])*180/Math.PI;
+        e.dimension.style={...e.dimension.style,dimscale:(e.dimension.style?.dimscale??e.dimension.resolvedScale??e.dimstyleOverrides?.dimscale??1)*sx};
+        delete e.block;delete e.dimension.references;e.dirty=true;return;
+    }
     const vector = p => ({x:m[0]*p.x+m[2]*p.y,y:m[1]*p.x+m[3]*p.y});
     if (e.direction) Object.assign(e.direction, vector(e.direction));
     if (e.major) Object.assign(e.major, vector(e.major));
@@ -380,6 +403,7 @@ export function transformEntity(e, m) {
         Object.assign(definition.base, transform(definition.base, m)); Object.assign(definition.offset, vector(definition.offset));
         definition.angle += Math.atan2(m[1],m[0]); definition.dashes = (definition.dashes || []).map(v=>v*sx);
     }
+    if(e.type==='HATCH' && e.gradient){const rotation=Math.atan2(m[1],m[0]);const angle=e.gradient.find(p=>p[0]===460);if(angle)angle[1]+=rotation;else e.gradient.push([460,rotation]);}
     if (e.type === 'HATCH') { e.patternScale = (e.patternScale || 1)*sx; e.patternAngle = (e.patternAngle || 0) + Math.atan2(m[1],m[0])*180/Math.PI; }
     for (const p of e.points || []) { if (p.bulge && determinant < 0) p.bulge *= -1; for (const k of ['startWidth','endWidth']) if (p[k]) p[k] *= sx; }
     for (const k of ['constantWidth','startWidth','endWidth','mtextWidth']) if (e[k]) e[k] *= sx;
@@ -417,9 +441,10 @@ export function transformEntity(e, m) {
         e.rotation = (e.rotation || 0) + rot;
     e.dirty = true;
 }
-export function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
+export function explodeEntity(e, doc) { if (e.type === 'VIEWPORT') throw new Error('A clipped viewport cannot be exploded without clipping its native geometry'); const g = entityGeometry(e, doc, { tolerance: .05 }); if(g.paths.some(p=>p.gradient))throw new Error('Gradient hatch explosion requires retaining native fill semantics'); return [...g.paths.map(p => polyline(p.points, p.closed, { layer: e.layer, color: p.color, width: p.width, dash: p.dash, fill: p.fill })), ...g.texts.map(t => text(t.p, t.text, t.height, { layer: e.layer, color: t.color, rotation: t.rotation, align: t.align }))]; }
 export function detachReferences(doc, deleted) {
     for (const e of doc.entities) {
+        if(e.dimension?.references)for(const [key,ref]of Object.entries(e.dimension.references))if(deleted.has(ref.entityId))delete e.dimension.references[key];
         const c = e.connector;
         if (!c)
             continue;
@@ -428,4 +453,56 @@ export function detachReferences(doc, deleted) {
                 c[end] = null;
     }
     doc.constraints = doc.constraints.filter(c => !(c.entities || [c.entityId]).some(id => deleted.has(id)));
+}
+
+// Reusable editing/evaluation APIs. Cyclic module imports are intentionally avoided.
+export function dimensionPicture(e,doc) { return buildDimensionPicture(e,doc); }
+export function editDimension(e,doc,patch) { return applyDimensionEdit(e,doc,patch); }
+export function dimensionGrips(e,doc) { return getDimensionGrips(e,doc); }
+export function regenerateDimensions(doc) { return refreshDimensions(doc); }
+export function validateDynamicBlock(block) { return validateDynamicDefinition(block); }
+export function dynamicValues(block,values={}) { return resolveDynamicValues(block,values); }
+export function evaluateDynamicBlock(block,values={},options={}) { return evaluateDynamicDefinition(block,values,transformEntity,options); }
+export function setDynamicParameters(e,doc,patch) {
+    if(e.type!=='INSERT'||!doc.blocks[e.block]?.dynamic)throw new Error('Select a Conduit parameterized block');
+    const values={...e.dynamicParameters,...patch};
+    const evaluated=evaluateDynamicBlock(doc.blocks[e.block],values);
+    e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
+}
+const dynamicCache=new WeakMap();
+function effectiveBlock(e,doc) {
+    const block=doc.blocks[e.block];if(!block?.dynamic)return block;
+    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base]);
+    let cache=dynamicCache.get(block);
+    if(!cache||cache.signature!==signature){cache={signature,values:new Map()};dynamicCache.set(block,cache);}
+    const key=JSON.stringify(e.dynamicParameters||{});
+    if(!cache.values.has(key)){
+        const evaluated=evaluateDynamicBlock(block,e.dynamicParameters||{});
+        if(cache.values.size>=64)cache.values.delete(cache.values.keys().next().value);
+        cache.values.set(key,evaluated);
+    }
+    return cache.values.get(key);
+}
+
+export function dynamicParameterGrips(e,doc) {
+    const b=doc.blocks[e.block];if(!b?.dynamic)return [];
+    const values=dynamicValues(b,e.dynamicParameters||{}),m=compose(matrix(e),matrix({x:-(b.base?.x||0),y:-(b.base?.y||0)}));
+    return b.dynamic.parameters.filter(p=>p.grip&&['distance','number','angle'].includes(p.type)).map(p=>{
+        const g=p.grip,base=g.base||{x:0,y:0},d=g.direction||{x:1,y:0},v=values[p.name];
+        const q=p.type==='angle'?{x:base.x+Math.cos(v*Math.PI/180)*(g.radius||40),y:base.y+Math.sin(v*Math.PI/180)*(g.radius||40)}:{x:base.x+d.x*v,y:base.y+d.y*v};
+        return {...transform(q,m),key:'dyn:'+p.name};
+    });
+}
+export function dynamicGripValue(e,doc,name,world) {
+    const b=doc.blocks[e.block],p=b?.dynamic?.parameters.find(p=>p.name===name),g=p?.grip;
+    if(!g)throw new Error('Missing dynamic parameter grip');
+    const m=compose(matrix(e),matrix({x:-(b.base?.x||0),y:-(b.base?.y||0)})),det=m[0]*m[3]-m[1]*m[2];
+    if(Math.abs(det)<1e-12)throw new Error('Singular block transform');
+    const dx=world.x-m[4],dy=world.y-m[5],q={x:(m[3]*dx-m[2]*dy)/det,y:(-m[1]*dx+m[0]*dy)/det};
+    const base=g.base||{x:0,y:0},d=g.direction||{x:1,y:0},length=d.x*d.x+d.y*d.y;
+    if(length<1e-12)throw new Error('Invalid grip direction');
+    let value=p.type==='angle'?Math.atan2(q.y-base.y,q.x-base.x)*180/Math.PI:((q.x-base.x)*d.x+(q.y-base.y)*d.y)/length;
+    value=Math.max(p.min??-Infinity,Math.min(p.max??Infinity,value));
+    if(p.values?.length)value=p.values.reduce((a,b)=>Math.abs(b-value)<Math.abs(a-value)?b:a);
+    return value;
 }
