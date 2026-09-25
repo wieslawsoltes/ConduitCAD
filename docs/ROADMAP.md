@@ -9,6 +9,14 @@ regression tests, verify actual mobile/pen behavior, storage quota recovery,
 service-worker/offline flows and downloaded exchange files. Expand the independent
 DXF corpus beyond self-generated examples. Fuzz parser and project-model inputs.
 
+## Delivered 0.5.0 boundary
+
+Graphical shared block editing, live nested updates, attributes, constraint-based
+variants, derived expressions, analytic QR solving, rank/DOF and calculated
+annotations are implemented. Continue with wider graphical action/lookup/state
+editing, implicit spline/ellipse and 3D relations, larger sparse connected
+components, stronger conflict localization and comparative robustness tests.
+
 ## Delivered 0.4.0 boundary
 
 Planar decimal dimension editing/regeneration, authored line/radius references,
@@ -38,8 +46,8 @@ and measured hardware frame budgets. Retain numerical accuracy and diagnostics.
 
 Add connector crossing/line-jump handling, shared trunks, junction connectivity,
 port classes/capacities, bus wiring, typed equipment properties, validated project
-libraries and configurable symbol standards. Extend the solver with structural
-rank/DOF reports, persistent constraint glyphs and larger sparse sketches. Add
+libraries and configurable symbol standards. Extend current local rank/DOF reports and authoring labels toward stronger
+conflict localization, document-level constraint layouts and larger sparse sketches. Add
 robust polygon Boolean/topological operations and non-destructive feature history.
 
 ## Product UX and reusable UI

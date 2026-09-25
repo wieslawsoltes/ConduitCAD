@@ -1,10 +1,10 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.4.0.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.5.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar
-geometry kernel, parameter expressions and a small-sketch constraint solver.
+geometry kernel, parameter expressions and an analytic planar constraint solver.
 WebGPU strokes and compute culling are implemented, with WebGL2 and Canvas 2D
 fallbacks. The application is built from 13 independently packaged ES modules.
 
@@ -13,6 +13,19 @@ or certified engineering-system parity**. Read [the exact compatibility
 boundary](docs/DXF_COMPATIBILITY.md) before importing production drawings.
 
 ![Desktop workbench](artifacts/desktop-canvas.png)
+
+## Shared block editing and parametric authoring
+
+Version 0.5.0 adds an isolated graphical block editor, shared/nested insert updates,
+attribute synchronization, constraint-based block variants, polar actions,
+analytic-Jacobian damped QR solving, local rank/DOF diagnostics, named driving
+expressions and calculated native annotations. See [Parametric authoring](docs/PARAMETRIC_AUTHORING.md)
+for the implemented workflows, reusable APIs and exact numerical/interchange limits.
+
+Select an insert → **Edit block geometry**. Save updates all its occurrences.
+Use **More → Block definitions** to create/insert/edit definitions. **Parameters &
+actions** authors behavior on selected geometry; **Constrain selection** links
+geometry to named values. **Test block** exercises a private scratch instance.
 
 ## Native DXF interchange update
 
@@ -94,12 +107,13 @@ and layer panels, keyboard shortcuts, crossing/window selection, and command pal
 | CAD drafting | Lines, polylines, rectangles, circles, text, aligned visible dimensions; selection, move, rotate, copy/paste, duplicate, delete, grip editing and bounded undo/redo |
 | Precision | Grid, endpoint, midpoint, center, quadrant, insertion, port and line-intersection snapping; orthographic constraint; numeric commands |
 | Geometry kernel | Double-precision affine geometry, intersections, projections, bulge arcs, adaptive curve tessellation, rational NURBS evaluation, polyline offsets and two-line fillets |
-| Parametrics | Safe arithmetic expressions and named dependencies; authored radius, line length and rectangle dimensions; small-sketch numerical constraints with conflict rollback |
+| Parametrics | Safe arithmetic expressions and named dependencies; authored radius, line length and rectangle dimensions; analytic component-partitioned constraints, rank/DOF diagnostics, named driving/reference dimensions, calculated annotations and atomic rollback |
+| Blocks | Graphical isolated editor, save/test/save-as, shared and nested reference updates, attribute synchronization, six parameter types, ten action types and constraint-based instances |
 | Symbols | 223 original editable block masters in 11 categories; 21 line/connection styles; safe explicit migration; custom blocks from selected geometry |
 | Connections | Named ports, obstacle-aware orthogonal A*, port leads, bend penalties, explicit waypoints, live rerouting, directed graph export |
 | Drawing management | Visible/locked/color layers, active layer and basic layout filtering, local autosave/recovery and portable native project files |
 | QA | Duplicate tags, missing blocks, zero-length lines, bad radii, free/missing connector endpoints, blocked routes, import-fidelity diagnostics |
-| Exchanges | ASCII/binary DXF import; normalized ASCII DXF R2000–R2018 export; native JSON, SVG, PNG, equipment CSV and graph JSON; original DXF download |
+| Exchanges | ASCII/binary DXF import; normalized ASCII/binary DXF R2000–R2018 export; native JSON, SVG, PNG, equipment CSV and graph JSON; original DXF download |
 | Rendering | Batched WebGPU strokes and compute culling, indirect draws, retained geometry, camera-relative Float32 uploads, adaptive tessellation, incremental same-topology edits; WebGL2 and Canvas fallbacks |
 
 The default symbols are illustrative engineering symbols, not an ISA/IEC/ISO

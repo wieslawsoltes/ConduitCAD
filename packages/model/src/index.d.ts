@@ -1,3 +1,4 @@
+import type { SolveReport } from '@conduitcad/constraints';
 import type { Point, Bounds, Matrix2D } from '@conduitcad/geometry';
 export type Parameters = Record<string, number | string>;
 export interface Layer {
@@ -265,7 +266,7 @@ export interface WipeoutEntity extends CadEntity {
 export type DynamicValue = number | string | boolean;
 export interface DynamicGrip { base?: Point; direction?: Point; radius?: number; }
 export type DynamicParameter =
-    | {name: string; label?: string; type: 'number' | 'distance' | 'angle' | 'integer'; default: number; min?: number; max?: number; values?: number[]; grip?: DynamicGrip}
+    | {name: string; label?: string; type: 'number' | 'distance' | 'angle' | 'integer'; default: number; min?: number; max?: number; values?: number[]; grip?: DynamicGrip; expression?: string}
     | {name: string; label?: string; type: 'boolean'; default: boolean}
     | {name: string; label?: string; type: 'enum'; default: string | number; values: Array<string | number>};
 export type DynamicAction = {parameter: string; entities?: string[]; ports?: string[]} & (
@@ -274,12 +275,14 @@ export type DynamicAction = {parameter: string; entities?: string[]; ports?: str
     | {type: 'rotate' | 'scale'; base?: Point}
     | {type: 'flip'; base?: Point; direction?: Point}
     | {type: 'array'; step?: Point}
+    | {type: 'polar'; angle?: number; angleParameter?: string}
+    | {type: 'polar-array'; base?: Point; angle?: number; angleParameter?: string}
     | {type: 'visibility'; states: Record<string, string[]>}
     | {type: 'lookup'; rows: Record<string, Record<string, DynamicValue>>}
 );
-export interface DynamicDefinition {version: 1; parameters: DynamicParameter[]; actions: DynamicAction[];}
+export interface DynamicDefinition {version: 1 | 2; parameters: DynamicParameter[]; actions: DynamicAction[]; constraints?: Constraint[];}
 export interface Block {dynamic?: DynamicDefinition; dynamicInstance?: {master: string; values: Record<string, DynamicValue>};}
-export interface EvaluatedBlock extends Block {dynamicValues: Record<string, DynamicValue>;}
+export interface EvaluatedBlock extends Block {solveReport?: SolveReport; dynamicValues: Record<string, DynamicValue>;}
 export interface CadEntity {dynamicParameters?: Record<string, DynamicValue>; dynamicSource?: string; dimension?: DimensionState;}
 export function validateDynamicBlock(block: Block): Block;
 export function dynamicValues(block: Block, values?: Record<string, DynamicValue>): Record<string, DynamicValue>;
@@ -321,3 +324,27 @@ export function dimensionGrips(dimension: CadEntity, document: Pick<CadDocument,
 export function regenerateDimensions(document: CadDocument): string[];
 export interface LinearGradientPaint {kind: 'linear'; start: Point; end: Point; frame: Matrix2D; colors: [string, string];}
 export interface RenderPath {gradient?: LinearGradientPaint | null;}
+
+export interface Port {anchor?: {entityId: string; point: string; followDirection?: boolean; reverse?: boolean};}
+export interface Block {parameters?: Parameters; constraints?: Constraint[]; revision?: number; flags?: number;}
+export interface Calculation {version?: 1; expression: string; precision?: number; prefix?: string; suffix?: string; value?: number;}
+export interface CadEntity {calculation?: Calculation;}
+export interface BlockReferenceReport {name: string; direct: string[]; inserts: string[]; nested: Array<{owner: string; entityId: string}>; definitions: string[];}
+export interface BlockEditSession {name: string; signature: string; draft: CadDocument & {blockEditing: {name: string; base: Point; ports: Port[]; dynamic: DynamicDefinition | null}}; referenceInfo: BlockReferenceReport;}
+export interface BlockUpdateOptions {expectedSignature?: string; attributes?: boolean;}
+export interface BlockUpdateReport extends BlockReferenceReport {revision: number; updatedInserts: number; attributesSynchronized: boolean;}
+export function blockDefinitionSignature(block: Block): string;
+export function inspectBlockReferences(document: CadDocument, name: string): BlockReferenceReport;
+/** Isolated full-document draft for shared native block editing. */
+export function beginBlockEdit(document: CadDocument, name: string): BlockEditSession;
+export function editedBlockDefinition(session: BlockEditSession): Block;
+/** Pure preparation: validates all affected variants before returning a replacement database. */
+export function prepareBlockUpdate(document: CadDocument, name: string, block: Block, options?: BlockUpdateOptions): {document: CadDocument; report: BlockUpdateReport};
+/** Atomically replaces the database after validation; hosts wrap history/routing/render invalidation. */
+export function updateBlockDefinition(document: CadDocument, name: string, block: Block, options?: BlockUpdateOptions): BlockUpdateReport;
+export function renameBlockDefinition(document: CadDocument, oldName: string, newName: string): void;
+export function duplicateBlockDefinition(document: CadDocument, name: string, newName: string): void;
+
+export function createBlockDefinition(document: CadDocument, name: string, definition?: Partial<Block>): void;
+export function deleteBlockDefinition(document: CadDocument, name: string): void;
+export function syncInsertAttributes(instance: CadEntity, document: CadDocument): CadEntity[];

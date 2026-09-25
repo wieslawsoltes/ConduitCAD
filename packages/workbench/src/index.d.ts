@@ -1,6 +1,9 @@
 export function symbolSVG(block: any, doc: any, extra?: string): string;
 export function mountWorkbench(element: any, options?: {}): Workbench;
 export class Workbench {
+    beginBlockEdit(name: string): void;
+    saveBlockEdit(close?: boolean): import("@conduitcad/model").BlockUpdateReport | null;
+    cancelBlockEdit(): void;
     constructor(root: any, options?: {});
     root: any;
     options: {};

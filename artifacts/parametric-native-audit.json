@@ -1,0 +1,250 @@
+{
+  "checks": [
+    {
+      "name": "ascii/editable: zero native audit errors and repairs",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: shared definition edit preserves native endpoint",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: shared references are not exploded",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: per-instance user values survive synchronization",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: native ATTDEF tag and prompt retained",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: preset flag retained",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: constant attribute remains native and uninstantiated",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: nested inserts remain shared native references",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: parameterized instance uses an evaluated anonymous block",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: independent solved native line measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: native dimension witnesses follow the solved sketch",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: dimension retains a native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: calculated annotation is portable native text",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: calculated attribute text is regenerated",
+      "passed": true
+    },
+    {
+      "name": "ascii/editable: dynamic action moves native attribute position",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: zero native audit errors and repairs",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: shared definition edit preserves native endpoint",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: shared references are not exploded",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: per-instance user values survive synchronization",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: native ATTDEF tag and prompt retained",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: preset flag retained",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: constant attribute remains native and uninstantiated",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: nested inserts remain shared native references",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: parameterized instance uses an evaluated anonymous block",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: independent solved native line measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: native dimension witnesses follow the solved sketch",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: dimension retains a native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: calculated annotation is portable native text",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: calculated attribute text is regenerated",
+      "passed": true
+    },
+    {
+      "name": "ascii/baked: dynamic action moves native attribute position",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: zero native audit errors and repairs",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: shared definition edit preserves native endpoint",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: shared references are not exploded",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: per-instance user values survive synchronization",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: native ATTDEF tag and prompt retained",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: preset flag retained",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: constant attribute remains native and uninstantiated",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: nested inserts remain shared native references",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: parameterized instance uses an evaluated anonymous block",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: independent solved native line measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: native dimension witnesses follow the solved sketch",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: dimension retains a native picture",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: calculated annotation is portable native text",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: calculated attribute text is regenerated",
+      "passed": true
+    },
+    {
+      "name": "binary/editable: dynamic action moves native attribute position",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: zero native audit errors and repairs",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: shared definition edit preserves native endpoint",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: shared references are not exploded",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: per-instance user values survive synchronization",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: native ATTDEF tag and prompt retained",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: preset flag retained",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: constant attribute remains native and uninstantiated",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: nested inserts remain shared native references",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: parameterized instance uses an evaluated anonymous block",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: independent solved native line measurement",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: native dimension witnesses follow the solved sketch",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: dimension retains a native picture",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: calculated annotation is portable native text",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: calculated attribute text is regenerated",
+      "passed": true
+    },
+    {
+      "name": "binary/baked: dynamic action moves native attribute position",
+      "passed": true
+    }
+  ],
+  "passed": 60,
+  "validator": "ezdxf 1.4.4",
+  "files": 4,
+  "errors": 0,
+  "repairs": 0,
+  "scope": "Independent readback of Conduit-authored native fields; not an Autodesk action-graph evaluation"
+}

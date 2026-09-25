@@ -1,6 +1,6 @@
 # @conduitcad/storage
 
-Local project persistence. Version **0.2.1**, native ESM JavaScript, MIT license.
+Local project persistence. Version **0.5.0**, native ESM JavaScript, MIT license.
 
 IndexedDB persistence with localStorage fallback, debounced save and retained project archives. Storage durability was not validated in the opaque-origin browser runner.
 

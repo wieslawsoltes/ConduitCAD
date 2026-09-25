@@ -1,25 +1,6 @@
 'use strict';
 (()=>{
 const __modules=Object.create(null);
-// packages/model/src/gradients.js
-__modules["packages/model/src/gradients.js"]=(()=>{
-/** Portable native LINEAR gradient descriptor. Unknown distributions are not approximated silently. */
-function linearHatchGradient(tags,contours,frame) {
-    if(!Array.isArray(tags))return null;
-    const value=(code,fallback)=>tags.find(p=>p[0]===code)?.[1]??fallback;
-    if(value(450,0)!==1||value(470,'LINEAR')!=='LINEAR'||value(461,0)!==0||value(453,2)!==2)return null;
-    const colors=tags.filter(p=>p[0]===421).map(p=>p[1]);
-    if(colors.length!==2||colors.some(c=>!Number.isInteger(c)||c<0||c>0xffffff))return null;
-    const rotation=value(460,0);if(!Number.isFinite(rotation))return null;
-    const u={x:Math.cos(rotation),y:Math.sin(rotation)};
-    let lo=Infinity,hi=-Infinity;
-    for(const polygon of contours)for(const p of polygon){const t=p.x*u.x+p.y*u.y;lo=Math.min(lo,t);hi=Math.max(hi,t);}
-    if(!Number.isFinite(lo)||hi-lo<1e-12)return null;
-    return {kind:'linear',start:{x:u.x*lo,y:u.y*lo},end:{x:u.x*hi,y:u.y*hi},frame:frame.slice(),colors:colors.map(c=>'#'+c.toString(16).padStart(6,'0'))};
-}
-
-return {linearHatchGradient};
-})();
 // packages/geometry/src/index.js
 __modules["packages/geometry/src/index.js"]=(()=>{
 /** Double-precision planar geometry. DXF coordinates are right-handed, Y up. */
@@ -432,8 +413,540 @@ function regenerateDimensions(doc) {
 
 return {dimensionPicture,editDimension,dimensionGrips,regenerateDimensions};
 })();
+// packages/constraints/src/expressions.js
+__modules["packages/constraints/src/expressions.js"]=(()=>{
+/** Bounded arithmetic parser. No eval, property access, or executable user code. */
+const functions = Object.freeze({
+    abs: [1, Math.abs], sqrt: [1, Math.sqrt], sin: [1, Math.sin], cos: [1, Math.cos],
+    tan: [1, Math.tan], asin: [1, Math.asin], acos: [1, Math.acos], atan: [1, Math.atan],
+    atan2: [2, Math.atan2], hypot: [2, Math.hypot], min: [2, Math.min], max: [2, Math.max],
+    floor: [1, Math.floor], ceil: [1, Math.ceil], round: [1, Math.round], exp: [1, Math.exp],
+    ln: [1, Math.log], log10: [1, Math.log10], pow: [2, Math.pow],
+    rad: [1, x => x * Math.PI / 180], deg: [1, x => x * 180 / Math.PI],
+    clamp: [3, (x, lo, hi) => { if (lo > hi) throw new Error('Invalid clamp range'); return Math.min(hi, Math.max(lo, x)); }]
+});
+const constants = Object.freeze({ pi: Math.PI, tau: Math.PI * 2, e: Math.E });
+const forbidden = new Set(['__proto__', 'constructor', 'prototype']);
+const finite = n => { if (!Number.isFinite(n)) throw new Error('Expression did not produce a finite number'); return n; };
+function expressionNames() { return [...Object.keys(constants), ...Object.keys(functions), ...forbidden]; }
+function expressionDependencies(source) {
+    const tokens = String(source).match(/[A-Za-z_]\w*|(?:\d*\.?\d+(?:e[+-]?\d+)?)/gi) || [];
+    return [...new Set(tokens.filter(t => /^[A-Za-z_]/.test(t) && !Object.hasOwn(constants, t) && !Object.hasOwn(functions, t)))];
+}
+function parseExpression(source, parameters = {}, stack = [], budget = {remaining: 20000, cache: new Map()}) {
+    if (--budget.remaining < 0) throw new Error('Expression evaluation budget exceeded');
+    if (typeof source === 'number') return finite(source);
+    if (stack.length > 64) throw new Error('Parameter dependency depth exceeds 64');
+    if (source && typeof source === 'object') source = source.expression ?? source.value;
+    const s = String(source), tokens = []; let offset = 0;
+    if (s.length > 4096) throw new Error('Expression exceeds 4096 characters');
+    while (offset < s.length) {
+        if (/\s/.test(s[offset])) { offset++; continue; }
+        const m = s.slice(offset).match(/^(?:\d*\.?\d+(?:e[+-]?\d+)?|[A-Za-z_]\w*|[(),+\-*/^])/i);
+        if (!m) throw new Error(`Invalid expression near “${s.slice(offset, offset + 12)}”`);
+        tokens.push(m[0]); offset += m[0].length;
+        if (tokens.length > 1024) throw new Error('Expression token budget exceeded');
+    }
+    let i = 0, depth = 0;
+    function primary() {
+        if (++depth > 64) throw new Error('Expression nesting exceeds 64');
+        try {
+            const t = tokens[i++];
+            if (t === undefined) throw new Error('Incomplete expression');
+            if (t === '(') { const v = sum(); if (tokens[i++] !== ')') throw new Error('Unclosed parenthesis'); return v; }
+            if (/^\d|^\./.test(t)) return finite(Number(t));
+            if (/^[A-Za-z_]/.test(t)) {
+                if (forbidden.has(t)) throw new Error('Reserved parameter name');
+                if (tokens[i] === '(') {
+                    if (!Object.hasOwn(functions, t)) throw new Error(`Unknown function: ${t}`);
+                    i++; const args = [];
+                    if (tokens[i] !== ')') { args.push(sum()); while (tokens[i] === ',') { i++; args.push(sum()); if (args.length > 3) throw new Error('Too many function arguments'); } }
+                    if (tokens[i++] !== ')') throw new Error('Unclosed function');
+                    const [arity, fn] = functions[t]; if (args.length !== arity) throw new Error(`${t} requires ${arity} arguments`);
+                    return finite(fn(...args));
+                }
+                if (Object.hasOwn(constants, t)) return constants[t];
+                if (!Object.hasOwn(parameters, t)) throw new Error(`Unknown parameter: ${t}`);
+                if (stack.includes(t)) throw new Error(`Parameter cycle: ${[...stack, t].join(' → ')}`);
+                if(budget.cache.has(t))return budget.cache.get(t);
+                const value=parseExpression(parameters[t], parameters, [...stack, t], budget);budget.cache.set(t,value);return value;
+            }
+            throw new Error(`Unexpected token: ${t}`);
+        } finally { depth--; }
+    }
+    function power() { const a = primary(); if (tokens[i] !== '^') return a; i++; return finite(a ** unary()); }
+    function unary() {
+        let sign = 1, count = 0;
+        while (tokens[i] === '+' || tokens[i] === '-') { if (tokens[i++] === '-') sign = -sign; if (++count > 64) throw new Error('Unary nesting exceeds 64'); }
+        return sign * power();
+    }
+    function product() { let v = unary(); while (tokens[i] === '*' || tokens[i] === '/') { const op = tokens[i++], b = unary(); v = finite(op === '*' ? v * b : v / b); } return v; }
+    function sum() { let v = product(); while (tokens[i] === '+' || tokens[i] === '-') { const op = tokens[i++], b = product(); v = finite(op === '+' ? v + b : v - b); } return v; }
+    const result = sum(); if (i !== tokens.length) throw new Error('Unexpected expression token: ' + tokens[i]); return finite(result);
+}
+/** Values and dependency lists suitable for a parameter/calculation inspector. */
+function parameterReport(parameters) {
+    if (Object.keys(parameters).length > 1024) throw new Error('Parameter count exceeds 1024');
+    return Object.entries(parameters).map(([name, expression]) => ({ name, expression, value: parseExpression(expression, parameters, [name]), dependencies: expressionDependencies(expression?.expression ?? expression) }));
+}
+
+return {expressionNames,expressionDependencies,parseExpression,parameterReport};
+})();
+// packages/constraints/src/solver.js
+__modules["packages/constraints/src/solver.js"]=(()=>{
+const {parseExpression, expressionNames} = __modules["packages/constraints/src/expressions.js"];
+const idsOf = c => c.entities || (c.entityId ? [c.entityId] : []);
+const types = new Set(['horizontal','vertical','length','radius','diameter','coincident','concentric','parallel','perpendicular','collinear','equal','angle','angle-between','fixed','fixed-point','distance','distance-x','distance-y','point-on-line','point-on-circle','midpoint','tangent','symmetric']);
+const numeric = new Set(['length','radius','diameter','angle','angle-between','distance','distance-x','distance-y']);
+const refMode = c => c.reference === true || c.mode === 'reference';
+const drivingParameters = (constraints, parameters) => ({...parameters,...Object.fromEntries(constraints.filter(c=>c.name&&!c.suppressed&&!refMode(c)&&numeric.has(c.type)).map(c=>[c.name,c.value]))});
+const pointKeys = e => ['a','b','c','p'].filter(k => e[k]).concat((e.points || []).map((_, i) => `points.${i}`));
+function point(e, key) {
+    if (!e) throw new Error('Constraint references a missing entity');
+    if (key === 'start') key = 'a'; if (key === 'end') key = 'b'; if (key === 'center') key = 'c';
+    const p = /^points\.\d+$/.test(key) ? e.points?.[Number(key.slice(7))] : ['a','b','c','p'].includes(key) ? e[key] : null;
+    if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) throw new Error(`Constraint needs a valid point: ${e.id}.${key}`);
+    return p;
+}
+const defaultPoint = e => e?.b ? 'b' : e?.c ? 'c' : e?.p ? 'p' : 'points.0';
+const secondPoint = e => e?.a ? 'a' : e?.c ? 'c' : e?.p ? 'p' : 'points.0';
+const norm = a => Math.hypot(...a);
+const wrap = x => Math.atan2(Math.sin(x), Math.cos(x));
+
+/** Rank-revealing column-pivoted Householder QR; never forms JᵀJ. */
+function qr(matrix, rhs = null, tolerance = 1e-10) {
+    const m = matrix.length, n = matrix[0]?.length || 0;
+    const a = matrix.map(r => Float64Array.from(r)), b = rhs ? Float64Array.from(rhs) : new Float64Array(m), permutation = Array.from({length:n}, (_,i)=>i);
+    let rank = 0, largest = 0;
+    for (let k=0;k<Math.min(m,n);k++) {
+        let pivot=k, best=-1;
+        for(let j=k;j<n;j++){let s=0;for(let i=k;i<m;i++)s+=a[i][j]*a[i][j];if(s>best){best=s;pivot=j;}}
+        const size=Math.sqrt(best);if(k===0)largest=size;
+        if(size<=Math.max(largest*tolerance,1e-15))break;
+        if(pivot!==k){for(let i=0;i<m;i++)[a[i][k],a[i][pivot]]=[a[i][pivot],a[i][k]];[permutation[k],permutation[pivot]]=[permutation[pivot],permutation[k]];}
+        const alpha=a[k][k]>=0?-size:size, v=new Float64Array(m-k);v[0]=a[k][k]-alpha;
+        for(let i=k+1;i<m;i++)v[i-k]=a[i][k];let vv=0;for(const x of v)vv+=x*x;
+        const beta=2/vv;
+        for(let j=k+1;j<n;j++){let d=0;for(let i=k;i<m;i++)d+=v[i-k]*a[i][j];d*=beta;for(let i=k;i<m;i++)a[i][j]-=d*v[i-k];}
+        let d=0;for(let i=k;i<m;i++)d+=v[i-k]*b[i];d*=beta;for(let i=k;i<m;i++)b[i]-=d*v[i-k];
+        a[k][k]=alpha;for(let i=k+1;i<m;i++)a[i][k]=0;rank++;
+    }
+    const z=new Float64Array(n),x=new Float64Array(n);
+    for(let i=rank-1;i>=0;i--){let v=b[i];for(let j=i+1;j<rank;j++)v-=a[i][j]*z[j];z[i]=v/a[i][i];}
+    for(let i=0;i<n;i++)x[permutation[i]]=z[i];
+    return {x,rank,permutation};
+}
+/** Dense forward-mode derivatives inside one bounded connected component. */
+function algebra(n) {
+    let singular=false;
+    const c = v => ({v,d:new Float64Array(n)});
+    const add = (a,b) => {const r=c(a.v+b.v);for(let i=0;i<n;i++)r.d[i]=a.d[i]+b.d[i];return r;};
+    const sub = (a,b) => {const r=c(a.v-b.v);for(let i=0;i<n;i++)r.d[i]=a.d[i]-b.d[i];return r;};
+    const mul = (a,b) => {const r=c(a.v*b.v);for(let i=0;i<n;i++)r.d[i]=a.d[i]*b.v+b.d[i]*a.v;return r;};
+    const div = (a,b) => {if(Math.abs(b.v)<1e-20)throw new Error('Degenerate constraint geometry');const r=c(a.v/b.v);for(let i=0;i<n;i++)r.d[i]=(a.d[i]-r.v*b.d[i])/b.v;return r;};
+    const hypot = (a,b) => {const h=Math.hypot(a.v,b.v),r=c(h);if(h<=1e-20)singular=true;if(h>1e-20)for(let i=0;i<n;i++)r.d[i]=(a.v*a.d[i]+b.v*b.d[i])/h;return r;};
+    const atan2 = (y,x) => {const r=c(Math.atan2(y.v,x.v)),den=x.v*x.v+y.v*y.v;if(den<1e-24)throw new Error('Degenerate line direction');for(let i=0;i<n;i++)r.d[i]=(x.v*y.d[i]-y.v*x.d[i])/den;return r;};
+    const delta = (a,b) => ({x:sub(a.x,b.x),y:sub(a.y,b.y)});
+    return {c,add,sub,mul,div,hypot,atan2,delta,clearSingular:()=>{singular=false;},isSingular:()=>singular};
+}
+function compile(entities, constraints, parameters, maxVariables) {
+    const map=new Map(entities.map(e=>[e.id,e]));
+    const xs=[],ys=[],sizes=[];
+    for(const e of entities){for(const k of pointKeys(e)){const p=point(e,k);xs.push(p.x);ys.push(p.y);}if(e.r!==undefined)sizes.push(e.r);}
+    const ox=xs.length?Math.min(...xs):0,oy=ys.length?Math.min(...ys):0;
+    const targets=constraints.map(c=>numeric.has(c.type)&&!refMode(c)?parseExpression(c.value,parameters):0);
+    const scale=Math.max(1e-6,Math.max(...xs,ox)-ox,Math.max(...ys,oy)-oy,...sizes,...targets.filter((_,i)=>!['angle','angle-between'].includes(constraints[i].type)).map(Math.abs));
+    const descriptors=[],index=new Map();
+    for(const e of entities){
+        if(!['LINE','CIRCLE','ARC','POINT','LWPOLYLINE','POLYLINE'].includes(e.type))throw new Error(`Unsupported constrained geometry: ${e.type}`);
+        if(e.extrusion&&(e.extrusion.x||e.extrusion.y||e.extrusion.z!==1))throw new Error('Constraints require default planar OCS');
+        if(e.elevation)throw new Error('Constraints require XY geometry at Z=0');
+        if(e.type==='POLYLINE'&&(e.flags&(8|16|64))||e.points?.some(p=>p.bulge))throw new Error('Constraints require a straight planar polyline');
+        for(const k of pointKeys(e)){const p=point(e,k);if(p.z)throw new Error('Constraints require XY geometry at Z=0');for(const axis of ['x','y']){index.set(`${e.id}/${k}/${axis}`,descriptors.length);descriptors.push({value:(p[axis]-(axis==='x'?ox:oy))/scale,object:p,key:axis,origin:axis==='x'?ox:oy});}}
+        if(e.r!==undefined){if(!(e.r>0))throw new Error('Radius must be positive');index.set(`${e.id}/r`,descriptors.length);descriptors.push({value:e.r/scale,object:e,key:'r',origin:0});}
+        if(e.type==='LINE'&&Math.hypot(e.b.x-e.a.x,e.b.y-e.a.y)<scale*1e-12)throw new Error('Constraint requires a nondegenerate line');
+    }
+    if(descriptors.length>maxVariables)throw new Error(`Connected sketch exceeds ${maxVariables} scalar variables`);
+    const n=descriptors.length,{c,add,sub,mul,div,hypot,atan2,delta,clearSingular,isSingular}=algebra(n);
+    const radius=(e,v)=>{if(!e?.c||e.r===undefined)throw new Error('Constraint requires a circle or arc');return variable(`${e.id}/r`,v);};
+    function variable(key,v){const i=index.get(key);if(i===undefined)throw new Error(`Missing constrained coordinate: ${key}`);const r=c(v[i]);r.d[i]=1;return r;}
+    function pos(e,key,v){point(e,key);key=key==='start'?'a':key==='end'?'b':key==='center'?'c':key;return {x:variable(`${e.id}/${key}/x`,v),y:variable(`${e.id}/${key}/y`,v)};}
+    function start(e,segment=0){return e?.type==='LINE'?'a':`points.${segment}`;}
+    function direction(e,v,segment=0){
+        if(e?.type==='LINE')return delta(pos(e,'b',v),pos(e,'a',v));
+        if(!['LWPOLYLINE','POLYLINE'].includes(e?.type)||!Number.isInteger(segment)||segment<0||segment>=e.points.length-(e.closed?0:1))throw new Error('Constraint requires a line or valid straight polyline segment');
+        return delta(pos(e,`points.${(segment+1)%e.points.length}`,v),pos(e,`points.${segment}`,v));
+    }
+    const length = u=>hypot(u.x,u.y),dot=(u,v)=>add(mul(u.x,v.x),mul(u.y,v.y)),cross=(u,v)=>sub(mul(u.x,v.y),mul(u.y,v.x));
+    function residual(v, includeReferences=false){
+        clearSingular();const rows=[],owners=[];
+        constraints.forEach((con,k)=>{
+            if(con.suppressed||refMode(con)&&!includeReferences)return;
+            const es=idsOf(con).map(id=>map.get(id)),[a,b,z]=es,value=targets[k],out=[];
+            const pp=()=>pos(a,con.pointA||defaultPoint(a),v),qq=()=>pos(b,con.pointB||secondPoint(b),v);
+            const dir=e=>direction(e,v,e===a?(con.segmentA??0):(con.segmentB??0)),first=e=>pos(e,start(e,e===a?(con.segmentA??0):(con.segmentB??0)),v);
+            const pushPoint=(p,q)=>out.push(sub(p.x,q.x),sub(p.y,q.y));
+            switch(con.type){
+                case 'horizontal':out.push(dir(a).y);break;
+                case 'vertical':out.push(dir(a).x);break;
+                case 'length':out.push(sub(length(dir(a)),c(value/scale)));break;
+                case 'radius':out.push(sub(radius(a,v),c(value/scale)));break;
+                case 'diameter':out.push(sub(mul(c(2),radius(a,v)),c(value/scale)));break;
+                case 'coincident':pushPoint(pp(),qq());break;
+                case 'concentric':radius(a,v);radius(b,v);pushPoint(pos(a,'c',v),pos(b,'c',v));break;
+                case 'parallel':case 'perpendicular':case 'collinear':{
+                    const u=dir(a),w=dir(b),den=mul(length(u),length(w));
+                    out.push(div(con.type==='perpendicular'?dot(u,w):cross(u,w),den));
+                    if(con.type==='collinear')out.push(div(cross(delta(first(b),first(a)),u),length(u)));break;
+                }
+                case 'equal':if((a.r!==undefined)!==(b?.r!==undefined))throw new Error('Equal requires matching geometry');out.push(sub(a.r!==undefined?radius(a,v):length(dir(a)),b?.r!==undefined?radius(b,v):length(dir(b))));break;
+                case 'angle':case 'angle-between':{
+                    const u=dir(a);let angle=atan2(u.y,u.x);
+                    if(con.type==='angle-between'){const w=dir(b);angle=sub(atan2(w.y,w.x),angle);}
+                    const r=sub(angle,c(value*Math.PI/180));r.v=wrap(r.v);out.push(r);break;
+                }
+                case 'distance':case 'distance-x':case 'distance-y':{
+                    const u=delta(qq(),pp());out.push(sub(con.type==='distance'?length(u):u[con.type==='distance-x'?'x':'y'],c(value/scale)));break;
+                }
+                case 'point-on-line':case 'midpoint':{
+                    const u=dir(b),start=first(b);
+                    if(con.type==='midpoint')pushPoint(pp(),{x:add(start.x,mul(u.x,c(.5))),y:add(start.y,mul(u.y,c(.5)))});
+                    else out.push(div(cross(delta(pp(),start),u),length(u)));break;
+                }
+                case 'point-on-circle':out.push(sub(length(delta(pp(),pos(b,'c',v))),radius(b,v)));break;
+                case 'tangent':{
+                    if(a.type==='LINE'||b?.type==='LINE'){
+                        const l=a.type==='LINE'?a:b,ring=a.type==='LINE'?b:a,u=direction(l,v);
+                        const r=div(cross(u,delta(pos(ring,'c',v),pos(l,'a',v))),length(u));
+                        const side=con.side??(Math.sign((l.b.x-l.a.x)*(ring.c.y-l.a.y)-(l.b.y-l.a.y)*(ring.c.x-l.a.x))||1);
+                        out.push(sub(r,mul(c(side),radius(ring,v))));
+                    }else{const r1=radius(a,v),r2=radius(b,v);out.push(sub(length(delta(pos(a,'c',v),pos(b,'c',v))),con.internal?mul(c(con.side??(a.r>=b.r?1:-1)),sub(r1,r2)):add(r1,r2)));}break;
+                }
+                case 'symmetric':{
+                    const u=direction(z,v,con.segmentC??0),p=pp(),q=qq(),mid={x:mul(add(p.x,q.x),c(.5)),y:mul(add(p.y,q.y),c(.5))};
+                    out.push(div(cross(delta(mid,pos(z,start(z,con.segmentC??0),v)),u),length(u)),div(dot(delta(q,p),u),length(u)));break;
+                }
+                case 'fixed-point':{
+                    const t=con.target;if(!t||!Number.isFinite(t.x)||!Number.isFinite(t.y))throw new Error('Fixed point requires an explicit target');pushPoint(pp(),{x:c((t.x-ox)/scale),y:c((t.y-oy)/scale)});break;
+                }
+                case 'fixed':{
+                    const t=con.target;if(!t)throw new Error('Fixed geometry requires an explicit target');
+                    for(const key of pointKeys(a)){const p=point(t,key);pushPoint(pos(a,key,v),{x:c((p.x-ox)/scale),y:c((p.y-oy)/scale)});}
+                    if(a.r!==undefined){if(!Number.isFinite(t.r))throw new Error('Missing fixed radius target');out.push(sub(radius(a,v),c(t.r/scale)));}break;
+                }
+                default:throw new Error(`Unknown constraint: ${con.type}`);
+            }
+            for(const row of out){if(!Number.isFinite(row.v)||row.d.some(v=>!Number.isFinite(v)))throw new Error('Non-finite constraint residual');rows.push(row);owners.push(k);}
+        });return {r:rows.map(v=>v.v),j:rows.map(v=>v.d),owners,singular:isSingular()};
+    }
+    const initial=descriptors.map(v=>v.value);residual(initial);
+    return {initial,descriptors,scale,residual,constraints,valid:v=>v.every(Number.isFinite)&&descriptors.every((d,i)=>d.key!=='r'||v[i]>1e-12),apply:v=>descriptors.forEach((d,i)=>{d.object[d.key]=v[i]*scale+d.origin;})};
+}
+function solveComponent(problem, options, analyzeOnly=false){
+    let x=problem.initial.slice(),current=problem.residual(x),cost=norm(current.r),lambda=1e-3,iterations=0,rejected=0;
+    const threshold=options.tolerance/problem.scale+options.relativeTolerance;
+    let singularStartPerturbed=false;
+    if(!analyzeOnly&&current.singular&&cost>threshold){
+        // Break only a nondifferentiable zero-distance initial state. The deterministic
+        // trial stays private and is accepted only if it lowers the original residual.
+        const seed=x.map((v,i)=>problem.descriptors[i].key==='r'?v:v+1e-4*(i%7+1)*(i%2?1:-1));
+        if(problem.valid(seed))try{const trial=problem.residual(seed),value=norm(trial.r);if(value<cost){x=seed;current=trial;cost=value;singularStartPerturbed=true;}}catch{}
+    }
+    if(!analyzeOnly)for(;iterations<options.maxIterations&&Math.max(0,...current.r.map(Math.abs))>threshold;iterations++){
+        const n=x.length,col=Array.from({length:n},(_,k)=>Math.max(1e-6,Math.hypot(...current.j.map(r=>r[k]))));
+        const augmented=current.j.map(r=>Array.from(r)),rhs=current.r.map(v=>-v);
+        for(let k=0;k<n;k++){const row=new Float64Array(n);row[k]=Math.sqrt(lambda)*col[k];augmented.push(row);rhs.push(0);}
+        const step=qr(augmented,rhs).x;let max=Math.max(0,...step.map(Math.abs));if(max>10)for(let k=0;k<n;k++)step[k]*=10/max;
+        const candidate=x.map((v,k)=>v+step[k]);let trial=null,nextCost=Infinity;
+        if(problem.valid(candidate))try{trial=problem.residual(candidate);nextCost=norm(trial.r);}catch{/* Reject a degenerate trial without touching source. */}
+        if(nextCost<cost){x=candidate;current=trial;cost=nextCost;lambda=Math.max(1e-12,lambda*.25);}else{lambda=Math.min(1e16,lambda*8);rejected++;if(lambda===1e16)break;}
+    }
+    const rank=qr(current.j,null,options.rankTolerance).rank,n=x.length,m=current.r.length;
+    const equationQR=qr(Array.from({length:n},(_,k)=>current.j.map(row=>row[k])),null,options.rankTolerance);
+    const dependent=new Set(equationQR.permutation.slice(rank).map(i=>current.owners[i]));
+    const converged=Math.max(0,...current.r.map(Math.abs))<=threshold;
+    const perConstraint=problem.constraints.map((c,k)=>{const rs=current.r.filter((_,i)=>current.owners[i]===k),error=Math.max(0,...rs.map(Math.abs));return {id:c.id??`constraint-${k}`,type:c.type,mode:refMode(c)?'reference':'driving',suppressed:!!c.suppressed,residual:error*problem.scale,satisfied:error<=threshold,redundant:converged&&dependent.has(k)};});
+    return {x,converged,iterations,singularStartPerturbed,rejectedSteps:rejected,residual:cost*problem.scale,normalizedResidual:cost,variables:n,equations:m,rank,degreesOfFreedom:n-rank,redundantEquations:m-rank,constraints:perConstraint,status:converged?(rank===n?'fully-constrained':'under-constrained'):'conflicting-or-unconverged'};
+}
+class SketchSolver {
+    constructor({tolerance=1e-7,relativeTolerance=1e-10,maxIterations=100,maxVariables=256,rankTolerance=1e-9}={}){
+        if(!Number.isFinite(tolerance)||tolerance<=0||!Number.isFinite(relativeTolerance)||relativeTolerance<0||!Number.isInteger(maxIterations)||maxIterations<1||maxIterations>1000||!Number.isInteger(maxVariables)||maxVariables<1||maxVariables>512||!Number.isFinite(rankTolerance)||rankTolerance<=0)throw new Error('Invalid solver options');
+        Object.assign(this,{tolerance,relativeTolerance,maxIterations,maxVariables,rankTolerance});
+    }
+    analyze(entities,constraints,parameters={}){return this.solve(entities,constraints,parameters,{analyzeOnly:true});}
+    solve(entities,constraints,parameters={}, {analyzeOnly=false}={}){
+        if(!Array.isArray(entities)||!Array.isArray(constraints)||constraints.length>4096)throw new Error('Invalid sketch or constraint budget');
+        const attached=new Set(constraints.filter(c=>!c.suppressed&&!refMode(c)).flatMap(idsOf));
+        constraints=[...constraints,...entities.filter(e=>e.locked&&attached.has(e.id)).map(e=>({id:'locked-'+e.id,type:'fixed',entityId:e.id,target:structuredClone(e),visible:false}))];
+        const map=new Map(entities.map(e=>[e.id,e]));if(map.size!==entities.length)throw new Error('Duplicate sketch entity IDs');
+        const parent=new Map(),find=id=>{if(!parent.has(id))parent.set(id,id);const p=parent.get(id);if(p!==id)parent.set(id,find(p));return parent.get(id);};
+        const constraintNames=new Set();
+        for(const c of constraints){
+            if(c.name){if(!/^[A-Za-z_]\w*$/.test(c.name)||expressionNames().includes(c.name)||constraintNames.has(c.name)||Object.hasOwn(parameters,c.name))throw new Error('Invalid or duplicate constraint name: '+c.name);constraintNames.add(c.name);}
+        }
+        parameters=drivingParameters(constraints,parameters);
+        for(const c of constraints){
+            if(c.type==='tangent'&&c.side!==undefined&&![1,-1].includes(c.side))throw new Error('Tangent side must be +1 or -1');
+            if(c.suppressed)continue;if(!types.has(c.type))throw new Error(`Unknown constraint: ${c.type}`);
+            const ids=idsOf(c);if(!ids.length||ids.some(id=>!map.has(id)))throw new Error('Constraint references a missing entity');
+            if(numeric.has(c.type)&&!refMode(c)){const v=parseExpression(c.value,parameters);if(['length','radius','diameter','distance'].includes(c.type)&&v<=0)throw new Error('Constraint size must be positive');}
+            if(refMode(c)){measureConstraint(entities,c);continue;}
+            ids.forEach(id=>{const root=find(ids[0]);parent.set(find(id),root);});
+        }
+        const groups=new Map();for(const id of parent.keys()){const root=find(id);if(!groups.has(root))groups.set(root,{ids:[],constraints:[]});groups.get(root).ids.push(id);}
+        for(const c of constraints)if(!c.suppressed&&!refMode(c))groups.get(find(idsOf(c)[0])).constraints.push(c);
+        const problems=[...groups.values()].map(g=>compile(g.ids.map(id=>map.get(id)),g.constraints,parameters,this.maxVariables));
+        if(problems.reduce((n,p)=>n+p.initial.length,0)>4096)throw new Error('Sketch exceeds 4096 scalar variables');
+        sketchAnnotations(entities,constraints,parameters);
+        const results=problems.map(p=>solveComponent(p,this,analyzeOnly)),converged=results.every(r=>r.converged);
+        if(converged&&!analyzeOnly)problems.forEach((p,i)=>p.apply(results[i].x));
+        const sum=k=>results.reduce((n,r)=>n+r[k],0);
+        const unconstrainedVariables=entities.filter(e=>!e.locked&&!parent.has(e.id)&&['LINE','CIRCLE','ARC','POINT','LWPOLYLINE'].includes(e.type)).reduce((n,e)=>n+pointKeys(e).length*2+(e.r!==undefined?1:0),0);
+        const dof=sum('degreesOfFreedom')+unconstrainedVariables;
+        const annotated=sketchAnnotations(entities,constraints,parameters);
+        const diagnostics=results.flatMap(r=>r.constraints);
+        return {converged,iterations:Math.max(0,...results.map(r=>r.iterations)),residual:Math.hypot(...results.map(r=>r.residual)),variables:sum('variables')+unconstrainedVariables,unconstrainedVariables,affectedVariables:sum('variables'),equations:sum('equations'),rank:sum('rank'),degreesOfFreedom:dof,redundantEquations:sum('redundantEquations'),components:results.map(({x,...r})=>r),constraints:diagnostics,annotations:annotated,conflicts:diagnostics.filter(c=>!c.satisfied).map(c=>c.id),status:!results.length?'unconstrained':converged?(dof?'under-constrained':'fully-constrained'):'conflicting-or-unconverged',rolledBack:!converged&&!analyzeOnly,analysisOnly:analyzeOnly,jacobian:'analytic-forward-mode',linearSolver:'column-pivoted-householder-qr'};
+    }
+}
+/** Read-only driving/reference values; measurements never solve or mutate. */
+function measureConstraint(entities,c){
+    const [a,b]=idsOf(c).map(id=>entities.find(e=>e.id===id));if(!a)throw new Error('Constraint references a missing entity');
+    const ends=e=>{if(e?.a&&e?.b)return [e.a,e.b];const i=e===a?(c.segmentA??0):(c.segmentB??0);if(!e?.points||!Number.isInteger(i)||i<0||i>=e.points.length-(e.closed?0:1))throw new Error('Constraint requires a line or valid polyline segment');return [e.points[i],e.points[(i+1)%e.points.length]];};
+    const len=e=>{const [p,q]=ends(e);return Math.hypot(q.x-p.x,q.y-p.y);};
+    if(c.type==='length')return len(a);
+    if(c.type==='radius'||c.type==='diameter'){if(a.r===undefined)throw new Error('Constraint requires a circle');return a.r*(c.type==='diameter'?2:1);}
+    if(c.type==='angle'||c.type==='angle-between'){const [p,q]=ends(a);let angle=Math.atan2(q.y-p.y,q.x-p.x);if(c.type==='angle-between'){const [r,s]=ends(b);angle=wrap(Math.atan2(s.y-r.y,s.x-r.x)-angle);}return angle*180/Math.PI;}
+    if(c.type.startsWith('distance')){const p=point(a,c.pointA||defaultPoint(a)),q=point(b,c.pointB||secondPoint(b));return c.type==='distance-x'?q.x-p.x:c.type==='distance-y'?q.y-p.y:Math.hypot(q.x-p.x,q.y-p.y);}
+    return null;
+}
+function sketchAnnotations(entities,constraints,parameters={}){
+    parameters=drivingParameters(constraints,parameters);
+    return constraints.filter(c=>!c.suppressed).map((c,i)=>{
+        const a=entities.find(e=>e.id===idsOf(c)[0]),b=entities.find(e=>e.id===idsOf(c)[1]);
+        let value=measureConstraint(entities,c),target=numeric.has(c.type)&&!refMode(c)?parseExpression(c.value,parameters):null;
+        const p=a?.c||a?.p||(a?.a&&a?.b?{x:(a.a.x+a.b.x)/2,y:(a.a.y+a.b.y)/2}:a?.points?.[0])||{x:0,y:0};
+        const name=c.name||c.type,text=value===null?name:`${name}${refMode(c)?' (ref)':''} = ${Number(value.toPrecision(8))}${['angle','angle-between'].includes(c.type)?'°':''}`;
+        return {id:c.id??`constraint-${i}`,entityIds:idsOf(c),position:{...p},text,value,target,expression:c.value??null,reference:refMode(c),visible:c.visible!==false};
+    });
+}
+
+return {SketchSolver,measureConstraint,sketchAnnotations};
+})();
+// packages/constraints/src/index.js
+__modules["packages/constraints/src/index.js"]=(()=>{
+const {parseExpression, parameterReport, expressionDependencies, expressionNames} = __modules["packages/constraints/src/expressions.js"];
+const {SketchSolver, measureConstraint, sketchAnnotations} = __modules["packages/constraints/src/solver.js"];
+function evaluateExpression(source, parameters = {}, stack = []) { return parseExpression(source, parameters, stack); }
+function resolveParameters(parameters) { return Object.fromEntries(parameterReport(parameters).map(p => [p.name, p.value])); }
+function describeParameters(parameters) { return parameterReport(parameters); }
+function parameterDependencies(source) { return expressionDependencies(source); }
+function reservedParameterNames() { return expressionNames(); }
+function constraintMeasurement(entities, constraint) { return measureConstraint(entities, constraint); }
+function constraintAnnotations(entities, constraints, parameters = {}) { return sketchAnnotations(entities, constraints, parameters); }
+/** Analytic-Jacobian, component-partitioned, damped QR planar constraint solver. */
+class ConstraintSolver extends SketchSolver {}
+/** Suggest horizontal/vertical and endpoint coincidences. Application is an explicit transaction. */
+function inferSketchConstraints(entities, existing = [], {linearTolerance = 1e-5, angularTolerance = 1e-5} = {}) {
+    if(!Number.isFinite(linearTolerance)||linearTolerance<=0||!Number.isFinite(angularTolerance)||angularTolerance<=0||entities.length>1000)throw new Error('Invalid automatic constraint budget or tolerance');
+    const result=[],known=new Set(existing.map(c=>JSON.stringify([c.type,c.entities||[c.entityId],c.pointA,c.pointB,c.segmentA]))),points=[],buckets=new Map(),connected=new Map(),ids=new Set(existing.map(c=>c.id));
+    let sequence=0;
+    const root=id=>{if(!connected.has(id))connected.set(id,id);const r=connected.get(id);if(r!==id)connected.set(id,root(r));return connected.get(id);};
+    const append=c=>{const key=JSON.stringify([c.type,c.entities,c.pointA,c.pointB,c.segmentA]);if(!known.has(key)){known.add(key);let id;do{id=`auto-${sequence++}-${c.entities[0]}-${c.type}`;}while(ids.has(id));ids.add(id);if(result.length>=4096)throw new Error('Automatic constraint count exceeds 4096');result.push({id,...c});}};
+    for(const e of entities){
+        if(e.locked||e.a?.z||e.b?.z||e.elevation||e.points?.some(p=>p.z)||e.extrusion&&(e.extrusion.x||e.extrusion.y||e.extrusion.z!==1))continue;
+        const segments=e.type==='LINE'?[[e.a,e.b,undefined]]:e.type==='LWPOLYLINE'&&!e.points.some(p=>p.bulge)?e.points.slice(0,e.closed?undefined:-1).map((p,i)=>[p,e.points[(i+1)%e.points.length],i]):[];
+        for(const [a,b,segment]of segments){const dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy);if(l<linearTolerance)continue;
+            if(Math.abs(dy)/l<angularTolerance)append({type:'horizontal',entities:[e.id],...(segment!==undefined?{segmentA:segment}:{})});
+            else if(Math.abs(dx)/l<angularTolerance)append({type:'vertical',entities:[e.id],...(segment!==undefined?{segmentA:segment}:{})});
+        }
+        if(e.type==='LINE')points.push({id:e.id,key:'a',p:e.a},{id:e.id,key:'b',p:e.b});
+        if(e.type==='LWPOLYLINE'&&!e.points.some(p=>p.bulge))e.points.forEach((p,i)=>points.push({id:e.id,key:`points.${i}`,p}));
+    }
+    if(points.length>8192)throw new Error('Automatic endpoint budget exceeds 8192');
+    for(const c of existing)if(c.type==='coincident'&&!c.suppressed&&!c.reference&&c.entities?.length===2){const [a,b]=c.entities;connected.set(root(a+'/'+(c.pointA||'b')),root(b+'/'+(c.pointB||'a')));}
+    for(const p of points){const ix=Math.floor(p.p.x/linearTolerance),iy=Math.floor(p.p.y/linearTolerance),identity=p.id+'/'+p.key;
+        for(let x=ix-1;x<=ix+1;x++)for(let y=iy-1;y<=iy+1;y++)for(const q of buckets.get(`${x},${y}`)||[]){
+            if(q.id===p.id||Math.hypot(q.p.x-p.p.x,q.p.y-p.p.y)>linearTolerance)continue;const previous=q.id+'/'+q.key;
+            if(root(identity)!==root(previous)){append({type:'coincident',entities:[q.id,p.id],pointA:q.key,pointB:p.key});connected.set(root(identity),root(previous));}
+        }
+        const key=`${ix},${iy}`;if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(p);
+    }
+    return result;
+}
+/** Resolve and atomically apply computed TEXT values from parameters and named measurements. */
+function evaluateCalculations(entities, constraints, parameters) {
+    const values={...resolveParameters(parameters)},updates=[];
+    for(const c of constraints)if(c.name&&!c.suppressed){const value=measureConstraint(entities,c);if(value!==null)values[c.name]=value;}
+    for(const e of entities)if(e.calculation){if(!['TEXT','MTEXT','ATTRIB','ATTDEF'].includes(e.type))throw new Error('Calculated annotations require a text entity');const spec=e.calculation,value=parseExpression(spec.expression,values),precision=spec.precision??3;if(!Number.isInteger(precision)||precision<0||precision>12)throw new Error('Annotation precision must be 0–12');updates.push({entity:e,value,text:`${spec.prefix||''}${Number(value.toFixed(precision))}${spec.suffix||''}`});}
+    for(const {entity,text,value}of updates){entity.text=text;entity.calculation.value=value;}
+    return updates.map(({entity,value,text})=>({entityId:entity.id,value,text}));
+}
+
+return {evaluateExpression,resolveParameters,describeParameters,parameterDependencies,reservedParameterNames,constraintMeasurement,constraintAnnotations,ConstraintSolver,inferSketchConstraints,evaluateCalculations};
+})();
+// packages/model/src/blocks.js
+__modules["packages/model/src/blocks.js"]=(()=>{
+const {matrix, compose, transform} = __modules["packages/geometry/src/index.js"];
+const {regenerateDimensions} = __modules["packages/model/src/dimensions.js"];
+const {ConstraintSolver, resolveParameters, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
+const clone = x => structuredClone(x);
+const own = (o,k) => Object.hasOwn(o,k);
+const attributeTag = e => String(e.attributeTag ?? e.tag ?? '');
+const constantAttribute = e => !!(e.constant || ((e.attributeFlags ?? e.flags ?? 0) & 2));
+const validName = name => typeof name==='string' && name.trim()===name && name.length>0 && name.length<=255 && !/[<>/\\":;?*|,=`\x00-\x1f]/.test(name) && !['__proto__','constructor','prototype'].includes(name);
+const point = (p,label) => {if(!p||!Number.isFinite(p.x)||!Number.isFinite(p.y)||Math.abs(p.x)>1e12||Math.abs(p.y)>1e12||p.z)throw new Error(`Invalid planar ${label}`);};
+function blockSignature(block) { return JSON.stringify(block); }
+/** Returns direct/nested references without flattening the database or invoking evaluators. */
+function blockReferences(document, name) {
+    if(!own(document.blocks,name))throw new Error('Missing block definition: '+name);
+    const affected=new Set([name]);let changed=true;
+    while(changed){changed=false;for(const [key,b]of Object.entries(document.blocks))if(!affected.has(key)&&(b.entities||[]).some(e=>e.type==='INSERT'&&affected.has(e.block))){affected.add(key);changed=true;}}
+    const direct=document.entities.filter(e=>e.type==='INSERT'&&e.block===name).map(e=>e.id);
+    const inserts=document.entities.filter(e=>e.type==='INSERT'&&affected.has(e.block)).map(e=>e.id);
+    const nested=Object.entries(document.blocks).flatMap(([owner,b])=>(b.entities||[]).filter(e=>e.type==='INSERT'&&e.block===name).map(e=>({owner,entityId:e.id})));
+    return {name,direct,inserts,nested,definitions:[...affected]};
+}
+function checkTree(blocks,root) {
+    const done=new Set(),active=new Set();
+    const visit=(name,depth)=>{
+        if(depth>32)throw new Error('Block nesting exceeds 32 levels');if(active.has(name))throw new Error('Cyclic block nesting: '+[...active,name].join(' → '));if(done.has(name))return;
+        const b=blocks[name];if(!b)throw new Error('Missing nested block: '+name);active.add(name);
+        for(const e of b.entities||[])if(e.type==='INSERT')visit(e.block,depth+1);
+        active.delete(name);done.add(name);
+    };visit(root,0);
+}
+function validateBlockDraft(block, blocks, evaluate) {
+    if(!block||!Array.isArray(block.entities)||block.entities.length>10000)throw new Error('Block must contain at most 10,000 entities');
+    point(block.base||{x:0,y:0},'block base');const ids=new Set(),ports=new Set(),tags=new Set();
+    const walk=(value,depth=0)=>{if(depth>32)throw new Error('Block data nesting exceeds 32');if(typeof value==='number'&&!Number.isFinite(value))throw new Error('Non-finite block data');if(value&&typeof value==='object')for(const [key,v]of Object.entries(value)){if(['__proto__','constructor','prototype'].includes(key))throw new Error('Reserved block property');walk(v,depth+1);}};
+    walk(block);
+    for(const e of block.entities){if(!e.id||ids.has(e.id))throw new Error('Missing or duplicate block entity ID');ids.add(e.id);for(const key of ['a','b','c','p'])if(key in e)point(e[key],'entity '+key);for(const p of e.points||[])point(p,'vertex');if(['CIRCLE','ARC'].includes(e.type)&&!(e.r>0))throw new Error('Radius must be positive');if(e.type==='LINE'&&(!e.a||!e.b))throw new Error('Line needs endpoints');if(e.type==='ATTDEF'){const tag=attributeTag(e);if(!tag||tag.length>255||/\s/.test(tag)||tags.has(tag.toUpperCase()))throw new Error('Attribute tags must be unique and contain no whitespace');tags.add(tag.toUpperCase());e.attributeTag=tag;}}
+    for(const p of block.ports||[]){point(p,'port');if(!p.name||ports.has(p.name)||!Number.isFinite(p.dx)||!Number.isFinite(p.dy)||Math.hypot(p.dx,p.dy)<1e-12)throw new Error('Invalid or duplicate block port');ports.add(p.name);if(p.anchor&&!ids.has(p.anchor.entityId))throw new Error('Port anchor references missing geometry');}
+    checkTree({...blocks,[block.name]:block},block.name);
+    resolveParameters(block.parameters||{});
+    if(block.dynamic)evaluate(block,{});
+    else if(block.constraints?.length){const report=new ConstraintSolver().solve(block.entities,block.constraints,block.parameters||{});if(!report.converged)throw new Error('Block constraints conflict: '+report.conflicts.join(', '));}
+    if(!block.dynamic){
+        for(const p of block.ports||[])if(p.anchor){const e=block.entities.find(e=>e.id===p.anchor.entityId),k=p.anchor.point,point=/^points\.\d+$/.test(k)?e?.points?.[Number(k.slice(7))]:['a','b','c','p'].includes(k)?e?.[k]:null;if(!point)throw new Error('Invalid port anchor');p.x=point.x;p.y=point.y;if(p.anchor.followDirection&&e.type==='LINE'){const n=Math.hypot(e.b.x-e.a.x,e.b.y-e.a.y),sign=p.anchor.reverse?-1:1;if(n<1e-12)throw new Error('Degenerate port direction');p.dx=sign*(e.b.x-e.a.x)/n;p.dy=sign*(e.b.y-e.a.y)/n;}}
+        regenerateDimensions({entities:block.entities,dimstyles:block.dimstyles||{}});
+        evaluateCalculations(block.entities,block.constraints||[],block.parameters||{});
+    }
+    return block;
+}
+/** Isolated copy for a graphical editing session. Does not mutate the source. */
+function beginBlockDraft(document,name) {
+    const block=document.blocks[name];if(!block)throw new Error('Missing block: '+name);
+    if(block.flags&4)throw new Error('External reference definitions must be resolved before editing');
+    const draft={...clone(document),name:`Block: ${name}`,entities:clone(block.entities||[]),constraints:clone(block.constraints||block.dynamic?.constraints||[]),parameters:clone(block.parameters||{}),activeLayout:'Model',layouts:['Model'],metadata:{}};
+    delete draft.original;delete draft.originalSource;delete draft.dxfSource;
+    for(const e of draft.entities)e.layout='Model';
+    draft.blockEditing={name,base:clone(block.base||{x:0,y:0}),ports:clone(block.ports||[]),dynamic:clone(block.dynamic||null)};
+    for(const p of block.dynamic?.parameters||[])if(['number','distance','angle','integer'].includes(p.type))draft.parameters[p.name]=p.expression??p.default;
+    return {name,signature:blockSignature(block),draft,referenceInfo:blockReferences(document,name)};
+}
+function blockFromDraft(session) {
+    const old=session.draft.blocks[session.name]||{},info=session.draft.blockEditing;
+    const result={...clone(old),name:session.name,base:clone(info.base),ports:clone(info.ports),entities:clone(session.draft.entities),constraints:clone(session.draft.constraints),parameters:clone(session.draft.parameters)};
+    if(info.dynamic){result.dynamic=clone(info.dynamic);result.dynamic.constraints=clone(result.constraints);for(const p of result.dynamic.parameters)delete result.parameters[p.name];}
+    else delete result.dynamic;
+    for(const e of result.entities){delete e.layout;delete e.handle;delete e.owner;delete e.raw;}
+    delete result.raw;return result;
+}
+/** Synchronize native attribute values while retaining existing user text and identity.
+ * Decompose the complete affine text frame, including mirrored and rotated nonuniform inserts.
+ */
+function syncAttributes(insert,block,nextId) {
+    const old=new Map((insert.attributes||[]).map(a=>[attributeTag(a).toUpperCase(),a]));
+    const m=compose(matrix(insert),matrix({x:-(block.base?.x||0),y:-(block.base?.y||0)}));
+    const definitions=(block.entities||[]).filter(e=>e.type==='ATTDEF'&&!constantAttribute(e));
+    const transformed=definitions.map(def=>{
+        const tag=attributeTag(def);if(!tag)throw new Error('Missing native attribute tag');
+        if(def.extrusion&&(def.extrusion.x||def.extrusion.y||def.extrusion.z!==1))throw new Error('Attribute synchronization requires default OCS');
+        const previous=old.get(tag.toUpperCase()),a={...clone(def),id:previous?.id||nextId(),type:'ATTRIB',attributeTag:tag,tag,layer:def.layer==='0'?insert.layer||'0':def.layer||insert.layer||'0',text:def.calculation?def.text??'':previous?.text??def.text??'',p:transform(def.p,m)};
+        if(def.alignPoint)a.alignPoint=transform(def.alignPoint,m);
+        const angle=(def.rotation||0)*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),width=(def.widthFactor||1)*((def.textFlags&2)?-1:1),vertical=(def.textFlags&4)?-1:1,slant=Math.tan((def.oblique||0)*Math.PI/180);
+        const ux=m[0]*c*width+m[2]*s*width,uy=m[1]*c*width+m[3]*s*width;
+        const vx=(m[0]*(c*slant-s)+m[2]*(s*slant+c))*vertical,vy=(m[1]*(c*slant-s)+m[3]*(s*slant+c))*vertical;
+        const baseline=Math.hypot(ux,uy),rise=(ux*vy-uy*vx)/baseline,h=Math.abs(rise);
+        if(!Number.isFinite(h)||h<1e-12||baseline<1e-12)throw new Error('Singular attribute frame');
+        a.height=(def.height||12)*h;a.widthFactor=baseline/h;a.rotation=Math.atan2(uy,ux)*180/Math.PI;
+        a.oblique=Math.atan((ux*vx+uy*vy)/baseline/rise)*180/Math.PI;a.textFlags=((def.textFlags||0)&~6)|(rise<0?4:0);
+        a.invisible=!!(def.invisible||def.hidden);delete a.handle;delete a.owner;delete a.raw;return a;
+    });
+    insert.attributes=transformed;
+}
+/** Prepare an entire database update, validate all variants and references, then commit once. */
+function prepareBlockDraft(document,name,replacement,{expectedSignature,attributes=true}={},evaluate,nextId) {
+    const original=document.blocks[name];if(original?.flags&4)throw new Error('External reference definitions are read-only');if(!original)throw new Error('Missing block definition');
+    if(expectedSignature!==undefined&&blockSignature(original)!==expectedSignature)throw new Error('Block changed since editing began. Reopen it before saving.');
+    const next=clone(document),block=clone(replacement);block.name=name;block.revision=(original.revision||0)+1;
+    validateBlockDraft(block,next.blocks,evaluate);next.blocks[name]=block;
+    const info=blockReferences(next,name),names=new Set(info.definitions),affectedIds=new Set(info.inserts);
+    for(const root of names)checkTree(next.blocks,root);
+    const validateInsert=e=>{
+        const b=next.blocks[e.block];if(!b)throw new Error('Missing insert definition');
+        const evaluated=b.dynamic?evaluate(b,e.dynamicParameters||{}):b;
+        if(e.block===name&&attributes)syncAttributes(e,evaluated,nextId);
+        e.dirty=true;return evaluated;
+    };
+    for(const e of next.entities)if(e.type==='INSERT'&&names.has(e.block))validateInsert(e);
+    for(const b of Object.values(next.blocks))for(const e of b.entities||[])if(e.type==='INSERT'&&names.has(e.block))validateInsert(e);
+    for(const e of next.entities)if(e.connector)for(const end of ['from','to']){
+        const reference=e.connector[end];if(!reference||!affectedIds.has(reference.entityId))continue;
+        const insert=next.entities.find(e=>e.id===reference.entityId),b=next.blocks[insert.block],evaluated=b.dynamic?evaluate(b,insert.dynamicParameters||{}):b;
+        const portName=reference.port??reference.portName??reference.name;
+        if(!(evaluated.ports||[]).some(p=>p.name===portName))throw new Error(`Block update would remove connected port: ${portName}`);
+    }
+    next.version=(next.version||0)+1;return {document:next,report:{...info,revision:block.revision,updatedInserts:info.inserts.length,attributesSynchronized:attributes}};
+}
+function renameBlockInDocument(document,oldName,newName) {
+    if(!validName(newName)||own(document.blocks,newName))throw new Error('Invalid or existing block name');
+    if(!own(document.blocks,oldName))throw new Error('Missing block definition');
+    const next=clone(document);next.blocks[newName]={...next.blocks[oldName],name:newName};delete next.blocks[oldName];
+    for(const e of [...next.entities,...Object.values(next.blocks).flatMap(b=>b.entities||[])]){if(e.block===oldName)e.block=newName;if(e.dynamicSource===oldName)e.dynamicSource=newName;}
+    return next;
+}
+function copyBlockInDocument(document,name,newName) {
+    if(!validName(newName)||own(document.blocks,newName))throw new Error('Invalid or existing block name');
+    if(!own(document.blocks,name))throw new Error('Missing block definition');
+    const next=clone(document);next.blocks[newName]={...clone(next.blocks[name]),name:newName,revision:0};delete next.blocks[newName].symbol;delete next.blocks[newName].handle;return next;
+}
+/** Create a validated definition without modifying an existing database object. */
+function createBlockInDocument(document,name,definition,evaluate) {
+    if(!validName(name)||own(document.blocks,name))throw new Error('Invalid or existing block name');
+    const next=clone(document),block={base:{x:0,y:0},ports:[],entities:[],...clone(definition||{}),name,revision:0};
+    validateBlockDraft(block,next.blocks,evaluate);next.blocks[name]=block;return next;
+}
+function removeBlockInDocument(document,name) {
+    const info=blockReferences(document,name);if(info.direct.length||info.nested.length)throw new Error('Referenced blocks cannot be deleted');
+    const next=clone(document);delete next.blocks[name];return next;
+}
+
+return {blockSignature,blockReferences,validateBlockDraft,beginBlockDraft,blockFromDraft,syncAttributes,prepareBlockDraft,renameBlockInDocument,copyBlockInDocument,createBlockInDocument,removeBlockInDocument};
+})();
+// packages/model/src/gradients.js
+__modules["packages/model/src/gradients.js"]=(()=>{
+/** Portable native LINEAR gradient descriptor. Unknown distributions are not approximated silently. */
+function linearHatchGradient(tags,contours,frame) {
+    if(!Array.isArray(tags))return null;
+    const value=(code,fallback)=>tags.find(p=>p[0]===code)?.[1]??fallback;
+    if(value(450,0)!==1||value(470,'LINEAR')!=='LINEAR'||value(461,0)!==0||value(453,2)!==2)return null;
+    const colors=tags.filter(p=>p[0]===421).map(p=>p[1]);
+    if(colors.length!==2||colors.some(c=>!Number.isInteger(c)||c<0||c>0xffffff))return null;
+    const rotation=value(460,0);if(!Number.isFinite(rotation))return null;
+    const u={x:Math.cos(rotation),y:Math.sin(rotation)};
+    let lo=Infinity,hi=-Infinity;
+    for(const polygon of contours)for(const p of polygon){const t=p.x*u.x+p.y*u.y;lo=Math.min(lo,t);hi=Math.max(hi,t);}
+    if(!Number.isFinite(lo)||hi-lo<1e-12)return null;
+    return {kind:'linear',start:{x:u.x*lo,y:u.y*lo},end:{x:u.x*hi,y:u.y*hi},frame:frame.slice(),colors:colors.map(c=>'#'+c.toString(16).padStart(6,'0'))};
+}
+
+return {linearHatchGradient};
+})();
 // packages/model/src/dynamic.js
 __modules["packages/model/src/dynamic.js"]=(()=>{
+const {regenerateDimensions} = __modules["packages/model/src/dimensions.js"];
+const {ConstraintSolver, evaluateExpression, parameterDependencies, resolveParameters, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
 const {matrix, compose, transform} = __modules["packages/geometry/src/index.js"];
 const clone=v=>JSON.parse(JSON.stringify(v));
 const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
@@ -445,7 +958,7 @@ const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 
 function validateDynamicDefinition(block) {
     const d=block.dynamic;
-    if(!d||d.version!==1||!Array.isArray(d.parameters)||!Array.isArray(d.actions))throw new Error('Expected Conduit dynamic-block schema version 1');
+    if(!d||![1,2].includes(d.version)||!Array.isArray(d.parameters)||!Array.isArray(d.actions))throw new Error('Expected Conduit dynamic-block schema version 1 or 2');
     if(d.parameters.length>64||d.actions.length>256||!Array.isArray(block.entities)||block.entities.length>10000)throw new Error('Dynamic block complexity limit exceeded');
     const names=new Set(),ids=new Set();
     for(const p of d.parameters){if(!/^[A-Za-z][\w-]{0,63}$/.test(p.name)||forbidden.has(p.name)||names.has(p.name))throw new Error('Invalid or duplicate parameter name');names.add(p.name);valueOf(p,p.default);
@@ -455,14 +968,15 @@ function validateDynamicDefinition(block) {
     }
     for(const e of block.entities){if(!e.id||ids.has(e.id))throw new Error('Dynamic geometry needs unique entity IDs');ids.add(e.id);}
     const portNames=new Set();for(const port of block.ports||[]){if(!port.name||portNames.has(port.name))throw new Error('Dynamic ports need unique names');portNames.add(port.name);for(const k of ['x','y','dx','dy'])finite(port[k],'port '+k);}
-    const types=new Set(['move','stretch','rotate','scale','flip','visibility','array','lookup']);
+    const types=new Set(['move','stretch','rotate','scale','flip','visibility','array','lookup','polar','polar-array']);
     for(const a of d.actions){
         if(!types.has(a.type)||!names.has(a.parameter))throw new Error('Unknown dynamic action or parameter');
         if(a.entities && (!Array.isArray(a.entities)||a.entities.some(id=>!ids.has(id))))throw new Error('Dynamic action references missing geometry');
         if(a.ports && (!Array.isArray(a.ports)||a.ports.some(n=>!(block.ports||[]).some(p=>p.name===n))))throw new Error('Dynamic action references missing port');
         for(const k of ['base','direction','step'])if(a[k]){finite(a[k].x,k);finite(a[k].y,k);}
         const parameter= d.parameters.find(p=>p.name===a.parameter);
-        if(['move','stretch','rotate','scale','array'].includes(a.type)&&!['number','distance','angle','integer'].includes(parameter.type))throw new Error('Geometric action requires a numeric parameter');
+        if(['move','stretch','rotate','scale','array','polar','polar-array'].includes(a.type)&&!['number','distance','angle','integer'].includes(parameter.type))throw new Error('Geometric action requires a numeric parameter');
+        if(a.angleParameter&&!names.has(a.angleParameter))throw new Error('Missing polar angle parameter');
         if(a.type==='flip'&&parameter.type!=='boolean')throw new Error('Flip requires a boolean parameter');
         if(a.type==='stretch') {
             if(!a.box)throw new Error('Stretch requires a crossing box');
@@ -487,26 +1001,35 @@ function valueOf(p,v) {
 function resolveDynamicValues(block,input={}) {
     validateDynamicDefinition(block);
     if(!input||Array.isArray(input)||typeof input!=='object')throw new Error('Invalid dynamic parameter values');
-    const definitions=new Map(block.dynamic.parameters.map(p=>[p.name,p])),values=Object.create(null),writers=new Map();
+    const definitions=new Map(block.dynamic.parameters.map(p=>[p.name,p])), values=Object.create(null), writers=new Map();
+    const constants=resolveParameters(block.parameters||{});
     for(const key of Object.keys(input))if(!definitions.has(key))throw new Error(`Unknown dynamic parameter: ${key}`);
     for(const p of definitions.values())values[p.name]=valueOf(p,own(input,p.name)?input[p.name]:p.default);
     const lookups=block.dynamic.actions.filter(a=>a.type==='lookup');
     for(const a of lookups){
         if(!a.rows||typeof a.rows!=='object')throw new Error('Lookup action requires rows');
-        for(const row of Object.values(a.rows))for(const key of Object.keys(row)) {
-            if(!definitions.has(key)||key===a.parameter||writers.has(key)&&writers.get(key)!==a)throw new Error('Invalid or ambiguous lookup dependency');
+        for(const row of Object.values(a.rows))for(const key of Object.keys(row)){
+            if(!definitions.has(key)||key===a.parameter||writers.has(key)&&writers.get(key)!==a||definitions.get(key).expression!==undefined)throw new Error('Invalid or ambiguous lookup dependency');
             writers.set(key,a);valueOf(definitions.get(key),row[key]);
         }
     }
     const visited=new Set(),active=new Set();
-    const run=a=>{
-        if(visited.has(a))return;if(active.has(a))throw new Error('Dynamic lookup cycle');active.add(a);
-        if(writers.has(a.parameter))run(writers.get(a.parameter));
-        const key=String(values[a.parameter]);if(!own(a.rows,key))throw new Error('No lookup row for selected value');
-        for(const [k,v]of Object.entries(a.rows[key]))values[k]=valueOf(definitions.get(k),v);
-        active.delete(a);visited.add(a);
-    };
-    lookups.forEach(run);return values;
+    function resolve(name){
+        if(!definitions.has(name)){if(own(constants,name))return constants[name];throw new Error('Unknown dynamic expression parameter: '+name);}
+        if(visited.has(name))return values[name];if(active.has(name))throw new Error('Dynamic parameter / lookup cycle: '+[...active,name].join(' → '));active.add(name);
+        const p=definitions.get(name),writer=writers.get(name);
+        if(p.expression!==undefined){
+            if(!['number','distance','angle','integer'].includes(p.type))throw new Error('Expressions require numeric parameters');
+            const dependencies=Object.fromEntries(parameterDependencies(p.expression).map(key=>[key,resolve(key)]));
+            values[name]=valueOf(p,evaluateExpression(p.expression,dependencies));
+        }else if(writer){
+            const key=String(resolve(writer.parameter));if(!own(writer.rows,key)||!own(writer.rows[key],name))throw new Error('No lookup row for selected value');
+            values[name]=valueOf(p,writer.rows[key][name]);
+        }
+        active.delete(name);visited.add(name);return values[name];
+    }
+    for(const p of definitions.values())resolve(p.name);
+    return values;
 }
 /** Pure bounded evaluation. Geometric transforms are supplied by the host model. */
 function evaluateDynamicDefinition(block,input,transformEntity,{maxEntities=10000}={}) {
@@ -544,6 +1067,13 @@ function evaluateDynamicDefinition(block,input,transformEntity,{maxEntities=1000
             for(const p of result.ports)if(portSelected(p)&&inside(p,a.box))Object.assign(p,transform(p,m));
             continue;
         }
+        if(a.type==='polar-array'){
+            if(!Number.isInteger(value)||value<1||value>256)throw new Error('Polar array count must be 1–256');
+            const originals=result.entities.filter(selected),sweep=a.angleParameter?values[a.angleParameter]:(a.angle??360);
+            finite(sweep,'array sweep');if(result.entities.length+originals.length*(value-1)>maxEntities)throw new Error('Dynamic array entity budget exceeded');
+            for(let i=1;i<value;i++)for(const e of originals){const copy=clone(e);copy.id=`${e.id}:polar:${i}`;transformEntity(copy,pivot(matrix({rotation:sweep*i/value}),a.base));result.entities.push(copy);}
+            continue;
+        }
         if(a.type==='array'){
             if(!Number.isInteger(value)||value<1||value>256)throw new Error('Array count must be 1–256');
             const originals=result.entities.filter(selected);if(result.entities.length+originals.length*(value-1)>maxEntities)throw new Error('Dynamic array entity budget exceeded');
@@ -552,6 +1082,11 @@ function evaluateDynamicDefinition(block,input,transformEntity,{maxEntities=1000
             continue; // Named terminals describe the original cell; no implicit port duplication.
         }
         let m;
+        if(a.type==='polar'){
+            const angle=a.angleParameter?values[a.angleParameter]:(a.angle??0);finite(angle,'polar angle');
+            const initialAngle=a.angleParameter?definitions.get(a.angleParameter).default:(a.angle??0),r=angle*Math.PI/180,q=initialAngle*Math.PI/180;
+            m=matrix({x:value*Math.cos(r)-p.default*Math.cos(q),y:value*Math.sin(r)-p.default*Math.sin(q)});
+        }
         if(a.type==='move'){const d=a.direction||{x:1,y:0};m=matrix({x:d.x*delta,y:d.y*delta});}
         if(a.type==='rotate')m=pivot(matrix({rotation:delta}),a.base);
         if(a.type==='scale'){const ratio=value/p.default;if(!(ratio>0)||!Number.isFinite(ratio))throw new Error('Dynamic scale requires positive nonzero reference and value');m=pivot(matrix({sx:ratio,sy:ratio}),a.base);}
@@ -568,6 +1103,22 @@ function evaluateDynamicDefinition(block,input,transformEntity,{maxEntities=1000
         for(const p of result.ports.filter(portSelected)){
             const q=transform(p,m),v=transform({x:p.x+(p.dx||0),y:p.y+(p.dy||0)},m);Object.assign(p,q,{dx:v.x-q.x,dy:v.y-q.y});
         }
+    }
+    // Constraint-based blocks solve a pristine post-action sketch for each parameter set.
+    const constraints=block.dynamic.constraints||block.constraints||[];
+    if(constraints.length){
+        const parameters={...block.parameters,...Object.fromEntries(Object.entries(values).filter(([,v])=>typeof v==='number'))};
+        const report=new ConstraintSolver().solve(result.entities,constraints,parameters);
+        if(!report.converged)throw new Error('Dynamic block constraints conflict: '+report.conflicts.join(', '));
+        result.solveReport=report;
+    }
+    regenerateDimensions({entities:result.entities,dimstyles:block.dimstyles||{}});
+    evaluateCalculations(result.entities,constraints,{...block.parameters,...Object.fromEntries(Object.entries(values).filter(([,v])=>typeof v==='number'))});
+    for(const port of result.ports)if(port.anchor){
+        const e=result.entities.find(e=>e.id===port.anchor.entityId),key=port.anchor.point;
+        const p=/^points\.\d+$/.test(key)?e?.points?.[Number(key.slice(7))]:['a','b','c','p'].includes(key)?e?.[key]:null;
+        if(!p)throw new Error('Invalid solved port anchor');port.x=p.x;port.y=p.y;
+        if(port.anchor.followDirection&&e.type==='LINE'){const n=Math.hypot(e.b.x-e.a.x,e.b.y-e.a.y),sign=port.anchor.reverse?-1:1;port.dx=sign*(e.b.x-e.a.x)/n;port.dy=sign*(e.b.y-e.a.y)/n;}
     }
     // Guard every coordinate, not only parameters. Prevent invalid buffers downstream.
     const check=v=>{if(typeof v==='number')finite(v,'geometry');else if(v&&typeof v==='object')for(const x of Object.values(v))check(x);};
@@ -834,6 +1385,7 @@ return {viewportTransform,viewportRectangle,insideClips,wipeoutPoints,helixPoint
 })();
 // packages/model/src/index.js
 __modules["packages/model/src/index.js"]=(()=>{
+const {blockSignature, blockReferences, beginBlockDraft, blockFromDraft, prepareBlockDraft, renameBlockInDocument, copyBlockInDocument, syncAttributes, createBlockInDocument, removeBlockInDocument} = __modules["packages/model/src/blocks.js"];
 const {linearHatchGradient} = __modules["packages/model/src/gradients.js"];
 const {dimensionPicture:buildDimensionPicture, editDimension:applyDimensionEdit, dimensionGrips:getDimensionGrips, regenerateDimensions:refreshDimensions} = __modules["packages/model/src/dimensions.js"];
 const {validateDynamicDefinition, resolveDynamicValues, evaluateDynamicDefinition} = __modules["packages/model/src/dynamic.js"];
@@ -1111,7 +1663,7 @@ function entityGeometry(e, doc, options = {}) {
                             texts.push({ ...t, entityId: e.id });
                     }
                     for (const child of block.entities || []) {
-                        if (child.type === 'ATTDEF' || child.hidden)
+                        if ((child.type === 'ATTDEF' && !(child.constant || ((child.attributeFlags ?? child.flags ?? 0)&2))) || child.hidden)
                             continue;
                         const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);
                         if (cl?.visible === false)
@@ -1303,12 +1855,13 @@ function setDynamicParameters(e,doc,patch) {
     if(e.type!=='INSERT'||!doc.blocks[e.block]?.dynamic)throw new Error('Select a Conduit parameterized block');
     const values={...e.dynamicParameters,...patch};
     const evaluated=evaluateDynamicBlock(doc.blocks[e.block],values);
-    e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
+    const updated=structuredClone(e);syncAttributes(updated,evaluated,()=>uid('attribute'));
+    e.attributes=updated.attributes;e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
 }
 const dynamicCache=new WeakMap();
 function effectiveBlock(e,doc) {
     const block=doc.blocks[e.block];if(!block?.dynamic)return block;
-    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base]);
+    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base,block.parameters,block.constraints]);
     let cache=dynamicCache.get(block);
     if(!cache||cache.signature!==signature){cache={signature,values:new Map()};dynamicCache.set(block,cache);}
     const key=JSON.stringify(e.dynamicParameters||{});
@@ -1343,7 +1896,28 @@ function dynamicGripValue(e,doc,name,world) {
     return value;
 }
 
-return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences,dimensionPicture,editDimension,dimensionGrips,regenerateDimensions,validateDynamicBlock,dynamicValues,evaluateDynamicBlock,setDynamicParameters,dynamicParameterGrips,dynamicGripValue};
+function blockDefinitionSignature(block) { return blockSignature(block); }
+function inspectBlockReferences(doc,name) { return blockReferences(doc,name); }
+function beginBlockEdit(doc,name) { return beginBlockDraft(doc,name); }
+function editedBlockDefinition(session) { return blockFromDraft(session); }
+function prepareBlockUpdate(doc,name,block,options={}) { return prepareBlockDraft(doc,name,block,options,evaluateDynamicBlock,()=>uid('attribute')); }
+function updateBlockDefinition(doc,name,block,options={}) {
+    const result=prepareBlockUpdate(doc,name,block,options);
+    // Validate before touching any live object. Host history owns the transaction.
+    Object.assign(doc,result.document);return result.report;
+}
+function renameBlockDefinition(doc,oldName,newName) { Object.assign(doc,renameBlockInDocument(doc,oldName,newName)); }
+function duplicateBlockDefinition(doc,name,newName) { Object.assign(doc,copyBlockInDocument(doc,name,newName)); }
+
+function createBlockDefinition(doc,name,definition={}) { Object.assign(doc,createBlockInDocument(doc,name,definition,evaluateDynamicBlock)); }
+function deleteBlockDefinition(doc,name) { Object.assign(doc,removeBlockInDocument(doc,name)); }
+function syncInsertAttributes(e,doc) {
+    if(e.type!=='INSERT'||!doc.blocks[e.block])throw new Error('Select a valid block reference');
+    const block=doc.blocks[e.block],evaluated=block.dynamic?evaluateDynamicBlock(block,e.dynamicParameters||{}):block,next=structuredClone(e);
+    syncAttributes(next,evaluated,()=>uid('attribute'));e.attributes=next.attributes;e.dirty=true;return e.attributes;
+}
+
+return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences,dimensionPicture,editDimension,dimensionGrips,regenerateDimensions,validateDynamicBlock,dynamicValues,evaluateDynamicBlock,setDynamicParameters,dynamicParameterGrips,dynamicGripValue,blockDefinitionSignature,inspectBlockReferences,beginBlockEdit,editedBlockDefinition,prepareBlockUpdate,updateBlockDefinition,renameBlockDefinition,duplicateBlockDefinition,createBlockDefinition,deleteBlockDefinition,syncInsertAttributes};
 })();
 // packages/dxf/src/codec.js
 __modules["packages/dxf/src/codec.js"]=(()=>{
@@ -2201,6 +2775,8 @@ function parseEntity(original, diagnostics, options = {}) {
             }
             if (['ATTRIB', 'ATTDEF'].includes(type)) {
                 e.attributeTag = get(raw, 2, '');
+                e.attributeFlags = Number(get(raw, 70, 0));e.constant=!!(e.attributeFlags&2);
+                if(type==='ATTDEF')e.prompt=get(raw,3,'');
                 e.invisible = !!(get(raw, 70, 0) & 1);
             }
             e.widthFactor = Number(get(raw, 41, 1));
@@ -2259,7 +2835,7 @@ function parseEntity(original, diagnostics, options = {}) {
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
         if (k in meta)
             e[k] = meta[k];
     readEntityFidelity(e, raw, diagnostics, options);
@@ -2375,7 +2951,7 @@ function parseDXF(input, options = {}) {
     for (const raw of records(sections.BLOCKS || [])) {
         const t = get(raw, 0);
         if (t === 'BLOCK') {
-            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
+            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, parameters: metadata(raw).parameters, constraints: metadata(raw).constraints, revision: metadata(raw).revision, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
             blockRecords = [];
         }
         else if (t === 'ENDBLK') {
@@ -2755,10 +3331,10 @@ function writeDXF(doc, options = {}) {
                 if (type === 'TEXT') { pair(100, 'AcDbText'); pair(73, e.valign || 0); }
                 else {
                     pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');
-                    pair(2, e.attributeTag || 'TAG');
+                    pair(2, e.attributeTag || e.tag || 'TAG');
                     if (type === 'ATTDEF')
-                        pair(3, 'Equipment tag');
-                    pair(70, e.invisible ? 1 : 0); pair(74, e.valign || 0);
+                        pair(3, e.prompt ?? 'Equipment tag');
+                    pair(70, ((e.attributeFlags ?? e.flags ?? 0)&~3) | (e.invisible?1:0) | (e.constant||((e.attributeFlags ?? e.flags ?? 0)&2)?2:0)); pair(74, e.valign || 0);
                 }
                 break;
             case 'MTEXT': {
@@ -2821,7 +3397,7 @@ function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
             if (e[k] !== undefined)
                 m[k] = e[k];
         if(e.type==='DIMENSION')writeDimensionOverrides(e.dimstyleOverrides,pair);
@@ -2866,7 +3442,7 @@ function writeDXF(doc, options = {}) {
         pp(10, b.base);
         pair(3, name);
         pair(1, '');
-        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
+        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, parameters: b.parameters, constraints: b.constraints, revision: b.revision, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
         for (const e of b.entities)
             emit(e, blockRecords[name]);
         pair(0, 'ENDBLK');

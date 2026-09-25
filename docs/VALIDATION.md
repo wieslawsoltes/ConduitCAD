@@ -1,3 +1,53 @@
+# Validation record — Conduit CAD 0.5.0
+
+## Shared block and parametric authoring checks
+
+`npm test`: **332 passed**, zero failures/skips (249 inherited + 83 new).
+The new cases cover expressions and cycles, scaled/translated and disconnected
+sketches, local rank/DOF/redundancy, atomic conflicts, every new relation family,
+singular starts, locks, block isolation, shared/nested updates, stale signatures,
+cyclic nesting, removed connected ports, attribute synchronization and affine
+frames, constraint-based variants, derived parameters, polar arrays, dependent
+dimensions/calculations and ASCII/binary metadata round-trips.
+
+`tests/browser_parametric.py`: **38 new passing checks**. Actual controls exercise
+native isolated geometry editing, shared save/undo/redo, behavior authoring,
+test-block scratch values, instance values, ATTDEF creation/sync, parameter values,
+solver diagnostics, computed text properties, auto constraints, driving dimensions,
+block-manager create/insert/edit and mobile controls. The binary download is saved
+and independently opened with ezdxf. With 125 existing checks this is **163**
+integrated checks, not 163 browser/device combinations. No uncaught JS errors.
+
+`tests/audit_parametric.py`: **60 independent checks** across four editable/baked ×
+ASCII/binary exports. ezdxf verifies native shared/nested INSERTs, canonical tags,
+prompts/flags/constants, preserved user values, evaluated anonymous block geometry,
+solved dimension witnesses/pictures and calculated text/attribute placements.
+All four files audit without errors or repairs. This is independent readback of
+Conduit-authored data, not an Autodesk evaluator execution or conformance certificate.
+
+Existing browser suites, 66 native editing checks, 110 native interop checks,
+37-entity fidelity fixture, 223-master catalogue and twenty starters also pass.
+Strict public TypeScript consumers and empty-cache offline package installation
+are checked for all thirteen version-0.5.0 archives.
+
+Reproduce with the 0.4 commands below plus:
+
+```sh
+node --test tests/parametric-authoring.test.mjs
+python tests/browser_parametric.py
+python tests/audit_parametric.py
+```
+
+The new browser suite defaults to standalone HTML locally. CI uses
+`CONDUIT_TEST_ORIGIN=localhost`. Save/schedule are stubbed for deterministic
+history checks; neither mode proves storage durability. Rendering is Canvas 2D,
+mobile is viewport/input emulation, and no hardware equivalence claim is made.
+Raw reports are `artifacts/browser-parametric.json`, `parametric-native-audit.json`
+and `ci-unit-tests.log`. Numerical rank is local and conflicts are residual-based,
+not proofs of global uniqueness or minimal unsatisfiable subsets.
+
+---
+
 # Validation record — Conduit CAD 0.4.0
 
 ## Dimension and parameter-action release

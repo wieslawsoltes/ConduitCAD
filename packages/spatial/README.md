@@ -1,6 +1,6 @@
 # @conduitcad/spatial
 
-Packed spatial index with incremental edits. Version **0.2.1**, native ESM JavaScript, MIT license.
+Packed spatial index with incremental edits. Version **0.5.0**, native ESM JavaScript, MIT license.
 
 Bounding-volume hierarchy, overlap searches and updated-object overlay; DOM-free.
 

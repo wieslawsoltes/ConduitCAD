@@ -1,0 +1,162 @@
+{
+  "checks": [
+    {
+      "name": "graphical block editor opens isolated native geometry",
+      "passed": true
+    },
+    {
+      "name": "property edit changes block draft without touching source",
+      "passed": true
+    },
+    {
+      "name": "save updates shared definition and preserves all insert identities",
+      "passed": true
+    },
+    {
+      "name": "nested insert renderer rebuilds after master save",
+      "passed": true
+    },
+    {
+      "name": "shared block update is one document undo transaction",
+      "passed": true
+    },
+    {
+      "name": "redo restores shared block edit",
+      "passed": true
+    },
+    {
+      "name": "native drawing tools add geometry inside block editor",
+      "passed": true
+    },
+    {
+      "name": "discard leaves previously saved master untouched",
+      "passed": true
+    },
+    {
+      "name": "graphical author attaches stretch to selected entity IDs",
+      "passed": true
+    },
+    {
+      "name": "behavior author validates and applies schema without JSON-only workflow",
+      "passed": true
+    },
+    {
+      "name": "test-block inspector evaluates scratch parameters",
+      "passed": true
+    },
+    {
+      "name": "test block does not mutate master draft",
+      "passed": true
+    },
+    {
+      "name": "saved behavior appears on every existing reference",
+      "passed": true
+    },
+    {
+      "name": "insert-specific parameters remain independent after shared authoring",
+      "passed": true
+    },
+    {
+      "name": "base point is editable in block workspace",
+      "passed": true
+    },
+    {
+      "name": "attribute definition is authored as native ATTDEF",
+      "passed": true
+    },
+    {
+      "name": "attribute synchronization creates values on all direct inserts",
+      "passed": true
+    },
+    {
+      "name": "fully parametric example has driving and reference constraints",
+      "passed": true
+    },
+    {
+      "name": "parameter inspector previews evaluated expression values",
+      "passed": true
+    },
+    {
+      "name": "parameter changes re-solve driving dimensions",
+      "passed": true
+    },
+    {
+      "name": "solve diagnostics show rank DOF and reference measurements",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation evaluates allowed math functions",
+      "passed": true
+    },
+    {
+      "name": "calculated text exposes editable formula and formatting properties",
+      "passed": true
+    },
+    {
+      "name": "calculated drawing annotation automatically updates",
+      "passed": true
+    },
+    {
+      "name": "constraint labels expose solved values and reference state",
+      "passed": true
+    },
+    {
+      "name": "edited block and parameterized design download opens independently",
+      "passed": true
+    },
+    {
+      "name": "instance attribute values are editable independently",
+      "passed": true
+    },
+    {
+      "name": "automatic constraints are created through the graphical inspector",
+      "passed": true
+    },
+    {
+      "name": "native associated dimension drives geometry by expression",
+      "passed": true
+    },
+    {
+      "name": "native dimension witnesses regenerate after the driving solve",
+      "passed": true
+    },
+    {
+      "name": "block manager creates and opens a clean authoring canvas",
+      "passed": true
+    },
+    {
+      "name": "block manager inserts an authored definition as a native reference",
+      "passed": true
+    },
+    {
+      "name": "manager edit closes modal and exposes the canvas",
+      "passed": true
+    },
+    {
+      "name": "mobile block editor provides scrollable 44px action targets",
+      "passed": true
+    },
+    {
+      "name": "mobile block editor does not overflow the document",
+      "passed": true
+    },
+    {
+      "name": "shared saves keep instance-specific attribute text",
+      "passed": true
+    },
+    {
+      "name": "mobile block save refreshes live definition",
+      "passed": true
+    },
+    {
+      "name": "no uncaught JavaScript errors",
+      "passed": true
+    }
+  ],
+  "passed": 38,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "origin": "localhost",
+  "storage": "save/schedule stubbed for deterministic transactions"
+}

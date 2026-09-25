@@ -1,6 +1,6 @@
 # @conduitcad/model
 
-DXF-native editable document model. Version **0.2.1**, native ESM JavaScript, MIT license.
+DXF-native editable document model. Version **0.5.0**, native ESM JavaScript, MIT license.
 
 JSON-safe CAD entities, native BLOCK/INSERT definitions, layers, ports, tags, geometry expansion and transformations.
 
@@ -20,7 +20,7 @@ model, history, routing, constraints, symbol, DXF and scene compilation engines
 can also be used in Node.js. There are no external runtime dependencies beyond
 the following sibling packages.
 
-**Dependencies:** `@conduitcad/geometry`.
+**Dependencies:** `@conduitcad/geometry`, `@conduitcad/constraints`.
 
 ## Public exports
 
@@ -40,3 +40,5 @@ associations; bounded declarative parameter-action evaluation, instance variants
 parameter grips and named-port updates. Public TypeScript definitions describe
 all eight action types. See `docs/CAD_EDITING.md` in the source repository for
 native interoperability, unsupported geometry and host history integration.
+
+Version 0.5 adds `beginBlockEdit`, `editedBlockDefinition`, `prepareBlockUpdate`, `updateBlockDefinition`, `inspectBlockReferences`, `createBlockDefinition`, `deleteBlockDefinition`, `duplicateBlockDefinition`, `renameBlockDefinition` and `syncInsertAttributes`. The workbench supplies undo/routing/render integration; headless hosts own those policies.

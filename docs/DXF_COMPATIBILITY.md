@@ -1,3 +1,12 @@
+## 0.5.0 authoring addition
+
+Shared block editing preserves native BLOCK/INSERT structure. Native attributes
+retain tags, prompts, flags and affine placement; constants are not duplicated.
+Constraint-based variants and calculated annotations are exported as evaluated
+native geometry/text, with Conduit metadata for editable reimport. This does not
+emit proprietary Autodesk action graphs or native dimensional constraint networks.
+See [Parametric authoring](PARAMETRIC_AUTHORING.md) for precise editing contracts.
+
 # DXF compatibility boundary — 0.4.0
 
 Recognizing a record, rendering its geometry and losslessly exporting all its

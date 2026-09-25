@@ -1,6 +1,6 @@
 # @conduitcad/renderer
 
-Retained CAD strokes with GPU fallbacks. Version **0.2.1**, native ESM JavaScript, MIT license.
+Retained CAD strokes with GPU fallbacks. Version **0.5.0**, native ESM JavaScript, MIT license.
 
 Scene-relative coordinates, adaptive curve tessellation, batched strokes, WebGPU compute culling/indirect draws, WebGL2 instancing and Canvas fallback. Text and fills use a Canvas overlay. Equal-topology edits patch buffer ranges. Hardware GPU execution was not validated in the delivery runner.
 

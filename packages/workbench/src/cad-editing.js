@@ -10,7 +10,7 @@ export function renderCadEditing(w,e,host) {
         if(e.dimension?.version!==1){section.innerHTML=`<h3>Native dimension</h3><p>${E(names[(e.dimtype??33)&15]||'Unknown')} · original graphics retained.</p>${button('dimension-manage','Enable dimension editing')}<p class="muted-note">Opt in to decimal-style regeneration. The original graphics remain unchanged until you confirm.</p>`;}
         else {
             const p=dimensionPicture(e,w.doc),s=p.style;
-            section.innerHTML=`<h3>${E(names[(e.dimtype??33)&15])} dimension</h3><div class="fields">${input('text','Dimension text',e.text??'<>')}${input('dimtxt','Dimension text height',s.dimtxt)}${input('dimasz','Arrow size',s.dimasz)}${input('dimdec','Decimal precision',s.dimdec)}${input('dimgap','Text gap',s.dimgap)}${input('dimlfac','Measurement factor',s.dimlfac)}${[0,1].includes((e.dimtype??33)&15)?input('offset','Dimension offset',e.offset??dimensionOffset(e)):''}${(e.dimtype&15)===0?input('dimensionAngle','Dimension angle',e.dimensionAngle||0):''}</div>${button('dimension-reset-text','Reset text position')}<p class="muted-note">Drag witness points, the dimension line, or the text grip. “&lt;&gt;” inserts the measurement; one space suppresses text. ${e.dimension.references?'Source points are associated; editing a witness grip detaches that point.':''}</p>`;
+            section.innerHTML=`<h3>${E(names[(e.dimtype??33)&15])} dimension</h3><div class="fields">${input('text','Dimension text',e.text??'<>')}${input('dimtxt','Dimension text height',s.dimtxt)}${input('dimasz','Arrow size',s.dimasz)}${input('dimdec','Decimal precision',s.dimdec)}${input('dimgap','Text gap',s.dimgap)}${input('dimlfac','Measurement factor',s.dimlfac)}${[0,1].includes((e.dimtype??33)&15)?input('offset','Dimension offset',e.offset??dimensionOffset(e)):''}${(e.dimtype&15)===0?input('dimensionAngle','Dimension angle',e.dimensionAngle||0):''}</div>${button('dimension-reset-text','Reset text position')}${e.dimension.references?button('dimension-drive','Drive source by expression'):''}<p class="muted-note">Drag witness points, the dimension line, or the text grip. “&lt;&gt;” inserts the measurement; one space suppresses text. ${e.dimension.references?'Source points are associated; editing a witness grip detaches that point.':''}</p>`;
         }
     } else if(e.type==='INSERT'){
         const block=w.doc.blocks[e.block];if(!block)return;
@@ -20,9 +20,10 @@ export function renderCadEditing(w,e,host) {
             section.innerHTML+=`<div class="fields">${block.dynamic.parameters.map(p=>{
                 const label=E(p.label||p.name),v=values[p.name];
                 if(p.type==='boolean'||p.type==='enum')return `<label class="field"><span>${label}</span><select data-dynamic="${E(p.name)}" aria-label="${label}">${(p.type==='boolean'?[false,true]:p.values).map(x=>`<option value="${E(JSON.stringify(x))}" ${v===x?'selected':''}>${E(String(x))}</option>`).join('')}</select></label>`;
-                return input(p.name,p.label||p.name,v,'dynamic');
+                return p.expression!==undefined?`<label class="field"><span>${label} · calculated</span><output>${E(v)}</output><small>${E(p.expression)}</small></label>`:input(p.name,p.label||p.name,v,'dynamic');
             }).join('')}</div>${button('dynamic-reset','Reset parameters')}`;
         }
+        if(e.attributes?.length)section.innerHTML+=`<h3>Attribute values</h3><div class="fields">${e.attributes.map(a=>`<label class="field"><span>${E(a.attributeTag||a.tag)}</span>${a.calculation?`<output>${E(a.text)}</output>`:`<input data-attribute="${E(a.id)}" value="${E(a.text||'')}">`}</label>`).join('')}</div>`;
         section.innerHTML+=button('dynamic-author',block.dynamic?'Edit behavior definition':'Add parameterized behavior')+'<p class="muted-note">Conduit actions export evaluated native DXF geometry. Proprietary Autodesk action graphs are not executed.</p>';
     } else if(e.type==='LINE'||e.type==='CIRCLE'||e.type==='ARC'){
         section.innerHTML='<h3>Dimension this object</h3>'+button('dimension-source',e.type==='LINE'?'Add associated dimension':'Add radius dimension');
@@ -33,19 +34,21 @@ export function renderCadEditing(w,e,host) {
 function dimensionOffset(e){const a=e.a,b=e.b,u=(e.dimtype&15)===0?{x:Math.cos((e.dimensionAngle||0)*Math.PI/180),y:Math.sin((e.dimensionAngle||0)*Math.PI/180)}:{x:(b.x-a.x)/Math.hypot(b.x-a.x,b.y-a.y),y:(b.y-a.y)/Math.hypot(b.x-a.x,b.y-a.y)};return -(e.definitionPoint.x-a.x)*u.y+(e.definitionPoint.y-a.y)*u.x;}
 function editable(w){const e=w.selected()[0];if(!e||w.selection.size!==1||isLocked(e,w.doc))throw new Error('Select one unlocked object');return e;}
 export function changeCadEditing(w,t) {
-    if(!t.dataset.dim&&!t.dataset.dynamic)return false;
+    if(!t.dataset.dim&&!t.dataset.dynamic&&!t.dataset.attribute)return false;
     const e=editable(w);
     w.edit('Edit CAD parameters',()=>{
-        if(t.dataset.dim){const key=t.dataset.dim,value=key==='text'?t.value:w.eval(t.value);editDimension(e,w.doc,['text','offset','dimensionAngle'].includes(key)?{[key]:value}:{style:{[key]:value}});}
+        if(t.dataset.attribute){const a=e.attributes?.find(a=>a.id===t.dataset.attribute);if(!a||a.calculation)throw new Error('Attribute is missing or calculated');a.text=t.value;e.dirty=true;}
+        else if(t.dataset.dim){const key=t.dataset.dim,value=key==='text'?t.value:w.eval(t.value);editDimension(e,w.doc,['text','offset','dimensionAngle'].includes(key)?{[key]:value}:{style:{[key]:value}});}
         else {
             const p=w.doc.blocks[e.block].dynamic.parameters.find(p=>p.name===t.dataset.dynamic);
+            if(p.expression!==undefined)throw new Error('Calculated block parameters are read-only');
             const value=['enum','boolean'].includes(p.type)?JSON.parse(t.value):w.eval(t.value);
             setDynamicParameters(e,w.doc,{[p.name]:value});w.reroute(new Set([e.id]));
         }
     });return true;
 }
 export function cadEditingAction(w,action) {
-    if(!['dimension-manage','dimension-reset-text','dimension-source','dynamic-author','dynamic-reset','dynamic-demo'].includes(action))return false;
+    if(!['dimension-manage','dimension-reset-text','dimension-source','dimension-drive','dynamic-author','dynamic-reset','dynamic-demo'].includes(action))return false;
     if(action==='dynamic-demo'){
         w.edit('Insert parameterized duct',()=>{
             const name='CC_DYNAMIC_DUCT_'+uid('block'),base={x:0,y:0};
@@ -55,7 +58,12 @@ export function cadEditingAction(w,action) {
         });w.closeModal();w.setTool('select');return true;
     }
     const e=editable(w);
-    if(action==='dimension-manage'){
+    if(action==='dimension-drive'){
+        const references=e.dimension?.references,source=w.doc.entities.find(x=>x.id===Object.values(references||{})[0]?.entityId);
+        if(!source||!['LINE','CIRCLE','ARC'].includes(source.type))throw new Error('An associated line or radius dimension is required');
+        const type=source.type==='LINE'?'length':'radius',value=type==='length'?Math.hypot(source.b.x-source.a.x,source.b.y-source.a.y):source.r;
+        w.ask('Drive dimension',[{name:'value',label:'Driving expression or named parameter',value:String(value)}],v=>w.edit('Add driving dimensional constraint',()=>{const existing=w.doc.constraints.find(c=>c.dimensionId===e.id);if(existing)existing.value=v.value;else w.doc.constraints.push({id:uid('constraint'),type,entities:[source.id],value:v.value,dimensionId:e.id});w.solveConstraints();w.showConstraintAnnotations=true;}));
+    } else if(action==='dimension-manage'){
         w.openModal('Enable native dimension editing','<p>This replaces the imported picture with Conduit’s planar decimal dimension evaluator. Original DXF bytes remain available. Custom arrows, tolerance layouts, annotative contexts and proprietary associations are not evaluated. This change is undoable.</p><div class="error-text"></div>',{confirm:'Enable editing',onConfirm:()=>{w.edit('Enable dimension regeneration',()=>editDimension(e,w.doc));w.closeModal();}});
     } else if(action==='dimension-reset-text')w.edit('Reset dimension text',()=>editDimension(e,w.doc,{manualText:false}));
     else if(action==='dimension-source'){

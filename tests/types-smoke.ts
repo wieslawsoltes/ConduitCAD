@@ -72,3 +72,13 @@ const dynamicBlock: Block = {name:'Editable',entities:[line({x:0,y:0},{x:100,y:0
 validateDynamicBlock(dynamicBlock);
 const variant = evaluateDynamicBlock(dynamicBlock,{Length:200},{maxEntities:100});
 void [variant.dynamicValues, dynamicValues(dynamicBlock), picture.entities, regenerateDimensions(documentModel), dimensionGrips(managed, documentModel), setDynamicParameters, dynamicGripValue, dynamicParameterGrips];
+
+import {beginBlockEdit, editedBlockDefinition, prepareBlockUpdate, updateBlockDefinition, inspectBlockReferences, type BlockEditSession} from '@conduitcad/model';
+import {describeParameters, inferSketchConstraints, evaluateCalculations, type SolveReport, type SketchConstraint} from '@conduitcad/constraints';
+const sketchRelations: SketchConstraint[] = [{type:'length',entityId:e.id,value:'Span',name:'measuredSpan'},{type:'fixed-point',entityId:e.id,pointA:'a',target:{x:0,y:0}}];
+const solve: SolveReport = new ConstraintSolver({relativeTolerance:1e-10,maxVariables:256}).analyze([e],sketchRelations,{Span:100});
+const session: BlockEditSession = beginBlockEdit(documentModel,'Part');
+const blockDefinition = editedBlockDefinition(session);
+const prepared = prepareBlockUpdate(documentModel,'Part',blockDefinition,{expectedSignature:session.signature,attributes:true});
+const constraintBased: import('@conduitcad/model').DynamicDefinition = {version:2,parameters:[{name:'Width',type:'distance',default:100},{name:'HalfWidth',type:'distance',default:50,expression:'Width/2'}],actions:[{type:'polar-array',parameter:'Width',angle:360,base:{x:0,y:0}}],constraints:[{type:'length',entityId:e.id,value:'Width'}]};
+void [solve.degreesOfFreedom,solve.conflicts,solve.annotations,prepared.report.updatedInserts,updateBlockDefinition,inspectBlockReferences,describeParameters({Width:100,Diagonal:'hypot(Width,Width)'}),inferSketchConstraints([e]),evaluateCalculations, constraintBased,app.beginBlockEdit,app.saveBlockEdit];

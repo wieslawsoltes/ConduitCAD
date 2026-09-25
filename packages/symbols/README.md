@@ -1,6 +1,6 @@
 # @conduitcad/symbols
 
-Original engineering symbol, line and drawing-starter libraries. Version **0.2.1**,
+Original engineering symbol, line and drawing-starter libraries. Version **0.5.0**,
 native ESM JavaScript with TypeScript declarations, MIT license.
 
 223 native CAD block masters in 11 categories; 21 connection styles; 20 genuinely

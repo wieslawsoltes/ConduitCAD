@@ -2,55 +2,55 @@
   "packages": [
     {
       "name": "@conduitcad/constraints",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/dxf",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/exchange",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/geometry",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/history",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/input",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/model",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/renderer",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/routing",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/spatial",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/storage",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/symbols",
-      "version": "0.4.0"
+      "version": "0.5.0"
     },
     {
       "name": "@conduitcad/workbench",
-      "version": "0.4.0"
+      "version": "0.5.0"
     }
   ],
   "registryAccess": false,

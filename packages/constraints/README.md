@@ -1,8 +1,8 @@
 # @conduitcad/constraints
 
-Parameters and sketch constraints. Version **0.2.1**, native ESM JavaScript, MIT license.
+Parameters and sketch constraints. Version **0.5.0**, native ESM JavaScript, MIT license.
 
-Non-eval expression parsing, named dependency resolution and a bounded dense damped least-squares solver. Convergence and failed edits are explicit.
+Safe bounded arithmetic/function expressions, memoized named dependencies and an analytic-Jacobian, normalized, component-partitioned Levenberg–Marquardt solver using pivoted Householder QR. Rank/DOF, redundancy, references and calculated annotations are exposed. Convergence and failed edits are explicit.
 
 ## Use
 
@@ -24,7 +24,7 @@ the following sibling packages.
 
 ## Public exports
 
-`evaluateExpression`, `resolveParameters`, `ConstraintSolver`.
+`evaluateExpression`, `resolveParameters`, `describeParameters`, `parameterDependencies`, `reservedParameterNames`, `ConstraintSolver`, `constraintMeasurement`, `constraintAnnotations`, `inferSketchConstraints`, `evaluateCalculations`.
 
 ## Documentation and validation
 
@@ -32,3 +32,5 @@ The full source workspace contains `docs/API.md` with integration examples,
 `docs/ARCHITECTURE.md`, `docs/DXF_COMPATIBILITY.md`, and `docs/VALIDATION.md`.
 Tests and raw validation reports are included there. These are original reusable
 2D engineering components, not a claim of complete AutoCAD/Visio compatibility.
+
+See `docs/PARAMETRIC_AUTHORING.md` in the workspace for equation definitions and numerical limits. Rank is local; this is not a claim of AutoCAD solver equivalence.

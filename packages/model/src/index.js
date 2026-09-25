@@ -1,3 +1,4 @@
+import { blockSignature, blockReferences, beginBlockDraft, blockFromDraft, prepareBlockDraft, renameBlockInDocument, copyBlockInDocument, syncAttributes, createBlockInDocument, removeBlockInDocument } from './blocks.js';
 import { linearHatchGradient } from './gradients.js';
 import { dimensionPicture as buildDimensionPicture, editDimension as applyDimensionEdit, dimensionGrips as getDimensionGrips, regenerateDimensions as refreshDimensions } from './dimensions.js';
 import { validateDynamicDefinition, resolveDynamicValues, evaluateDynamicDefinition } from './dynamic.js';
@@ -275,7 +276,7 @@ export function entityGeometry(e, doc, options = {}) {
                             texts.push({ ...t, entityId: e.id });
                     }
                     for (const child of block.entities || []) {
-                        if (child.type === 'ATTDEF' || child.hidden)
+                        if ((child.type === 'ATTDEF' && !(child.constant || ((child.attributeFlags ?? child.flags ?? 0)&2))) || child.hidden)
                             continue;
                         const cl = (child.layer === '0') ? (e.layer === '0' && parentLayer ? parentLayer : layerFor(e, doc)) : layerFor(child, doc);
                         if (cl?.visible === false)
@@ -467,12 +468,13 @@ export function setDynamicParameters(e,doc,patch) {
     if(e.type!=='INSERT'||!doc.blocks[e.block]?.dynamic)throw new Error('Select a Conduit parameterized block');
     const values={...e.dynamicParameters,...patch};
     const evaluated=evaluateDynamicBlock(doc.blocks[e.block],values);
-    e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
+    const updated=structuredClone(e);syncAttributes(updated,evaluated,()=>uid('attribute'));
+    e.attributes=updated.attributes;e.dynamicParameters={...evaluated.dynamicValues};e.dirty=true;return evaluated;
 }
 const dynamicCache=new WeakMap();
 function effectiveBlock(e,doc) {
     const block=doc.blocks[e.block];if(!block?.dynamic)return block;
-    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base]);
+    const signature=JSON.stringify([block.entities,block.ports,block.dynamic,block.base,block.parameters,block.constraints]);
     let cache=dynamicCache.get(block);
     if(!cache||cache.signature!==signature){cache={signature,values:new Map()};dynamicCache.set(block,cache);}
     const key=JSON.stringify(e.dynamicParameters||{});
@@ -505,4 +507,25 @@ export function dynamicGripValue(e,doc,name,world) {
     value=Math.max(p.min??-Infinity,Math.min(p.max??Infinity,value));
     if(p.values?.length)value=p.values.reduce((a,b)=>Math.abs(b-value)<Math.abs(a-value)?b:a);
     return value;
+}
+
+export function blockDefinitionSignature(block) { return blockSignature(block); }
+export function inspectBlockReferences(doc,name) { return blockReferences(doc,name); }
+export function beginBlockEdit(doc,name) { return beginBlockDraft(doc,name); }
+export function editedBlockDefinition(session) { return blockFromDraft(session); }
+export function prepareBlockUpdate(doc,name,block,options={}) { return prepareBlockDraft(doc,name,block,options,evaluateDynamicBlock,()=>uid('attribute')); }
+export function updateBlockDefinition(doc,name,block,options={}) {
+    const result=prepareBlockUpdate(doc,name,block,options);
+    // Validate before touching any live object. Host history owns the transaction.
+    Object.assign(doc,result.document);return result.report;
+}
+export function renameBlockDefinition(doc,oldName,newName) { Object.assign(doc,renameBlockInDocument(doc,oldName,newName)); }
+export function duplicateBlockDefinition(doc,name,newName) { Object.assign(doc,copyBlockInDocument(doc,name,newName)); }
+
+export function createBlockDefinition(doc,name,definition={}) { Object.assign(doc,createBlockInDocument(doc,name,definition,evaluateDynamicBlock)); }
+export function deleteBlockDefinition(doc,name) { Object.assign(doc,removeBlockInDocument(doc,name)); }
+export function syncInsertAttributes(e,doc) {
+    if(e.type!=='INSERT'||!doc.blocks[e.block])throw new Error('Select a valid block reference');
+    const block=doc.blocks[e.block],evaluated=block.dynamic?evaluateDynamicBlock(block,e.dynamicParameters||{}):block,next=structuredClone(e);
+    syncAttributes(next,evaluated,()=>uid('attribute'));e.attributes=next.attributes;e.dirty=true;return e.attributes;
 }

@@ -1,3 +1,4 @@
+import { parametricAction, renderParametricInspector, refreshCalculations, drawParametricOverlay, startBlockEditor, finishBlockEditor, parameterManager, constraintAuthor } from './parametric-workbench.js';
 import { renderCadEditing, changeCadEditing, cadEditingAction } from './cad-editing.js';
 import { editDimension, dimensionGrips, regenerateDimensions, setDynamicParameters, dynamicParameterGrips, dynamicGripValue } from '@conduitcad/model';
 import { bounds, inflate, contains, distance, distanceToSegment, lerp, union, emptyBounds, center, validBounds, snapCandidates, lineIntersection, offsetPolyline, filletLines, matrix, compose, TAU, clamp } from '@conduitcad/geometry';
@@ -67,7 +68,7 @@ export class Workbench {
                 if (error)
                     this.toast('Autosave unavailable. Export a project copy to keep your work.', true);
             } });
-        this.history = new History({ capture: () => this.doc, restore: d => { this.doc = d; this.selection = new Set([...this.selection].filter(id => d.entities.some(e => e.id === id))); this.renderer.setDocument(d); this.updateUI(); }, onChange: () => { this.updateHistory(); this.store.schedule(this.doc); this.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: this.doc } })); } });
+        this.history = new History({ capture: () => this.doc, restore: d => { this.doc = d; this.selection = new Set([...this.selection].filter(id => d.entities.some(e => e.id === id))); refreshCalculations(this); this.lastSolve=null; this.renderer.setDocument(d); this.updateUI(); }, onChange: () => { this.updateHistory(); this.store.schedule(this.doc); this.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: this.doc } })); } });
         this.input = new PointerController(this.$('.viewport'), { down: p => this.pointerDown(p), move: p => {try{this.pointerMove(p);}catch(error){this.cancelGesture();this.toast(error.message,true);}}, up: p => this.pointerUp(p), hover: p => this.pointerHover(p), cancel: () => this.cancelGesture(), gesture: ({ previous, current, scale, dx, dy }) => { this.camera.zoom(scale, { x: previous.x, y: previous.y }); this.camera.pan(dx, dy); this.renderer.invalidate(); }, wheel: p => {
                 if (p.original.shiftKey)
                     this.camera.pan(-p.deltaY, 0);
@@ -130,6 +131,7 @@ export class Workbench {
                 const e = this.selected()[0];
                 if (['TEXT', 'MTEXT'].includes(e.type))
                     this.editText(e);
+                else if(e.type==='INSERT'&&!this.blockSession)startBlockEditor(this,e.block);
                 else
                     this.openPanel('inspector');
             }
@@ -149,7 +151,7 @@ export class Workbench {
         window.addEventListener('blur', () => { this.space = false; this.cancelGesture(); }, opt);
         document.addEventListener('visibilitychange', () => {
             if (document.hidden)
-                this.store.save(this.doc).catch(() => { });
+                this.store.save(this.blockSession?.parentDocument || this.doc).catch(() => { });
         }, opt);
     }
     async onClick(event) {
@@ -223,6 +225,7 @@ export class Workbench {
         }
     }
     async action(action) {
+        if(parametricAction(this,action))return;
         if(cadEditingAction(this,action))return;
         switch (action) {
             case 'library-guide':
@@ -445,9 +448,14 @@ export class Workbench {
         if (s.message)
             this.$('.render-badge')?.setAttribute('title', s.message);
     }
+    beginBlockEdit(name) { return startBlockEditor(this,name); }
+    saveBlockEdit(close=false) { return finishBlockEditor(this,true,!close); }
+    cancelBlockEdit() { return finishBlockEditor(this,false); }
     selected() { return this.doc.entities.filter(e => this.selection.has(e.id)); }
     eval(source) { return evaluateExpression(source, this.doc.parameters); }
     touch(changed = null) {
+        refreshCalculations(this);
+        if(changed){changed=new Set(changed);for(const c of this.doc.constraints||[])if(!c.suppressed)for(const id of c.entities||[c.entityId])if(id)changed.add(id);for(const e of this.doc.entities)if(e.calculation)changed.add(e.id);}
         const regenerated=regenerateDimensions(this.doc);
         if(changed&&regenerated.length)changed=new Set([...changed,...regenerated]);
         this.doc.version = (this.doc.version || 0) + 1;
@@ -457,7 +465,7 @@ export class Workbench {
             this.renderer.setDocument(this.doc);
         this.updateStatus();
     }
-    edit(label, action) { this.history.run(label, () => { action(); this.touch(); }); this.updateUI(); }
+    edit(label, action) { this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
     updateSelection() { this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
@@ -646,7 +654,8 @@ export class Workbench {
         window.addEventListener('pointercancel', () => { clearTimeout(timer); abort.abort(); this.previewSymbol = null; this.renderer.invalidate(); }, { signal: abort.signal, once: true });
     }
     field(name, label, value, full = false, unit = '') { return `<label class="field ${full ? 'full' : ''}"><span>${E(label)}${unit ? `<span class="unit">${E(unit)}</span>` : ''}</span><input data-prop="${name}" value="${E(value ?? '')}" autocomplete="off" spellcheck="false" inputmode="${['tag', 'text'].includes(name) ? 'text' : 'decimal'}" aria-label="${E(label)}"></label>`; }
-    renderInspector() {
+    renderInspector() { this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); }
+    renderBaseInspector() {
         const host = this.$('.inspector-content');
         if (!host)
             return;
@@ -685,8 +694,9 @@ export class Workbench {
             fields += this.field('radius', 'Radius', e.parametric?.radius ?? format(e.r), true, this.doc.units);
         if (e.parametric?.kind === 'rectangle')
             fields += this.field('rectWidth', 'Width', e.parametric.width, false, this.doc.units) + this.field('rectHeight', 'Height', e.parametric.height, false, this.doc.units);
-        if (e.type === 'TEXT' || e.type === 'MTEXT')
-            fields += this.field('text', 'Text', e.text, true) + this.field('height', 'Text height', format(e.height)) + this.field('rotation', 'Rotation', format(e.rotation || 0));
+        if (['TEXT','MTEXT','ATTDEF','ATTRIB'].includes(e.type))
+            fields += (e.calculation?this.field('calculationExpression','Calculated expression',e.calculation.expression,true)+this.field('calculationPrecision','Calculation precision',e.calculation.precision??3)+this.field('calculationPrefix','Calculation prefix',e.calculation.prefix||'',true)+this.field('calculationSuffix','Calculation suffix',e.calculation.suffix||'',true):this.field('text', 'Text', e.text, true)) + this.field('height', 'Text height', format(e.height)) + this.field('rotation', 'Rotation', format(e.rotation || 0));
+        if(['ATTDEF','ATTRIB'].includes(e.type))fields+=this.field('attributeTag','Attribute tag',e.attributeTag||e.tag||'',true)+this.field('prompt','Attribute prompt',e.prompt||'',true)+this.field('attributeFlags','Attribute flags · 1 hidden / 2 constant / 4 verify / 8 preset',e.attributeFlags||0,true);
         host.innerHTML = `<div class="object-card"><div class="object-preview">${block ? symbolSVG(block, this.doc) : icon(e.connector ? 'connect' : e.type === 'LINE' ? 'line' : e.type === 'CIRCLE' ? 'circle' : 'rect')}</div><div class="object-meta"><strong>${E(e.tag || block?.symbol?.name || e.type)}</strong><small>${E(e.type)}${e.connector ? ' · ROUTED CONNECTION' : e.type === 'INSERT' ? ' · BLOCK REFERENCE' : ' · CAD ENTITY'}</small></div></div><div class="inspector-section"><h3>Identity</h3><div class="fields">${e.type === 'INSERT' ? this.field('tag', 'Equipment tag', e.tag || '', true) : ''}${e.connector ? this.field('label', 'Line label', e.label || '', true) : ''}<label class="field full">Layer<select data-prop="layer">${this.doc.layers.map(l => `<option ${l.name === e.layer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></label></div></div><div class="inspector-section"><h3>Geometry ${isLocked(e, this.doc) ? '· locked' : ''}</h3><div class="fields">${fields}</div></div>${e.connector ? `<div class="inspector-section"><h3>Connection</h3><div class="property-list"><div class="property-row"><span>Routing</span><b>${E(e.connector.status || 'routed')}</b></div><div class="property-row"><span>Start</span><b>${E(e.connector.from?.port || 'Free endpoint')}</b></div><div class="property-row"><span>End</span><b>${E(e.connector.to?.port || 'Free endpoint')}</b></div></div><div style="margin-top:12px">${btn('reroute', 'Reroute', 'connect', 'btn')}</div></div>` : ''}<div class="inspector-section"><h3>Actions</h3><div class="operation-grid">${btn('duplicate', 'Duplicate', 'copy')}${btn('rotate', 'Rotate 90°', 'rotate')}${btn('offset', 'Offset', 'offset')}${btn('constraint', 'Constrain', 'param')}${e.type === 'INSERT' ? btn('explode', 'Explode', 'symbols') : btn('make-symbol', 'Make symbol', 'symbols')}${btn('delete', 'Delete', 'trash')}</div></div>${this.constraintsHTML(selected)}<p class="muted-note">Numeric fields accept expressions such as <code>valveSize / 2</code>. Named parameters are managed in Parameters.</p>`;
         if (block?.symbol) {
             const section = document.createElement('section'); section.className = 'inspector-section symbol-provenance';
@@ -739,8 +749,9 @@ export class Workbench {
         }
     }
     setProperty(e, key, source) {
-        if (['tag', 'text', 'label', 'layer'].includes(key)) {
-            e[key] = source;
+        if(key.startsWith('calculation')){if(!e.calculation)throw new Error('No calculated text');const fields={calculationExpression:'expression',calculationPrecision:'precision',calculationPrefix:'prefix',calculationSuffix:'suffix'};if(!fields[key])throw new Error('Unknown calculated text field');e.calculation[fields[key]]=key==='calculationPrecision'?Number(source):source;e.dirty=true;return;}
+        if (['tag', 'text', 'label', 'layer', 'attributeTag', 'prompt'].includes(key)) {
+            e[key] = source;if(key==='attributeTag')e.tag=source;
             e.dirty = true;
             return;
         }
@@ -784,6 +795,7 @@ export class Workbench {
                 throw new Error('Text height must be positive');
             e.height = v;
         }
+        else if(key==='attributeFlags'){if(!Number.isInteger(v)||v<0||v>15)throw new Error('Attribute flags must be an integer 0–15');e.attributeFlags=v;e.constant=!!(v&2);e.invisible=!!(v&1);}
         else if (key === 'sx' || key === 'sy') {
             if (Math.abs(v) < 1e-8)
                 throw new Error('Scale must be nonzero');
@@ -814,10 +826,10 @@ export class Workbench {
             e.points = [{ ...a }, { x: a.x + c * w, y: a.y + s * w }, { x: a.x + c * w - s * h, y: a.y + s * w + c * h }, { x: a.x - s * h, y: a.y + c * h }];
         }
     }
+    constraintsForSolve() {const referenced=new Set(this.doc.constraints.filter(c=>!c.suppressed&&!c.reference).flatMap(c=>c.entities||[c.entityId]));return [...this.doc.constraints,...this.doc.entities.filter(e=>!e.locked&&referenced.has(e.id)&&isLocked(e,this.doc)).map(e=>({id:'layer-lock-'+e.id,type:'fixed',entityId:e.id,target:clone(e),visible:false}))];}
     solveConstraints() {
-        if (!this.doc.constraints.length)
-            return;
-        const result = this.solver.solve(this.doc.entities, this.doc.constraints, this.doc.parameters);
+        if (!this.doc.constraints.length) { this.lastSolve=null; return; }
+        const result = this.solver.solve(this.doc.entities, this.constraintsForSolve(), this.doc.parameters);
         this.lastSolve = result;
         if (!result.converged)
             throw new Error(`Constraints conflict or did not converge (residual ${result.residual.toPrecision(3)}). The edit was rolled back.`);
@@ -1131,6 +1143,7 @@ export class Workbench {
                 this.doc.entities[i] = next;
             }
             this.cursor = { x: start.x + dx, y: start.y + dy };
+            this.solveConstraints();
             this.reroute(this.selection);
             this.touch(this.selection);
             return;
@@ -1180,6 +1193,7 @@ export class Workbench {
             this.doc.entities[i] = e;
             e.dirty = true;
             this.cursor = q;
+            this.solveConstraints();
             this.reroute(new Set([e.id]));
             this.touch(new Set([e.id]));
             return;
@@ -1368,6 +1382,7 @@ export class Workbench {
     }
     drawOverlay(ctx, cam) {
         ctx.save();
+        drawParametricOverlay(this,ctx,cam);
         const selected = this.selected();
         for (const e of selected) {
             if (!isVisible(e, this.doc))
@@ -1697,58 +1712,8 @@ export class Workbench {
             });
         });
     }
-    constraintDialog() {
-        const es = this.requireSelection();
-        if (es.some(e => !['LINE', 'CIRCLE', 'ARC'].includes(e.type)))
-            throw new Error('Sketch constraints currently support lines, circles and arcs. Symbol dimensions can be edited in Properties.');
-        const body = `<p>Apply a geometric constraint to the selected sketch. Edits with conflicting constraints are rolled back.</p><label class="field">Constraint<select id="constraint-type"><option value="horizontal">Horizontal line</option><option value="vertical">Vertical line</option><option value="length">Line length</option><option value="radius">Circle / arc radius</option><option value="angle">Line angle · degrees</option><option value="coincident">Coincident · first line end to second start</option><option value="parallel">Parallel lines</option><option value="perpendicular">Perpendicular lines</option><option value="equal">Equal lengths / radii</option><option value="fixed">Fixed geometry</option></select></label><label class="field">Value or parameter expression<input id="constraint-value" value="100" inputmode="decimal"></label><div class="error-text"></div>`;
-        this.openModal('Constrain sketch', body, { confirm: 'Apply constraint', onConfirm: () => {
-                const type = this.modal.querySelector('#constraint-type').value, value = this.modal.querySelector('#constraint-value').value, two = ['coincident', 'parallel', 'perpendicular', 'equal'].includes(type);
-                if (two && es.length !== 2)
-                    throw new Error('This constraint requires exactly two objects');
-                if (['horizontal', 'vertical', 'length', 'angle', 'parallel', 'perpendicular', 'coincident'].includes(type) && es.some(e => e.type !== 'LINE'))
-                    throw new Error('This constraint requires line entities');
-                if (type === 'radius' && es.some(e => e.r === undefined))
-                    throw new Error('Select circles or arcs for a radius constraint');
-                this.edit('Add ' + type + ' constraint', () => {
-                    if (two)
-                        this.doc.constraints.push({ id: uid('constraint'), type, entities: es.map(e => e.id) });
-                    else
-                        for (const e of es)
-                            this.doc.constraints.push({ id: uid('constraint'), type, entities: [e.id], ...(['length', 'radius', 'angle'].includes(type) ? { value } : {}), ...(type === 'fixed' ? { target: clone(e) } : {}) });
-                    this.solveConstraints();
-                    this.reroute(this.selection);
-                });
-                this.closeModal();
-                this.toast('Constraint solved');
-            } });
-    }
-    parametersDialog() {
-        const values = this.doc.parameters, rows = Object.entries(values).map(([name, value]) => `<div class="param-row"><input class="param-name" value="${E(name)}" aria-label="Parameter name"><input class="param-expression" value="${E(value)}" aria-label="Expression for ${E(name)}"><button type="button" class="remove-param icon-btn" title="Remove parameter" aria-label="Remove parameter">${icon('close')}</button></div>`).join('');
-        this.openModal('Named parameters', `<p>Use names in dimension fields and sketch constraints. Arithmetic supports + − × / ^ and parentheses; cycles and invalid expressions are rejected.</p><div id="parameter-rows">${rows}</div><button class="btn" id="add-parameter">${icon('plus')} Add parameter</button><div class="hint-box">Example: <code>valveSize = 64</code>, then use <code>valveSize / 2</code> in a radius field. Applying re-evaluates authored dimensions and solves the sketch.</div><div class="error-text"></div>`, { confirm: 'Apply parameters', onConfirm: () => {
-                const next = {};
-                for (const row of this.modal.querySelectorAll('.param-row')) {
-                    const name = row.querySelector('.param-name').value.trim(), value = row.querySelector('.param-expression').value.trim();
-                    if (!/^[A-Za-z_]\w*$/.test(name) || ['__proto__', 'constructor', 'prototype', 'pi'].includes(name))
-                        throw new Error('Use unique parameter names containing letters, digits and underscores');
-                    if (name in next)
-                        throw new Error('Duplicate parameter: ' + name);
-                    next[name] = value;
-                }
-                resolveParameters(next);
-                this.edit('Update parameters', () => {
-                    this.doc.parameters = next;
-                    for (const e of this.doc.entities)
-                        this.evaluateParametric(e);
-                    this.solveConstraints();
-                    this.reroute();
-                });
-                this.closeModal();
-                this.toast('Parameters applied; constrained geometry updated.');
-            } });
-        this.modal.querySelector('#add-parameter').onclick = () => { const row = document.createElement('div'); row.className = 'param-row'; row.innerHTML = `<input class="param-name" value="size${this.modal.querySelectorAll('.param-row').length}" aria-label="Parameter name"><input class="param-expression" value="100" aria-label="Parameter expression"><button class="remove-param icon-btn" aria-label="Remove parameter">${icon('close')}</button>`; this.modal.querySelector('#parameter-rows').append(row); };
-        this.modal.addEventListener('click', e => e.target.closest('.remove-param')?.closest('.param-row').remove());
-    }
+    constraintDialog() { return constraintAuthor(this); }
+    parametersDialog() { return parameterManager(this); }
     precisionDialog() {
         this.openModal('Draw with exact values', `<p>World coordinates use the drawing’s ${E(this.doc.units)} units. All values accept named parameter expressions.</p><label class="field">Geometry<select id="precision-type"><option value="line">Line</option><option value="rect">Rectangle</option><option value="circle">Circle</option></select></label><div class="fields"><label class="field">X<input id="precision-x" value="${format(this.camera.x)}" inputmode="decimal"></label><label class="field">Y<input id="precision-y" value="${format(this.camera.y)}" inputmode="decimal"></label><label class="field">End X / width / radius<input id="precision-a" value="100" inputmode="decimal"></label><label class="field">End Y / height<input id="precision-b" value="80" inputmode="decimal"></label></div><div class="error-text"></div>`, { confirm: 'Create geometry', onConfirm: () => {
                 const get = id => this.modal.querySelector('#precision-' + id).value, kind = get('type'), x = this.eval(get('x')), y = this.eval(get('y')), a = this.eval(get('a')), b = this.eval(get('b'));
@@ -1771,7 +1736,7 @@ export class Workbench {
             } });
     }
     lineStylesDialog() { this.openModal('Line & connection library', `<p>Choose a line type, then connect symbol ports or free points. Every connector is a native DXF polyline with optional application metadata.</p><div class="line-style-list">${LINE_STYLES.map(s => `<button data-style="${s.id}"><svg viewBox="0 0 90 20"><path d="M3 10h84" stroke="${s.color}" stroke-width="${s.width}" ${s.dash.length ? `stroke-dasharray="${s.dash.join(' ')}"` : ''}/>${s.arrow === 'end' ? `<path d="m77 5 9 5-9 5" fill="none" stroke="${s.color}" stroke-width="${s.width}"/>` : ''}</svg><span>${E(s.name)}</span>${s.id === this.lineStyle ? icon('check') : ''}</button>`).join('')}</div>`); }
-    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); }
+    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); }
     editText(e) { this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false } = {}) {
         this.closeModal();
@@ -1841,6 +1806,7 @@ export class Workbench {
         });
     }
     async newDocument(kind) {
+        if(this.blockSession)throw new Error('Close the block editor before creating another drawing');
         if (this.switchingDocument) return;
         this.switchingDocument = true;
         try {
@@ -1859,6 +1825,7 @@ export class Workbench {
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
     exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
     async doExport(format) {
+        if(this.blockSession)throw new Error('Save or close the block editor before exporting');
         const name = this.basename(), version = this.modal?.querySelector('#dxf-version')?.value || 'AC1024';
         if (format === 'project')
             downloadFile(name + '.conduit.json', JSON.stringify(this.doc, null, 2), 'application/json');
@@ -1897,6 +1864,7 @@ export class Workbench {
             throw new Error('Unknown export format');
     }
     async openFile(file) {
+        if(this.blockSession)throw new Error('Close the block editor before opening another drawing');
         if (file.size > 128 * 1024 * 1024) {
             this.toast('The import limit is 128 MiB.', true);
             return;
@@ -1957,6 +1925,14 @@ export class Workbench {
     commandDialog() { this.openModal('Command palette', `<div class="command-input">${icon('code')}<input id="cad-command" placeholder="LINE 0,0 100,50" autocomplete="off" spellcheck="false" aria-label="CAD command"></div><div class="error-text"></div><p class="muted-note">Enter executes. Commands use drawing units and comma-separated point coordinates.</p><table class="keyboard-table"><tr><td>Line with exact endpoints</td><td>LINE 0,0 100,50</td></tr><tr><td>Circle with center and radius</td><td>CIRCLE 0,0 25</td></tr><tr><td>Rectangle · x, y, width, height</td><td>RECT 0 0 120 80</td></tr><tr><td>Move selected objects</td><td>MOVE 10 -20</td></tr><tr><td>Transforms and editing</td><td>ROTATE 45 / OFFSET 10</td></tr><tr><td>Named parameter</td><td>PARAM size=100</td></tr><tr><td>History and view</td><td>UNDO / REDO / FIT</td></tr></table>`, { confirm: 'Run command', onConfirm: () => { this.executeCommand(this.modal.querySelector('#cad-command').value); this.closeModal(); } }); }
     executeCommand(source) {
         const s = source.trim(), split = s.indexOf(' '), cmd = (split < 0 ? s : s.slice(0, split)).toUpperCase(), rest = split < 0 ? '' : s.slice(split + 1).trim(), args = rest.replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+        if(cmd==='BEDIT'){startBlockEditor(this,rest||this.selected()[0]?.block);return;}
+        if(cmd==='BSAVE'){finishBlockEditor(this,true,true);return;}
+        if(cmd==='BCLOSE'){finishBlockEditor(this,rest.toLowerCase()!=='discard');return;}
+        if(cmd==='BTEST'||cmd==='BTESTBLOCK'){this.action('block-test');return;}
+        if(cmd==='ATTSYNC'){this.action('block-sync-attributes');return;}
+        if(cmd==='BSAVEAS'){this.action('block-save-as');return;}
+        if(cmd==='PARAMETERS'){parameterManager(this);return;}
+        if(cmd==='SOLVE'){this.edit('Solve constraints',()=>this.solveConstraints());return;}
         const nums = () => args.map(v => this.eval(v));
         if (['LINE', 'L'].includes(cmd)) {
             const n = nums();
@@ -2048,6 +2024,7 @@ export class Workbench {
                         this.history.redo();
                         return;
                     case 's':
+                        if(this.blockSession){finishBlockEditor(this,true,true);return;}
                         this.doExport('project');
                         return;
                     case 'o':
@@ -2122,7 +2099,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.3.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.5.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

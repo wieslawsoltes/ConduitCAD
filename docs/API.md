@@ -1,3 +1,11 @@
+## 0.5 block authoring / solver API
+
+The complete typed surface and executable example are in
+[PARAMETRIC_AUTHORING.md](PARAMETRIC_AUTHORING.md). Block sessions are isolated;
+preparation is pure and updates are atomic. Hosts supply history/routing/render
+policies; the workbench integrates these. Solver diagnostics expose local numerical
+rank/DOF and per-constraint residuals without hiding unconstrained geometry.
+
 # Package API examples
 
 All examples assume the workspace was bootstrapped or all npm package archives

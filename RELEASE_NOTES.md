@@ -1,3 +1,35 @@
+# Conduit CAD 0.5.0 — shared block editor and parametric authoring
+
+- Isolated graphical native block canvas with save/save-close/discard/test,
+  save-as, base/port editing, attribute definitions and native nested placement.
+- Atomic shared-definition commits update direct and transitive nested inserts,
+  retained per-instance parameters/values, routed connectors and dimension pictures.
+  Cycles, stale sessions, invalid variants and removed connected ports are refused.
+- Block manager creates/inserts/edits/deletes unused definitions; unique copies,
+  shared renames and explicit attribute synchronization are undoable.
+- Native ATTDEF/ATTRIB tag/prompt/flags round-trips, constant-attribute rendering,
+  per-instance editing and affine attribute frames for reflected/nonuniform inserts.
+- Constraint-based schema v2, derived parameter expressions, polar/polar-array
+  actions, graphical parameter/action forms, solved ports, dimensions and text.
+- Analytic forward derivatives, scaled connected components, damped pivoted QR,
+  local rank/DOF/redundancy/residual reports, locked-geometry protection and atomic
+  failure. Supports 23 relation types on the documented planar parameterization.
+- Named driving-dimension dependencies, reference measurements, explicit auto
+  constraints, driving dimension UI, live authoring labels and calculated native TEXT.
+- All 13 packages, typed public APIs, DXF metadata and regression pipelines updated.
+
+Executed: 332 Node tests; 163 integrated browser checks (125 existing + 38 new);
+60 new independent native-field checks across four ASCII/binary editable/baked
+files, plus prior native dimension/interop/fidelity/symbol audits. No audit repairs.
+Canvas 2D and emulated-mobile testing; no physical GPU qualification is implied.
+
+This is not full AutoCAD parity: proprietary action/association graphs are not
+executed; advanced visibility/lookup/crossing definitions still use schema fields;
+3D/arbitrary curve solving, complete annotation/font styles and comparative solver
+robustness remain outside this release. See docs/PARAMETRIC_AUTHORING.md.
+
+---
+
 # Conduit CAD 0.4.0 — dimensions, parameterized blocks and gradient rendering
 
 - Pure planar decimal dimension regeneration for native subtypes 0–6. Generated

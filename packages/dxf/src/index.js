@@ -149,6 +149,8 @@ function parseEntity(original, diagnostics, options = {}) {
             }
             if (['ATTRIB', 'ATTDEF'].includes(type)) {
                 e.attributeTag = get(raw, 2, '');
+                e.attributeFlags = Number(get(raw, 70, 0));e.constant=!!(e.attributeFlags&2);
+                if(type==='ATTDEF')e.prompt=get(raw,3,'');
                 e.invisible = !!(get(raw, 70, 0) & 1);
             }
             e.widthFactor = Number(get(raw, 41, 1));
@@ -207,7 +209,7 @@ function parseEntity(original, diagnostics, options = {}) {
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
         if (k in meta)
             e[k] = meta[k];
     readEntityFidelity(e, raw, diagnostics, options);
@@ -323,7 +325,7 @@ export function parseDXF(input, options = {}) {
     for (const raw of records(sections.BLOCKS || [])) {
         const t = get(raw, 0);
         if (t === 'BLOCK') {
-            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
+            block = { name: get(raw, 2, ''), base: pt(raw), entities: [], flags: +get(raw,70,0), ports: metadata(raw).ports || [], symbol: metadata(raw).symbol, dynamic: metadata(raw).dynamic, parameters: metadata(raw).parameters, constraints: metadata(raw).constraints, revision: metadata(raw).revision, dynamicInstance: metadata(raw).dynamicInstance, dimensionPicture: metadata(raw).dimensionPicture };
             blockRecords = [];
         }
         else if (t === 'ENDBLK') {
@@ -703,10 +705,10 @@ export function writeDXF(doc, options = {}) {
                 if (type === 'TEXT') { pair(100, 'AcDbText'); pair(73, e.valign || 0); }
                 else {
                     pair(100, type === 'ATTRIB' ? 'AcDbAttribute' : 'AcDbAttributeDefinition');
-                    pair(2, e.attributeTag || 'TAG');
+                    pair(2, e.attributeTag || e.tag || 'TAG');
                     if (type === 'ATTDEF')
-                        pair(3, 'Equipment tag');
-                    pair(70, e.invisible ? 1 : 0); pair(74, e.valign || 0);
+                        pair(3, e.prompt ?? 'Equipment tag');
+                    pair(70, ((e.attributeFlags ?? e.flags ?? 0)&~3) | (e.invisible?1:0) | (e.constant||((e.attributeFlags ?? e.flags ?? 0)&2)?2:0)); pair(74, e.valign || 0);
                 }
                 break;
             case 'MTEXT': {
@@ -769,7 +771,7 @@ export function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
             if (e[k] !== undefined)
                 m[k] = e[k];
         if(e.type==='DIMENSION')writeDimensionOverrides(e.dimstyleOverrides,pair);
@@ -814,7 +816,7 @@ export function writeDXF(doc, options = {}) {
         pp(10, b.base);
         pair(3, name);
         pair(1, '');
-        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
+        meta({ ports: b.ports || [], symbol: b.symbol, dynamic: b.dynamic, parameters: b.parameters, constraints: b.constraints, revision: b.revision, dynamicInstance: b.dynamicInstance, dimensionPicture: b.dimensionPicture });
         for (const e of b.entities)
             emit(e, blockRecords[name]);
         pair(0, 'ENDBLK');
