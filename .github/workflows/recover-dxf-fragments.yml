@@ -1,0 +1,38 @@
+name: Recover interrupted DXF fragments
+on:
+  push:
+    branches: [work/dxf-interop-recovery]
+    paths: [.github/workflows/recover-dxf-fragments.yml]
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read original blobs and recover decompressed prefix
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import base64,hashlib,json,lzma,os,pathlib,urllib.request
+          out=pathlib.Path('recovery');out.mkdir()
+          parts=[]
+          for sha in ['f03498bb5bf65fa32012323991635eb91b2d68c5','6e88354dc6a0d8b5d1352f8537557f8f631071b7','732d43d069710c83401115c03f491041bdba04e7']:
+              request=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request,timeout=30) as response: record=json.load(response)
+              data=base64.b64decode(record['content'])
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==sha
+              parts.append(data)
+          raw=b''.join(parts); (out/'prefix.xz').write_bytes(raw)
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=2000000);(out/'prefix.patch').write_bytes(patch)
+          report={'complete':decoder.eof,'compressedBytes':len(raw),'decompressedBytes':len(patch),'patchSHA256':hashlib.sha256(patch).hexdigest()}
+          (out/'recovery.json').write_text(json.dumps(report,indent=2));print(report)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dxf-recovered-fragments
+          path: recovery
+          retention-days: 7
