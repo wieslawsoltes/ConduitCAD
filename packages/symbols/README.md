@@ -1,34 +1,32 @@
 # @conduitcad/symbols
 
-Original engineering symbol and line libraries. Version **0.1.0**, native ESM JavaScript, MIT license.
+Original engineering symbol, line and drawing-starter libraries. Version **0.2.1**,
+native ESM JavaScript with TypeScript declarations, MIT license.
 
-56 illustrative P&ID, electrical and flowchart masters, ten line styles, native block insertion and three complete example drawings. Symbols are not standards-certified.
-
-## Use
-
-Install this package and its sibling dependencies from the supplied npm archives,
-or run `node scripts/bootstrap.mjs` in the complete workspace. The package name is
-prepared for npm distribution; this release does not claim a registry publication.
+223 native CAD block masters in 11 categories; 21 connection styles; 20 genuinely
+editable industry starters. No raster stencils or external runtime downloads.
+Reference families and project conventions are explicit; these are **not
+standards-certified** symbols. See the workspace `docs/SYMBOLS.md` and generated
+`docs/SYMBOL_REVIEW.md` for the per-master review and exact approval boundary.
 
 ```js
-import { SYMBOLS, LINE_STYLES, installSymbols } from '@conduitcad/symbols';
+import {createDrawing, searchSymbols, insertSymbol, auditSymbols} from '@conduitcad/symbols';
+const document = createDrawing('hydraulic-actuator');
+const choices = searchSymbols('cylinder', {category: 'Hydraulics'});
+document.entities.push(insertSymbol(document, choices[0].id, 900, 450, {tag: 'A-2'}));
+if (auditSymbols().some(r => r.errors.length)) throw new Error('Catalogue geometry regression');
 ```
 
-`src/index.js` contains the implementation and `src/index.d.ts` the TypeScript
-API declarations. Browser-facing components require a browser DOM; the geometry,
-model, history, routing, constraints, symbol, DXF and scene compilation engines
-can also be used in Node.js. There are no external runtime dependencies beyond
-the following sibling packages.
+Public exports: `SYMBOLS`, `CATEGORIES`, `STANDARD_REFERENCES`, `LINE_STYLES`,
+`DRAWING_TYPES`, `searchSymbols`, `installSymbols`, `insertSymbol`, `createDemo`,
+`createDrawing`, `auditSymbol`, `auditSymbols`, `symbolUpdates`,
+`updateSymbolDefinitions`.
 
-**Dependencies:** `@conduitcad/geometry`, `@conduitcad/model`.
+All original 64 IDs/block names/terminal names are preserved. Installing or
+browsing a library never replaces existing saved definitions. Explicit migration
+validates every selected master before mutation; wrap it in your application's
+history transaction and reroute dependent connections afterwards.
 
-## Public exports
-
-`SYMBOLS`, `LINE_STYLES`, `installSymbols`, `insertSymbol`, `createDemo`.
-
-## Documentation and validation
-
-The full source workspace contains `docs/API.md` with integration examples,
-`docs/ARCHITECTURE.md`, `docs/DXF_COMPATIBILITY.md`, and `docs/VALIDATION.md`.
-Tests and raw validation reports are included there. These are original reusable
-2D engineering components, not a claim of complete AutoCAD/Visio compatibility.
+Dependencies: `@conduitcad/geometry`, `@conduitcad/model`, `@conduitcad/routing`.
+Install the supplied sibling tarballs together, or run the workspace bootstrap.
+Registry publication is separate from producing/installing npm archives.

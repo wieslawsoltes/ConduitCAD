@@ -1,6 +1,6 @@
 # @conduitcad/dxf
 
-ASCII/binary DXF reading and normalized ASCII writing. Version **0.1.0**, native ESM JavaScript, MIT license.
+ASCII/binary DXF reading and normalized ASCII writing. Version **0.2.1**, native ESM JavaScript, MIT license.
 
 R12/modern binary group streams, ASCII parsing, common 2D entity semantics, native blocks, Conduit XDATA and original-source preservation. Edited exports are not universal lossless DXF round trips.
 

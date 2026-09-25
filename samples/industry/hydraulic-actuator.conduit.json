@@ -1,0 +1,1910 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Hydraulic actuator circuit",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p5q-1c4",
+      "type": "INSERT",
+      "layer": "Hydraulics",
+      "block": "CC_HYD_RESERVOIR",
+      "x": 150,
+      "y": 140,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "TK-1"
+    },
+    {
+      "id": "e-mugr5p5q-1c5",
+      "type": "INSERT",
+      "layer": "Hydraulics",
+      "block": "CC_HYD_PUMP",
+      "x": 150,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "P-1"
+    },
+    {
+      "id": "e-mugr5p5q-1c6",
+      "type": "INSERT",
+      "layer": "Hydraulics",
+      "block": "CC_HYD_VALVE_43",
+      "x": 570,
+      "y": 280,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "V-1"
+    },
+    {
+      "id": "e-mugr5p5q-1c7",
+      "type": "INSERT",
+      "layer": "Hydraulics",
+      "block": "CC_HYD_CYLINDER",
+      "x": 570,
+      "y": 470,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "A-1"
+    },
+    {
+      "id": "e-mugr5p5q-1c8",
+      "type": "INSERT",
+      "layer": "Hydraulics",
+      "block": "CC_HYD_RELIEF",
+      "x": 330,
+      "y": 160,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "RV-1"
+    },
+    {
+      "id": "e-mugr5p5r-1c9",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "suction",
+          "x": 139,
+          "y": 185,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c4"
+        },
+        {
+          "x": 139,
+          "y": 203
+        },
+        {
+          "x": 87,
+          "y": 203
+        },
+        {
+          "x": 87,
+          "y": 350
+        },
+        {
+          "name": "in",
+          "x": 105,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c5"
+        }
+      ],
+      "closed": false,
+      "color": "#557d99",
+      "width": 2.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c4",
+          "port": "suction"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c5",
+          "port": "in"
+        },
+        "style": "hydraulic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1ca",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "out",
+          "x": 195,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c5"
+        },
+        {
+          "x": 213,
+          "y": 350
+        },
+        {
+          "x": 213,
+          "y": 217
+        },
+        {
+          "x": 559,
+          "y": 217
+        },
+        {
+          "name": "P",
+          "x": 559,
+          "y": 235,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c6"
+        }
+      ],
+      "closed": false,
+      "color": "#557d99",
+      "width": 2.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c5",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c6",
+          "port": "P"
+        },
+        "style": "hydraulic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cb",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "A",
+          "x": 559,
+          "y": 325,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c6"
+        },
+        {
+          "x": 559,
+          "y": 343
+        },
+        {
+          "x": 547,
+          "y": 343
+        },
+        {
+          "name": "A",
+          "x": 547,
+          "y": 425,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c7"
+        }
+      ],
+      "closed": false,
+      "color": "#557d99",
+      "width": 2.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c6",
+          "port": "A"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c7",
+          "port": "A"
+        },
+        "style": "hydraulic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cc",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "B",
+          "x": 581,
+          "y": 325,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c6"
+        },
+        {
+          "x": 581,
+          "y": 343
+        },
+        {
+          "x": 593,
+          "y": 343
+        },
+        {
+          "name": "B",
+          "x": 593,
+          "y": 425,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c7"
+        }
+      ],
+      "closed": false,
+      "color": "#557d99",
+      "width": 2.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c6",
+          "port": "B"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c7",
+          "port": "B"
+        },
+        "style": "hydraulic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cd",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "T",
+          "x": 581,
+          "y": 235,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c6"
+        },
+        {
+          "x": 581,
+          "y": 217
+        },
+        {
+          "x": 760,
+          "y": 217
+        },
+        {
+          "x": 760,
+          "y": 90
+        },
+        {
+          "x": 210,
+          "y": 90
+        },
+        {
+          "x": 210,
+          "y": 203
+        },
+        {
+          "x": 161,
+          "y": 203
+        },
+        {
+          "name": "return",
+          "x": 161,
+          "y": 185,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c4"
+        }
+      ],
+      "closed": false,
+      "color": "#587b9b",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c6",
+          "port": "T"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c4",
+          "port": "return"
+        },
+        "style": "hyd-return",
+        "arrow": "none",
+        "waypoints": [
+          {
+            "x": 760,
+            "y": 90
+          },
+          {
+            "x": 210,
+            "y": 90
+          }
+        ],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1ce",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "out",
+          "x": 195,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c5"
+        },
+        {
+          "x": 267,
+          "y": 350
+        },
+        {
+          "x": 267,
+          "y": 160
+        },
+        {
+          "name": "in",
+          "x": 285,
+          "y": 160,
+          "dx": -1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c8"
+        }
+      ],
+      "closed": false,
+      "color": "#557d99",
+      "width": 2.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c5",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c8",
+          "port": "in"
+        },
+        "style": "hydraulic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cf",
+      "type": "LWPOLYLINE",
+      "layer": "Hydraulics",
+      "points": [
+        {
+          "name": "out",
+          "x": 375,
+          "y": 160,
+          "dx": 1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c8"
+        },
+        {
+          "x": 393,
+          "y": 160
+        },
+        {
+          "x": 393,
+          "y": 216.001
+        },
+        {
+          "x": 161,
+          "y": 216.001
+        },
+        {
+          "name": "return",
+          "x": 161,
+          "y": 185,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection",
+          "entityId": "e-mugr5p5q-1c4"
+        }
+      ],
+      "closed": false,
+      "color": "#587b9b",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5q-1c8",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5q-1c4",
+          "port": "return"
+        },
+        "style": "hyd-return",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cg",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Hydraulic actuator circuit",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5r-1ch",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Industrial machinery  /  Fluid-power circuit",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5r-1ci",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p5r-1cj",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5r-1ck",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "HYDRAULIC-ACTUATOR  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_HYD_RESERVOIR": {
+      "name": "CC_HYD_RESERVOIR",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hyd-reservoir-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": 20
+            },
+            {
+              "x": -30,
+              "y": -22
+            },
+            {
+              "x": 30,
+              "y": -22
+            },
+            {
+              "x": 30,
+              "y": 20
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-reservoir-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -11,
+            "y": 45
+          },
+          "b": {
+            "x": -11,
+            "y": -8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-reservoir-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": 45
+          },
+          "b": {
+            "x": 11,
+            "y": -8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-reservoir-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -25,
+            "y": 0
+          },
+          "b": {
+            "x": 25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "suction",
+          "x": -11,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "return",
+          "x": 11,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Vented hydraulic reservoir",
+        "category": "Hydraulics",
+        "group": "Sources & drives",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hyd reservoir"
+        ],
+        "defaultLayer": "Hydraulics",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -30,
+          "minY": -22,
+          "maxX": 30,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_HYD_PUMP": {
+      "name": "CC_HYD_PUMP",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hyd-pump-0",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-pump-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-pump-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 26,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-pump-3",
+          "type": "SOLID",
+          "layer": "0",
+          "points": [
+            {
+              "x": 10,
+              "y": -8
+            },
+            {
+              "x": 10,
+              "y": 8
+            },
+            {
+              "x": 24,
+              "y": 0
+            }
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Fixed-displacement pump",
+        "category": "Hydraulics",
+        "group": "Sources & drives",
+        "energy": "liquid/filled triangle",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hyd pump"
+        ],
+        "defaultLayer": "Hydraulics",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25.970550818758205,
+          "maxX": 45,
+          "maxY": 25.970550818758205
+        }
+      }
+    },
+    "CC_HYD_VALVE_43": {
+      "name": "CC_HYD_VALVE_43",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hyd-valve-43-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -66,
+              "y": -22
+            },
+            {
+              "x": -22,
+              "y": -22
+            },
+            {
+              "x": -22,
+              "y": 22
+            },
+            {
+              "x": -66,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-1",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": 22
+            },
+            {
+              "x": -22,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 22,
+              "y": -22
+            },
+            {
+              "x": 66,
+              "y": -22
+            },
+            {
+              "x": 66,
+              "y": 22
+            },
+            {
+              "x": 22,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -88,
+              "y": 0
+            },
+            {
+              "x": -85.8,
+              "y": 0
+            },
+            {
+              "x": -83.38,
+              "y": 6
+            },
+            {
+              "x": -80.96,
+              "y": -6
+            },
+            {
+              "x": -78.53999999999999,
+              "y": 6
+            },
+            {
+              "x": -76.12,
+              "y": -6
+            },
+            {
+              "x": -73.7,
+              "y": 6
+            },
+            {
+              "x": -71.28,
+              "y": -6
+            },
+            {
+              "x": -68.2,
+              "y": 0
+            },
+            {
+              "x": -66,
+              "y": 0
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 66,
+              "y": 0
+            },
+            {
+              "x": 68.2,
+              "y": 0
+            },
+            {
+              "x": 70.62,
+              "y": 6
+            },
+            {
+              "x": 73.04,
+              "y": -6
+            },
+            {
+              "x": 75.46000000000001,
+              "y": 6
+            },
+            {
+              "x": 77.88,
+              "y": -6
+            },
+            {
+              "x": 80.3,
+              "y": 6
+            },
+            {
+              "x": 82.72,
+              "y": -6
+            },
+            {
+              "x": 85.8,
+              "y": 0
+            },
+            {
+              "x": 88,
+              "y": 0
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -11,
+            "y": 22
+          },
+          "b": {
+            "x": -11,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -11,
+            "y": -22
+          },
+          "b": {
+            "x": -11,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -11,
+            "y": 22
+          },
+          "b": {
+            "x": -11,
+            "y": 10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -16,
+            "y": 10
+          },
+          "b": {
+            "x": -6,
+            "y": 10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-9",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": 22
+          },
+          "b": {
+            "x": 11,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-10",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": -22
+          },
+          "b": {
+            "x": 11,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-11",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": 22
+          },
+          "b": {
+            "x": 11,
+            "y": 10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-12",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 6,
+            "y": 10
+          },
+          "b": {
+            "x": 16,
+            "y": 10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-13",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -11,
+            "y": -22
+          },
+          "b": {
+            "x": -11,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-14",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -16,
+            "y": -10
+          },
+          "b": {
+            "x": -6,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-15",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": -22
+          },
+          "b": {
+            "x": 11,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-16",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 6,
+            "y": -10
+          },
+          "b": {
+            "x": 16,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-17",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -55,
+            "y": -16
+          },
+          "b": {
+            "x": -33,
+            "y": 16
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-18",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -33,
+              "y": 16
+            },
+            {
+              "x": -39.56143382143746,
+              "y": 12.016272322698683
+            },
+            {
+              "x": -34.36996969898145,
+              "y": 8.447140738510171
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-19",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -55,
+            "y": 16
+          },
+          "b": {
+            "x": -33,
+            "y": -16
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-20",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -33,
+              "y": -16
+            },
+            {
+              "x": -34.36996969898145,
+              "y": -8.447140738510171
+            },
+            {
+              "x": -39.56143382143746,
+              "y": -12.016272322698683
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-21",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 33,
+            "y": -16
+          },
+          "b": {
+            "x": 33,
+            "y": 16
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-22",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 33,
+              "y": 16
+            },
+            {
+              "x": 29.85,
+              "y": 9
+            },
+            {
+              "x": 36.15,
+              "y": 9
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-23",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 55,
+            "y": 16
+          },
+          "b": {
+            "x": 55,
+            "y": -16
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-valve-43-24",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 55,
+              "y": -16
+            },
+            {
+              "x": 58.15,
+              "y": -9
+            },
+            {
+              "x": 51.85,
+              "y": -9
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "A",
+          "x": -11,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "B",
+          "x": 11,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "P",
+          "x": -11,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "T",
+          "x": 11,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "4/3 valve · closed centre",
+        "category": "Hydraulics",
+        "group": "Directional valves",
+        "positions": 3,
+        "workingPorts": 4,
+        "normalState": "all ports closed",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hyd valve 43"
+        ],
+        "defaultLayer": "Hydraulics",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -88,
+          "minY": -45,
+          "maxX": 88,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_HYD_CYLINDER": {
+      "name": "CC_HYD_CYLINDER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hyd-cylinder-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -34,
+              "y": -22
+            },
+            {
+              "x": 34,
+              "y": -22
+            },
+            {
+              "x": 34,
+              "y": 22
+            },
+            {
+              "x": -34,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -22
+          },
+          "b": {
+            "x": -8,
+            "y": 22
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -5
+          },
+          "b": {
+            "x": 49,
+            "y": -5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 49,
+            "y": -5
+          },
+          "b": {
+            "x": 49,
+            "y": 5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 49,
+            "y": 5
+          },
+          "b": {
+            "x": -8,
+            "y": 5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -23,
+            "y": -22
+          },
+          "b": {
+            "x": -23,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-cylinder-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 23,
+            "y": -22
+          },
+          "b": {
+            "x": 23,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "A",
+          "x": -23,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "B",
+          "x": 23,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "hydraulic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Double-acting cylinder",
+        "category": "Hydraulics",
+        "group": "Actuators",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hyd cylinder"
+        ],
+        "defaultLayer": "Hydraulics",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -34,
+          "minY": -45,
+          "maxX": 49,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_HYD_RELIEF": {
+      "name": "CC_HYD_RELIEF",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hyd-relief-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": 22
+            },
+            {
+              "x": -22,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -22,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 22,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -16,
+            "y": 0
+          },
+          "b": {
+            "x": 16,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-4",
+          "type": "SOLID",
+          "layer": "0",
+          "points": [
+            {
+              "x": 16,
+              "y": 0
+            },
+            {
+              "x": 9,
+              "y": 3.15
+            },
+            {
+              "x": 9,
+              "y": -3.15
+            }
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 0,
+              "y": 22
+            },
+            {
+              "x": 0,
+              "y": 24.6
+            },
+            {
+              "x": 6,
+              "y": 27.46
+            },
+            {
+              "x": -6,
+              "y": 30.32
+            },
+            {
+              "x": 6,
+              "y": 33.18
+            },
+            {
+              "x": -6,
+              "y": 36.04
+            },
+            {
+              "x": 6,
+              "y": 38.900000000000006
+            },
+            {
+              "x": -6,
+              "y": 41.760000000000005
+            },
+            {
+              "x": 0,
+              "y": 45.400000000000006
+            },
+            {
+              "x": 0,
+              "y": 48
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hyd-relief-6",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -34,
+              "y": 0
+            },
+            {
+              "x": -34,
+              "y": -34
+            },
+            {
+              "x": 0,
+              "y": -34
+            },
+            {
+              "x": 0,
+              "y": -22
+            }
+          ],
+          "closed": false,
+          "dash": [
+            4,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "hydraulic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Pressure relief valve",
+        "category": "Hydraulics",
+        "group": "Flow & pressure",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hyd relief"
+        ],
+        "defaultLayer": "Hydraulics",
+        "labelOffset": 56,
+        "extents": {
+          "minX": -45,
+          "minY": -34,
+          "maxX": 45,
+          "maxY": 48
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Pump, relief valve, reservoir and closed-centre directional valve driving a double-acting cylinder.",
+    "industry": "Industrial machinery",
+    "drawingType": "Fluid-power circuit",
+    "templateId": "hydraulic-actuator",
+    "standardRefs": [
+      "ISO-1219-1"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

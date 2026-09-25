@@ -1,0 +1,1654 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Industrial network topology",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p6u-1e7",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_CLOUD",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "WAN"
+    },
+    {
+      "id": "e-mugr5p6u-1e8",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_ROUTER",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "R1"
+    },
+    {
+      "id": "e-mugr5p6u-1e9",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_FIREWALL",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FW1"
+    },
+    {
+      "id": "e-mugr5p6u-1ea",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_SWITCH",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "SW1"
+    },
+    {
+      "id": "e-mugr5p6u-1eb",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_SERVER",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "SRV1"
+    },
+    {
+      "id": "e-mugr5p6u-1ec",
+      "type": "INSERT",
+      "layer": "Network",
+      "block": "CC_NET_AP",
+      "x": 700,
+      "y": 140,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "AP1"
+    },
+    {
+      "id": "e-mugr5p6u-1ed",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1e7"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1e8"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6u-1e7",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6u-1e8",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1ee",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1e8"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1e9"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6u-1e8",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6u-1e9",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1ef",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1e9"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1ea"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6u-1e9",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6u-1ea",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1eg",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1ea"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1eb"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6u-1ea",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6u-1eb",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1eh",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "branch",
+          "x": 700,
+          "y": 310,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1ea"
+        },
+        {
+          "x": 700,
+          "y": 292
+        },
+        {
+          "x": 637,
+          "y": 292
+        },
+        {
+          "x": 637,
+          "y": 140
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 140,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection",
+          "entityId": "e-mugr5p6u-1ec"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "LAN",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6u-1ea",
+          "port": "branch"
+        },
+        "to": {
+          "entityId": "e-mugr5p6u-1ec",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1ei",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Industrial network topology",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6u-1ej",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "IT & telecom  /  Network topology",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6u-1ek",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p6u-1el",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6u-1em",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "NETWORK  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_NET_CLOUD": {
+      "name": "CC_NET_CLOUD",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-cloud-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-cloud-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-cloud-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-cloud-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "WAN",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-cloud-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -22
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "External network",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net cloud"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_NET_ROUTER": {
+      "name": "CC_NET_ROUTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-router-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-router-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-router-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-router-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "RTR",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-router-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -22
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Router",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net router"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_NET_FIREWALL": {
+      "name": "CC_NET_FIREWALL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-firewall-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -24
+            },
+            {
+              "x": 30,
+              "y": -24
+            },
+            {
+              "x": 30,
+              "y": 24
+            },
+            {
+              "x": -30,
+              "y": 24
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -30,
+            "y": -8
+          },
+          "b": {
+            "x": 30,
+            "y": -8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -30,
+            "y": 8
+          },
+          "b": {
+            "x": 30,
+            "y": 8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -24
+          },
+          "b": {
+            "x": 0,
+            "y": -8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -15,
+            "y": -8
+          },
+          "b": {
+            "x": -15,
+            "y": 8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 15,
+            "y": -8
+          },
+          "b": {
+            "x": 15,
+            "y": 8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 8
+          },
+          "b": {
+            "x": 0,
+            "y": 24
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-firewall-9",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -24
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Firewall",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net firewall"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 24
+        }
+      }
+    },
+    "CC_NET_SWITCH": {
+      "name": "CC_NET_SWITCH",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-switch-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-switch-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-switch-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-switch-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "SW",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-switch-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -22
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Network switch",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net switch"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_NET_SERVER": {
+      "name": "CC_NET_SERVER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-server-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -27,
+              "y": -32
+            },
+            {
+              "x": 27,
+              "y": -32
+            },
+            {
+              "x": 27,
+              "y": 32
+            },
+            {
+              "x": -27,
+              "y": 32
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -21,
+              "y": -27
+            },
+            {
+              "x": 21,
+              "y": -27
+            },
+            {
+              "x": 21,
+              "y": -13
+            },
+            {
+              "x": -21,
+              "y": -13
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-4",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 12,
+            "y": -20
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -21,
+              "y": -7
+            },
+            {
+              "x": 21,
+              "y": -7
+            },
+            {
+              "x": 21,
+              "y": 7
+            },
+            {
+              "x": -21,
+              "y": 7
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-6",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 12,
+            "y": 0
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-7",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -21,
+              "y": 13
+            },
+            {
+              "x": 21,
+              "y": 13
+            },
+            {
+              "x": 21,
+              "y": 27
+            },
+            {
+              "x": -21,
+              "y": 27
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-8",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 12,
+            "y": 20
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-server-9",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -32
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Server",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net server"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 32
+        }
+      }
+    },
+    "CC_NET_AP": {
+      "name": "CC_NET_AP",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-net-ap-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "AP",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-4",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 23
+          },
+          "r": 10,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-5",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 23
+          },
+          "r": 18,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-net-ap-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -22
+          },
+          "b": {
+            "x": 0,
+            "y": -40
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "data",
+          "role": "connection"
+        },
+        {
+          "name": "branch",
+          "x": 0,
+          "y": -40,
+          "dx": 0,
+          "dy": -1,
+          "medium": "data",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Wireless access point",
+        "category": "Network",
+        "group": "Network topology",
+        "representation": "vendor-neutral functional symbol",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "net ap"
+        ],
+        "defaultLayer": "Network",
+        "labelOffset": 62,
+        "extents": {
+          "minX": -45,
+          "minY": -40,
+          "maxX": 45,
+          "maxY": 41
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "WAN, perimeter firewall, switch and server with a wireless branch.",
+    "industry": "IT & telecom",
+    "drawingType": "Network topology",
+    "templateId": "network",
+    "standardRefs": [
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

@@ -1,0 +1,5307 @@
+{
+  "version": "0.2.1",
+  "masters": 223,
+  "categories": 11,
+  "terminalCount": 509,
+  "tolerance": 0.15,
+  "normativeDimensionsVerified": false,
+  "results": [
+    {
+      "id": "gate-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "ball-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 2,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "globe-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 2,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "butterfly-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "check-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "control-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "LWPOLYLINE": 2,
+        "ELLIPSE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 50
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "signal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "solenoid-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 54
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "relief-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 47
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "three-way-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pump",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "gear-pump",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "compressor",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fan",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 2,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28.99504826328353,
+        "maxX": 45,
+        "maxY": 28.99504826328353
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "strainer",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -37,
+        "maxX": 45,
+        "maxY": 15
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "filter",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 6,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "heat-exchanger",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "tank",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "ELLIPSE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -88,
+        "maxX": 45,
+        "maxY": 75
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "vessel",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "ARC": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -65,
+        "maxX": 45,
+        "maxY": 65
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0.019813111628131708
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "mixer",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "ARC": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -54.98050646461107,
+        "maxX": 45,
+        "maxY": 83
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0.01949353538893206
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-indicator",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flow-transmitter",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "temperature",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "level-transmitter",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "reducer",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 20
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flange",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "offpage",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -17,
+        "maxX": 45,
+        "maxY": 17
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "resistor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -12,
+        "maxX": 45,
+        "maxY": 12
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "resistor-iec",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -11,
+        "maxX": 45,
+        "maxY": 11
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "capacitor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "inductor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ARC": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": 0,
+        "maxX": 45,
+        "maxY": 7.5
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "diode",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "led",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 47
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "switch",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -3,
+        "maxX": 45,
+        "maxY": 26
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "switch-nc",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -3,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fuse",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -10,
+        "maxX": 45,
+        "maxY": 10
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "relay",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "motor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "generator",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "transformer",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -17.995053331976685,
+        "maxX": 45,
+        "maxY": 17.995053331976685
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "ground",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -26,
+        "minY": -15,
+        "maxX": 26,
+        "maxY": 40
+      },
+      "terminals": {
+        "terminal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "battery",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 6
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "terminal",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "op-amp",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -35,
+        "maxX": 45,
+        "maxY": 35
+      },
+      "terminals": {
+        "positive": 0,
+        "negative": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "lamp",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23.995006276540956,
+        "maxX": 45,
+        "maxY": 23.995006276540956
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "process",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -35,
+        "maxX": 55,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "decision",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -60,
+        "minY": -42,
+        "maxX": 60,
+        "maxY": 42
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "yes": 0,
+        "no": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "terminator",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ARC": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -30,
+        "maxX": 55,
+        "maxY": 30
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "data",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -65,
+        "minY": -35,
+        "maxX": 65,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "document",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "SPLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -32.94012451171875,
+        "maxX": 55,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "database",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ELLIPSE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 39.999793006054844
+      },
+      "terminals": {
+        "in": 0.0006209837397667666,
+        "out": 1.0072929868609742e-19,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "subprocess",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -35,
+        "maxX": 55,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "manual",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -35,
+        "maxX": 55,
+        "maxY": 42
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "preparation",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -60,
+        "minY": -35,
+        "maxX": 60,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "delay",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "ARC": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -50,
+        "minY": -35,
+        "maxX": 39.98045473055891,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0.01954526944108892
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "junction",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -15.980110739502758,
+        "minY": -15.99502691201306,
+        "maxX": 16,
+        "maxY": 15.99502691201306
+      },
+      "terminals": {
+        "in": 0.01491617251030289,
+        "out": 0.01491617251030289,
+        "left": 0.01988926049724249,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "note",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -35,
+        "maxX": 45,
+        "maxY": 35
+      },
+      "terminals": {
+        "left": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-panel",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -26,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-rear",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -26,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "capacitor-polarized",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "ARC": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 26
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "signal-ground",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -24,
+        "minY": -22,
+        "maxX": 24,
+        "maxY": 40
+      },
+      "terminals": {
+        "terminal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "chassis",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -35,
+        "minY": -8,
+        "maxX": 24,
+        "maxY": 40
+      },
+      "terminals": {
+        "terminal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "contact-no",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "contact-nc",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "potentiometer",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -11,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "wiper": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "needle-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 32
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "diaphragm-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 1,
+        "ELLIPSE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -15,
+        "maxX": 45,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "plug-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "knife-gate-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 44
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "motor-valve",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 56.99510631393827
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "rupture-disc",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ELLIPSE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "orifice-plate",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 23
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "spectacle-blind",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -11.99510631393827,
+        "maxX": 45,
+        "maxY": 39.99510631393827
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "expansion-joint",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -15,
+        "maxX": 45,
+        "maxY": 15
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "static-mixer",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "plate-exchanger",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 8
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "column",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 10,
+        "ARC": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -75,
+        "maxX": 45,
+        "maxY": 75
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "packed-column",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 12,
+        "ARC": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -75,
+        "maxX": 45,
+        "maxY": 75
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "cyclone",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -60,
+        "maxX": 45,
+        "maxY": 60
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "steam-trap",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 20
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "sight-glass",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -13,
+        "maxX": 45,
+        "maxY": 13
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "sampling-point",
+      "category": "P&ID",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 0
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "sample": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "variable-resistor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 27
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "thermistor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -23,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "photoresistor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -11,
+        "maxX": 45,
+        "maxY": 42
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "zener-diode",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "photodiode",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 49
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "transistor-npn",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 22,
+        "maxY": 45
+      },
+      "terminals": {
+        "base": 0,
+        "collector": 0,
+        "emitter": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "transistor-pnp",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 22,
+        "maxY": 45
+      },
+      "terminals": {
+        "base": 0,
+        "collector": 0,
+        "emitter": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "transformer-windings",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 6,
+        "ARC": 8
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -30,
+        "maxX": 45,
+        "maxY": 30
+      },
+      "terminals": {
+        "primary-1": 0,
+        "primary-2": 0,
+        "secondary-1": 0,
+        "secondary-2": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "circuit-breaker",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "CIRCLE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -17,
+        "maxX": 45,
+        "maxY": 20
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "disconnect",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -6,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "voltmeter",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "ammeter",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "ac-source",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "SPLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "dc-source",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 5,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "junction-dot",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "wire-crossing",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ARC": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "inverter",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pv-module",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 7,
+        "LWPOLYLINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 46
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "three-phase-motor",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "CIRCLE": 1,
+        "TEXT": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "top": 0,
+        "bottom": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "cell",
+      "category": "Electrical",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "manual-operation",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -35,
+        "maxX": 55,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "offpage-flow",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -40,
+        "minY": -40,
+        "maxX": 40,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "internal-storage",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -35,
+        "maxX": 55,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "display",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "ARC": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -60,
+        "minY": -30,
+        "maxX": 60,
+        "maxY": 30
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 8.486163071406433e-18
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "stored-data",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ELLIPSE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -50,
+        "minY": -35,
+        "maxX": 48,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 3.567803825940462e-20,
+        "right": 3.567803825940462e-20
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "merge",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -52,
+        "minY": -35,
+        "maxX": 52,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "left": 0,
+        "right": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "extract",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -52,
+        "minY": -35,
+        "maxX": 52,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "collate",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -35,
+        "maxX": 45,
+        "maxY": 35
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "sort",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -40,
+        "maxX": 55,
+        "maxY": 40
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "left": 0,
+        "right": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "parallel",
+      "category": "Flow",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -55,
+        "minY": -10,
+        "maxX": 55,
+        "maxY": 10
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-transmitter",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "differential-pressure",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "temperature-indicator",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flow-indicator",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "level-indicator",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-switch",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "level-switch",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "temperature-switch",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "analyser",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flow-controller",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pressure-controller",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "temperature-controller",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "level-controller",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "TEXT": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -25.98044676510998,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flow-controller-panel",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -26,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "flow-controller-rear",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -26,
+        "minY": -45,
+        "maxX": 26,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "ip-converter",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "thermowell",
+      "category": "Instrumentation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ARC": 1
+      },
+      "bounds": {
+        "minX": -13,
+        "minY": -29.98042658026826,
+        "maxX": 13,
+        "maxY": 45
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-pump",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-motor",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-variable-pump",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 3,
+        "SOLID": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -32,
+        "maxX": 45,
+        "maxY": 32
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-filter",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-throttle",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "ELLIPSE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -14,
+        "maxX": 45,
+        "maxY": 14
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-flow-control",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ELLIPSE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -27,
+        "maxX": 45,
+        "maxY": 27
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-check",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -15,
+        "maxX": 45,
+        "maxY": 15
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-gauge",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -23.98002718426999,
+        "minY": -45,
+        "maxX": 24,
+        "maxY": 23.995006276540956
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-cylinder",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 6
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-cylinder-spring",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-cylinder-cushioned",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 9
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-valve-22-nc",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 5,
+        "LINE": 8
+      },
+      "bounds": {
+        "minX": -68,
+        "minY": -45,
+        "maxX": 74,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "P": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-valve-32",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 6,
+        "LINE": 10
+      },
+      "bounds": {
+        "minX": -68,
+        "minY": -45,
+        "maxX": 74,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "P": 0,
+        "R": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-shuttle",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 3,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "A": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-plug",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -12,
+        "minY": -45,
+        "maxX": 12,
+        "maxY": 0
+      },
+      "terminals": {
+        "terminal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-compressor",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-motor",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-filter",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-throttle",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "ELLIPSE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -14,
+        "maxX": 45,
+        "maxY": 14
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-flow-control",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "ELLIPSE": 2,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -27,
+        "maxX": 45,
+        "maxY": 27
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-check",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -15,
+        "maxX": 45,
+        "maxY": 15
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-gauge",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "CIRCLE": 1,
+        "LINE": 2,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -23.98002718426999,
+        "minY": -45,
+        "maxX": 24,
+        "maxY": 23.995006276540956
+      },
+      "terminals": {
+        "sense": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-cylinder",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 6
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-cylinder-spring",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-cylinder-cushioned",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 9
+      },
+      "bounds": {
+        "minX": -34,
+        "minY": -45,
+        "maxX": 49,
+        "maxY": 22
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-valve-22-nc",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 5,
+        "LINE": 8
+      },
+      "bounds": {
+        "minX": -68,
+        "minY": -45,
+        "maxX": 74,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "P": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-valve-32",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 6,
+        "LINE": 10
+      },
+      "bounds": {
+        "minX": -68,
+        "minY": -45,
+        "maxX": 74,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "P": 0,
+        "R": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-shuttle",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 3,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "A": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-plug",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -12,
+        "minY": -45,
+        "maxX": 12,
+        "maxY": 0
+      },
+      "terminals": {
+        "terminal": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-valve-43",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 9,
+        "LINE": 16
+      },
+      "bounds": {
+        "minX": -88,
+        "minY": -45,
+        "maxX": 88,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0,
+        "P": 0,
+        "T": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-valve-43-tandem",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 10,
+        "LINE": 12
+      },
+      "bounds": {
+        "minX": -88,
+        "minY": -45,
+        "maxX": 88,
+        "maxY": 45
+      },
+      "terminals": {
+        "A": 0,
+        "B": 0,
+        "P": 0,
+        "T": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-reservoir",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -30,
+        "minY": -22,
+        "maxX": 30,
+        "maxY": 45
+      },
+      "terminals": {
+        "suction": 0,
+        "return": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-accumulator",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "ARC": 2,
+        "ELLIPSE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -21,
+        "minY": -60,
+        "maxX": 21,
+        "maxY": 45
+      },
+      "terminals": {
+        "fluid": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hyd-relief",
+      "category": "Hydraulics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 3,
+        "LINE": 3,
+        "SOLID": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -34,
+        "maxX": 45,
+        "maxY": 48
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-dryer",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-lubricator",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -28,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-regulator",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 4,
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 50
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-exhaust",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -10,
+        "minY": -12,
+        "maxX": 10,
+        "maxY": 45
+      },
+      "terminals": {
+        "exhaust": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "pneu-silencer",
+      "category": "Pneumatics",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -16,
+        "minY": -18,
+        "maxX": 16,
+        "maxY": 45
+      },
+      "terminals": {
+        "exhaust": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-fan",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 3,
+        "CIRCLE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -30,
+        "maxX": 45,
+        "maxY": 30
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-filter",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-damper",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 37
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-motor-damper",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 4,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 55.98026728428272
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-fire-damper",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-heating-coil",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 6,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-cooling-coil",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 6,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-silencer",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 3,
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25,
+        "maxX": 45,
+        "maxY": 25
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-diffuser",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -26,
+        "maxX": 45,
+        "maxY": 26
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-return-grille",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 7
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -26,
+        "maxX": 45,
+        "maxY": 26
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-boiler",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 45
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "flue": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-chiller",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-radiator",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 7
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 45,
+        "maxY": 20
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "hvac-expansion-vessel",
+      "category": "HVAC",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ARC": 2
+      },
+      "bounds": {
+        "minX": -22,
+        "minY": -45,
+        "maxX": 22,
+        "maxY": 34.980177256503
+      },
+      "terminals": {
+        "water": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-meter",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-backflow",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 6,
+        "CIRCLE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-heater",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ARC": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -44.98018688837187,
+        "maxX": 45,
+        "maxY": 44.98018688837187
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-softener",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 4,
+        "ARC": 2,
+        "LWPOLYLINE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -44.98018688837187,
+        "maxX": 45,
+        "maxY": 44.98018688837187
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-ro",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 5
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -45,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "reject": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-uv",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-screen",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 7
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -30,
+        "maxX": 45,
+        "maxY": 30
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-dosing",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 3,
+        "CIRCLE": 1,
+        "LWPOLYLINE": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 26
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-drain",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -25,
+        "minY": -45,
+        "maxX": 25,
+        "maxY": 25
+      },
+      "terminals": {
+        "waste": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-tap",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -20,
+        "maxX": 30,
+        "maxY": 20
+      },
+      "terminals": {
+        "supply": 0,
+        "outlet": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-sump",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -30,
+        "maxX": 45,
+        "maxY": 28
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "water-air-release",
+      "category": "Water",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "CIRCLE": 1,
+        "LINE": 1
+      },
+      "bounds": {
+        "minX": -18,
+        "minY": -45,
+        "maxX": 22,
+        "maxY": 38
+      },
+      "terminals": {
+        "water": 0,
+        "vent": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-plc",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-di",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-do",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-ai",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-ao",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-vfd",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-safety-relay",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-pid-block",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-gateway",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-hmi",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 2,
+        "CIRCLE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -24,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-proximity",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "ARC": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "auto-photoeye",
+      "category": "Automation",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 3,
+        "LINE": 4
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -18,
+        "maxX": 45,
+        "maxY": 18
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-panel",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-smoke",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-heat",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-call",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-sounder",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LINE": 2,
+        "CIRCLE": 1,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -25.99511123166104,
+        "maxX": 45,
+        "maxY": 25.99511123166104
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-strobe",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-monitor",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "fire-interface",
+      "category": "Fire",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 2,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -22,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-router",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-switch",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-firewall",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 9
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 24
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-server",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 4,
+        "LINE": 3,
+        "CIRCLE": 3
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 32
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-workstation",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-ap",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1,
+        "ARC": 2
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 41
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-patch",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-phone",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-camera",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    },
+    {
+      "id": "net-cloud",
+      "category": "Network",
+      "geometryRevision": 3,
+      "primitives": {
+        "LWPOLYLINE": 1,
+        "LINE": 3,
+        "TEXT": 1
+      },
+      "bounds": {
+        "minX": -45,
+        "minY": -40,
+        "maxX": 45,
+        "maxY": 22
+      },
+      "terminals": {
+        "in": 0,
+        "out": 0,
+        "branch": 0
+      },
+      "errors": [],
+      "warnings": [
+        "Normative dimensions / entry not independently verified"
+      ]
+    }
+  ]
+}

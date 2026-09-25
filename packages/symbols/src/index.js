@@ -1,3 +1,7 @@
+import { expandCatalog } from './catalog.js';
+import { CATEGORIES as categoryList, REFERENCES as referenceList, categoryDefinition } from './conventions.js';
+import { DRAWING_TYPES as drawingTypes, buildTemplate } from './templates.js';
+import { inspectSymbol, inspectCatalog } from './validation.js';
 import { line, polyline, circle, rect, text, entity, uid, clone, createDocument, ports, entityBounds } from '@conduitcad/model';
 import { arcPoints, TAU } from '@conduitcad/geometry';
 const p = (x, y) => ({ x, y }), L = (x1, y1, x2, y2) => line(p(x1, y1), p(x2, y2)), P = (points, closed = false) => polyline(points.map(([x, y]) => p(x, y)), closed), C = (x, y, r) => circle(p(x, y), r), R = (x, y, w, h) => rect(x, y, w, h), T = (x, y, s, h = 15) => text(p(x, y), s, h, { align: 'center' });
@@ -97,20 +101,62 @@ def('chassis','Chassis connection','Electrical',[L(0,40,0,8),L(-24,8,24,8),L(-24
 def('contact-no','Contact · normally open','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23)]);
 def('contact-nc','Contact · normally closed','Electrical',[L(-45,0,-8,0),L(8,0,45,0),L(-8,-23,-8,23),L(8,-23,8,23),L(-19,-28,19,28)]);
 def('potentiometer','Potentiometer','Electrical',[...lead,R(-25,-11,50,22),L(0,45,0,12),P([[-6,22],[0,12],[6,22]])],[...horizontal,{name:'wiper',x:0,y:45,dx:0,dy:1}]);
+expandCatalog(symbols);
 export const SYMBOLS = symbols;
+export const CATEGORIES = categoryList;
+export const STANDARD_REFERENCES = referenceList;
+export const DRAWING_TYPES = drawingTypes;
+export function auditSymbols() { return inspectCatalog(SYMBOLS); }
+export function auditSymbol(master, tolerance) { return inspectSymbol(master, tolerance); }
+export function searchSymbols(query = '', { category, standard, limit = Infinity } = {}) {
+    if (!(limit >= 0)) throw new RangeError('Invalid search limit');
+    const tokens = String(query).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().split(/\s+/).filter(Boolean);
+    return SYMBOLS.filter(s => (!category || category === 'All' || s.category === category) && (!standard || s.symbol.standardRefs.includes(standard)) && tokens.every(token => [s.name, s.id, s.category, s.symbol.group, ...s.symbol.aliases, ...s.symbol.standardRefs].join(' ').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(token))).slice(0, limit);
+}
+export function symbolUpdates(doc) {
+    return SYMBOLS.filter(s => doc.blocks[s.block] && (doc.blocks[s.block].symbol?.geometryRevision || 0) < s.symbol.geometryRevision);
+}
+/** Explicit replacement only; callers should wrap this in their document history transaction. */
+export function updateSymbolDefinitions(doc, ids) {
+    const chosen = [...new Set(ids)].map(id => {
+        const s = SYMBOLS.find(s => s.id === id);
+        if (!s) throw new Error(`Unknown symbol: ${id}`);
+        const old = doc.blocks[s.block];
+        const ports = new Set(s.ports.map(p => p.name));
+        for (const p of old?.ports || []) if (!ports.has(p.name)) throw new Error(`Cannot remove saved terminal ${id}.${p.name}`);
+        return s;
+    });
+    for (const s of chosen) doc.blocks[s.block] = clone({ name: s.block, base: s.base, entities: s.entities, ports: s.ports, symbol: s.symbol });
+    return chosen.map(s => s.id);
+}
 export const LINE_STYLES = [
     { id: 'process', name: 'Process pipe', layer: 'Process', color: '#147c77', width: 2, dash: [], arrow: 'end' },
     { id: 'signal', name: 'Instrument signal', layer: 'Instruments', color: '#aa7c4b', width: 1.5, dash: [6, 4], arrow: 'none' },
     { id: 'electrical', name: 'Electrical wire', layer: 'Electrical', color: '#6979b4', width: 1.5, dash: [], arrow: 'none' },
     { id: 'data', name: 'Data / communication', layer: 'Electrical', color: '#8876a7', width: 1.5, dash: [10, 3, 2, 3], arrow: 'end' },
-    { id: 'pneumatic', name: 'Pneumatic signal', layer: 'Instruments', color: '#a38560', width: 1.5, dash: [10, 3, 2, 3, 2, 3], arrow: 'none' },
-    { id: 'hydraulic', name: 'Hydraulic line', layer: 'Process', color: '#557d99', width: 2.8, dash: [], arrow: 'end' },
+    { id: 'pneumatic', name: 'Pneumatic signal · project dash convention', layer: 'Instruments', color: '#a38560', width: 1.5, dash: [10, 3, 2, 3, 2, 3], arrow: 'none' },
+    { id: 'hydraulic', name: 'Hydraulic working line', layer: 'Hydraulics', color: '#557d99', width: 2.8, dash: [], arrow: 'none' },
     { id: 'drain', name: 'Drain / utility', layer: 'Process', color: '#75898d', width: 1.5, dash: [12, 5], arrow: 'end' },
     { id: 'center', name: 'Centerline', layer: 'Annotations', color: '#8e9298', width: 1, dash: [16, 3, 2, 3], arrow: 'none' },
     { id: 'hidden', name: 'Hidden edge', layer: '0', color: '#8e9298', width: 1.2, dash: [4, 3], arrow: 'none' },
-    { id: 'boundary', name: 'Equipment boundary', layer: 'Annotations', color: '#9bacb3', width: 1, dash: [8, 4], arrow: 'none' }
+    { id: 'boundary', name: 'Equipment boundary', layer: 'Annotations', color: '#9bacb3', width: 1, dash: [8, 4], arrow: 'none' },
+    { id: 'workflow', name: 'Workflow sequence', layer: 'Process', color: '#147c77', width: 1.8, dash: [], arrow: 'end' },
+    { id: 'water', name: 'Water supply · project', layer: 'Water', color: '#257cab', width: 2, dash: [], arrow: 'end' },
+    { id: 'hot-water', name: 'Hot water · project', layer: 'Water', color: '#b65440', width: 2, dash: [], arrow: 'end' },
+    { id: 'wastewater', name: 'Wastewater · project', layer: 'Water', color: '#836848', width: 2, dash: [12, 4], arrow: 'end' },
+    { id: 'return', name: 'Hydronic return · project', layer: 'HVAC', color: '#547889', width: 1.8, dash: [12, 4], arrow: 'end' },
+    { id: 'air', name: 'Air duct centreline · schematic', layer: 'HVAC', color: '#528c80', width: 2.5, dash: [], arrow: 'end' },
+    { id: 'air-power', name: 'Pneumatic working line', layer: 'Pneumatics', color: '#528c80', width: 1.8, dash: [], arrow: 'none' },
+    { id: 'hyd-return', name: 'Hydraulic return line', layer: 'Hydraulics', color: '#587b9b', width: 1.8, dash: [], arrow: 'none' },
+    { id: 'pilot', name: 'Fluid-power pilot line', layer: 'Hydraulics', color: '#7b8898', width: 1.2, dash: [4, 3], arrow: 'none' },
+    { id: 'power', name: 'Power single-line', layer: 'Electrical', color: '#6979b4', width: 2.4, dash: [], arrow: 'none' },
+    { id: 'alarm', name: 'Fire-alarm loop · project', layer: 'Fire', color: '#bd6455', width: 1.6, dash: [], arrow: 'none' }
+
 ];
 export function installSymbols(doc) {
+    for (const category of CATEGORIES) {
+        if (!doc.layers.some(layer => layer.name === category.layer)) doc.layers.push({ name: category.layer, color: '#355463', visible: true, locked: false });
+    }
     for (const s of SYMBOLS)
         if (!doc.blocks[s.block])
             doc.blocks[s.block] = clone({ name: s.block, base: s.base, entities: s.entities, ports: s.ports, symbol: s.symbol });
@@ -122,10 +168,13 @@ export function insertSymbol(doc, id, x, y, options = {}) {
         throw new Error(`Unknown symbol: ${id}`);
     if (s.block && !doc.blocks[s.block])
         doc.blocks[s.block] = clone({ name: s.block, base: s.base, entities: s.entities, ports: s.ports, symbol: s.symbol });
-    return entity('INSERT', { block: s.block || s.name, x, y, sx: 1, sy: 1, rotation: 0, layer: s.category === 'Electrical' ? 'Electrical' : s.category === 'Flow' ? 'Process' : 'Equipment', tag: options.tag ?? '', ...options });
+    const layer = s.symbol?.defaultLayer || categoryDefinition(s.category)?.layer || 'Equipment';
+    if (!doc.layers.some(l => l.name === layer)) doc.layers.push({ name: layer, color: '#355463', visible: true, locked: false });
+    return entity('INSERT', { block: s.block || s.name, x, y, sx: 1, sy: 1, rotation: 0, layer, tag: options.tag ?? '', ...options });
 }
-/** Three genuinely editable demonstration projects; no background image or mock canvas. */
+/** Editable CAD starters; the three original drawing IDs remain backward compatible. */
 export function createDemo(kind = 'pid') {
+    if (!['pid', 'electrical', 'flow'].includes(kind)) return buildTemplate(kind, installSymbols, insertSymbol, LINE_STYLES);
     const doc = installSymbols(createDocument(kind === 'electrical' ? 'Motor control circuit' : kind === 'flow' ? 'Commissioning workflow' : 'Process water skid'));
     const E = doc.entities;
     const put = (id, x, y, tag, extra = {}) => { const e = insertSymbol(doc, id, x, y, { tag, ...extra }); E.push(e); return e; };
@@ -142,7 +191,7 @@ export function createDemo(kind = 'pid') {
     const note = (x, y, t, h = 12, color = '#849298') => E.push(text(p(x, y), t, h, { layer: 'Annotations', color }));
     note(40, 650, 'CONDUIT / ENGINEERING WORKSPACE', 12, '#6d9693');
     note(40, 606, doc.name, 30, '#304c58');
-    note(40, 576, kind === 'pid' ? 'PW-101   ·   PIPING & INSTRUMENTATION   ·   REV 01' : kind === 'flow' ? 'QA-204   ·   PROCESS FLOW   ·   REV 01' : 'EL-301   ·   ELECTRICAL SCHEMATIC   ·   REV 01', 12);
+    note(40, 576, kind === 'pid' ? 'PW-101   ·   PIPING & INSTRUMENTATION   ·   REV 03' : kind === 'flow' ? 'QA-204   ·   PROCESS FLOW   ·   REV 03' : 'EL-301   ·   ELECTRICAL SCHEMATIC   ·   REV 03', 12);
     E.push(line(p(40, 553), p(1100, 553), { layer: 'Annotations', color: '#ccd7db', width: 1 }));
     if (kind === 'pid') {
         note(40, 520, '01  /  INTAKE', 11);
@@ -196,5 +245,5 @@ export function createDemo(kind = 'pid') {
     doc.metadata.description = 'Editable demonstration drawing. Symbols are illustrative, not standards-certified.';
     return doc;
 }
-// Instrument takeoff points remain explicit, inspectable block ports.
-SYMBOLS.find(s => s.id === 'check-valve').ports = [...horizontal, { name: 'top', x: 0, y: 18, dx: 0, dy: 1 }];
+export function createDrawing(type = 'pid') { return createDemo(type); }
+

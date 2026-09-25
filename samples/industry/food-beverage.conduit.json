@@ -1,0 +1,1359 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Product transfer and heating",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p4c-19r",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_TANK",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "TK-101"
+    },
+    {
+      "id": "e-mugr5p4c-19s",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_PUMP",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "P-101"
+    },
+    {
+      "id": "e-mugr5p4c-19t",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_PLATE_EXCHANGER",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "HX-101"
+    },
+    {
+      "id": "e-mugr5p4c-19u",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_SAMPLING_POINT",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "SP-101"
+    },
+    {
+      "id": "e-mugr5p4c-19v",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_DIAPHRAGM_VALVE",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "DV-101"
+    },
+    {
+      "id": "e-mugr5p4c-19w",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19r"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19s"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4c-19r",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4c-19s",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4c-19x",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19s"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19t"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4c-19s",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4c-19t",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4c-19y",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19t"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19u"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4c-19t",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4c-19u",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4c-19z",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19u"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4c-19v"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4c-19u",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4c-19v",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4c-1a0",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Product transfer and heating",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4c-1a1",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Food & beverage  /  Process flow diagram",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4c-1a2",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p4c-1a3",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4c-1a4",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "FOOD-BEVERAGE  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_TANK": {
+      "name": "CC_TANK",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-tank-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -35,
+            "y": -45
+          },
+          "b": {
+            "x": -35,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 35,
+            "y": -45
+          },
+          "b": {
+            "x": 35,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -35,
+            "y": -45
+          },
+          "b": {
+            "x": 35,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-3",
+          "type": "ELLIPSE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 35
+          },
+          "major": {
+            "x": 35,
+            "y": 0
+          },
+          "ratio": 0.2857142857142857,
+          "start": 0,
+          "end": 6.283185307179586,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -35,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 35,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 45
+          },
+          "b": {
+            "x": 0,
+            "y": 75
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-tank-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -45
+          },
+          "b": {
+            "x": 0,
+            "y": -88
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "top",
+          "x": 0,
+          "y": 75,
+          "dx": 0,
+          "dy": 1,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "bottom",
+          "x": 0,
+          "y": -88,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Storage tank",
+        "category": "P&ID",
+        "labelOffset": 110,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Flat-bottom storage tank is distinct from a domed pressure vessel."
+        },
+        "group": "Equipment & instruments",
+        "aliases": [
+          "tank"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -88,
+          "maxX": 45,
+          "maxY": 75
+        }
+      }
+    },
+    "CC_PUMP": {
+      "name": "CC_PUMP",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pump-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 27
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -27
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-4",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 27,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -15,
+              "y": -18
+            },
+            {
+              "x": 23,
+              "y": 0
+            },
+            {
+              "x": -15,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": -31
+          },
+          "b": {
+            "x": 22,
+            "y": -31
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "top",
+          "x": 0,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "bottom",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Centrifugal pump",
+        "category": "P&ID",
+        "labelOffset": 67,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Reviewed: silhouette, terminal positions, normal state and distinct function retained."
+        },
+        "group": "Equipment & instruments",
+        "aliases": [
+          "pump"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_PLATE_EXCHANGER": {
+      "name": "CC_PLATE_EXCHANGER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-plate-exchanger-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -35
+            },
+            {
+              "x": 30,
+              "y": -35
+            },
+            {
+              "x": 30,
+              "y": 35
+            },
+            {
+              "x": -30,
+              "y": 35
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 35
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -35
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -25,
+            "y": -27
+          },
+          "b": {
+            "x": -11,
+            "y": 27
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -13,
+            "y": -27
+          },
+          "b": {
+            "x": 1,
+            "y": 27
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -1,
+            "y": -27
+          },
+          "b": {
+            "x": 13,
+            "y": 27
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-plate-exchanger-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 11,
+            "y": -27
+          },
+          "b": {
+            "x": 25,
+            "y": 27
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "top",
+          "x": 0,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "bottom",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Plate heat exchanger",
+        "category": "P&ID",
+        "group": "Equipment",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "plate exchanger"
+        ],
+        "defaultLayer": "Equipment",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_SAMPLING_POINT": {
+      "name": "CC_SAMPLING_POINT",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-sampling-point-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-sampling-point-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 0
+          },
+          "b": {
+            "x": 0,
+            "y": -32
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-sampling-point-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -8,
+              "y": -17
+            },
+            {
+              "x": 8,
+              "y": -17
+            },
+            {
+              "x": 0,
+              "y": -25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-sampling-point-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -8,
+              "y": -33
+            },
+            {
+              "x": 8,
+              "y": -33
+            },
+            {
+              "x": 0,
+              "y": -25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-sampling-point-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -33
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "sample",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Sampling point",
+        "category": "P&ID",
+        "group": "Fittings & connections",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "sampling point"
+        ],
+        "defaultLayer": "Equipment",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 0
+        }
+      }
+    },
+    "CC_DIAPHRAGM_VALVE": {
+      "name": "CC_DIAPHRAGM_VALVE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-diaphragm-valve-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-diaphragm-valve-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-diaphragm-valve-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -15
+            },
+            {
+              "x": -25,
+              "y": 12
+            },
+            {
+              "x": 25,
+              "y": 12
+            },
+            {
+              "x": 25,
+              "y": -15
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-diaphragm-valve-3",
+          "type": "ELLIPSE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 12
+          },
+          "major": {
+            "x": 25,
+            "y": 0
+          },
+          "ratio": 0.72,
+          "start": 3.141592653589793,
+          "end": 6.283185307179586,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-diaphragm-valve-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 12
+          },
+          "b": {
+            "x": 0,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-diaphragm-valve-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -12,
+            "y": 35
+          },
+          "b": {
+            "x": 12,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Diaphragm valve",
+        "category": "P&ID",
+        "group": "Valves & actuators",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "diaphragm valve"
+        ],
+        "defaultLayer": "Equipment",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -15,
+          "maxX": 45,
+          "maxY": 35
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Storage, pumping, heat exchange and sample point; hygienic design is not inferred from the symbol.",
+    "industry": "Food & beverage",
+    "drawingType": "Process flow diagram",
+    "templateId": "food-beverage",
+    "standardRefs": [
+      "ISO-10628-2",
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

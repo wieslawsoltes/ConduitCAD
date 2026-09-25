@@ -1,0 +1,1279 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Air handling system",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p59-1bb",
+      "type": "INSERT",
+      "layer": "HVAC",
+      "block": "CC_HVAC_FILTER",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "F-101"
+    },
+    {
+      "id": "e-mugr5p59-1bc",
+      "type": "INSERT",
+      "layer": "HVAC",
+      "block": "CC_HVAC_HEATING_COIL",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "HC-101"
+    },
+    {
+      "id": "e-mugr5p59-1bd",
+      "type": "INSERT",
+      "layer": "HVAC",
+      "block": "CC_HVAC_COOLING_COIL",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "CC-101"
+    },
+    {
+      "id": "e-mugr5p59-1be",
+      "type": "INSERT",
+      "layer": "HVAC",
+      "block": "CC_HVAC_FAN",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "SF-101"
+    },
+    {
+      "id": "e-mugr5p59-1bf",
+      "type": "INSERT",
+      "layer": "HVAC",
+      "block": "CC_HVAC_MOTOR_DAMPER",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "MD-101"
+    },
+    {
+      "id": "e-mugr5p5a-1bg",
+      "type": "LWPOLYLINE",
+      "layer": "HVAC",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bb"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bc"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 2.5,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p59-1bb",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p59-1bc",
+          "port": "in"
+        },
+        "style": "air",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5a-1bh",
+      "type": "LWPOLYLINE",
+      "layer": "HVAC",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bc"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bd"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 2.5,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p59-1bc",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p59-1bd",
+          "port": "in"
+        },
+        "style": "air",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5a-1bi",
+      "type": "LWPOLYLINE",
+      "layer": "HVAC",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bd"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1be"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 2.5,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p59-1bd",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p59-1be",
+          "port": "in"
+        },
+        "style": "air",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5a-1bj",
+      "type": "LWPOLYLINE",
+      "layer": "HVAC",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1be"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection",
+          "entityId": "e-mugr5p59-1bf"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 2.5,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p59-1be",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p59-1bf",
+          "port": "in"
+        },
+        "style": "air",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5a-1bk",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Air handling system",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5a-1bl",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Building services  /  Air-system schematic",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5a-1bm",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p5a-1bn",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5a-1bo",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "HVAC-AIR  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_HVAC_FILTER": {
+      "name": "CC_HVAC_FILTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hvac-filter-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": 25
+            },
+            {
+              "x": -30,
+              "y": 25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-filter-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-filter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-filter-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": -25
+          },
+          "b": {
+            "x": 22,
+            "y": 25
+          },
+          "dash": [
+            4,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Duct filter",
+        "category": "HVAC",
+        "group": "Air & hydronic systems",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hvac filter"
+        ],
+        "defaultLayer": "HVAC",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25,
+          "maxX": 45,
+          "maxY": 25
+        }
+      }
+    },
+    "CC_HVAC_HEATING_COIL": {
+      "name": "CC_HVAC_HEATING_COIL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hvac-heating-coil-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": 25
+            },
+            {
+              "x": -30,
+              "y": 25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -18,
+            "y": -23
+          },
+          "b": {
+            "x": -18,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -6,
+            "y": -23
+          },
+          "b": {
+            "x": -6,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 6,
+            "y": -23
+          },
+          "b": {
+            "x": 6,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 18,
+            "y": -23
+          },
+          "b": {
+            "x": 18,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-heating-coil-7",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 33
+          },
+          "text": "+",
+          "height": 16,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Air heating coil",
+        "category": "HVAC",
+        "group": "Air & hydronic systems",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hvac heating coil"
+        ],
+        "defaultLayer": "HVAC",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25,
+          "maxX": 45,
+          "maxY": 25
+        }
+      }
+    },
+    "CC_HVAC_COOLING_COIL": {
+      "name": "CC_HVAC_COOLING_COIL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hvac-cooling-coil-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": 25
+            },
+            {
+              "x": -30,
+              "y": 25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -18,
+            "y": -23
+          },
+          "b": {
+            "x": -18,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -6,
+            "y": -23
+          },
+          "b": {
+            "x": -6,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 6,
+            "y": -23
+          },
+          "b": {
+            "x": 6,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 18,
+            "y": -23
+          },
+          "b": {
+            "x": 18,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-cooling-coil-7",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 33
+          },
+          "text": "−",
+          "height": 16,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Air cooling coil",
+        "category": "HVAC",
+        "group": "Air & hydronic systems",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hvac cooling coil"
+        ],
+        "defaultLayer": "HVAC",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25,
+          "maxX": 45,
+          "maxY": 25
+        }
+      }
+    },
+    "CC_HVAC_FAN": {
+      "name": "CC_HVAC_FAN",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hvac-fan-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -30
+            },
+            {
+              "x": 32,
+              "y": -30
+            },
+            {
+              "x": 32,
+              "y": 30
+            },
+            {
+              "x": -32,
+              "y": 30
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-fan-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-fan-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-fan-3",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 24,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-fan-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -16,
+            "y": 0
+          },
+          "b": {
+            "x": 16,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-fan-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 16,
+              "y": 0
+            },
+            {
+              "x": 9,
+              "y": 3.15
+            },
+            {
+              "x": 9,
+              "y": -3.15
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Duct fan",
+        "category": "HVAC",
+        "group": "Air & hydronic systems",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hvac fan"
+        ],
+        "defaultLayer": "HVAC",
+        "labelOffset": 52,
+        "extents": {
+          "minX": -45,
+          "minY": -30,
+          "maxX": 45,
+          "maxY": 30
+        }
+      }
+    },
+    "CC_HVAC_MOTOR_DAMPER": {
+      "name": "CC_HVAC_MOTOR_DAMPER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-hvac-motor-damper-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": 25
+            },
+            {
+              "x": -30,
+              "y": 25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -24,
+            "y": -18
+          },
+          "b": {
+            "x": 24,
+            "y": 18
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 25
+          },
+          "b": {
+            "x": 0,
+            "y": 36
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-5",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 46
+          },
+          "r": 10,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-hvac-motor-damper-6",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 42
+          },
+          "text": "M",
+          "height": 10,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "air",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Motorized duct damper",
+        "category": "HVAC",
+        "group": "Air & hydronic systems",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "hvac motor damper"
+        ],
+        "defaultLayer": "HVAC",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25,
+          "maxX": 45,
+          "maxY": 55.992661810508096
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Filter, heating and cooling coils, fan and controlled air outlet.",
+    "industry": "Building services",
+    "drawingType": "Air-system schematic",
+    "templateId": "hvac-air",
+    "standardRefs": [
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

@@ -1,0 +1,996 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Flow-control loop",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p67-1d1",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_FLOW_TRANSMITTER",
+      "x": 150,
+      "y": 420,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FT-101"
+    },
+    {
+      "id": "e-mugr5p67-1d2",
+      "type": "INSERT",
+      "layer": "Instruments",
+      "block": "CC_FLOW_CONTROLLER_PANEL",
+      "x": 390,
+      "y": 420,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FIC-101"
+    },
+    {
+      "id": "e-mugr5p67-1d3",
+      "type": "INSERT",
+      "layer": "Instruments",
+      "block": "CC_IP_CONVERTER",
+      "x": 630,
+      "y": 300,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FY-101"
+    },
+    {
+      "id": "e-mugr5p67-1d4",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_CONTROL_VALVE",
+      "x": 880,
+      "y": 300,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FCV-101"
+    },
+    {
+      "id": "e-mugr5p67-1d5",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "sense",
+          "x": 150,
+          "y": 375,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d1"
+        },
+        {
+          "x": 150,
+          "y": 300
+        },
+        {
+          "x": 390,
+          "y": 300
+        },
+        {
+          "name": "sense",
+          "x": 390,
+          "y": 375,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d2"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "4–20 mA",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p67-1d1",
+          "port": "sense"
+        },
+        "to": {
+          "entityId": "e-mugr5p67-1d2",
+          "port": "sense"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [
+          {
+            "x": 150,
+            "y": 300
+          },
+          {
+            "x": 390,
+            "y": 300
+          }
+        ],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p67-1d6",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "sense",
+          "x": 390,
+          "y": 375,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d2"
+        },
+        {
+          "x": 390,
+          "y": 357
+        },
+        {
+          "x": 567,
+          "y": 357
+        },
+        {
+          "x": 567,
+          "y": 300
+        },
+        {
+          "name": "in",
+          "x": 585,
+          "y": 300,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d3"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p67-1d2",
+          "port": "sense"
+        },
+        "to": {
+          "entityId": "e-mugr5p67-1d3",
+          "port": "in"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p67-1d7",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "out",
+          "x": 675,
+          "y": 300,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d3"
+        },
+        {
+          "x": 693,
+          "y": 300
+        },
+        {
+          "x": 693,
+          "y": 368
+        },
+        {
+          "x": 880,
+          "y": 368
+        },
+        {
+          "name": "signal",
+          "x": 880,
+          "y": 350,
+          "dx": 0,
+          "dy": 1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p67-1d4"
+        }
+      ],
+      "closed": false,
+      "color": "#a38560",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3,
+        2,
+        3
+      ],
+      "label": "AIR",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p67-1d3",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p67-1d4",
+          "port": "signal"
+        },
+        "style": "pneumatic",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p67-1d8",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Flow-control loop",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p67-1d9",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Process automation  /  Instrument functional loop",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p67-1da",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p67-1db",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p67-1dc",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "INSTRUMENT-LOOP  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_FLOW_TRANSMITTER": {
+      "name": "CC_FLOW_TRANSMITTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-flow-transmitter-0",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-flow-transmitter-1",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "FT",
+          "height": 15,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-flow-transmitter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -26
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "sense",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Flow transmitter",
+        "category": "P&ID",
+        "labelOffset": 67,
+        "geometryRevision": 3,
+        "convention": "ISA-5.1 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISA-5.1"
+        ],
+        "group": "Field & panel instruments",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Reviewed: silhouette, terminal positions, normal state and distinct function retained."
+        },
+        "aliases": [
+          "flow transmitter"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -26,
+          "minY": -45,
+          "maxX": 26,
+          "maxY": 25.970550818758205
+        }
+      }
+    },
+    "CC_FLOW_CONTROLLER_PANEL": {
+      "name": "CC_FLOW_CONTROLLER_PANEL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-flow-controller-panel-0",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-flow-controller-panel-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -26,
+            "y": 0
+          },
+          "b": {
+            "x": 26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-flow-controller-panel-2",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": 7
+          },
+          "text": "FIC",
+          "height": 12,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-flow-controller-panel-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -26
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "sense",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Flow controller · accessible panel",
+        "category": "Instrumentation",
+        "group": "Location variants",
+        "functionCode": "FIC",
+        "instrumentLocation": "primary accessible panel",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISA-5.1"
+        ],
+        "convention": "ISA-5.1 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "flow controller panel"
+        ],
+        "defaultLayer": "Instruments",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -26,
+          "minY": -45,
+          "maxX": 26,
+          "maxY": 25.970550818758205
+        }
+      }
+    },
+    "CC_IP_CONVERTER": {
+      "name": "CC_IP_CONVERTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-ip-converter-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -26,
+              "y": -24
+            },
+            {
+              "x": 26,
+              "y": -24
+            },
+            {
+              "x": 26,
+              "y": 24
+            },
+            {
+              "x": -26,
+              "y": 24
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ip-converter-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ip-converter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 26,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ip-converter-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -26,
+            "y": -24
+          },
+          "b": {
+            "x": 26,
+            "y": 24
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ip-converter-4",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": -13,
+            "y": 8
+          },
+          "text": "I",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ip-converter-5",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 13,
+            "y": -17
+          },
+          "text": "P",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Current / pressure converter",
+        "category": "Instrumentation",
+        "group": "Control functions",
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "aliases": [
+          "I/P",
+          "electropneumatic",
+          "ip converter"
+        ],
+        "geometryRevision": 3,
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "defaultLayer": "Instruments",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -24,
+          "maxX": 45,
+          "maxY": 24
+        }
+      }
+    },
+    "CC_CONTROL_VALVE": {
+      "name": "CC_CONTROL_VALVE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-control-valve-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": -25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 0
+          },
+          "b": {
+            "x": 0,
+            "y": 30
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -20,
+            "y": 30
+          },
+          "b": {
+            "x": 20,
+            "y": 30
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-6",
+          "type": "ELLIPSE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 30
+          },
+          "major": {
+            "x": 20,
+            "y": 0
+          },
+          "ratio": 0.7,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 44
+          },
+          "b": {
+            "x": 0,
+            "y": 50
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "signal",
+          "x": 0,
+          "y": 50,
+          "dx": 0,
+          "dy": 1,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Control valve",
+        "category": "P&ID",
+        "labelOffset": 48,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Native elliptical diaphragm cap and a connected signal terminal."
+        },
+        "group": "Valves & actuators",
+        "aliases": [
+          "control valve"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -18,
+          "maxX": 45,
+          "maxY": 50
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Field transmitter, controller, current-to-pressure converter and valve actuator.",
+    "industry": "Process automation",
+    "drawingType": "Instrument functional loop",
+    "templateId": "instrument-loop",
+    "standardRefs": [
+      "ISA-5.1",
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/symbols",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Modular Conduit CAD symbols engine",
   "type": "module",
   "main": "./src/index.js",
@@ -26,7 +26,8 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.2.0",
-    "@conduitcad/model": "0.2.0"
+    "@conduitcad/geometry": "0.2.1",
+    "@conduitcad/model": "0.2.1",
+    "@conduitcad/routing": "0.2.1"
   }
 }

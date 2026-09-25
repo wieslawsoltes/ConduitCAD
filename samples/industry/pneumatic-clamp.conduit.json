@@ -1,0 +1,1758 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Pneumatic spring-return actuator",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p5z-1cl",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_COMPRESSOR",
+      "x": 120,
+      "y": 300,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "AIR"
+    },
+    {
+      "id": "e-mugr5p5z-1cm",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_FILTER",
+      "x": 310,
+      "y": 300,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "F1"
+    },
+    {
+      "id": "e-mugr5p5z-1cn",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_REGULATOR",
+      "x": 500,
+      "y": 300,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PR1"
+    },
+    {
+      "id": "e-mugr5p5z-1co",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_VALVE_32",
+      "x": 760,
+      "y": 280,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "V1"
+    },
+    {
+      "id": "e-mugr5p5z-1cp",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_CYLINDER_SPRING",
+      "x": 760,
+      "y": 470,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "A1"
+    },
+    {
+      "id": "e-mugr5p5z-1cq",
+      "type": "INSERT",
+      "layer": "Pneumatics",
+      "block": "CC_PNEU_SILENCER",
+      "x": 930,
+      "y": 130,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "EXH"
+    },
+    {
+      "id": "e-mugr5p5z-1cr",
+      "type": "LWPOLYLINE",
+      "layer": "Pneumatics",
+      "points": [
+        {
+          "name": "out",
+          "x": 165,
+          "y": 300,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cl"
+        },
+        {
+          "name": "in",
+          "x": 265,
+          "y": 300,
+          "dx": -1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cm"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5z-1cl",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5z-1cm",
+          "port": "in"
+        },
+        "style": "air-power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1cs",
+      "type": "LWPOLYLINE",
+      "layer": "Pneumatics",
+      "points": [
+        {
+          "name": "out",
+          "x": 355,
+          "y": 300,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cm"
+        },
+        {
+          "name": "in",
+          "x": 455,
+          "y": 300,
+          "dx": -1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cn"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5z-1cm",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5z-1cn",
+          "port": "in"
+        },
+        "style": "air-power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1ct",
+      "type": "LWPOLYLINE",
+      "layer": "Pneumatics",
+      "points": [
+        {
+          "name": "out",
+          "x": 545,
+          "y": 300,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cn"
+        },
+        {
+          "x": 563,
+          "y": 300
+        },
+        {
+          "x": 563,
+          "y": 217
+        },
+        {
+          "x": 772,
+          "y": 217
+        },
+        {
+          "name": "P",
+          "x": 772,
+          "y": 235,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1co"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5z-1cn",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p5z-1co",
+          "port": "P"
+        },
+        "style": "air-power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1cu",
+      "type": "LWPOLYLINE",
+      "layer": "Pneumatics",
+      "points": [
+        {
+          "name": "A",
+          "x": 772,
+          "y": 325,
+          "dx": 0,
+          "dy": 1,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1co"
+        },
+        {
+          "x": 772,
+          "y": 343
+        },
+        {
+          "x": 737,
+          "y": 343
+        },
+        {
+          "name": "A",
+          "x": 737,
+          "y": 425,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cp"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5z-1co",
+          "port": "A"
+        },
+        "to": {
+          "entityId": "e-mugr5p5z-1cp",
+          "port": "A"
+        },
+        "style": "air-power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1cv",
+      "type": "LWPOLYLINE",
+      "layer": "Pneumatics",
+      "points": [
+        {
+          "name": "R",
+          "x": 796,
+          "y": 235,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1co"
+        },
+        {
+          "x": 796,
+          "y": 217
+        },
+        {
+          "x": 930,
+          "y": 217
+        },
+        {
+          "name": "exhaust",
+          "x": 930,
+          "y": 175,
+          "dx": 0,
+          "dy": 1,
+          "medium": "pneumatic",
+          "role": "connection",
+          "entityId": "e-mugr5p5z-1cq"
+        }
+      ],
+      "closed": false,
+      "color": "#528c80",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p5z-1co",
+          "port": "R"
+        },
+        "to": {
+          "entityId": "e-mugr5p5z-1cq",
+          "port": "exhaust"
+        },
+        "style": "air-power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1cw",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Pneumatic spring-return actuator",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5z-1cx",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Industrial machinery  /  Pneumatic circuit",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5z-1cy",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p5z-1cz",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p5z-1d0",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "PNEUMATIC-CLAMP  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_PNEU_COMPRESSOR": {
+      "name": "CC_PNEU_COMPRESSOR",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-compressor-0",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-compressor-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-compressor-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 26,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-compressor-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 10,
+              "y": -8
+            },
+            {
+              "x": 10,
+              "y": 8
+            },
+            {
+              "x": 24,
+              "y": 0
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Air compressor",
+        "category": "Pneumatics",
+        "group": "Sources & drives",
+        "energy": "gas/open triangle",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu compressor"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25.970550818758205,
+          "maxX": 45,
+          "maxY": 25.970550818758205
+        }
+      }
+    },
+    "CC_PNEU_FILTER": {
+      "name": "CC_PNEU_FILTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-filter-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -28,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": 28
+            },
+            {
+              "x": 28,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": -28
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-filter-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -28,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-filter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 28,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-filter-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -28
+          },
+          "b": {
+            "x": 0,
+            "y": 28
+          },
+          "dash": [
+            4,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Air filter",
+        "category": "Pneumatics",
+        "group": "Conditioning",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu filter"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 50,
+        "extents": {
+          "minX": -45,
+          "minY": -28,
+          "maxX": 45,
+          "maxY": 28
+        }
+      }
+    },
+    "CC_PNEU_REGULATOR": {
+      "name": "CC_PNEU_REGULATOR",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-regulator-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": -22
+            },
+            {
+              "x": 22,
+              "y": 22
+            },
+            {
+              "x": -22,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -22,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 22,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -16,
+            "y": 0
+          },
+          "b": {
+            "x": 16,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 16,
+              "y": 0
+            },
+            {
+              "x": 9,
+              "y": 3.15
+            },
+            {
+              "x": 9,
+              "y": -3.15
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 0,
+              "y": 22
+            },
+            {
+              "x": 0,
+              "y": 24.5
+            },
+            {
+              "x": 6,
+              "y": 27.25
+            },
+            {
+              "x": -6,
+              "y": 30
+            },
+            {
+              "x": 6,
+              "y": 32.75
+            },
+            {
+              "x": -6,
+              "y": 35.5
+            },
+            {
+              "x": 6,
+              "y": 38.25
+            },
+            {
+              "x": -6,
+              "y": 41
+            },
+            {
+              "x": 0,
+              "y": 44.5
+            },
+            {
+              "x": 0,
+              "y": 47
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -15,
+            "y": 28
+          },
+          "b": {
+            "x": 15,
+            "y": 50
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-regulator-7",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 15,
+              "y": 50
+            },
+            {
+              "x": 7.49236948858338,
+              "y": 48.40063009155285
+            },
+            {
+              "x": 11.21796056943674,
+              "y": 43.320278617661906
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Pressure regulator",
+        "category": "Pneumatics",
+        "group": "Conditioning",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu regulator"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 50
+        }
+      }
+    },
+    "CC_PNEU_VALVE_32": {
+      "name": "CC_PNEU_VALVE_32",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-valve-32-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -48,
+              "y": -22
+            },
+            {
+              "x": 0,
+              "y": -22
+            },
+            {
+              "x": 0,
+              "y": 22
+            },
+            {
+              "x": -48,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-1",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 0,
+              "y": -22
+            },
+            {
+              "x": 48,
+              "y": -22
+            },
+            {
+              "x": 48,
+              "y": 22
+            },
+            {
+              "x": 0,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -68,
+              "y": -18
+            },
+            {
+              "x": -48,
+              "y": -18
+            },
+            {
+              "x": -48,
+              "y": 2
+            },
+            {
+              "x": -68,
+              "y": 2
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -68,
+            "y": -18
+          },
+          "b": {
+            "x": -48,
+            "y": 2
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-4",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 48,
+              "y": 0
+            },
+            {
+              "x": 50.6,
+              "y": 0
+            },
+            {
+              "x": 53.46,
+              "y": 7
+            },
+            {
+              "x": 56.32,
+              "y": -7
+            },
+            {
+              "x": 59.18,
+              "y": 7
+            },
+            {
+              "x": 62.04,
+              "y": -7
+            },
+            {
+              "x": 64.9,
+              "y": 7
+            },
+            {
+              "x": 67.76,
+              "y": -7
+            },
+            {
+              "x": 71.4,
+              "y": 0
+            },
+            {
+              "x": 74,
+              "y": 0
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 12,
+            "y": 22
+          },
+          "b": {
+            "x": 12,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 12,
+            "y": -22
+          },
+          "b": {
+            "x": 12,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 36,
+            "y": -22
+          },
+          "b": {
+            "x": 36,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -36,
+            "y": -16
+          },
+          "b": {
+            "x": -36,
+            "y": 16
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-9",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -36,
+              "y": 16
+            },
+            {
+              "x": -39.15,
+              "y": 9
+            },
+            {
+              "x": -32.85,
+              "y": 9
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-10",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -12,
+            "y": -22
+          },
+          "b": {
+            "x": -12,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-11",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -17,
+            "y": -10
+          },
+          "b": {
+            "x": -7,
+            "y": -10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-12",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 12,
+            "y": -22
+          },
+          "b": {
+            "x": 12,
+            "y": -12
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-13",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 7,
+            "y": -12
+          },
+          "b": {
+            "x": 17,
+            "y": -12
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-14",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 12,
+            "y": 17
+          },
+          "b": {
+            "x": 36,
+            "y": -17
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-valve-32-15",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 36,
+              "y": -17
+            },
+            {
+              "x": 34.53666638609341,
+              "y": -9.464672884710906
+            },
+            {
+              "x": 29.389768847525414,
+              "y": -13.097777029582433
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "A",
+          "x": 12,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "pneumatic",
+          "role": "connection"
+        },
+        {
+          "name": "P",
+          "x": 12,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection"
+        },
+        {
+          "name": "R",
+          "x": 36,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "3/2 valve · spring-rest exhaust",
+        "category": "Pneumatics",
+        "group": "Directional valves",
+        "positions": 2,
+        "workingPorts": 3,
+        "normalState": "P blocked; A to R",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu valve 32"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -68,
+          "minY": -45,
+          "maxX": 74,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_PNEU_CYLINDER_SPRING": {
+      "name": "CC_PNEU_CYLINDER_SPRING",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-cylinder-spring-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -34,
+              "y": -22
+            },
+            {
+              "x": 34,
+              "y": -22
+            },
+            {
+              "x": 34,
+              "y": 22
+            },
+            {
+              "x": -34,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -22
+          },
+          "b": {
+            "x": -8,
+            "y": 22
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -8,
+            "y": -5
+          },
+          "b": {
+            "x": 49,
+            "y": -5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 49,
+            "y": -5
+          },
+          "b": {
+            "x": 49,
+            "y": 5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 49,
+            "y": 5
+          },
+          "b": {
+            "x": -8,
+            "y": 5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -23,
+            "y": -22
+          },
+          "b": {
+            "x": -23,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-cylinder-spring-6",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 2.8000000000000003,
+              "y": 0
+            },
+            {
+              "x": 5.880000000000001,
+              "y": 8
+            },
+            {
+              "x": 8.96,
+              "y": -8
+            },
+            {
+              "x": 12.040000000000001,
+              "y": 8
+            },
+            {
+              "x": 15.120000000000001,
+              "y": -8
+            },
+            {
+              "x": 18.2,
+              "y": 8
+            },
+            {
+              "x": 21.28,
+              "y": -8
+            },
+            {
+              "x": 25.2,
+              "y": 0
+            },
+            {
+              "x": 28,
+              "y": 0
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "A",
+          "x": -23,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Single-acting spring-return cylinder",
+        "category": "Pneumatics",
+        "group": "Actuators",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu cylinder spring"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -34,
+          "minY": -45,
+          "maxX": 49,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_PNEU_SILENCER": {
+      "name": "CC_PNEU_SILENCER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pneu-silencer-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 45
+          },
+          "b": {
+            "x": 0,
+            "y": 18
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-silencer-1",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -16,
+              "y": -18
+            },
+            {
+              "x": 16,
+              "y": -18
+            },
+            {
+              "x": 16,
+              "y": 18
+            },
+            {
+              "x": -16,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-silencer-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -10,
+            "y": -14
+          },
+          "b": {
+            "x": -10,
+            "y": 14
+          },
+          "dash": [
+            2,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-silencer-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -14
+          },
+          "b": {
+            "x": 0,
+            "y": 14
+          },
+          "dash": [
+            2,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pneu-silencer-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 10,
+            "y": -14
+          },
+          "b": {
+            "x": 10,
+            "y": 14
+          },
+          "dash": [
+            2,
+            3
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "exhaust",
+          "x": 0,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "pneumatic",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Exhaust silencer",
+        "category": "Pneumatics",
+        "group": "Connections",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-1219-1",
+          "NFPC-FLUID"
+        ],
+        "convention": "ISO-1219-1 / NFPC-FLUID family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pneu silencer"
+        ],
+        "defaultLayer": "Pneumatics",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -16,
+          "minY": -18,
+          "maxX": 16,
+          "maxY": 45
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Air preparation, 3/2 valve with spring-rest exhaust, cylinder and exhaust silencer.",
+    "industry": "Industrial machinery",
+    "drawingType": "Pneumatic circuit",
+    "templateId": "pneumatic-clamp",
+    "standardRefs": [
+      "ISO-1219-1"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

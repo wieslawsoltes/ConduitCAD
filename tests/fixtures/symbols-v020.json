@@ -1,0 +1,551 @@
+[
+  {
+    "id": "gate-valve",
+    "block": "CC_GATE_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "ball-valve",
+    "block": "CC_BALL_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "globe-valve",
+    "block": "CC_GLOBE_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "butterfly-valve",
+    "block": "CC_BUTTERFLY_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "check-valve",
+    "block": "CC_CHECK_VALVE",
+    "ports": [
+      "in",
+      "out",
+      "top"
+    ]
+  },
+  {
+    "id": "control-valve",
+    "block": "CC_CONTROL_VALVE",
+    "ports": [
+      "in",
+      "out",
+      "signal"
+    ]
+  },
+  {
+    "id": "solenoid-valve",
+    "block": "CC_SOLENOID_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "relief-valve",
+    "block": "CC_RELIEF_VALVE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "three-way-valve",
+    "block": "CC_THREE_WAY_VALVE",
+    "ports": [
+      "in",
+      "out",
+      "branch"
+    ]
+  },
+  {
+    "id": "pump",
+    "block": "CC_PUMP",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "gear-pump",
+    "block": "CC_GEAR_PUMP",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "compressor",
+    "block": "CC_COMPRESSOR",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "fan",
+    "block": "CC_FAN",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "strainer",
+    "block": "CC_STRAINER",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "filter",
+    "block": "CC_FILTER",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "heat-exchanger",
+    "block": "CC_HEAT_EXCHANGER",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "tank",
+    "block": "CC_TANK",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "vessel",
+    "block": "CC_VESSEL",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "mixer",
+    "block": "CC_MIXER",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "pressure-indicator",
+    "block": "CC_PRESSURE_INDICATOR",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "flow-transmitter",
+    "block": "CC_FLOW_TRANSMITTER",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "temperature",
+    "block": "CC_TEMPERATURE",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "level-transmitter",
+    "block": "CC_LEVEL_TRANSMITTER",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "reducer",
+    "block": "CC_REDUCER",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "flange",
+    "block": "CC_FLANGE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "offpage",
+    "block": "CC_OFFPAGE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "resistor",
+    "block": "CC_RESISTOR",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "resistor-iec",
+    "block": "CC_RESISTOR_IEC",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "capacitor",
+    "block": "CC_CAPACITOR",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "inductor",
+    "block": "CC_INDUCTOR",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "diode",
+    "block": "CC_DIODE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "led",
+    "block": "CC_LED",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "switch",
+    "block": "CC_SWITCH",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "switch-nc",
+    "block": "CC_SWITCH_NC",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "fuse",
+    "block": "CC_FUSE",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "relay",
+    "block": "CC_RELAY",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "motor",
+    "block": "CC_MOTOR",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "generator",
+    "block": "CC_GENERATOR",
+    "ports": [
+      "in",
+      "out",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "transformer",
+    "block": "CC_TRANSFORMER",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "ground",
+    "block": "CC_GROUND",
+    "ports": [
+      "terminal"
+    ]
+  },
+  {
+    "id": "battery",
+    "block": "CC_BATTERY",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "terminal",
+    "block": "CC_TERMINAL",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "op-amp",
+    "block": "CC_OP_AMP",
+    "ports": [
+      "positive",
+      "negative",
+      "out"
+    ]
+  },
+  {
+    "id": "lamp",
+    "block": "CC_LAMP",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "process",
+    "block": "CC_PROCESS",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "decision",
+    "block": "CC_DECISION",
+    "ports": [
+      "in",
+      "out",
+      "yes",
+      "no"
+    ]
+  },
+  {
+    "id": "terminator",
+    "block": "CC_TERMINATOR",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "data",
+    "block": "CC_DATA",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "document",
+    "block": "CC_DOCUMENT",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "database",
+    "block": "CC_DATABASE",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "subprocess",
+    "block": "CC_SUBPROCESS",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "manual",
+    "block": "CC_MANUAL",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "preparation",
+    "block": "CC_PREPARATION",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "delay",
+    "block": "CC_DELAY",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "junction",
+    "block": "CC_JUNCTION",
+    "ports": [
+      "in",
+      "out",
+      "left",
+      "right"
+    ]
+  },
+  {
+    "id": "note",
+    "block": "CC_NOTE",
+    "ports": [
+      "left",
+      "top",
+      "bottom"
+    ]
+  },
+  {
+    "id": "pressure-panel",
+    "block": "CC_PRESSURE_PANEL",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "pressure-rear",
+    "block": "CC_PRESSURE_REAR",
+    "ports": [
+      "sense"
+    ]
+  },
+  {
+    "id": "capacitor-polarized",
+    "block": "CC_CAPACITOR_POLARIZED",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "signal-ground",
+    "block": "CC_SIGNAL_GROUND",
+    "ports": [
+      "terminal"
+    ]
+  },
+  {
+    "id": "chassis",
+    "block": "CC_CHASSIS",
+    "ports": [
+      "terminal"
+    ]
+  },
+  {
+    "id": "contact-no",
+    "block": "CC_CONTACT_NO",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "contact-nc",
+    "block": "CC_CONTACT_NC",
+    "ports": [
+      "in",
+      "out"
+    ]
+  },
+  {
+    "id": "potentiometer",
+    "block": "CC_POTENTIOMETER",
+    "ports": [
+      "in",
+      "out",
+      "wiper"
+    ]
+  }
+]

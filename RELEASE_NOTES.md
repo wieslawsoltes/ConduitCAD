@@ -1,3 +1,29 @@
+# Conduit CAD 0.2.1 — engineering symbol libraries
+
+223 original masters in eleven categories, up from 64 in three; 21 connection
+styles and 20 editable industry starters. All thirteen packages are versioned
+0.2.1. The original symbol IDs, block names and named terminals remain available.
+
+The catalogue uses explicit ISO 10628-2, ISO 1219-1, IEC 60617, ISA-5.1 and ISO
+5807 reference families where relevant. Other forms are labeled project
+conventions. This is a geometry/convention review, **not normative dimensional
+certification or engineering approval**. See docs/SYMBOLS.md and the generated
+per-master ledger/visual atlas for scope and audit details.
+
+Native curves, valve geometry, electrical alternatives, liquid/gas triangles,
+actuator states, instrument location lines, valid ellipse axes, inherited fills,
+preview text bounds and endpoint-body routing were corrected. The workbench adds
+category/family search, a searchable industry chooser and explicit undoable saved
+master updates; browsing or installing never silently replaces user definitions.
+
+Validation: 164 Node tests, 76 integrated browser checks (Canvas 2D), strict
+TypeScript contracts, clean offline package integration and independent ezdxf
+audits of 223 masters and twenty starters. New tests distinguish automated
+geometry checks from standards approval. This release adds no claim of new font,
+dynamic-block, ACIS/3D-solid or physical-device GPU functionality.
+
+---
+
 # Conduit CAD 0.2.0 — DXF fidelity and touch editing
 
 This release expands the native interchange/model/rendering pipeline, rather

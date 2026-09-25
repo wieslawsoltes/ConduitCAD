@@ -1,0 +1,182 @@
+[
+  {
+    "id": "pid",
+    "industry": "Process engineering",
+    "type": "Piping & instrumentation",
+    "file": "samples/pid.dxf",
+    "entities": 39,
+    "nodes": 12,
+    "edges": 13
+  },
+  {
+    "id": "electrical",
+    "industry": "Electrical engineering",
+    "type": "Electrical schematic",
+    "file": "samples/electrical.dxf",
+    "entities": 23,
+    "nodes": 7,
+    "edges": 7
+  },
+  {
+    "id": "flow",
+    "industry": "Manufacturing & quality",
+    "type": "Flowchart",
+    "file": "samples/flow.dxf",
+    "entities": 20,
+    "nodes": 6,
+    "edges": 6
+  },
+  {
+    "id": "water-treatment",
+    "industry": "Water & wastewater",
+    "type": "Treatment process flow",
+    "file": "samples/industry/water-treatment.dxf",
+    "entities": 16,
+    "nodes": 6,
+    "edges": 5
+  },
+  {
+    "id": "chemical-batch",
+    "industry": "Chemical & petrochemical",
+    "type": "Piping & instrumentation",
+    "file": "samples/industry/chemical-batch.dxf",
+    "entities": 17,
+    "nodes": 6,
+    "edges": 6
+  },
+  {
+    "id": "oil-gas",
+    "industry": "Oil & gas",
+    "type": "Process flow diagram",
+    "file": "samples/industry/oil-gas.dxf",
+    "entities": 16,
+    "nodes": 6,
+    "edges": 5
+  },
+  {
+    "id": "food-beverage",
+    "industry": "Food & beverage",
+    "type": "Process flow diagram",
+    "file": "samples/industry/food-beverage.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "pharmaceutical",
+    "industry": "Pharmaceutical & biotech",
+    "type": "Utility process schematic",
+    "file": "samples/industry/pharmaceutical.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "power-single-line",
+    "industry": "Power & energy",
+    "type": "Single-line diagram",
+    "file": "samples/industry/power-single-line.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "solar",
+    "industry": "Renewable energy",
+    "type": "Power conversion schematic",
+    "file": "samples/industry/solar.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "hvac-air",
+    "industry": "Building services",
+    "type": "Air-system schematic",
+    "file": "samples/industry/hvac-air.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "hvac-hydronic",
+    "industry": "Building services",
+    "type": "Hydronic schematic",
+    "file": "samples/industry/hvac-hydronic.dxf",
+    "entities": 15,
+    "nodes": 5,
+    "edges": 5
+  },
+  {
+    "id": "hydraulic-actuator",
+    "industry": "Industrial machinery",
+    "type": "Fluid-power circuit",
+    "file": "samples/industry/hydraulic-actuator.dxf",
+    "entities": 17,
+    "nodes": 5,
+    "edges": 7
+  },
+  {
+    "id": "pneumatic-clamp",
+    "industry": "Industrial machinery",
+    "type": "Pneumatic circuit",
+    "file": "samples/industry/pneumatic-clamp.dxf",
+    "entities": 16,
+    "nodes": 6,
+    "edges": 5
+  },
+  {
+    "id": "instrument-loop",
+    "industry": "Process automation",
+    "type": "Instrument functional loop",
+    "file": "samples/industry/instrument-loop.dxf",
+    "entities": 12,
+    "nodes": 4,
+    "edges": 3
+  },
+  {
+    "id": "automation-io",
+    "industry": "Process automation",
+    "type": "Control architecture",
+    "file": "samples/industry/automation-io.dxf",
+    "entities": 16,
+    "nodes": 6,
+    "edges": 5
+  },
+  {
+    "id": "fire-alarm",
+    "industry": "Fire protection",
+    "type": "Alarm-system topology",
+    "file": "samples/industry/fire-alarm.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "network",
+    "industry": "IT & telecom",
+    "type": "Network topology",
+    "file": "samples/industry/network.dxf",
+    "entities": 16,
+    "nodes": 6,
+    "edges": 5
+  },
+  {
+    "id": "plumbing",
+    "industry": "Building services",
+    "type": "Water distribution schematic",
+    "file": "samples/industry/plumbing.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  },
+  {
+    "id": "quality-workflow",
+    "industry": "Manufacturing & quality",
+    "type": "Information flowchart",
+    "file": "samples/industry/quality-workflow.dxf",
+    "entities": 14,
+    "nodes": 5,
+    "edges": 4
+  }
+]

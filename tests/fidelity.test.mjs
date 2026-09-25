@@ -122,9 +122,9 @@ test('native hatch similarity transformation updates analytic edges and pattern 
 test('SVG exchange retains compound hole contours, opacity, and masked text',()=>{
  const svg=writeSVG(doc);assert.match(svg,/fill-rule="evenodd"/);assert.doesNotMatch(svg,/fill-opacity="0.15"/);assert.match(svg,/font-family="DejaVuSans.ttf"/);assert.match(svg,/#ebd29b/);assert.match(svg,/opacity="0.6"/);
 });
-test('all 64 original symbol masters have connection ports on actual terminal geometry',()=>{
+test('all 223 original symbol masters have connection ports on actual terminal geometry',()=>{
  const d=installSymbols(createDocument());for(const s of SYMBOLS){const e=insertSymbol(d,s.id,0,0),g=entityGeometry(e,d,{tolerance:.01});
   for(const port of s.ports){let best=Infinity;for(const path of g.paths){for(let i=1;i<path.points.length;i++)best=Math.min(best,distanceToSegment(port,path.points[i-1],path.points[i]));if(path.closed)best=Math.min(best,distanceToSegment(port,path.points.at(-1),path.points[0]));}assert.ok(best<.15,`${s.id}:${port.name} terminal gap ${best}`);}
-  assert.equal(s.symbol.geometryRevision,2);assert.match(s.symbol.conformity,/not standards-certified/);
+  assert.equal(s.symbol.geometryRevision,3);assert.match(s.symbol.conformity,/not standards-certified/);
  }
 });

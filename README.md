@@ -1,9 +1,9 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.2.0.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.2.1.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
-ports, routed connectors, original P&ID / electrical / flow libraries, a planar
+ports, routed connectors, eleven original engineering symbol libraries, a planar
 geometry kernel, parameter expressions and a small-sketch constraint solver.
 WebGPU strokes and compute culling are implemented, with WebGL2 and Canvas 2D
 fallbacks. The application is built from 13 independently packaged ES modules.
@@ -64,8 +64,7 @@ finger-driven geometry placement. Landscape phones use a compact tool rail.
 
 On desktop, drag library symbols directly to the drawing; use the full properties
 and layer panels, keyboard shortcuts, crossing/window selection, and command palette.
-**Help** contains the implemented shortcut and touch reference. The three editable
-example drawings are available from **New** or `samples/`.
+**Help** contains the implemented shortcut and touch reference. Twenty editable industry starters are searchable from **New**; source drawings are in `samples/` and `samples/industry/`.
 
 ### Included capabilities
 
@@ -76,7 +75,7 @@ example drawings are available from **New** or `samples/`.
 | Precision | Grid, endpoint, midpoint, center, quadrant, insertion, port and line-intersection snapping; orthographic constraint; numeric commands |
 | Geometry kernel | Double-precision affine geometry, intersections, projections, bulge arcs, adaptive curve tessellation, rational NURBS evaluation, polyline offsets and two-line fillets |
 | Parametrics | Safe arithmetic expressions and named dependencies; authored radius, line length and rectangle dimensions; small-sketch numerical constraints with conflict rollback |
-| Symbols | 64 original editable block masters: 28 P&ID, 24 electrical, 12 flow; 10 line/connection styles; custom blocks from selected geometry |
+| Symbols | 223 original editable block masters in 11 categories; 21 line/connection styles; safe explicit migration; custom blocks from selected geometry |
 | Connections | Named ports, obstacle-aware orthogonal A*, port leads, bend penalties, explicit waypoints, live rerouting, directed graph export |
 | Drawing management | Visible/locked/color layers, active layer and basic layout filtering, local autosave/recovery and portable native project files |
 | QA | Duplicate tags, missing blocks, zero-length lines, bad radii, free/missing connector endpoints, blocked routes, import-fidelity diagnostics |
@@ -87,7 +86,26 @@ The default symbols are illustrative engineering symbols, not an ISA/IEC/ISO
 certified library. The geometry kernel is planar and is not a 3D B-rep / ACIS /
 Parasolid or general exact polygon-Boolean kernel.
 
-## New in 0.2.0
+## New in 0.2.1 — engineering libraries
+
+**223 masters / 11 categories / 21 line styles / 20 drawing starters.** The
+original 64 identities and named ports remain compatible. New categories include
+instrumentation, hydraulics, pneumatics, HVAC, water/plumbing, automation,
+fire-alarm topology and networks. Every master carries a reference-family and
+review record, not a blanket ISO certification label.
+
+Corrections include analytic curved geometry, valve/actuator distinctions,
+liquid/gas energy triangles, spring-rest valve states, transformer variants,
+coloured fills, dashed location dividers and visible functional marks in the
+library preview. Endpoint-aware routing no longer removes equipment bodies from
+the obstacle search. The mobile library has a 44px native category selector,
+searchable family metadata, drag handles and an explicit undoable update dialog.
+
+See [symbol scope and migration](docs/SYMBOLS.md), the
+[per-master review ledger](docs/SYMBOL_REVIEW.md), the self-contained
+[visual atlas](docs/symbol-atlas.html), and [drawing starters](docs/DRAWING_TYPES.md).
+
+## Previous 0.2.0 fidelity work
 
 Native HATCH polylines and line/arc/ellipse/rational-spline edge loops, nested
 island holes, pattern scanlines with signed dashes, variable-width bulged
@@ -189,17 +207,17 @@ OBJECTS/dictionary ownership graphs are outside this release.
 
 The release includes runnable tests and raw reports in `artifacts/`.
 
-* 124 Node tests pass: geometry, NURBS, expressions, constraints and rollback,
+* 164 Node tests pass: geometry, NURBS, expressions, constraints and rollback,
   history, spatial indexing, routing, DXF readers/writers, identity/ports/tags,
   original bytes, Unicode, scene compilation and incremental updates.
-* 43 integrated Chromium checks pass (29 established workflows and 14 new
-  pixel/import/clipping/native-touch regressions), including touch placement,
+* 76 integrated Chromium checks pass: 29 established workflows, 14 fidelity
+  regressions and 33 catalogue checks. These include touch placement,
   pinch arbitration, desktop dragging, rerouting, expressions, undo/redo,
   commands, copy/delete, responsive layouts and export-dialog options.
 * A separate 37-entity DXF fixture generated by ezdxf verifies native hatch
   edges, island styles, patterns, polyface/polygon meshes, OCS, text alignment,
   background masks, lineweights, transparency and normalized re-export.
-* The three generated sample DXFs and the independent fixture pass ezdxf audits with
+* All 223 catalogue masters, all 20 starter DXFs and the independent fixture pass ezdxf audits with
   **zero errors and zero repairs**. This is not an AutoCAD interoperability
   certificate or evidence that arbitrary customer DXFs are supported.
 

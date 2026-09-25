@@ -1,6 +1,6 @@
 # @conduitcad/constraints
 
-Parameters and sketch constraints. Version **0.1.0**, native ESM JavaScript, MIT license.
+Parameters and sketch constraints. Version **0.2.1**, native ESM JavaScript, MIT license.
 
 Non-eval expression parsing, named dependency resolution and a bounded dense damped least-squares solver. Convergence and failed edits are explicit.
 

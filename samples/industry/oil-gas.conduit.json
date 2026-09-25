@@ -1,0 +1,1403 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Separation and metering",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p42-19b",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_GATE_VALVE",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "XV-101"
+    },
+    {
+      "id": "e-mugr5p42-19c",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_VESSEL",
+      "x": 370,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "V-101"
+    },
+    {
+      "id": "e-mugr5p42-19d",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_ORIFICE_PLATE",
+      "x": 620,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "FE-101"
+    },
+    {
+      "id": "e-mugr5p42-19e",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_CONTROL_VALVE",
+      "x": 860,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PCV-101"
+    },
+    {
+      "id": "e-mugr5p42-19f",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_BALL_VALVE",
+      "x": 370,
+      "y": 150,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "LV-101"
+    },
+    {
+      "id": "e-mugr5p42-19g",
+      "type": "INSERT",
+      "layer": "Instruments",
+      "block": "CC_PRESSURE_TRANSMITTER",
+      "x": 620,
+      "y": 490,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PT-101"
+    },
+    {
+      "id": "e-mugr5p43-19h",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19b"
+        },
+        {
+          "name": "in",
+          "x": 325,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19c"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p42-19b",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p42-19c",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p43-19i",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 415,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19c"
+        },
+        {
+          "name": "in",
+          "x": 575,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19d"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p42-19c",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p42-19d",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p43-19j",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 665,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19d"
+        },
+        {
+          "name": "in",
+          "x": 815,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19e"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p42-19d",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p42-19e",
+          "port": "in"
+        },
+        "style": "process",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p43-19k",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "bottom",
+          "x": 370,
+          "y": 300,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19c"
+        },
+        {
+          "x": 370,
+          "y": 276.99
+        },
+        {
+          "x": 307,
+          "y": 276.99
+        },
+        {
+          "x": 307,
+          "y": 150
+        },
+        {
+          "name": "in",
+          "x": 325,
+          "y": 150,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19f"
+        }
+      ],
+      "closed": false,
+      "color": "#75898d",
+      "width": 1.5,
+      "dash": [
+        12,
+        5
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p42-19c",
+          "port": "bottom"
+        },
+        "to": {
+          "entityId": "e-mugr5p42-19f",
+          "port": "in"
+        },
+        "style": "drain",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p43-19l",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "sense",
+          "x": 620,
+          "y": 445,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19g"
+        },
+        {
+          "x": 620,
+          "y": 427
+        },
+        {
+          "x": 860,
+          "y": 427
+        },
+        {
+          "name": "signal",
+          "x": 860,
+          "y": 400,
+          "dx": 0,
+          "dy": 1,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p42-19e"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p42-19g",
+          "port": "sense"
+        },
+        "to": {
+          "entityId": "e-mugr5p42-19e",
+          "port": "signal"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p43-19m",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Separation and metering",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p43-19n",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Oil & gas  /  Process flow diagram",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p43-19o",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p43-19p",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p43-19q",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "OIL-GAS  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_GATE_VALVE": {
+      "name": "CC_GATE_VALVE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-gate-valve-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-gate-valve-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-gate-valve-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": -25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-gate-valve-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Gate valve",
+        "category": "P&ID",
+        "labelOffset": 48,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Two separate non-self-intersecting triangles with exact common apex."
+        },
+        "group": "Valves & actuators",
+        "aliases": [
+          "gate valve"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -18,
+          "maxX": 45,
+          "maxY": 18
+        }
+      }
+    },
+    "CC_VESSEL": {
+      "name": "CC_VESSEL",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-vessel-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -27,
+            "y": -23
+          },
+          "b": {
+            "x": -27,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-1",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 23
+          },
+          "r": 27,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 23
+          },
+          "b": {
+            "x": 27,
+            "y": -23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-3",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": -23
+          },
+          "r": 27,
+          "start": 3.141592653589793,
+          "end": 6.283185307179586,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 50
+          },
+          "b": {
+            "x": 0,
+            "y": 65
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -15,
+            "y": -45.45
+          },
+          "b": {
+            "x": -15,
+            "y": -65
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-vessel-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 15,
+            "y": -45.45
+          },
+          "b": {
+            "x": 15,
+            "y": -65
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "top",
+          "x": 0,
+          "y": 65,
+          "dx": 0,
+          "dy": 1,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "bottom",
+          "x": 0,
+          "y": -50,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Pressure vessel",
+        "category": "P&ID",
+        "labelOffset": 87,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Native domed-end vessel rather than a plain rectangular box."
+        },
+        "group": "Equipment & instruments",
+        "aliases": [
+          "vessel"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -65,
+          "maxX": 45,
+          "maxY": 65
+        }
+      }
+    },
+    "CC_ORIFICE_PLATE": {
+      "name": "CC_ORIFICE_PLATE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-orifice-plate-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-orifice-plate-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -23
+          },
+          "b": {
+            "x": 0,
+            "y": -5
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-orifice-plate-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 5
+          },
+          "b": {
+            "x": 0,
+            "y": 23
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Orifice plate",
+        "category": "P&ID",
+        "group": "Fittings & connections",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "orifice plate"
+        ],
+        "defaultLayer": "Equipment",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -23,
+          "maxX": 45,
+          "maxY": 23
+        }
+      }
+    },
+    "CC_CONTROL_VALVE": {
+      "name": "CC_CONTROL_VALVE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-control-valve-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": -25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 0
+          },
+          "b": {
+            "x": 0,
+            "y": 30
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -20,
+            "y": 30
+          },
+          "b": {
+            "x": 20,
+            "y": 30
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-6",
+          "type": "ELLIPSE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 30
+          },
+          "major": {
+            "x": 20,
+            "y": 0
+          },
+          "ratio": 0.7,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-control-valve-7",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 44
+          },
+          "b": {
+            "x": 0,
+            "y": 50
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "signal",
+          "x": 0,
+          "y": 50,
+          "dx": 0,
+          "dy": 1,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Control valve",
+        "category": "P&ID",
+        "labelOffset": 48,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Native elliptical diaphragm cap and a connected signal terminal."
+        },
+        "group": "Valves & actuators",
+        "aliases": [
+          "control valve"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -18,
+          "maxX": 45,
+          "maxY": 50
+        }
+      }
+    },
+    "CC_BALL_VALVE": {
+      "name": "CC_BALL_VALVE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-ball-valve-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -25,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ball-valve-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 25,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ball-valve-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": -25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ball-valve-3",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 25,
+              "y": -18
+            },
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 25,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ball-valve-4",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 11,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Ball valve",
+        "category": "P&ID",
+        "labelOffset": 48,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Valve body plus ball element; distinguish from butterfly disc."
+        },
+        "group": "Valves & actuators",
+        "aliases": [
+          "ball valve"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -18,
+          "maxX": 45,
+          "maxY": 18
+        }
+      }
+    },
+    "CC_PRESSURE_TRANSMITTER": {
+      "name": "CC_PRESSURE_TRANSMITTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pressure-transmitter-0",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pressure-transmitter-1",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "PT",
+          "height": 12,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pressure-transmitter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -26
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "sense",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Pressure transmitter",
+        "category": "Instrumentation",
+        "group": "Field instruments",
+        "functionCode": "PT",
+        "instrumentLocation": "field",
+        "aliases": [
+          "PT",
+          "pressure transmitter"
+        ],
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISA-5.1"
+        ],
+        "convention": "ISA-5.1 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "defaultLayer": "Instruments",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -26,
+          "minY": -45,
+          "maxX": 26,
+          "maxY": 25.970550818758205
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Separator, metering and outlet isolation with a liquid draw-off.",
+    "industry": "Oil & gas",
+    "drawingType": "Process flow diagram",
+    "templateId": "oil-gas",
+    "standardRefs": [
+      "ISO-10628-2"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

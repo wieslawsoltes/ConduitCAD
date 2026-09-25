@@ -1,4 +1,51 @@
-# Validation record — Conduit CAD 0.2.0
+# Validation record — Conduit CAD 0.2.1
+
+## Executed engineering-library checks
+
+`npm test`: **164 passing Node tests**, including all earlier tests plus catalogue
+provenance, all 64 legacy identities/ports, full geometry coverage, coloured
+fills, native curves/ellipse axes, safe migration/undo, twenty template DXF
+round-trips and endpoint-body routing regressions.
+
+`node scripts/catalog-artifacts.mjs`: **223 masters** in **11 categories**, with
+unique identities, valid native geometry and normalized named terminals within
+0.15 units of the drawn geometry. The generated per-master ledger and visual
+atlas were reviewed by category. These checks do not verify normative dimensions.
+
+`python tests/browser_symbols.py`: **33 passing browser checks** cover every
+category, family search, missing-block preview without mutation, lazy insertion,
+industry creation, migration/undo, save failure, touch dragging and mobile layout.
+Together with the 29 established workflows and 14 fidelity checks, there are
+**76 integrated checks**. Independent CDP touch and Playwright tap/layout phases
+use separate input sessions. All suites report zero uncaught JavaScript errors.
+
+`python tests/audit_symbol_library.py`: ezdxf independently reads the complete
+223-master specimen and all **20** starter DXFs. It verifies block primitive
+sequences, native cubic splines, metadata, named ports and revision records.
+All **21 files** audit with **zero errors and zero repairs**. The existing
+37-entity fidelity fixture and three legacy-root sample audits also pass.
+
+`tsc -p tests/tsconfig.json`: strict typed consumers pass for all 13 packages,
+including the new catalogue/migration APIs and typed routing options.
+`node scripts/verify-packages.mjs`: clean offline installation/import and DXF
+integration pass for all 13 version-0.2.1 npm archives with an empty npm cache.
+
+Run `node scripts/catalog-artifacts.mjs` before the new independent audit.
+The committed raw reports are in `artifacts/`. CI regenerates reports from the
+checked-out sources, so screenshots and old reports are not substitutes for a
+passing current run.
+
+## Environment and approval boundary
+
+Browser execution here uses **Canvas 2D**, not physical-device GPU qualification.
+Persistence is a test-only in-memory adapter at an opaque origin. Real mobile
+storage/PWA durability and hardware WebGPU/WebGL2 equivalence are not certified.
+No font/3D/dynamic-block feature implementation is asserted by this symbol release.
+Reference-family matching and terminal geometry tests are not ISO/IEC/ISA
+certification; every starter is a non-approved concept drawing.
+
+## Historical 0.2.0 fidelity record
+
 
 Implementation, unit tests, browser checks, independent format validation and
 hardware certification are separate claims. Raw reports are in `artifacts/`.

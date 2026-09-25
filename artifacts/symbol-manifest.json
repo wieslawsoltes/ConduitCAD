@@ -1,0 +1,8495 @@
+[
+  {
+    "id": "gate-valve",
+    "block": "CC_GATE_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "ball-valve",
+    "block": "CC_BALL_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "globe-valve",
+    "block": "CC_GLOBE_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "butterfly-valve",
+    "block": "CC_BUTTERFLY_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "check-valve",
+    "block": "CC_CHECK_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 18,
+        "dx": 0,
+        "dy": 1,
+        "medium": "signal",
+        "role": "legacy auxiliary takeoff"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "control-valve",
+    "block": "CC_CONTROL_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "ELLIPSE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "signal",
+        "x": 0,
+        "y": 50,
+        "dx": 0,
+        "dy": 1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "solenoid-valve",
+    "block": "CC_SOLENOID_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "relief-valve",
+    "block": "CC_RELIEF_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "three-way-valve",
+    "block": "CC_THREE_WAY_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "pump",
+    "block": "CC_PUMP",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "gear-pump",
+    "block": "CC_GEAR_PUMP",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "compressor",
+    "block": "CC_COMPRESSOR",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "fan",
+    "block": "CC_FAN",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "strainer",
+    "block": "CC_STRAINER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "filter",
+    "block": "CC_FILTER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "heat-exchanger",
+    "block": "CC_HEAT_EXCHANGER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "tank",
+    "block": "CC_TANK",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "ELLIPSE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 75,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -88,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "vessel",
+    "block": "CC_VESSEL",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 65,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -50,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "mixer",
+    "block": "CC_MIXER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 83,
+        "dx": 0,
+        "dy": 1,
+        "medium": "mechanical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -55,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "pressure-indicator",
+    "block": "CC_PRESSURE_INDICATOR",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "flow-transmitter",
+    "block": "CC_FLOW_TRANSMITTER",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "temperature",
+    "block": "CC_TEMPERATURE",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "level-transmitter",
+    "block": "CC_LEVEL_TRANSMITTER",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "reducer",
+    "block": "CC_REDUCER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "flange",
+    "block": "CC_FLANGE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "offpage",
+    "block": "CC_OFFPAGE",
+    "category": "P&ID",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "resistor",
+    "block": "CC_RESISTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "resistor-iec",
+    "block": "CC_RESISTOR_IEC",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "capacitor",
+    "block": "CC_CAPACITOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "inductor",
+    "block": "CC_INDUCTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "diode",
+    "block": "CC_DIODE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "led",
+    "block": "CC_LED",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "switch",
+    "block": "CC_SWITCH",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "switch-nc",
+    "block": "CC_SWITCH_NC",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "fuse",
+    "block": "CC_FUSE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "relay",
+    "block": "CC_RELAY",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "motor",
+    "block": "CC_MOTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "generator",
+    "block": "CC_GENERATOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "transformer",
+    "block": "CC_TRANSFORMER",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "ground",
+    "block": "CC_GROUND",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "terminal",
+        "x": 0,
+        "y": 40,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "battery",
+    "block": "CC_BATTERY",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "terminal",
+    "block": "CC_TERMINAL",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "op-amp",
+    "block": "CC_OP_AMP",
+    "category": "Electrical",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "positive",
+        "x": -45,
+        "y": 18,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "negative",
+        "x": -45,
+        "y": -18,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "lamp",
+    "block": "CC_LAMP",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "process",
+    "block": "CC_PROCESS",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "decision",
+    "block": "CC_DECISION",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 42,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -42,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "yes",
+        "x": 60,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "no",
+        "x": -60,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "terminator",
+    "block": "CC_TERMINATOR",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 30,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -30,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "data",
+    "block": "CC_DATA",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -53.5,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 53.5,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "document",
+    "block": "CC_DOCUMENT",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "SPLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -24,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "database",
+    "block": "CC_DATABASE",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "LINE",
+      "ELLIPSE",
+      "ELLIPSE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 40,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "subprocess",
+    "block": "CC_SUBPROCESS",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "manual",
+    "block": "CC_MANUAL",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 32,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "preparation",
+    "block": "CC_PREPARATION",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -60,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 60,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "delay",
+    "block": "CC_DELAY",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -50,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 40,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "junction",
+    "block": "CC_JUNCTION",
+    "category": "Flow",
+    "entities": [
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 16,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -16,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -16,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 16,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "note",
+    "block": "CC_NOTE",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "left",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "pressure-panel",
+    "block": "CC_PRESSURE_PANEL",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "pressure-rear",
+    "block": "CC_PRESSURE_REAR",
+    "category": "P&ID",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "capacitor-polarized",
+    "block": "CC_CAPACITOR_POLARIZED",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "signal-ground",
+    "block": "CC_SIGNAL_GROUND",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "terminal",
+        "x": 0,
+        "y": 40,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "chassis",
+    "block": "CC_CHASSIS",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "terminal",
+        "x": 0,
+        "y": 40,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "contact-no",
+    "block": "CC_CONTACT_NO",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "contact-nc",
+    "block": "CC_CONTACT_NC",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "potentiometer",
+    "block": "CC_POTENTIOMETER",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "wiper",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "needle-valve",
+    "block": "CC_NEEDLE_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "diaphragm-valve",
+    "block": "CC_DIAPHRAGM_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "ELLIPSE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "plug-valve",
+    "block": "CC_PLUG_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "knife-gate-valve",
+    "block": "CC_KNIFE_GATE_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "motor-valve",
+    "block": "CC_MOTOR_VALVE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "rupture-disc",
+    "block": "CC_RUPTURE_DISC",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "ELLIPSE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "orifice-plate",
+    "block": "CC_ORIFICE_PLATE",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "spectacle-blind",
+    "block": "CC_SPECTACLE_BLIND",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "expansion-joint",
+    "block": "CC_EXPANSION_JOINT",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "static-mixer",
+    "block": "CC_STATIC_MIXER",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "plate-exchanger",
+    "block": "CC_PLATE_EXCHANGER",
+    "category": "P&ID",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "column",
+    "block": "CC_COLUMN",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 75,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -75,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "packed-column",
+    "block": "CC_PACKED_COLUMN",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 75,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -75,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "cyclone",
+    "block": "CC_CYCLONE",
+    "category": "P&ID",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 60,
+        "dx": 0,
+        "dy": 1,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -60,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "steam-trap",
+    "block": "CC_STEAM_TRAP",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "sight-glass",
+    "block": "CC_SIGHT_GLASS",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "sampling-point",
+    "block": "CC_SAMPLING_POINT",
+    "category": "P&ID",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "process",
+        "role": "connection"
+      },
+      {
+        "name": "sample",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "process",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-10628-2"
+    ]
+  },
+  {
+    "id": "variable-resistor",
+    "block": "CC_VARIABLE_RESISTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "thermistor",
+    "block": "CC_THERMISTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "photoresistor",
+    "block": "CC_PHOTORESISTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "zener-diode",
+    "block": "CC_ZENER_DIODE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "photodiode",
+    "block": "CC_PHOTODIODE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "transistor-npn",
+    "block": "CC_TRANSISTOR_NPN",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "base",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "collector",
+        "x": 22,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "emitter",
+        "x": 22,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "transistor-pnp",
+    "block": "CC_TRANSISTOR_PNP",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "base",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "collector",
+        "x": 22,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "emitter",
+        "x": 22,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "transformer-windings",
+    "block": "CC_TRANSFORMER_WINDINGS",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC",
+      "ARC",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "primary-1",
+        "x": -45,
+        "y": 25,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "primary-2",
+        "x": -45,
+        "y": -25,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "secondary-1",
+        "x": 45,
+        "y": 25,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "secondary-2",
+        "x": 45,
+        "y": -25,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "circuit-breaker",
+    "block": "CC_CIRCUIT_BREAKER",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "CIRCLE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "disconnect",
+    "block": "CC_DISCONNECT",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "voltmeter",
+    "block": "CC_VOLTMETER",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "ammeter",
+    "block": "CC_AMMETER",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "ac-source",
+    "block": "CC_AC_SOURCE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "SPLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "dc-source",
+    "block": "CC_DC_SOURCE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "junction-dot",
+    "block": "CC_JUNCTION_DOT",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "wire-crossing",
+    "block": "CC_WIRE_CROSSING",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "inverter",
+    "block": "CC_INVERTER",
+    "category": "Electrical",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "pv-module",
+    "block": "CC_PV_MODULE",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "three-phase-motor",
+    "block": "CC_THREE_PHASE_MOTOR",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "top",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "bottom",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "cell",
+    "block": "CC_CELL",
+    "category": "Electrical",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "electrical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "IEC-60617"
+    ]
+  },
+  {
+    "id": "manual-operation",
+    "block": "CC_MANUAL_OPERATION",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "offpage-flow",
+    "block": "CC_OFFPAGE_FLOW",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "internal-storage",
+    "block": "CC_INTERNAL_STORAGE",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "display",
+    "block": "CC_DISPLAY",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "ARC",
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 30,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -30,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -60,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 60,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "stored-data",
+    "block": "CC_STORED_DATA",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "ELLIPSE",
+      "LINE",
+      "ELLIPSE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -50,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 36,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-5807"
+    ]
+  },
+  {
+    "id": "merge",
+    "block": "CC_MERGE",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -26,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 26,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "extract",
+    "block": "CC_EXTRACT",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -26,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 26,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "collate",
+    "block": "CC_COLLATE",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 35,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -35,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "sort",
+    "block": "CC_SORT",
+    "category": "Flow",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 40,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "left",
+        "x": -55,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "right",
+        "x": 55,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "parallel",
+    "block": "CC_PARALLEL",
+    "category": "Flow",
+    "entities": [
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": 0,
+        "y": 10,
+        "dx": 0,
+        "dy": 1,
+        "medium": "logical",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 0,
+        "y": -10,
+        "dx": 0,
+        "dy": -1,
+        "medium": "logical",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "pressure-transmitter",
+    "block": "CC_PRESSURE_TRANSMITTER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "differential-pressure",
+    "block": "CC_DIFFERENTIAL_PRESSURE",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "temperature-indicator",
+    "block": "CC_TEMPERATURE_INDICATOR",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "flow-indicator",
+    "block": "CC_FLOW_INDICATOR",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "level-indicator",
+    "block": "CC_LEVEL_INDICATOR",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "pressure-switch",
+    "block": "CC_PRESSURE_SWITCH",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "level-switch",
+    "block": "CC_LEVEL_SWITCH",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "temperature-switch",
+    "block": "CC_TEMPERATURE_SWITCH",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "analyser",
+    "block": "CC_ANALYSER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "flow-controller",
+    "block": "CC_FLOW_CONTROLLER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "pressure-controller",
+    "block": "CC_PRESSURE_CONTROLLER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "temperature-controller",
+    "block": "CC_TEMPERATURE_CONTROLLER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "level-controller",
+    "block": "CC_LEVEL_CONTROLLER",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "flow-controller-panel",
+    "block": "CC_FLOW_CONTROLLER_PANEL",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "flow-controller-rear",
+    "block": "CC_FLOW_CONTROLLER_REAR",
+    "category": "Instrumentation",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISA-5.1"
+    ]
+  },
+  {
+    "id": "ip-converter",
+    "block": "CC_IP_CONVERTER",
+    "category": "Instrumentation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "thermowell",
+    "block": "CC_THERMOWELL",
+    "category": "Instrumentation",
+    "entities": [
+      "LINE",
+      "LINE",
+      "LINE",
+      "ARC",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hyd-pump",
+    "block": "CC_HYD_PUMP",
+    "category": "Hydraulics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-motor",
+    "block": "CC_HYD_MOTOR",
+    "category": "Hydraulics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-variable-pump",
+    "block": "CC_HYD_VARIABLE_PUMP",
+    "category": "Hydraulics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "SOLID",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-filter",
+    "block": "CC_HYD_FILTER",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-throttle",
+    "block": "CC_HYD_THROTTLE",
+    "category": "Hydraulics",
+    "entities": [
+      "LINE",
+      "ELLIPSE",
+      "ELLIPSE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-flow-control",
+    "block": "CC_HYD_FLOW_CONTROL",
+    "category": "Hydraulics",
+    "entities": [
+      "LINE",
+      "ELLIPSE",
+      "ELLIPSE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-check",
+    "block": "CC_HYD_CHECK",
+    "category": "Hydraulics",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-gauge",
+    "block": "CC_HYD_GAUGE",
+    "category": "Hydraulics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-cylinder",
+    "block": "CC_HYD_CYLINDER",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-cylinder-spring",
+    "block": "CC_HYD_CYLINDER_SPRING",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-cylinder-cushioned",
+    "block": "CC_HYD_CYLINDER_CUSHIONED",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-valve-22-nc",
+    "block": "CC_HYD_VALVE_22_NC",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": 12,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": 12,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-valve-32",
+    "block": "CC_HYD_VALVE_32",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": 12,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": 12,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "R",
+        "x": 36,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-shuttle",
+    "block": "CC_HYD_SHUTTLE",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "A",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-plug",
+    "block": "CC_HYD_PLUG",
+    "category": "Hydraulics",
+    "entities": [
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "terminal",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-compressor",
+    "block": "CC_PNEU_COMPRESSOR",
+    "category": "Pneumatics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-motor",
+    "block": "CC_PNEU_MOTOR",
+    "category": "Pneumatics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-filter",
+    "block": "CC_PNEU_FILTER",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-throttle",
+    "block": "CC_PNEU_THROTTLE",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "ELLIPSE",
+      "ELLIPSE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-flow-control",
+    "block": "CC_PNEU_FLOW_CONTROL",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "ELLIPSE",
+      "ELLIPSE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-check",
+    "block": "CC_PNEU_CHECK",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-gauge",
+    "block": "CC_PNEU_GAUGE",
+    "category": "Pneumatics",
+    "entities": [
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "SOLID"
+    ],
+    "ports": [
+      {
+        "name": "sense",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-cylinder",
+    "block": "CC_PNEU_CYLINDER",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-cylinder-spring",
+    "block": "CC_PNEU_CYLINDER_SPRING",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-cylinder-cushioned",
+    "block": "CC_PNEU_CYLINDER_CUSHIONED",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 23,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-valve-22-nc",
+    "block": "CC_PNEU_VALVE_22_NC",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": 12,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": 12,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-valve-32",
+    "block": "CC_PNEU_VALVE_32",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": 12,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": 12,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "R",
+        "x": 36,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-shuttle",
+    "block": "CC_PNEU_SHUTTLE",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "A",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-plug",
+    "block": "CC_PNEU_PLUG",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "terminal",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-valve-43",
+    "block": "CC_HYD_VALVE_43",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": -11,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "T",
+        "x": 11,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-valve-43-tandem",
+    "block": "CC_HYD_VALVE_43_TANDEM",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "A",
+        "x": -11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "B",
+        "x": 11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "P",
+        "x": -11,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "T",
+        "x": 11,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-reservoir",
+    "block": "CC_HYD_RESERVOIR",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "suction",
+        "x": -11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "return",
+        "x": 11,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-accumulator",
+    "block": "CC_HYD_ACCUMULATOR",
+    "category": "Hydraulics",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "ELLIPSE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "fluid",
+        "x": 0,
+        "y": -60,
+        "dx": 0,
+        "dy": -1,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hyd-relief",
+    "block": "CC_HYD_RELIEF",
+    "category": "Hydraulics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "SOLID",
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "hydraulic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-dryer",
+    "block": "CC_PNEU_DRYER",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-lubricator",
+    "block": "CC_PNEU_LUBRICATOR",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-regulator",
+    "block": "CC_PNEU_REGULATOR",
+    "category": "Pneumatics",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-exhaust",
+    "block": "CC_PNEU_EXHAUST",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "exhaust",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "pneu-silencer",
+    "block": "CC_PNEU_SILENCER",
+    "category": "Pneumatics",
+    "entities": [
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "exhaust",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "pneumatic",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "ISO-1219-1",
+      "NFPC-FLUID"
+    ]
+  },
+  {
+    "id": "hvac-fan",
+    "block": "CC_HVAC_FAN",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-filter",
+    "block": "CC_HVAC_FILTER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-damper",
+    "block": "CC_HVAC_DAMPER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-motor-damper",
+    "block": "CC_HVAC_MOTOR_DAMPER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-fire-damper",
+    "block": "CC_HVAC_FIRE_DAMPER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-heating-coil",
+    "block": "CC_HVAC_HEATING_COIL",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-cooling-coil",
+    "block": "CC_HVAC_COOLING_COIL",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-silencer",
+    "block": "CC_HVAC_SILENCER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-diffuser",
+    "block": "CC_HVAC_DIFFUSER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-return-grille",
+    "block": "CC_HVAC_RETURN_GRILLE",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "air",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-boiler",
+    "block": "CC_HVAC_BOILER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "flue",
+        "x": 0,
+        "y": 45,
+        "dx": 0,
+        "dy": 1,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-chiller",
+    "block": "CC_HVAC_CHILLER",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-radiator",
+    "block": "CC_HVAC_RADIATOR",
+    "category": "HVAC",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "hvac-expansion-vessel",
+    "block": "CC_HVAC_EXPANSION_VESSEL",
+    "category": "HVAC",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "water",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-meter",
+    "block": "CC_WATER_METER",
+    "category": "Water",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-backflow",
+    "block": "CC_WATER_BACKFLOW",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "CIRCLE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-heater",
+    "block": "CC_WATER_HEATER",
+    "category": "Water",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-softener",
+    "block": "CC_WATER_SOFTENER",
+    "category": "Water",
+    "entities": [
+      "LINE",
+      "ARC",
+      "LINE",
+      "ARC",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-ro",
+    "block": "CC_WATER_RO",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "reject",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-uv",
+    "block": "CC_WATER_UV",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-screen",
+    "block": "CC_WATER_SCREEN",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-dosing",
+    "block": "CC_WATER_DOSING",
+    "category": "Water",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-drain",
+    "block": "CC_WATER_DRAIN",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "waste",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-tap",
+    "block": "CC_WATER_TAP",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "supply",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "outlet",
+        "x": 30,
+        "y": -20,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-sump",
+    "block": "CC_WATER_SUMP",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "water-air-release",
+    "block": "CC_WATER_AIR_RELEASE",
+    "category": "Water",
+    "entities": [
+      "LWPOLYLINE",
+      "CIRCLE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "water",
+        "x": 0,
+        "y": -45,
+        "dx": 0,
+        "dy": -1,
+        "medium": "water",
+        "role": "connection"
+      },
+      {
+        "name": "vent",
+        "x": 22,
+        "y": 38,
+        "dx": 1,
+        "dy": 0,
+        "medium": "water",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-plc",
+    "block": "CC_AUTO_PLC",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-di",
+    "block": "CC_AUTO_DI",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-do",
+    "block": "CC_AUTO_DO",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-ai",
+    "block": "CC_AUTO_AI",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-ao",
+    "block": "CC_AUTO_AO",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-vfd",
+    "block": "CC_AUTO_VFD",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-safety-relay",
+    "block": "CC_AUTO_SAFETY_RELAY",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-pid-block",
+    "block": "CC_AUTO_PID_BLOCK",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-gateway",
+    "block": "CC_AUTO_GATEWAY",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-hmi",
+    "block": "CC_AUTO_HMI",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LWPOLYLINE",
+      "CIRCLE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-proximity",
+    "block": "CC_AUTO_PROXIMITY",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "ARC",
+      "ARC",
+      "ARC"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "auto-photoeye",
+    "block": "CC_AUTO_PHOTOEYE",
+    "category": "Automation",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "LINE",
+      "LWPOLYLINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "signal",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-panel",
+    "block": "CC_FIRE_PANEL",
+    "category": "Fire",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-smoke",
+    "block": "CC_FIRE_SMOKE",
+    "category": "Fire",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-heat",
+    "block": "CC_FIRE_HEAT",
+    "category": "Fire",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-call",
+    "block": "CC_FIRE_CALL",
+    "category": "Fire",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-sounder",
+    "block": "CC_FIRE_SOUNDER",
+    "category": "Fire",
+    "entities": [
+      "LINE",
+      "LINE",
+      "CIRCLE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-strobe",
+    "block": "CC_FIRE_STROBE",
+    "category": "Fire",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-monitor",
+    "block": "CC_FIRE_MONITOR",
+    "category": "Fire",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "fire-interface",
+    "block": "CC_FIRE_INTERFACE",
+    "category": "Fire",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "alarm",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-router",
+    "block": "CC_NET_ROUTER",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-switch",
+    "block": "CC_NET_SWITCH",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-firewall",
+    "block": "CC_NET_FIREWALL",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-server",
+    "block": "CC_NET_SERVER",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "LWPOLYLINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "CIRCLE",
+      "LWPOLYLINE",
+      "CIRCLE",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-workstation",
+    "block": "CC_NET_WORKSTATION",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-ap",
+    "block": "CC_NET_AP",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "ARC",
+      "ARC",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-patch",
+    "block": "CC_NET_PATCH",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-phone",
+    "block": "CC_NET_PHONE",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-camera",
+    "block": "CC_NET_CAMERA",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  },
+  {
+    "id": "net-cloud",
+    "block": "CC_NET_CLOUD",
+    "category": "Network",
+    "entities": [
+      "LWPOLYLINE",
+      "LINE",
+      "LINE",
+      "TEXT",
+      "LINE"
+    ],
+    "ports": [
+      {
+        "name": "in",
+        "x": -45,
+        "y": 0,
+        "dx": -1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "out",
+        "x": 45,
+        "y": 0,
+        "dx": 1,
+        "dy": 0,
+        "medium": "data",
+        "role": "connection"
+      },
+      {
+        "name": "branch",
+        "x": 0,
+        "y": -40,
+        "dx": 0,
+        "dy": -1,
+        "medium": "data",
+        "role": "connection"
+      }
+    ],
+    "refs": [
+      "PROJECT"
+    ]
+  }
+]

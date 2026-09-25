@@ -1,0 +1,1374 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Automation I/O architecture",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p6e-1dd",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_PROXIMITY",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "B1"
+    },
+    {
+      "id": "e-mugr5p6e-1de",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_DI",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "DI1"
+    },
+    {
+      "id": "e-mugr5p6e-1df",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_PLC",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PLC1"
+    },
+    {
+      "id": "e-mugr5p6e-1dg",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_AO",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "AO1"
+    },
+    {
+      "id": "e-mugr5p6e-1dh",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_VFD",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "VFD1"
+    },
+    {
+      "id": "e-mugr5p6e-1di",
+      "type": "INSERT",
+      "layer": "Automation",
+      "block": "CC_AUTO_HMI",
+      "x": 510,
+      "y": 490,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "HMI1"
+    },
+    {
+      "id": "e-mugr5p6f-1dj",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1dd"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1de"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6e-1dd",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6e-1de",
+          "port": "in"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1dk",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1de"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1df"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6e-1de",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6e-1df",
+          "port": "in"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1dl",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1df"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1dg"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6e-1df",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6e-1dg",
+          "port": "in"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1dm",
+      "type": "LWPOLYLINE",
+      "layer": "Instruments",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1dg"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1dh"
+        }
+      ],
+      "closed": false,
+      "color": "#aa7c4b",
+      "width": 1.5,
+      "dash": [
+        6,
+        4
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6e-1dg",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p6e-1dh",
+          "port": "in"
+        },
+        "style": "signal",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1dn",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "in",
+          "x": 465,
+          "y": 490,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1di"
+        },
+        {
+          "x": 447,
+          "y": 490
+        },
+        {
+          "x": 447,
+          "y": 350
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection",
+          "entityId": "e-mugr5p6e-1df"
+        }
+      ],
+      "closed": false,
+      "color": "#8876a7",
+      "width": 1.5,
+      "dash": [
+        10,
+        3,
+        2,
+        3
+      ],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p6e-1di",
+          "port": "in"
+        },
+        "to": {
+          "entityId": "e-mugr5p6e-1df",
+          "port": "in"
+        },
+        "style": "data",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1do",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Automation I/O architecture",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6f-1dp",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Process automation  /  Control architecture",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6f-1dq",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p6f-1dr",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p6f-1ds",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "AUTOMATION-IO  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_AUTO_PROXIMITY": {
+      "name": "CC_AUTO_PROXIMITY",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-proximity-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -27,
+              "y": -18
+            },
+            {
+              "x": 27,
+              "y": -18
+            },
+            {
+              "x": 27,
+              "y": 18
+            },
+            {
+              "x": -27,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -18,
+            "y": -8
+          },
+          "b": {
+            "x": -18,
+            "y": 8
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-4",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": -8,
+            "y": 0
+          },
+          "r": 7,
+          "start": -1.5707963267948966,
+          "end": 1.5707963267948966,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-5",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 1,
+            "y": 0
+          },
+          "r": 7,
+          "start": -1.5707963267948966,
+          "end": 1.5707963267948966,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-proximity-6",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 10,
+            "y": 0
+          },
+          "r": 7,
+          "start": -1.5707963267948966,
+          "end": 1.5707963267948966,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Inductive proximity sensor",
+        "category": "Automation",
+        "group": "Sensors",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto proximity"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -18,
+          "maxX": 45,
+          "maxY": 18
+        }
+      }
+    },
+    "CC_AUTO_DI": {
+      "name": "CC_AUTO_DI",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-di-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-di-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-di-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-di-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "DI",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Digital input module",
+        "category": "Automation",
+        "group": "Control & I/O",
+        "representation": "functional block",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto di"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_AUTO_PLC": {
+      "name": "CC_AUTO_PLC",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-plc-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-plc-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-plc-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-plc-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "PLC",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Programmable logic controller",
+        "category": "Automation",
+        "group": "Control & I/O",
+        "representation": "functional block",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto plc"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_AUTO_AO": {
+      "name": "CC_AUTO_AO",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-ao-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-ao-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-ao-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-ao-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "AO",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Analog output module",
+        "category": "Automation",
+        "group": "Control & I/O",
+        "representation": "functional block",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto ao"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_AUTO_VFD": {
+      "name": "CC_AUTO_VFD",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-vfd-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-vfd-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-vfd-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-vfd-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -4
+          },
+          "text": "VFD",
+          "height": 11,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Variable-frequency drive",
+        "category": "Automation",
+        "group": "Control & I/O",
+        "representation": "functional block",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto vfd"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_AUTO_HMI": {
+      "name": "CC_AUTO_HMI",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-auto-hmi-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -24
+            },
+            {
+              "x": 32,
+              "y": -24
+            },
+            {
+              "x": 32,
+              "y": 24
+            },
+            {
+              "x": -32,
+              "y": 24
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-hmi-1",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -25,
+              "y": -14
+            },
+            {
+              "x": 25,
+              "y": -14
+            },
+            {
+              "x": 25,
+              "y": 17
+            },
+            {
+              "x": -25,
+              "y": 17
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-hmi-2",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": -19
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-hmi-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-hmi-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-auto-hmi-5",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -2
+          },
+          "text": "HMI",
+          "height": 12,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "signal",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Operator HMI",
+        "category": "Automation",
+        "group": "Control & I/O",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "auto hmi"
+        ],
+        "defaultLayer": "Automation",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -24,
+          "maxX": 45,
+          "maxY": 24
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Sensor, I/O, PLC and drive function chain; signal topology, not a power wiring diagram.",
+    "industry": "Process automation",
+    "drawingType": "Control architecture",
+    "templateId": "automation-io",
+    "standardRefs": [
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

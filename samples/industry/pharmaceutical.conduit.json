@@ -1,0 +1,1234 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Purified water treatment",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p4k-1a5",
+      "type": "INSERT",
+      "layer": "Water",
+      "block": "CC_WATER_SOFTENER",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "IX-101"
+    },
+    {
+      "id": "e-mugr5p4k-1a6",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "CC_PUMP",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "P-101"
+    },
+    {
+      "id": "e-mugr5p4k-1a7",
+      "type": "INSERT",
+      "layer": "Water",
+      "block": "CC_WATER_RO",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "RO-101"
+    },
+    {
+      "id": "e-mugr5p4k-1a8",
+      "type": "INSERT",
+      "layer": "Water",
+      "block": "CC_WATER_UV",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "UV-101"
+    },
+    {
+      "id": "e-mugr5p4k-1a9",
+      "type": "INSERT",
+      "layer": "Water",
+      "block": "CC_WATER_METER",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "WM-101"
+    },
+    {
+      "id": "e-mugr5p4k-1aa",
+      "type": "LWPOLYLINE",
+      "layer": "Water",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a5"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a6"
+        }
+      ],
+      "closed": false,
+      "color": "#257cab",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4k-1a5",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4k-1a6",
+          "port": "in"
+        },
+        "style": "water",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4k-1ab",
+      "type": "LWPOLYLINE",
+      "layer": "Water",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a6"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a7"
+        }
+      ],
+      "closed": false,
+      "color": "#257cab",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4k-1a6",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4k-1a7",
+          "port": "in"
+        },
+        "style": "water",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4k-1ac",
+      "type": "LWPOLYLINE",
+      "layer": "Water",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a7"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a8"
+        }
+      ],
+      "closed": false,
+      "color": "#257cab",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4k-1a7",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4k-1a8",
+          "port": "in"
+        },
+        "style": "water",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4k-1ad",
+      "type": "LWPOLYLINE",
+      "layer": "Water",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a8"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection",
+          "entityId": "e-mugr5p4k-1a9"
+        }
+      ],
+      "closed": false,
+      "color": "#257cab",
+      "width": 2,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p4k-1a8",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p4k-1a9",
+          "port": "in"
+        },
+        "style": "water",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p4k-1ae",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Purified water treatment",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4k-1af",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Pharmaceutical & biotech  /  Utility process schematic",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4k-1ag",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p4k-1ah",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p4k-1ai",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "PHARMACEUTICAL  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_WATER_SOFTENER": {
+      "name": "CC_WATER_SOFTENER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-water-softener-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -27,
+            "y": -18
+          },
+          "b": {
+            "x": -27,
+            "y": 18
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-1",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 18
+          },
+          "r": 27,
+          "start": 0,
+          "end": 3.141592653589793,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 18
+          },
+          "b": {
+            "x": 27,
+            "y": -18
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-3",
+          "type": "ARC",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": -18
+          },
+          "r": 27,
+          "start": 3.141592653589793,
+          "end": 6.283185307179586,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-6",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -21,
+              "y": -20
+            },
+            {
+              "x": 21,
+              "y": -20
+            },
+            {
+              "x": 21,
+              "y": 20
+            },
+            {
+              "x": -21,
+              "y": 20
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-softener-7",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "IX",
+          "height": 13,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Water softener",
+        "category": "Water",
+        "group": "Treatment & distribution",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "water softener"
+        ],
+        "defaultLayer": "Water",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_PUMP": {
+      "name": "CC_PUMP",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pump-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -27,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 27,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 27
+          },
+          "b": {
+            "x": 0,
+            "y": 45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -27
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-4",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 27,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -15,
+              "y": -18
+            },
+            {
+              "x": 23,
+              "y": 0
+            },
+            {
+              "x": -15,
+              "y": 18
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pump-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": -31
+          },
+          "b": {
+            "x": 22,
+            "y": -31
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "top",
+          "x": 0,
+          "y": 45,
+          "dx": 0,
+          "dy": 1,
+          "medium": "process",
+          "role": "connection"
+        },
+        {
+          "name": "bottom",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "process",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Centrifugal pump",
+        "category": "P&ID",
+        "labelOffset": 67,
+        "geometryRevision": 3,
+        "convention": "ISO-10628-2 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-10628-2"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Reviewed: silhouette, terminal positions, normal state and distinct function retained."
+        },
+        "group": "Equipment & instruments",
+        "aliases": [
+          "pump"
+        ],
+        "defaultLayer": "Equipment",
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 45
+        }
+      }
+    },
+    "CC_WATER_RO": {
+      "name": "CC_WATER_RO",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-water-ro-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-ro-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-ro-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-ro-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -7,
+            "y": -22
+          },
+          "b": {
+            "x": -7,
+            "y": 22
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-ro-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 7,
+            "y": -22
+          },
+          "b": {
+            "x": 7,
+            "y": 22
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-ro-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -22
+          },
+          "b": {
+            "x": 0,
+            "y": -45
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        },
+        {
+          "name": "reject",
+          "x": 0,
+          "y": -45,
+          "dx": 0,
+          "dy": -1,
+          "medium": "water",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Reverse-osmosis membrane",
+        "category": "Water",
+        "group": "Treatment & distribution",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "water ro"
+        ],
+        "defaultLayer": "Water",
+        "labelOffset": 67,
+        "extents": {
+          "minX": -45,
+          "minY": -45,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_WATER_UV": {
+      "name": "CC_WATER_UV",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-water-uv-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": -22
+            },
+            {
+              "x": 32,
+              "y": 22
+            },
+            {
+              "x": -32,
+              "y": 22
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-uv-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -32,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-uv-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 32,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-uv-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": 10
+          },
+          "b": {
+            "x": 22,
+            "y": 10
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-uv-4",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -12
+          },
+          "text": "UV",
+          "height": 13,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "UV disinfection",
+        "category": "Water",
+        "group": "Treatment & distribution",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "water uv"
+        ],
+        "defaultLayer": "Water",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -22,
+          "maxX": 45,
+          "maxY": 22
+        }
+      }
+    },
+    "CC_WATER_METER": {
+      "name": "CC_WATER_METER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-water-meter-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-meter-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 26,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-meter-2",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-water-meter-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "WM",
+          "height": 13,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "water",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Water meter",
+        "category": "Water",
+        "group": "Treatment & distribution",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "water meter"
+        ],
+        "defaultLayer": "Water",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25.970550818758205,
+          "maxX": 45,
+          "maxY": 25.970550818758205
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Ion exchange, membrane separation and UV equipment; not a validated pharmaceutical system.",
+    "industry": "Pharmaceutical & biotech",
+    "drawingType": "Utility process schematic",
+    "templateId": "pharmaceutical",
+    "standardRefs": [
+      "ISO-10628-2",
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

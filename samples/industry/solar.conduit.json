@@ -1,0 +1,1252 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Solar power conversion",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p50-1ax",
+      "type": "INSERT",
+      "layer": "Electrical",
+      "block": "CC_PV_MODULE",
+      "x": 130,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PV1"
+    },
+    {
+      "id": "e-mugr5p50-1ay",
+      "type": "INSERT",
+      "layer": "Electrical",
+      "block": "CC_DISCONNECT",
+      "x": 320,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "QS1"
+    },
+    {
+      "id": "e-mugr5p50-1az",
+      "type": "INSERT",
+      "layer": "Electrical",
+      "block": "CC_INVERTER",
+      "x": 510,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "INV1"
+    },
+    {
+      "id": "e-mugr5p50-1b0",
+      "type": "INSERT",
+      "layer": "Electrical",
+      "block": "CC_CIRCUIT_BREAKER",
+      "x": 700,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "QF1"
+    },
+    {
+      "id": "e-mugr5p50-1b1",
+      "type": "INSERT",
+      "layer": "Electrical",
+      "block": "CC_AC_SOURCE",
+      "x": 890,
+      "y": 350,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "GRID"
+    },
+    {
+      "id": "e-mugr5p51-1b2",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 175,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1ax"
+        },
+        {
+          "name": "in",
+          "x": 275,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1ay"
+        }
+      ],
+      "closed": false,
+      "color": "#6979b4",
+      "width": 1.5,
+      "dash": [],
+      "label": "DC",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p50-1ax",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p50-1ay",
+          "port": "in"
+        },
+        "style": "electrical",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p51-1b3",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 365,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1ay"
+        },
+        {
+          "name": "in",
+          "x": 465,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1az"
+        }
+      ],
+      "closed": false,
+      "color": "#6979b4",
+      "width": 1.5,
+      "dash": [],
+      "label": "DC",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p50-1ay",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p50-1az",
+          "port": "in"
+        },
+        "style": "electrical",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p51-1b4",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 555,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1az"
+        },
+        {
+          "name": "in",
+          "x": 655,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1b0"
+        }
+      ],
+      "closed": false,
+      "color": "#6979b4",
+      "width": 2.4,
+      "dash": [],
+      "label": "AC",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p50-1az",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p50-1b0",
+          "port": "in"
+        },
+        "style": "power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p51-1b5",
+      "type": "LWPOLYLINE",
+      "layer": "Electrical",
+      "points": [
+        {
+          "name": "out",
+          "x": 745,
+          "y": 350,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1b0"
+        },
+        {
+          "name": "in",
+          "x": 845,
+          "y": 350,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection",
+          "entityId": "e-mugr5p50-1b1"
+        }
+      ],
+      "closed": false,
+      "color": "#6979b4",
+      "width": 2.4,
+      "dash": [],
+      "label": "AC",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p50-1b0",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p50-1b1",
+          "port": "in"
+        },
+        "style": "power",
+        "arrow": "none",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p51-1b6",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Solar power conversion",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p51-1b7",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Renewable energy  /  Power conversion schematic",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p51-1b8",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p51-1b9",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p51-1ba",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "SOLAR  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_PV_MODULE": {
+      "name": "CC_PV_MODULE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-pv-module-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-2",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -20
+            },
+            {
+              "x": 30,
+              "y": -20
+            },
+            {
+              "x": 30,
+              "y": 20
+            },
+            {
+              "x": -30,
+              "y": 20
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -10,
+            "y": -20
+          },
+          "b": {
+            "x": -10,
+            "y": 20
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 10,
+            "y": -20
+          },
+          "b": {
+            "x": 10,
+            "y": 20
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-5",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -30,
+            "y": 0
+          },
+          "b": {
+            "x": 30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-6",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -22,
+            "y": 46
+          },
+          "b": {
+            "x": -8,
+            "y": 28
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-7",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -8,
+              "y": 28
+            },
+            {
+              "x": -9.811124809869016,
+              "y": 35.45937845420629
+            },
+            {
+              "x": -14.784043779339873,
+              "y": 31.59155258906229
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-8",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -4,
+            "y": 46
+          },
+          "b": {
+            "x": 10,
+            "y": 28
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-pv-module-9",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 10,
+              "y": 28
+            },
+            {
+              "x": 8.188875190130984,
+              "y": 35.45937845420629
+            },
+            {
+              "x": 3.215956220660128,
+              "y": 31.59155258906229
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Photovoltaic module",
+        "category": "Electrical",
+        "group": "Sources",
+        "standardRefs": [
+          "PROJECT"
+        ],
+        "geometryRevision": 3,
+        "convention": "Explicit project drafting convention",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "pv module"
+        ],
+        "defaultLayer": "Electrical",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -20,
+          "maxX": 45,
+          "maxY": 46
+        }
+      }
+    },
+    "CC_DISCONNECT": {
+      "name": "CC_DISCONNECT",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-disconnect-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -20,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-disconnect-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 20,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-disconnect-2",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": -20,
+            "y": 0
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-disconnect-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -20,
+            "y": 0
+          },
+          "b": {
+            "x": 15,
+            "y": 24
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-disconnect-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 20,
+            "y": -6
+          },
+          "b": {
+            "x": 20,
+            "y": 6
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Disconnector",
+        "category": "Electrical",
+        "group": "Power & protection",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "IEC-60617"
+        ],
+        "convention": "IEC-60617 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "disconnect"
+        ],
+        "defaultLayer": "Electrical",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -6,
+          "maxX": 45,
+          "maxY": 24
+        }
+      }
+    },
+    "CC_INVERTER": {
+      "name": "CC_INVERTER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-inverter-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": -25
+            },
+            {
+              "x": 30,
+              "y": 25
+            },
+            {
+              "x": -30,
+              "y": 25
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-inverter-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -30,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-inverter-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 30,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-inverter-3",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -30,
+            "y": -25
+          },
+          "b": {
+            "x": 30,
+            "y": 25
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-inverter-4",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": -14,
+            "y": 10
+          },
+          "text": "=",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-inverter-5",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 14,
+            "y": -18
+          },
+          "text": "~",
+          "height": 18,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "DC / AC inverter",
+        "category": "Electrical",
+        "group": "Power & protection",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "IEC-60617"
+        ],
+        "convention": "IEC-60617 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "inverter"
+        ],
+        "defaultLayer": "Electrical",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25,
+          "maxX": 45,
+          "maxY": 25
+        }
+      }
+    },
+    "CC_CIRCUIT_BREAKER": {
+      "name": "CC_CIRCUIT_BREAKER",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-circuit-breaker-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -18,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-circuit-breaker-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 18,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-circuit-breaker-2",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": -18,
+            "y": 0
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-circuit-breaker-3",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 18,
+            "y": 0
+          },
+          "r": 2,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-circuit-breaker-4",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -18,
+            "y": 0
+          },
+          "b": {
+            "x": 13,
+            "y": 20
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-circuit-breaker-5",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -7,
+              "y": -8
+            },
+            {
+              "x": -7,
+              "y": -17
+            },
+            {
+              "x": 8,
+              "y": -17
+            },
+            {
+              "x": 8,
+              "y": -8
+            }
+          ],
+          "closed": false,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Circuit breaker · single-line",
+        "category": "Electrical",
+        "group": "Power & protection",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "IEC-60617"
+        ],
+        "convention": "IEC-60617 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "circuit breaker"
+        ],
+        "defaultLayer": "Electrical",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -17,
+          "maxX": 45,
+          "maxY": 20
+        }
+      }
+    },
+    "CC_AC_SOURCE": {
+      "name": "CC_AC_SOURCE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-ac-source-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -45,
+            "y": 0
+          },
+          "b": {
+            "x": -26,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ac-source-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 26,
+            "y": 0
+          },
+          "b": {
+            "x": 45,
+            "y": 0
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ac-source-2",
+          "type": "CIRCLE",
+          "layer": "0",
+          "c": {
+            "x": 0,
+            "y": 0
+          },
+          "r": 26,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-ac-source-3",
+          "type": "SPLINE",
+          "layer": "0",
+          "degree": 3,
+          "knots": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "controlPoints": [
+            {
+              "x": -17,
+              "y": 0
+            },
+            {
+              "x": -10,
+              "y": 30
+            },
+            {
+              "x": 10,
+              "y": -30
+            },
+            {
+              "x": 17,
+              "y": 0
+            }
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "electrical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "AC voltage source",
+        "category": "Electrical",
+        "group": "Sources",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "IEC-60617"
+        ],
+        "convention": "IEC-60617 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "ac source"
+        ],
+        "defaultLayer": "Electrical",
+        "labelOffset": 48,
+        "extents": {
+          "minX": -45,
+          "minY": -25.970550818758205,
+          "maxX": 45,
+          "maxY": 25.970550818758205
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Photovoltaic generation, DC isolation, inverter and AC protection.",
+    "industry": "Renewable energy",
+    "drawingType": "Power conversion schematic",
+    "templateId": "solar",
+    "standardRefs": [
+      "IEC-60617",
+      "PROJECT"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

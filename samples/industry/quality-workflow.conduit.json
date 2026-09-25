@@ -1,0 +1,1118 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Manufacturing release workflow",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-mugr5p7a-1f1",
+      "type": "INSERT",
+      "layer": "Process",
+      "block": "CC_PREPARATION",
+      "x": 140,
+      "y": 390,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "SETUP"
+    },
+    {
+      "id": "e-mugr5p7a-1f2",
+      "type": "INSERT",
+      "layer": "Process",
+      "block": "CC_MANUAL_OPERATION",
+      "x": 370,
+      "y": 390,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "OPERATE"
+    },
+    {
+      "id": "e-mugr5p7a-1f3",
+      "type": "INSERT",
+      "layer": "Process",
+      "block": "CC_DECISION",
+      "x": 620,
+      "y": 390,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "PASS?"
+    },
+    {
+      "id": "e-mugr5p7a-1f4",
+      "type": "INSERT",
+      "layer": "Process",
+      "block": "CC_INTERNAL_STORAGE",
+      "x": 880,
+      "y": 390,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "RECORD"
+    },
+    {
+      "id": "e-mugr5p7a-1f5",
+      "type": "INSERT",
+      "layer": "Process",
+      "block": "CC_DOCUMENT",
+      "x": 620,
+      "y": 170,
+      "sx": 1,
+      "sy": 1,
+      "rotation": 0,
+      "tag": "NCR"
+    },
+    {
+      "id": "e-mugr5p7b-1f6",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "right",
+          "x": 200,
+          "y": 390,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f1"
+        },
+        {
+          "name": "left",
+          "x": 325,
+          "y": 390,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f2"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p7a-1f1",
+          "port": "right"
+        },
+        "to": {
+          "entityId": "e-mugr5p7a-1f2",
+          "port": "left"
+        },
+        "style": "workflow",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p7b-1f7",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "right",
+          "x": 415,
+          "y": 390,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f2"
+        },
+        {
+          "name": "no",
+          "x": 560,
+          "y": 390,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f3"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 1.8,
+      "dash": [],
+      "label": "",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p7a-1f2",
+          "port": "right"
+        },
+        "to": {
+          "entityId": "e-mugr5p7a-1f3",
+          "port": "no"
+        },
+        "style": "workflow",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p7b-1f8",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "yes",
+          "x": 680,
+          "y": 390,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f3"
+        },
+        {
+          "name": "left",
+          "x": 825,
+          "y": 390,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f4"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 1.8,
+      "dash": [],
+      "label": "YES",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p7a-1f3",
+          "port": "yes"
+        },
+        "to": {
+          "entityId": "e-mugr5p7a-1f4",
+          "port": "left"
+        },
+        "style": "workflow",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p7b-1f9",
+      "type": "LWPOLYLINE",
+      "layer": "Process",
+      "points": [
+        {
+          "name": "out",
+          "x": 620,
+          "y": 348,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f3"
+        },
+        {
+          "name": "in",
+          "x": 620,
+          "y": 205,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection",
+          "entityId": "e-mugr5p7a-1f5"
+        }
+      ],
+      "closed": false,
+      "color": "#147c77",
+      "width": 1.8,
+      "dash": [],
+      "label": "NO",
+      "connector": {
+        "from": {
+          "entityId": "e-mugr5p7a-1f3",
+          "port": "out"
+        },
+        "to": {
+          "entityId": "e-mugr5p7a-1f5",
+          "port": "in"
+        },
+        "style": "workflow",
+        "arrow": "end",
+        "waypoints": [],
+        "status": "routed"
+      }
+    },
+    {
+      "id": "e-mugr5p7b-1fa",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 620
+      },
+      "text": "Manufacturing release workflow",
+      "height": 27,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p7b-1fb",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 584
+      },
+      "text": "Manufacturing & quality  /  Information flowchart",
+      "height": 13,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p7b-1fc",
+      "type": "LINE",
+      "layer": "Annotations",
+      "a": {
+        "x": 40,
+        "y": 562
+      },
+      "b": {
+        "x": 1120,
+        "y": 562
+      }
+    },
+    {
+      "id": "e-mugr5p7b-1fd",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 40,
+        "y": 42
+      },
+      "text": "CONCEPT SCHEMATIC — NOT FOR CONSTRUCTION",
+      "height": 11,
+      "rotation": 0
+    },
+    {
+      "id": "e-mugr5p7b-1fe",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 650,
+        "y": 42
+      },
+      "text": "QUALITY-WORKFLOW  |  REV 03  |  mm",
+      "height": 11,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "CC_PREPARATION": {
+      "name": "CC_PREPARATION",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-preparation-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -40,
+              "y": -35
+            },
+            {
+              "x": 40,
+              "y": -35
+            },
+            {
+              "x": 60,
+              "y": 0
+            },
+            {
+              "x": 40,
+              "y": 35
+            },
+            {
+              "x": -40,
+              "y": 35
+            },
+            {
+              "x": -60,
+              "y": 0
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-preparation-1",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "Prepare",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": 0,
+          "y": 35,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 0,
+          "y": -35,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "left",
+          "x": -60,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "right",
+          "x": 60,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Preparation",
+        "category": "Flow",
+        "labelOffset": 57,
+        "geometryRevision": 3,
+        "convention": "ISO-5807 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-5807"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Reviewed: silhouette, terminal positions, normal state and distinct function retained."
+        },
+        "group": "Components",
+        "aliases": [
+          "preparation"
+        ],
+        "defaultLayer": "Process",
+        "extents": {
+          "minX": -60,
+          "minY": -35,
+          "maxX": 60,
+          "maxY": 35
+        }
+      }
+    },
+    "CC_MANUAL_OPERATION": {
+      "name": "CC_MANUAL_OPERATION",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-manual-operation-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -55,
+              "y": 35
+            },
+            {
+              "x": 55,
+              "y": 35
+            },
+            {
+              "x": 35,
+              "y": -35
+            },
+            {
+              "x": -35,
+              "y": -35
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-manual-operation-1",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "Manual",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": 0,
+          "y": 35,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 0,
+          "y": -35,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "left",
+          "x": -45,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "right",
+          "x": 45,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Manual operation",
+        "category": "Flow",
+        "group": "Information flow",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-5807"
+        ],
+        "convention": "ISO-5807 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "manual operation"
+        ],
+        "defaultLayer": "Process",
+        "labelOffset": 57,
+        "extents": {
+          "minX": -55,
+          "minY": -35,
+          "maxX": 55,
+          "maxY": 35
+        }
+      }
+    },
+    "CC_DECISION": {
+      "name": "CC_DECISION",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-decision-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": 0,
+              "y": 42
+            },
+            {
+              "x": 60,
+              "y": 0
+            },
+            {
+              "x": 0,
+              "y": -42
+            },
+            {
+              "x": -60,
+              "y": 0
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-decision-1",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "Decision",
+          "height": 13,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": 0,
+          "y": 42,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 0,
+          "y": -42,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "yes",
+          "x": 60,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "no",
+          "x": -60,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Decision",
+        "category": "Flow",
+        "labelOffset": 64,
+        "geometryRevision": 3,
+        "convention": "ISO-5807 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-5807"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Reviewed: silhouette, terminal positions, normal state and distinct function retained."
+        },
+        "group": "Components",
+        "aliases": [
+          "decision"
+        ],
+        "defaultLayer": "Process",
+        "extents": {
+          "minX": -60,
+          "minY": -42,
+          "maxX": 60,
+          "maxY": 42
+        }
+      }
+    },
+    "CC_INTERNAL_STORAGE": {
+      "name": "CC_INTERNAL_STORAGE",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-internal-storage-0",
+          "type": "LWPOLYLINE",
+          "layer": "0",
+          "points": [
+            {
+              "x": -55,
+              "y": -35
+            },
+            {
+              "x": 55,
+              "y": -35
+            },
+            {
+              "x": 55,
+              "y": 35
+            },
+            {
+              "x": -55,
+              "y": 35
+            }
+          ],
+          "closed": true,
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-internal-storage-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -40,
+            "y": -35
+          },
+          "b": {
+            "x": -40,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-internal-storage-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -55,
+            "y": 22
+          },
+          "b": {
+            "x": 55,
+            "y": 22
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-internal-storage-3",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 5,
+            "y": -7
+          },
+          "text": "Storage",
+          "height": 13,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": 0,
+          "y": 35,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 0,
+          "y": -35,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "left",
+          "x": -55,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "right",
+          "x": 55,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Internal storage",
+        "category": "Flow",
+        "group": "Information flow",
+        "geometryRevision": 3,
+        "standardRefs": [
+          "ISO-5807"
+        ],
+        "convention": "ISO-5807 family",
+        "conformity": "Original master; not standards-certified",
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "New independently constructed CAD master with explicit terminal topology."
+        },
+        "aliases": [
+          "internal storage"
+        ],
+        "defaultLayer": "Process",
+        "labelOffset": 57,
+        "extents": {
+          "minX": -55,
+          "minY": -35,
+          "maxX": 55,
+          "maxY": 35
+        }
+      }
+    },
+    "CC_DOCUMENT": {
+      "name": "CC_DOCUMENT",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "entities": [
+        {
+          "id": "master-document-0",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -55,
+            "y": -24
+          },
+          "b": {
+            "x": -55,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-document-1",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": -55,
+            "y": 35
+          },
+          "b": {
+            "x": 55,
+            "y": 35
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-document-2",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 55,
+            "y": 35
+          },
+          "b": {
+            "x": 55,
+            "y": -24
+          },
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-document-3",
+          "type": "SPLINE",
+          "layer": "0",
+          "degree": 3,
+          "knots": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1
+          ],
+          "controlPoints": [
+            {
+              "x": -55,
+              "y": -24
+            },
+            {
+              "x": -20,
+              "y": -55
+            },
+            {
+              "x": 20,
+              "y": 7
+            },
+            {
+              "x": 55,
+              "y": -24
+            }
+          ],
+          "weights": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        },
+        {
+          "id": "master-document-4",
+          "type": "TEXT",
+          "layer": "0",
+          "p": {
+            "x": 0,
+            "y": -5
+          },
+          "text": "Document",
+          "height": 14,
+          "rotation": 0,
+          "align": "center",
+          "linetype": "CONTINUOUS",
+          "color": "BYBLOCK"
+        }
+      ],
+      "ports": [
+        {
+          "name": "in",
+          "x": 0,
+          "y": 35,
+          "dx": 0,
+          "dy": 1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "out",
+          "x": 0,
+          "y": -24,
+          "dx": 0,
+          "dy": -1,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "left",
+          "x": -55,
+          "y": 0,
+          "dx": -1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        },
+        {
+          "name": "right",
+          "x": 55,
+          "y": 0,
+          "dx": 1,
+          "dy": 0,
+          "medium": "logical",
+          "role": "connection"
+        }
+      ],
+      "symbol": {
+        "name": "Document",
+        "category": "Flow",
+        "labelOffset": 55,
+        "geometryRevision": 3,
+        "convention": "ISO-5807 family",
+        "conformity": "Original master; not standards-certified",
+        "standardRefs": [
+          "ISO-5807"
+        ],
+        "normativeEntry": null,
+        "review": {
+          "level": "geometry-and-convention",
+          "dimensionalConformance": "not-verified",
+          "note": "Native cubic document wave replaces sharp zigzag bottom."
+        },
+        "group": "Components",
+        "aliases": [
+          "document"
+        ],
+        "defaultLayer": "Process",
+        "extents": {
+          "minX": -55,
+          "minY": -32.94012451171875,
+          "maxX": 55,
+          "maxY": 35
+        }
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Hydraulics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Pneumatics",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "HVAC",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Water",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Automation",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Fire",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Network",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": "Preparation, controlled operation, inspection decision and record storage.",
+    "industry": "Manufacturing & quality",
+    "drawingType": "Information flowchart",
+    "templateId": "quality-workflow",
+    "standardRefs": [
+      "ISO-5807"
+    ],
+    "geometryRevision": 3,
+    "approval": "Concept schematic; engineering approval required"
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

@@ -54,7 +54,7 @@ export function entityGeometry(e, doc, options = {}) {
     const style = resolveStyle(e, doc, parentStyle, parentLayer), paths = [], texts = [], warnings = [];
     const path = (pts, closed = false, fill = null, extra = {}) => {
         if (pts.length > 1)
-            paths.push({ points: pts.map(p => transform(p, m)), closed, fill, ...style, ...extra, entityId: e.id });
+            paths.push({ points: pts.map(p => transform(p, m)), closed, fill: fill === 'BYBLOCK' || fill === 'BYLAYER' ? style.color : fill, ...style, ...extra, entityId: e.id });
     };
     const label = (p, value, height, rotation = 0, align = 'left') => {
         const textStyle = doc.textStyles?.[e.styleName] || {}, q = transform(p, m), angle = rotation * Math.PI / 180;

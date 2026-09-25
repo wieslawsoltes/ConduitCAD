@@ -1,6 +1,6 @@
 # @conduitcad/input
 
-Pointer gesture controller. Version **0.1.0**, native ESM JavaScript, MIT license.
+Pointer gesture controller. Version **0.2.1**, native ESM JavaScript, MIT license.
 
 Shared mouse, pen and touch handling with pan/pinch arbitration, long press, pointer capture, wheel input and cancellation.
 

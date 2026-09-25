@@ -3,7 +3,7 @@ import { createDocument, validateDocument, entity, line, polyline, rect, circle,
 import { History } from '@conduitcad/history';
 import { ConstraintSolver, evaluateExpression, resolveParameters } from '@conduitcad/constraints';
 import { routeOrthogonal, routePorts, routeVia, graphFromDocument } from '@conduitcad/routing';
-import { SYMBOLS, LINE_STYLES, installSymbols, insertSymbol, createDemo } from '@conduitcad/symbols';
+import { SYMBOLS, LINE_STYLES, CATEGORIES, STANDARD_REFERENCES, DRAWING_TYPES, searchSymbols, symbolUpdates, updateSymbolDefinitions, installSymbols, insertSymbol, createDemo } from '@conduitcad/symbols';
 import { parseDXF, writeDXF, exportReport } from '@conduitcad/dxf';
 import { CadRenderer, Camera, drawPath, drawText } from '@conduitcad/renderer';
 import { PointerController } from '@conduitcad/input';
@@ -19,11 +19,12 @@ const format = n => Number.isFinite(n) ? Number(n.toFixed(3)).toString() : '0';
 export function symbolSVG(block, doc, extra = '') {
     if (!block)
         return icon('symbols');
-    const g = entityGeometry({ id: 'preview', type: 'INSERT', block: block.name || block.block, x: 0, y: 0, sx: 1, sy: 1, layer: 'Equipment' }, doc, { tolerance: .4 }), pts = g.paths.flatMap(p => p.points), b = bounds(pts);
+    const preview = { id: 'preview', type: 'INSERT', block: block.name || block.block, x: 0, y: 0, sx: 1, sy: 1, layer: 'Equipment' };
+    const g = entityGeometry(preview, doc, { tolerance: .03 }), pts = g.paths.flatMap(p => p.points), b = union(bounds(pts), entityBounds(preview, doc));
     if (!validBounds(b))
         return icon('symbols');
     const pad = 8, view = `${b.minX - pad} ${-b.maxY - pad} ${b.maxX - b.minX + pad * 2} ${b.maxY - b.minY + pad * 2}`;
-    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" fill="${p.fill ? 'currentColor' : 'none'}" fill-rule="evenodd" stroke="${p.stroke === false ? 'none' : 'currentColor'}" stroke-width="1.7" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
+    return `<svg viewBox="${view}" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" ${extra}>${g.paths.map(p => `<path d="${p.points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${-p.y}`).join(' ')}${p.closed ? 'Z' : ''}" fill="${p.fill ? 'currentColor' : 'none'}" fill-rule="evenodd" stroke="${p.stroke === false ? 'none' : 'currentColor'}" stroke-width="1.7" ${p.dash?.length ? `stroke-dasharray="${p.dash.join(' ')}"` : ''} vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}${g.texts.map(t => `<text x="${t.p.x}" y="${-t.p.y}" fill="currentColor" font-size="${t.height}" font-family="system-ui" text-anchor="${t.align === 'center' ? 'middle' : t.align === 'right' ? 'end' : 'start'}">${E(t.text)}</text>`).join('')}</svg>`;
 }
 export class Workbench {
     constructor(root, options = {}) {
@@ -100,7 +101,7 @@ export class Workbench {
         this.root.innerHTML = `<div class="app">
  <header class="appbar"><div class="brand"><span class="logo">${icon('logo')}</span><span class="brand-name">conduit</span><small>CAD</small></div><div class="document-title"><span class="divider"></span><button class="doc-title-button" data-action="rename" title="Rename drawing"><span class="doc-name"></span>${icon('down')}</button><span class="save-status">${icon('check')} Local workspace</span></div><div class="appbar-actions">${btn('new', 'New', 'plus', 'desktop-only', 'Create a drawing')}${btn('open', 'Open DXF', 'folder', 'btn')}${btn('export', 'Export', 'export', 'btn primary')}${iconButton('help', 'help', 'Help & shortcuts', 'desktop-only')}<div class="avatar" title="Local workspace · no account">CC</div></div></header>
  <nav class="workbar" aria-label="Workspace tools"><div class="workspace-label">${icon('symbols')} Design workspace</div>${btn('mode-draw', 'Draw', 'line', 'tab active')}${btn('mode-connect', 'Connect', 'connect', 'tab')}${btn('mode-inspect', 'Inspect', 'properties', 'tab')}<span class="spacer"></span>${btn('parameters', 'Parameters', 'param', 'compact optional')}${btn('line-styles', 'Line styles', 'line', 'compact optional')}<span class="separator desktop-only"></span>${btn('toggle-library', 'Library', 'symbols', 'compact mobile-only')}${iconButton('toggle-inspector', 'properties', 'Properties and layers', 'compact inspector-toggle')}${iconButton('command', 'command', 'Command palette', 'compact optional')}${iconButton('more', 'more', 'More drawing tools', 'compact mobile-only')}</nav>
- <main class="workspace"><aside class="library" aria-label="Symbol library"><div class="panel-heading"><h2>Symbol library <small class="library-count"></small></h2>${iconButton('toggle-library', 'close', 'Close library', 'mobile-only')}</div><p class="panel-subtitle">Drag a symbol. Make a connection.</p><div class="searchbox">${icon('search')}<input id="symbol-search" type="search" placeholder="Find a symbol…" aria-label="Search symbols" autocomplete="off"></div><div class="category-tabs"><button data-category="P&ID" class="active">P&ID</button><button data-category="Electrical">Electrical</button><button data-category="Flow">Flow</button><button data-category="Custom">Custom</button></div><div class="library-scroll"></div><div class="library-footer">${icon('check')} Native DXF blocks · editable geometry</div></aside>
+ <main class="workspace"><aside class="library" aria-label="Symbol library"><div class="panel-heading"><h2>Symbol library <small class="library-count"></small></h2>${iconButton('toggle-library', 'close', 'Close library', 'mobile-only')}</div><p class="panel-subtitle">Drag a symbol. Make a connection.</p><div class="searchbox">${icon('search')}<input id="symbol-search" type="search" placeholder="Find a symbol…" aria-label="Search symbols" autocomplete="off"></div><div class="category-tabs"><select id="symbol-category" aria-label="Symbol category"><option value="All">All categories</option>${CATEGORIES.map(c => `<option value="${E(c.id)}" ${c.id === this.category ? 'selected' : ''}>${E(c.name)} · ${SYMBOLS.filter(s => s.category === c.id).length}</option>`).join('')}<option value="Custom">Custom / imported blocks</option></select></div><div class="library-summary" role="status" aria-live="polite"></div><div class="library-scroll"></div><div class="library-footer">${btn('library-guide', 'Conventions & library updates', 'help')}</div></aside>
  <section class="canvas-area" aria-label="Drawing canvas"><div class="viewport" tabindex="0" role="application" aria-label="CAD drawing. Use toolbar tools, touch gestures, or keyboard shortcuts."></div><div class="canvas-head"><div class="undo-group">${iconButton('undo', 'undo', 'Undo · Ctrl/⌘ Z')}${iconButton('redo', 'redo', 'Redo · Ctrl/⌘ Shift Z')}</div><div class="render-badge"><span class="dot"></span><span class="backend-name">Initializing</span><span class="stats-text quiet"> · retained renderer</span></div></div><div class="view-label">MODEL SPACE / TOP</div><div class="axis"><svg viewBox="0 0 38 38"><path d="M8 29V5m0 24h24M5 8l3-3 3 3m18 18 3 3-3 3" fill="none" stroke="#9aafa0" stroke-width="1.2"/><text x="2" y="4" font-size="6" fill="#94aa99">Y</text><text x="33" y="33" font-size="6" fill="#94aa99">X</text></svg><span class="unit-label">mm</span></div><div class="zoom-controls">${iconButton('zoom-out', 'minus', 'Zoom out')}<span class="zoom-value">100%</span>${iconButton('zoom-in', 'plus', 'Zoom in')}<span class="separator"></span>${iconButton('fit', 'fit', 'Fit drawing · F')}</div><div class="tool-hint"></div><button class="finish-button hide" data-action="finish">${icon('check')} Finish path</button><nav class="tool-dock" aria-label="Drawing tools">
  ${this.toolButton('select', 'Select', 'select')}${this.toolButton('pan', 'Pan', 'pan', 'mobile-hidden')}${this.toolButton('line', 'Line', 'line')}${this.toolButton('connect', 'Connect', 'connect')}<span class="dock-divider"></span>${this.toolButton('rect', 'Rectangle', 'rect', 'mobile-hidden')}${this.toolButton('circle', 'Circle', 'circle', 'mobile-hidden')}${this.toolButton('text', 'Text', 'text', 'mobile-hidden')}${this.toolButton('dimension', 'Measure', 'dimension', 'desktop-only')}${btn('shapes', 'Shapes', 'rect', 'mobile-only')}${btn('toggle-library', 'Symbols', 'symbols', 'mobile-only')}${btn('toggle-inspector', 'Edit', 'properties', 'mobile-only')}<span class="dock-divider"></span>${btn('more', 'More', 'more', '')}
  </nav></section>
@@ -170,10 +171,11 @@ export class Workbench {
             return;
         }
         if (target.dataset.symbol) {
-            if (this.suppressLibraryClick) {
-                this.suppressLibraryClick = false;
+            if (this.suppressLibraryClick === target.dataset.symbol && performance.now() < this.suppressLibraryClickUntil) {
+                this.suppressLibraryClick = null;
                 return;
             }
+            this.suppressLibraryClick = null;
             this.pickSymbol(target.dataset.symbol);
             return;
         }
@@ -198,7 +200,7 @@ export class Workbench {
             return;
         }
         if (target.dataset.demo) {
-            this.newDocument(target.dataset.demo);
+            try { await this.newDocument(target.dataset.demo); } catch (error) { this.toast(error.message, true); }
             return;
         }
         if (target.dataset.style) {
@@ -220,6 +222,9 @@ export class Workbench {
     }
     async action(action) {
         switch (action) {
+            case 'library-guide':
+                this.libraryGuide();
+                break;
             case 'undo':
                 this.history.undo();
                 break;
@@ -519,17 +524,31 @@ export class Workbench {
     symbolName(id) { return SYMBOLS.find(s => s.id === id)?.name || this.doc.blocks[id]?.symbol?.name || id || 'symbol'; }
     renderLibrary() {
         this.$('.library-count').textContent = String(SYMBOLS.length);
+        this.$('#symbol-category').value = this.category;
         this.root.querySelectorAll('[data-category]').forEach(b => b.classList.toggle('active', b.dataset.category === this.category));
-        let items = this.category === 'Custom' ? Object.values(this.doc.blocks).filter(b => !SYMBOLS.some(s => s.block === b.name)).map(b => ({ id: b.name, name: b.symbol?.name || b.name, block: b.name, category: 'Custom' })) : SYMBOLS.filter(s => s.category === this.category);
-        const query = this.librarySearch.trim().toLowerCase();
-        if (query)
-            items = (this.category === 'Custom' ? items : SYMBOLS).filter(s => (s.name + ' ' + s.category + ' ' + s.id).toLowerCase().includes(query));
+        const query = this.librarySearch.trim();
+        let items = this.category === 'Custom' ? Object.values(this.doc.blocks).filter(b => !SYMBOLS.some(s => s.block === b.name)).map(b => ({ id: b.name, name: b.symbol?.name || b.name, block: b.name, category: 'Custom', symbol: b.symbol })) : searchSymbols(query, { category: query ? undefined : this.category });
+        if (query && this.category === 'Custom') items = items.filter(s => (s.name + ' ' + s.id).toLowerCase().includes(query.toLowerCase()));
+        this.$('.library-summary').textContent = `${items.length} matching symbols${query && this.category !== 'Custom' ? ' · all categories' : ''}`;
         const groups = {};
         for (const s of items) {
-            let group = this.category === 'P&ID' && !query ? (s.id.includes('valve') ? 'Valves & actuators' : ['pressure-indicator', 'flow-transmitter', 'temperature', 'level-transmitter'].includes(s.id) ? 'Instruments' : s.id === 'reducer' || s.id === 'flange' || s.id === 'offpage' ? 'Fittings & connections' : 'Equipment') : query ? s.category : this.category === 'Custom' ? 'Your DXF blocks' : this.category === 'Electrical' ? 'Components' : 'Diagram shapes';
+            const group = query || this.category === 'All' ? (CATEGORIES.find(c => c.id === s.category)?.name || s.category) : s.symbol?.group || (this.category === 'Custom' ? 'Your DXF blocks' : 'Components');
             (groups[group] ??= []).push(s);
         }
-        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${symbolSVG(this.doc.blocks[s.block], this.doc)}<span>${E(s.name)}</span><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">⠿</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
+        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${this.librarySymbolPreview(s)}<span>${E(s.name)}</span><small class="symbol-convention">${E(s.symbol?.standardRefs?.filter(r => r !== 'NFPC-FLUID').join(' / ') || 'Custom')}</small><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">⠿</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
+    }
+    librarySymbolPreview(symbol) {
+        const existing = this.doc.blocks[symbol.block];
+        if (existing) return symbolSVG(existing, this.doc);
+        const block = { name: symbol.block, base: symbol.base, entities: symbol.entities, ports: symbol.ports, symbol: symbol.symbol };
+        return symbolSVG(block, { ...this.doc, blocks: { ...this.doc.blocks, [symbol.block]: block } });
+    }
+    libraryGuide() {
+        const updates = symbolUpdates(this.doc).filter(s => this.doc.entities.some(e => e.type === 'INSERT' && e.block === s.block));
+        this.openModal('Symbol conventions & library updates', `<p><strong>${SYMBOLS.length} masters · ${CATEGORIES.length} categories · geometry revision 3.</strong> Native CAD geometry, named terminals, documented normal states and explicit reference families.</p><div class="hint-box">Reference families do not certify normative dimensions. ISO process/fluid-power, IEC electrical and ISA instrument notation are kept separate. Building services, automation, fire-alarm and network blocks are project conventions, not ISO safety signs.</div><div class="convention-list">${CATEGORIES.map(c => `<section><strong>${E(c.name)}</strong><p>${E(c.description)}</p><small>${E(c.refs.join(' / '))}</small></section>`).join('')}</div><details><summary>Primary reference catalogue</summary>${Object.entries(STANDARD_REFERENCES).map(([id, r]) => `<p><strong>${E(id)}</strong> — ${E(r.title)}<br><small>${E(r.scope)}</small></p>`).join('')}</details><div class="hint-box">${updates.length ? `${updates.length} used saved definitions have an older geometry revision. Applying updates replaces those definitions, keeps instance IDs/transforms and named terminals, and reroutes connections in one undoable edit. Custom changes to those definitions will be replaced.` : 'No used saved definitions need a revision update.'} Existing drawings are never migrated automatically.</div>`, { wide: true, ...(updates.length ? { confirm: 'Update used definitions', onConfirm: () => {
+            this.edit('Update symbol library definitions', () => { updateSymbolDefinitions(this.doc, updates.map(s => s.id)); this.reroute(); });
+            this.closeModal(); this.toast('Library updated; Undo restores previous definitions and routes.');
+        } } : {}) });
     }
     pickSymbol(id) {
         this.pendingSymbol = id;
@@ -552,7 +571,7 @@ export class Workbench {
         return entity('INSERT', { block: id, x, y, sx: 1, sy: 1, rotation: 0, layer: this.currentLayer, tag: tag ? this.nextTag(id) : '' });
     }
     nextTag(id) {
-        const prefix = id.includes('valve') ? 'HV' : id.includes('pump') ? 'P' : id === 'heat-exchanger' ? 'E' : id === 'pressure-indicator' ? 'PI' : id === 'flow-transmitter' ? 'FT' : id === 'temperature' ? 'TT' : id.includes('tank') ? 'TK' : id === 'motor' ? 'M' : id === 'resistor' ? 'R' : id === 'capacitor' ? 'C' : 'S';
+        const prefix = SYMBOLS.find(s => s.id === id)?.symbol?.functionCode || (id.includes('valve') ? 'HV' : id.includes('pump') ? 'P' : id === 'heat-exchanger' ? 'E' : id === 'pressure-indicator' ? 'PI' : id === 'flow-transmitter' ? 'FT' : id === 'temperature' ? 'TT' : id.includes('tank') ? 'TK' : id === 'motor' ? 'M' : id === 'resistor' ? 'R' : id === 'capacitor' ? 'C' : 'S');
         let i = 101;
         const tags = new Set(this.doc.entities.map(e => e.tag));
         while (tags.has(prefix + '-' + i))
@@ -569,6 +588,7 @@ export class Workbench {
         const abort = new AbortController();
         const begin = () => {
             dragging = true;
+            if (this.isMobile()) document.activeElement?.blur?.();
             try { this.$('.viewport').setPointerCapture(event.pointerId); } catch {}
             card.style.touchAction = 'none';
             this.pendingSymbol = id;
@@ -599,9 +619,11 @@ export class Workbench {
             if (e.pointerId !== event.pointerId) return;
             clearTimeout(timer);
             abort.abort();
+            try { if (this.$('.viewport').hasPointerCapture(e.pointerId)) this.$('.viewport').releasePointerCapture(e.pointerId); } catch {}
             card.style.touchAction = 'pan-y';
             if (dragging) {
-                this.suppressLibraryClick = true;
+                this.suppressLibraryClick = id;
+                this.suppressLibraryClickUntil = performance.now() + 300;
                 this.previewSymbol = null;
                 const r = this.$('.viewport').getBoundingClientRect();
                 if (this.renderer.containsPoint({x:e.clientX-r.left,y:e.clientY-r.top})) {
@@ -659,12 +681,21 @@ export class Workbench {
         if (e.type === 'TEXT' || e.type === 'MTEXT')
             fields += this.field('text', 'Text', e.text, true) + this.field('height', 'Text height', format(e.height)) + this.field('rotation', 'Rotation', format(e.rotation || 0));
         host.innerHTML = `<div class="object-card"><div class="object-preview">${block ? symbolSVG(block, this.doc) : icon(e.connector ? 'connect' : e.type === 'LINE' ? 'line' : e.type === 'CIRCLE' ? 'circle' : 'rect')}</div><div class="object-meta"><strong>${E(e.tag || block?.symbol?.name || e.type)}</strong><small>${E(e.type)}${e.connector ? ' · ROUTED CONNECTION' : e.type === 'INSERT' ? ' · BLOCK REFERENCE' : ' · CAD ENTITY'}</small></div></div><div class="inspector-section"><h3>Identity</h3><div class="fields">${e.type === 'INSERT' ? this.field('tag', 'Equipment tag', e.tag || '', true) : ''}${e.connector ? this.field('label', 'Line label', e.label || '', true) : ''}<label class="field full">Layer<select data-prop="layer">${this.doc.layers.map(l => `<option ${l.name === e.layer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></label></div></div><div class="inspector-section"><h3>Geometry ${isLocked(e, this.doc) ? '· locked' : ''}</h3><div class="fields">${fields}</div></div>${e.connector ? `<div class="inspector-section"><h3>Connection</h3><div class="property-list"><div class="property-row"><span>Routing</span><b>${E(e.connector.status || 'routed')}</b></div><div class="property-row"><span>Start</span><b>${E(e.connector.from?.port || 'Free endpoint')}</b></div><div class="property-row"><span>End</span><b>${E(e.connector.to?.port || 'Free endpoint')}</b></div></div><div style="margin-top:12px">${btn('reroute', 'Reroute', 'connect', 'btn')}</div></div>` : ''}<div class="inspector-section"><h3>Actions</h3><div class="operation-grid">${btn('duplicate', 'Duplicate', 'copy')}${btn('rotate', 'Rotate 90°', 'rotate')}${btn('offset', 'Offset', 'offset')}${btn('constraint', 'Constrain', 'param')}${e.type === 'INSERT' ? btn('explode', 'Explode', 'symbols') : btn('make-symbol', 'Make symbol', 'symbols')}${btn('delete', 'Delete', 'trash')}</div></div>${this.constraintsHTML(selected)}<p class="muted-note">Numeric fields accept expressions such as <code>valveSize / 2</code>. Named parameters are managed in Parameters.</p>`;
+        if (block?.symbol) {
+            const section = document.createElement('section'); section.className = 'inspector-section symbol-provenance';
+            section.innerHTML = `<h3>Symbol convention</h3><p>${E(block.symbol.standardRefs?.join(' / ') || block.symbol.convention || 'Custom block')}</p><p class="muted-note">Saved geometry revision ${E(block.symbol.geometryRevision || 'custom')} · ${E(block.symbol.review?.dimensionalConformance || 'not-verified')} dimensions</p>${btn('library-guide', 'Conventions & updates', 'help', 'btn')}`;
+            host.append(section);
+        }
         host.scrollTop = scroll;
     }
     constraintsHTML(selected) { const ids = new Set(selected.map(e => e.id)), cs = this.doc.constraints.filter(c => (c.entities || [c.entityId]).some(id => ids.has(id))); return cs.length ? `<div class="inspector-section"><h3>Sketch constraints</h3>${cs.map(c => `<div class="constraint-item">${icon('param')}<span>${E(c.type)}${c.value !== undefined ? ' = ' + E(c.value) : ''}</span><button data-constraint-delete="${E(c.id)}" title="Remove constraint">${icon('close')}</button></div>`).join('')}</div>` : ''; }
     onChange(event) {
         const t = event.target;
         try {
+            if (t.id === 'symbol-category') {
+                this.category = t.value; this.librarySearch = ''; this.$('#symbol-search').value = '';
+                this.renderLibrary(); this.$('.library-scroll').scrollTop = 0; return;
+            }
             if (t.dataset.activeLayer !== undefined) {
                 this.currentLayer = t.value;
                 this.updateStatus();
@@ -918,9 +949,7 @@ export class Workbench {
     obstacles() { return this.doc.entities.filter(e => e.type === 'INSERT' && isVisible(e, this.doc)).map(e => { const points = entityGeometry(e, this.doc, { tolerance: 1 }).paths.flatMap(p => p.points); return { ...bounds(points), id: e.id }; }).filter(validBounds); }
     routeConnection(start, end, waypoints = []) {
         const obstacles = this.obstacles();
-        if (waypoints.length)
-            return routeVia(start.p, end.p, waypoints, obstacles.filter(b => b.id !== start.ref?.entityId && b.id !== end.ref?.entityId), { clearance: 12 });
-        return routePorts({ ...start.p, entityId: start.ref?.entityId }, { ...end.p, entityId: end.ref?.entityId }, obstacles, { clearance: 12, lead: 22 });
+        return routePorts({ ...start.p, entityId: start.ref?.entityId }, { ...end.p, entityId: end.ref?.entityId }, obstacles, { clearance: 12, lead: 22, waypoints });
     }
     createConnector(start, end) {
         if (distance(start.p, end.p) < 1e-6) {
@@ -948,7 +977,7 @@ export class Workbench {
                 continue;
             const endpoint = (ref, fallback) => { const p = ref && ports(map.get(ref.entityId) || {}, this.doc).find(p => p.name === ref.port); return { p: p || fallback, ref: p ? ref : null }; };
             const a = endpoint(c.from, e.points[0]), b = endpoint(c.to, e.points.at(-1)), obs = obstacles.filter(o => o.id !== a.ref?.entityId && o.id !== b.ref?.entityId);
-            const route = c.waypoints?.length ? routeVia(a.p, b.p, c.waypoints, obs, { clearance: 12 }) : routePorts({ ...a.p, entityId: a.ref?.entityId }, { ...b.p, entityId: b.ref?.entityId }, obstacles, { clearance: 12, lead: 22 });
+            const route = routePorts({ ...a.p, entityId: a.ref?.entityId }, { ...b.p, entityId: b.ref?.entityId }, obstacles, { clearance: 12, lead: 22, waypoints: c.waypoints });
             e.points = route.points;
             c.status = route.status;
             e.dirty = true;
@@ -1786,26 +1815,31 @@ export class Workbench {
     }
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }
     toast(message, error = false) { const el = this.$('.toast'); el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
-    newDialog() { this.openModal('Create a drawing', `<p>Your current drawing is saved to this device before switching. Export a project copy for a portable backup.</p><div class="export-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Start with a clean DXF-native model.</small></span></button><button class="export-option" data-demo="pid">${icon('connect')}<span><strong>Process water skid</strong><small>P&ID equipment and instrument connections.</small></span></button><button class="export-option" data-demo="electrical">${icon('bolt')}<span><strong>Motor control circuit</strong><small>Electrical component and wire example.</small></span></button><button class="export-option" data-demo="flow">${icon('graph')}<span><strong>Commissioning workflow</strong><small>Flowchart shapes and routed decisions.</small></span></button></div>`); }
+    newDialog() {
+        this.openModal('Create a drawing', `<p>Your current drawing is saved before switching. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
+        const input = this.modal.querySelector('#template-search');
+        input.addEventListener('input', () => {
+            const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+            let count = 0;
+            this.modal.querySelectorAll('[data-search]').forEach(card => { const show = words.every(word => card.dataset.search.includes(word)); card.hidden = !show; if (show) count++; });
+            this.modal.querySelector('.template-count').textContent = `${count} matching drawing starters`;
+        });
+    }
     async newDocument(kind) {
+        if (this.switchingDocument) return;
+        this.switchingDocument = true;
         try {
-            await this.store.save(this.doc, uid('project'));
-        }
-        catch {
-            this.toast('Previous project could not be saved. Export it before starting a new drawing.', true);
-            return;
-        }
-        this.closeModal();
-        this.cancelGesture();
-        this.doc = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
-        this.selection.clear();
-        this.history.clear();
-        this.currentLayer = 'Process';
-        this.renderer.setDocument(this.doc);
-        this.setTool('select');
-        this.updateUI();
-        this.renderer.fit();
-        this.store.schedule(this.doc);
+            const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
+            try { await this.store.save(this.doc, uid('project')); }
+            catch { this.toast('Previous project could not be saved. Export it before starting a new drawing.', true); return; }
+            const profile = DRAWING_TYPES.find(p => p.id === kind);
+            this.closeModal(); this.closePanels(); this.cancelGesture();
+            this.doc = next; this.selection.clear(); this.history.clear();
+            this.category = profile?.categories[0] || 'P&ID'; this.lineStyle = profile?.defaultLineStyle || 'process';
+            this.currentLayer = LINE_STYLES.find(s => s.id === this.lineStyle)?.layer || 'Process';
+            this.librarySearch = ''; this.$('#symbol-search').value = '';
+            this.renderer.setDocument(this.doc); this.setTool('select'); this.updateUI(); this.renderer.fit(); this.store.schedule(this.doc);
+        } finally { this.switchingDocument = false; }
     }
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
     exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>Normalized planar CAD entities, blocks, layers and tags.</small></span></button><button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
@@ -2069,7 +2103,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.2.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>64</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, full paper-layout/XCLIP behavior, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.2.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>13</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, dynamic blocks, XREF resolution, associative hatch editing, full paper-layout/XCLIP behavior, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Gradient hatches retain their data but use a flat-color preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

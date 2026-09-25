@@ -16,6 +16,9 @@ export interface Port extends Point {
     dx: number;
     dy: number;
     entityId?: string;
+    /** Semantic medium/function; diagrams do not imply simulation or sizing. */
+    medium?: string;
+    role?: string;
 }
 export interface PortReference {
     entityId: string;

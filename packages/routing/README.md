@@ -1,6 +1,6 @@
 # @conduitcad/routing
 
-Obstacle-aware orthogonal connector routing. Version **0.1.0**, native ESM JavaScript, MIT license.
+Obstacle-aware orthogonal connector routing. Version **0.2.1**, native ESM JavaScript, MIT license.
 
 Visibility grid routing with directional A*, bend penalties, port leads, waypoints and explicit blocked fallback status.
 

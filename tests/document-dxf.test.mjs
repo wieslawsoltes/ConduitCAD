@@ -8,11 +8,11 @@ import { writeSVG, writeBOM } from '@conduitcad/exchange';
 import { distance } from '@conduitcad/geometry';
 const near = (a, b, t = 1e-5) => assert.ok(Math.abs(a - b) < t, `${a} != ${b}`);
 const dxf = entities => '0\nSECTION\n2\nENTITIES\n' + entities + '0\nENDSEC\n0\nEOF\n';
-test('all 64 symbol masters have finite geometry and valid named ports', () => {
+test('all 223 symbol masters have finite geometry and valid named ports', () => {
     const d = installSymbols(createDocument());
-    assert.equal(SYMBOLS.length, 64);
-    assert.equal(LINE_STYLES.length, 10);
-    assert.equal(new Set(SYMBOLS.map(s => s.id)).size, 64);
+    assert.equal(SYMBOLS.length, 223);
+    assert.equal(LINE_STYLES.length, 21);
+    assert.equal(new Set(SYMBOLS.map(s => s.id)).size, 223);
     for (const s of SYMBOLS) {
         const e = insertSymbol(d, s.id, 200, 300), g = entityGeometry(e, d);
         assert.ok(g.paths.length + g.texts.length > 0, s.id);

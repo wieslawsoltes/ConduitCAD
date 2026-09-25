@@ -12,7 +12,9 @@ archives. No archive reconstruction or download from this conversation is needed
 Pushes to `main` and manual runs on `main` additionally deploy `dist/` to the
 `github-pages` environment. The pipeline links local packages without downloading
 npm dependencies, runs unit tests, builds the app, packs all thirteen modules,
-then runs browser/touch workflows and independent DXF validation.
+then generates the 223-master atlas/specimen and twenty starters, runs the
+catalogue/touch browser suite, and independently audits every master and starter
+with ezdxf. The previous DXF fidelity and interaction suites remain required.
 
 After deployment, `scripts/verify-pages.mjs` requests the real project root and
 all eight other production resources, including the standalone HTML, worker,

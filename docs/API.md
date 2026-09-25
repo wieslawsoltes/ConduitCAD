@@ -192,3 +192,36 @@ is available through the storage API, not a full recent-files browser.
 `graphFromDocument` returns nodes, directed edges and adjacency. Text and SVG
 markup are escaped. CSV is a data export, not a database synchronization engine;
 review externally sourced tag values before opening them in spreadsheet tools.
+
+## Revision-3 engineering libraries and industry starters
+
+```js
+import {
+  SYMBOLS, CATEGORIES, STANDARD_REFERENCES, DRAWING_TYPES,
+  searchSymbols, createDrawing, auditSymbols, symbolUpdates, updateSymbolDefinitions
+} from '@conduitcad/symbols';
+
+const hydraulic = createDrawing('hydraulic-actuator');
+const valves = searchSymbols('valve', {category: 'Hydraulics', standard: 'ISO-1219-1'});
+const issues = auditSymbols().flatMap(result => result.errors);
+// Convention references are not dimensional or engineering approval.
+console.log(CATEGORIES.length, SYMBOLS.length, DRAWING_TYPES.length); // 11, 223, 20
+console.log(STANDARD_REFERENCES['ISO-1219-1'].scope, valves.length, issues.length);
+
+// Explicit saved-project migration, never invoked automatically by installSymbols.
+const updates = symbolUpdates(documentModel);
+history.run('Update selected symbol definitions', () => {
+  updateSymbolDefinitions(documentModel, updates.map(master => master.id));
+  // Invoke the host's connection rerouting and renderer invalidation here.
+});
+```
+
+Search uses case/accent-normalized multiword matching across names, IDs, groups,
+aliases and reference families. Search limits/categories/references are optional.
+Symbol metadata is serialized through the existing Conduit DXF XDATA convention;
+foreign CAD applications see normal blocks/primitives, not a proprietary stencil.
+
+`routePorts` now accepts `waypoints` in its options. It creates terminal-normal
+escape stubs, keeps endpoint bodies as obstacles, and rejects colliding escape
+stubs. This prevents a return route from passing back through a directional-valve
+body. `routeVia` remains the free-point waypoint router; it does not infer ports.

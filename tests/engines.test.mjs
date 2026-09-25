@@ -52,3 +52,18 @@ test('router reports blocked endpoints and safety limits, never claims successfu
 test('port leads and waypoints preserve exact endpoints', () => { const from = { x: 0, y: 0, dx: 1, dy: 0, entityId: 'a' }, to = { x: 100, y: 50, dx: -1, dy: 0, entityId: 'b' }, r = routePorts(from, to, [{ id: 'a', minX: -40, minY: -40, maxX: 0, maxY: 40 }]); assert.equal(r.status, 'routed'); near(r.points[0].x, 0); near(r.points.at(-1).y, 50); const v = routeVia({ x: 0, y: 0 }, { x: 100, y: 0 }, [{ x: 50, y: 40 }], []); assert.equal(v.status, 'routed'); assert.ok(v.points.some(p => p.x === 50 && p.y === 40)); });
 test('directed graph preserves port references', () => { const d = createDocument(); d.entities = [{ type: 'INSERT', id: 'a', tag: 'A', block: 'X' }, { type: 'INSERT', id: 'b', tag: 'B', block: 'X' }, { id: 'wire', connector: { from: { entityId: 'a', port: 'out' }, to: { entityId: 'b', port: 'in' }, style: 'electrical' } }]; const g = graphFromDocument(d); assert.equal(g.nodes.length, 2); assert.equal(g.edges[0].fromPort, 'out'); assert.equal(g.adjacency.a[0].to, 'b'); });
 test('spatial updates remove stale hits and discover objects outside original tree bounds', () => { const items = Array.from({ length: 1000 }, (_, i) => ({ id: i, minX: i, minY: 0, maxX: i + 1, maxY: 1 })), idx = new SpatialIndex(items); idx.update([{ id: 10, minX: 10000, minY: 10000, maxX: 10010, maxY: 10010 }]); assert.ok(!idx.search({ minX: 10, minY: 0, maxX: 11, maxY: 1 }).some(x => x.id === 10)); assert.deepEqual(idx.search({ minX: 9999, minY: 9999, maxX: 10011, maxY: 10011 }).map(x => x.id), [10]); assert.equal(idx.size, 1000); assert.throws(() => idx.update([{ id: 'missing', minX: 0, minY: 0, maxX: 1, maxY: 1 }]), /existing/); });
+
+test('port routing does not re-enter the bodies of its own endpoint equipment', () => {
+    const obstacles=[{id:'a',minX:-40,minY:0,maxX:40,maxY:100},{id:'b',minX:-30,minY:160,maxX:30,maxY:200}];
+    const r=routePorts({x:0,y:0,dx:0,dy:-1,entityId:'a'},{x:0,y:200,dx:0,dy:1,entityId:'b'},obstacles,{clearance:8});
+    assert.equal(r.status,'routed');assert.ok(r.points[1].y<0);assert.ok(r.points.at(-2).y>200);
+    for(let i=1;i<r.points.length-2;i++) for(const b of obstacles) assert.ok(!segmentIntersectsBox(r.points[i],r.points[i+1],b));
+});
+test('a waypoint inside endpoint equipment is rejected rather than routed through its body', () => {
+    const r=routePorts({x:0,y:0,dx:0,dy:-1,entityId:'a'},{x:140,y:100,dx:1,dy:0,entityId:'b'},[{id:'a',minX:-40,minY:0,maxX:40,maxY:100}],{waypoints:[{x:0,y:40}]});
+    assert.equal(r.status,'blocked');
+});
+test('port routing validates lead and clearance budgets', () => {
+    assert.throws(()=>routePorts({x:0,y:0},{x:1,y:1},[],{lead:-1}),/Invalid/);
+    assert.throws(()=>routePorts({x:0,y:0},{x:1,y:1},[],{clearance:Infinity}),/Invalid/);
+});

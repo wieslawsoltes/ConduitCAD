@@ -41,3 +41,11 @@ const transform = objectCoordinateTransform({x: 0, y: 0, z: -1}, 8);
 const viewScene = buildScene(native, {view: {minX: 0, minY: 0, maxX: 100, maxY: 100}});
 const inside: boolean = renderer.containsPoint({x: 40, y: 40});
 void [hatch, layout.lines, transform, viewScene.diagnostics, inside, renderer.stats.compositor];
+
+import {CATEGORIES, SYMBOLS, DRAWING_TYPES, STANDARD_REFERENCES, searchSymbols, auditSymbols, symbolUpdates, updateSymbolDefinitions, createDrawing, type SymbolMaster} from '@conduitcad/symbols';
+const master: SymbolMaster | undefined = searchSymbols('pump',{category:'Hydraulics',standard:'ISO-1219-1',limit:4})[0];
+const templates: string[] = DRAWING_TYPES.map(t=>t.industry);
+const auditErrors: string[] = auditSymbols().flatMap(r=>r.errors);
+const newer = symbolUpdates(documentModel).map(s=>s.id);
+updateSymbolDefinitions(documentModel,newer);
+void [master?.ports[0]?.medium, CATEGORIES[0].description, STANDARD_REFERENCES['ISO-1219-1'].scope, SYMBOLS[0].symbol.review, templates, auditErrors, createDrawing('water-treatment')];

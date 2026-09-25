@@ -90,12 +90,30 @@ export function routeOrthogonal(start, end, obstacles = [], options = {}) {
         path.push({ x: x[n.i], y: y[n.j] });
     return { points: simplifyOrthogonal(path.reverse()), status: 'routed', visited };
 }
+/** Exit endpoint envelopes along the named terminal normal, then keep both bodies
+ * in the visibility graph. Dropping them lets a route re-enter its own equipment.
+ */
 export function routePorts(from, to, obstacles = [], options = {}) {
-    const lead = options.lead ?? 20;
-    const a = add(from, mul(normalize({ x: from.dx || 0, y: from.dy || 0 }), lead)), b = add(to, mul(normalize({ x: to.dx || 0, y: to.dy || 0 }), lead));
-    const filtered = obstacles.filter(o => o.id !== from.entityId && o.id !== to.entityId);
-    const r = routeOrthogonal(a, b, filtered, options);
-    return { ...r, points: simplifyOrthogonal([from, ...r.points, to]) };
+    const lead = options.lead ?? 20, clearance = options.clearance ?? 14;
+    if (!Number.isFinite(lead) || lead < 0 || !Number.isFinite(clearance) || clearance < 0) throw new RangeError('Invalid routing lead or clearance');
+    const escape = port => {
+        const direction = normalize({ x: port.dx || 0, y: port.dy || 0 });
+        let length = lead;
+        const own = obstacles.find(o => port.entityId && o.id === port.entityId);
+        if (own && contains(inflate(own, clearance), port)) {
+            const box = inflate(own, clearance), exits = [];
+            for (const axis of ['x', 'y']) {
+                const v = direction[axis];
+                if (Math.abs(v) > 1e-9) exits.push(((axis === 'x' ? (v > 0 ? box.maxX : box.minX) : (v > 0 ? box.maxY : box.minY)) - port[axis]) / v);
+            }
+            if (exits.length) length = Math.max(length, Math.min(...exits) + .01);
+        }
+        return add(port, mul(direction, length));
+    };
+    const a = escape(from), b = escape(to);
+    const r = options.waypoints?.length ? routeVia(a, b, options.waypoints, obstacles, options) : routeOrthogonal(a, b, obstacles, options);
+    const crossed = [[from, a], [to, b]].some(([port, exit]) => obstacles.some(o => o.id !== port.entityId && segmentIntersectsBox(port, exit, inflate(o, clearance))));
+    return { ...r, ...(crossed ? { status: 'blocked', reason: 'A terminal escape crosses another obstacle' } : {}), points: simplifyOrthogonal([from, ...r.points, to]) };
 }
 export function routeVia(start, end, waypoints, obstacles = [], options = {}) {
     const pts = [start, ...waypoints, end], out = [];

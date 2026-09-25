@@ -1,6 +1,6 @@
 # @conduitcad/workbench
 
-Touch-first CAD and diagramming workbench. Version **0.1.0**, native ESM JavaScript, MIT license.
+Touch-first CAD and diagramming workbench. Version **0.2.1**, native ESM JavaScript, MIT license.
 
 Complete DOM UI with library, editing tools, numeric properties, routing, parameters, layer controls and local file workflows. CSS and keyboard handling expect one workbench per document.
 

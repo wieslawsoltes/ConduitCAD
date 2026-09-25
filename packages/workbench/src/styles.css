@@ -30,3 +30,31 @@
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #13816f;outline-offset:2px}
 @media(pointer:coarse){.icon-btn,.zoom-controls button,.layer-row button{min-width:44px;min-height:44px}.symbol-drag-handle{opacity:.7}.field input,.field select{font-size:16px}.tool-dock button{min-width:44px;min-height:48px}}
 @media(max-width:900px){.zoom-controls{gap:0;max-width:calc(100% - 48px)}.zoom-controls .zoom-value{min-width:48px}.library-scroll{padding-bottom:max(28px,env(safe-area-inset-bottom))}.modal{max-height:calc(100dvh - 24px);overscroll-behavior:contain}.modal-body{min-height:0;overflow:auto;overscroll-behavior:contain}.tool-hint{max-width:calc(100% - 56px)}}
+
+/* Large mobile-first engineering catalogue; selectors remain native and keyboard accessible. */
+.category-tabs { padding:0; background:none; margin-bottom:6px; }
+.category-tabs select { width:100%; min-height:44px; font-size:12px; background:var(--panel); }
+.library-summary { margin:0 16px 10px; color:#74857b; font-size:10px; }
+.symbol-card { min-width:0; min-height:119px; }
+.symbol-card .symbol-convention { font-size:8px; color:#82958c; line-height:1.3; max-width:100%; overflow-wrap:anywhere; }
+.library-footer { padding:4px 7px; }
+.library-footer button { width:100%; min-height:44px; font-size:10px; }
+.template-count { margin:8px 0 14px; color:var(--muted); font-size:11px; }
+.template-card { min-height:200px; align-items:stretch; }
+.template-content { display:flex; flex-direction:column; gap:7px; width:100%; min-width:0; }
+.template-industry { color:var(--teal)!important; text-transform:uppercase; letter-spacing:.5px; font-size:9px!important; }
+.template-preview { display:flex; gap:14px; height:52px; margin:7px 0; color:#456e68; }
+.template-preview svg { width:72px; max-width:28%; height:52px; }
+.template-grid [hidden] { display:none!important; }
+.convention-list { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:18px 0; }
+.convention-list section { border:1px solid var(--border); border-radius:9px; padding:12px; }
+.convention-list p { margin:5px 0; font-size:11px; }
+.convention-list small { color:var(--teal); font-size:10px; }
+.symbol-provenance p { overflow-wrap:anywhere; }
+@media (max-width:600px) {
+    .category-tabs select { min-height:44px; font-size:14px; }
+    .library-summary { margin-bottom:6px; }
+    .convention-list { grid-template-columns:1fr; }
+    .template-card { min-height:188px; }
+}
+@media(max-width:720px){.library-footer{display:flex;padding:4px 14px;flex-shrink:0}.library-footer button{width:100%;font-size:11px}.library-scroll{min-height:0}}
