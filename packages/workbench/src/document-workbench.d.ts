@@ -1,0 +1,17 @@
+export function createDocumentHistory(w: any): History;
+export function captureActiveDocument(w: any): void;
+export function initializeDocuments(w: any): void;
+export function claimWorkspace(w: any): Promise<void>;
+export function forkRecoveryWorkspace(w: any): Promise<void>;
+export function recoverDocuments(w: any): Promise<boolean>;
+export function documentChanged(w: any): void;
+export function scheduleRecovery(w: any): void;
+export function activateDocument(w: any, id: any): any;
+export function openDocument(w: any, document: any, options?: {}): any;
+export function renderDocuments(w: any): void;
+export function requestCloseDocument(w: any, id: any): Promise<void>;
+export function documentList(w: any): void;
+export function documentAction(w: any, action: any): Promise<void>;
+export function documentKeyDown(w: any, event: any): boolean;
+export function disposeDocuments(w: any): any;
+import { History } from '@conduitcad/history';

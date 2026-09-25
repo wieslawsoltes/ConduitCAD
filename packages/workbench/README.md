@@ -1,8 +1,8 @@
 # @conduitcad/workbench
 
-Touch-first CAD and diagramming workbench. Version **0.5.0**, native ESM JavaScript, MIT license.
+Touch-first CAD and diagramming workbench. Version **0.7.0**, native ESM JavaScript, MIT license.
 
-Complete DOM UI with library, editing tools, numeric properties, routing, parameters, layer controls and local file workflows. CSS and keyboard handling expect one workbench per document.
+Complete DOM UI with library, editing tools, numeric properties, routing, parameters, layer controls and local file workflows. CSS and keyboard handling expect one workbench per browser document (with multiple drawing sessions).
 
 ## Use
 
@@ -20,7 +20,11 @@ model, history, routing, constraints, symbol, DXF and scene compilation engines
 can also be used in Node.js. There are no external runtime dependencies beyond
 the following sibling packages.
 
-**Dependencies:** `@conduitcad/geometry`, `@conduitcad/spatial`, `@conduitcad/model`, `@conduitcad/history`, `@conduitcad/constraints`, `@conduitcad/routing`, `@conduitcad/symbols`, `@conduitcad/dxf`, `@conduitcad/renderer`, `@conduitcad/input`, `@conduitcad/storage`, `@conduitcad/exchange`.
+Multi-document API: await `ready`, then `openDocument`, `activateDocument`,
+`closeDocument`, `saveAllDocuments`. `documents` exposes the DOM-free session
+manager. See `docs/MULTI_DOCUMENT.md` for recovery and ownership contracts.
+
+**Dependencies:** `@conduitcad/workspace`, `@conduitcad/drawing`, `@conduitcad/geometry`, `@conduitcad/spatial`, `@conduitcad/model`, `@conduitcad/history`, `@conduitcad/constraints`, `@conduitcad/routing`, `@conduitcad/symbols`, `@conduitcad/dxf`, `@conduitcad/renderer`, `@conduitcad/input`, `@conduitcad/storage`, `@conduitcad/exchange`.
 
 ## Public exports
 

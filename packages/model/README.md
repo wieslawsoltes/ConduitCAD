@@ -1,6 +1,6 @@
 # @conduitcad/model
 
-DXF-native editable document model. Version **0.5.0**, native ESM JavaScript, MIT license.
+DXF-native editable document model. Version **0.7.0**, native ESM JavaScript, MIT license.
 
 JSON-safe CAD entities, native BLOCK/INSERT definitions, layers, ports, tags, geometry expansion and transformations.
 

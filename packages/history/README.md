@@ -1,6 +1,6 @@
 # @conduitcad/history
 
-Synchronous transactional undo/redo. Version **0.5.0**, native ESM JavaScript, MIT license.
+Synchronous transactional undo/redo. Version **0.7.0**, native ESM JavaScript, MIT license.
 
 Snapshot transactions, no-op suppression, redo invalidation, cancellation and exception rollback. Whole-document snapshots have explicit size limits.
 

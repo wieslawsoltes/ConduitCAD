@@ -1,18 +1,32 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.6.0.**
+**Touch-first, DXF-native 2D CAD and diagramming. Version 0.7.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar
 geometry kernel, parameter expressions and an analytic planar constraint solver.
 WebGPU strokes and compute culling are implemented, with WebGL2 and Canvas 2D
-fallbacks. The application is built from 14 independently packaged ES modules.
+fallbacks. The application is built from 15 independently packaged ES modules.
 
 This is an engineering foundation, **not full AutoCAD, Visio, universal DXF,
 or certified engineering-system parity**. Read [the exact compatibility
 boundary](docs/DXF_COMPATIBILITY.md) before importing production drawings.
 
 ![Desktop workbench](artifacts/desktop-canvas.png)
+
+## Multi-document workspace and mobile editing
+
+Version 0.7.0 adds independent document tabs, a searchable switcher, multi-file
+DXF/project import, per-tab undo/view/selection/settings, suspended block-editor
+drafts and conflict-safe cross-document block paste. New/Open no longer replace
+the current drawing. Device recovery checkpoints the open set and active tab
+atomically; Save-and-close failures retain the drawing. Recently closed recovery
+copies can be reopened. Export still downloads the active document only.
+
+Mobile adds scrollable 44px tabs, expandable library/property sheets, compact
+landscape file controls and tool rail, safe-area spacing and VisualViewport-aware
+keyboard layout. See [Multi-document workflows and recovery contract](docs/MULTI_DOCUMENT.md)
+for controls, persistence limits, accessibility, APIs and test scope.
 
 ## Expanded native drawing tools
 
@@ -88,7 +102,7 @@ ordered fills, masked text, long dash arrays or dotted ink use the Canvas 2D
 fidelity compositor even when a GPU stroke backend is available.
 
 Useful startup options: `?renderer=canvas`, `?renderer=webgl2`,
-`?renderer=webgpu`, `?fresh=1` to skip loading the autosave, and `?no-sw=1` to
+`?renderer=webgpu`, `?fresh=1` to skip loading the saved workspace, and `?no-sw=1` to
 skip registration of the service worker. `fresh` does not delete saved data.
 The single-file build does not register a service worker.
 
@@ -122,7 +136,7 @@ and layer panels, keyboard shortcuts, crossing/window selection, and command pal
 | Blocks | Graphical isolated editor, save/test/save-as, shared and nested reference updates, attribute synchronization, six parameter types, ten action types and constraint-based instances |
 | Symbols | 223 original editable block masters in 11 categories; 21 line/connection styles; safe explicit migration; custom blocks from selected geometry |
 | Connections | Named ports, obstacle-aware orthogonal A*, port leads, bend penalties, explicit waypoints, live rerouting, directed graph export |
-| Drawing management | Visible/locked/color layers, active layer and basic layout filtering, local autosave/recovery and portable native project files |
+| Drawing management | Visible/locked/color layers, active layer and basic layout filtering, independent document tabs, atomic workspace recovery and portable native project files |
 | QA | Duplicate tags, missing blocks, zero-length lines, bad radii, free/missing connector endpoints, blocked routes, import-fidelity diagnostics |
 | Exchanges | ASCII/binary DXF import; normalized ASCII/binary DXF R2000–R2018 export; native JSON, SVG, PNG, equipment CSV and graph JSON; original DXF download |
 | Rendering | Batched WebGPU strokes and compute culling, indirect draws, retained geometry, camera-relative Float32 uploads, adaptive tessellation, incremental same-topology edits; WebGL2 and Canvas fallbacks |
@@ -182,6 +196,7 @@ See [symbol conventions](docs/SYMBOLS.md), [release notes](RELEASE_NOTES.md) and
 | `@conduitcad/dxf` | Group-code readers, normalized writer, diagnostics and preservation |
 | `@conduitcad/renderer` | Camera, retained scene compiler and three rendering backends |
 | `@conduitcad/input` | Multi-pointer gesture arbitration and wheel/context input |
+| `@conduitcad/workspace` | Independent document sessions, ordered tabs, serialized checkpoints and clipboard block merging |
 | `@conduitcad/storage` | Browser-local IndexedDB / localStorage recovery and downloads |
 | `@conduitcad/exchange` | SVG, PNG, equipment schedules and public exchange helpers |
 | `@conduitcad/workbench` | Application shell, tool state, touch UI and property editors |

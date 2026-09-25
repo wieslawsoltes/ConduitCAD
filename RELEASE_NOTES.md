@@ -1,3 +1,32 @@
+# Conduit CAD 0.7.0 — multiple drawings and mobile workspace
+
+- Independent document tabs retain document/history/selection/camera/layout,
+  snapping/layer/library state, accepted drawing commands and isolated block drafts.
+- Single active renderer; native multi-file input/drop is ordered and failure-safe.
+  Cross-document paste remaps colliding block names and preserves existing masters.
+- Document switcher provides search, duplicate, reorder, close, reopen saved closed
+  drawings and Save all. Save-and-close waits for successful device checkpoints.
+- Serialized revision-aware checkpoints atomically write open records and manifest
+  to IndexedDB; single-value localStorage fallback, legacy autosave migration,
+  per-window namespaces, guarded Web Locks ownership and non-destructive recovery.
+- Mobile 44px scrollable tabs, expandable inert-hidden sheets, compact landscape
+  controls/rail, safe-area handling and VisualViewport-driven keyboard layout.
+- New DOM-free @conduitcad/workspace; all fifteen package archives versioned 0.7.0.
+
+Validation: 450 Node tests (35 new); 55 new browser workspace/mobile checks locally,
+plus six native IndexedDB/multi-window checks when run on localhost. The 246 inherited integrated
+browser checks remain. Browser execution is Canvas 2D and emulated touch. Local
+recovery tests use real fallback serialization over test memory Web Storage; CI
+runs the production app on localhost with native IndexedDB. No physical-device
+keyboard, storage durability or hardware GPU qualification is implied.
+
+Recovery does not persist undo/redo or clipboard; a Test Block recovers its master
+draft rather than scratch history. No cloud sync, concurrent collaborative editing,
+workspace file container or universal foreign-DXF-object cloning is added.
+See docs/MULTI_DOCUMENT.md and docs/VALIDATION.md.
+
+---
+
 # Conduit CAD 0.6.0 — expanded native drawing tools
 
 - 28 new drawing workflows across 15 native DXF entity families, in a searchable

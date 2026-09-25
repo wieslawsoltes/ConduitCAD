@@ -89,5 +89,13 @@ export class PointerController {
         catch { }
     }
     clearLong() { clearTimeout(this.longTimer); this.longTimer = null; }
+    reset() {
+        this.clearLong();
+        for (const id of this.pointers.keys()) {
+            try { if (this.element.hasPointerCapture(id)) this.element.releasePointerCapture(id); } catch {}
+        }
+        this.pointers.clear(); this.gesture = null;
+        this.handlers.cancel?.('document-switch');
+    }
     dispose() { this.clearLong(); this.abort.abort(); this.pointers.clear(); }
 }

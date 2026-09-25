@@ -1,0 +1,11 @@
+export function restoreHistory(w: any): History;
+export function startBlockEditor(w: any, name: any): void;
+export function finishBlockEditor(w: any, save?: boolean, stay?: boolean, newName?: any): import("@conduitcad/model").BlockUpdateReport;
+export function renderBlockBar(w: any): void;
+export function renderParametricInspector(w: any, host: any): void;
+export function constraintAuthor(w: any): void;
+export function parameterManager(w: any): void;
+export function refreshCalculations(w: any): void;
+export function drawParametricOverlay(w: any, ctx: any, cam: any): void;
+export function parametricAction(w: any, action: any): boolean;
+import { History } from '@conduitcad/history';

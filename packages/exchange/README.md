@@ -1,6 +1,6 @@
 # @conduitcad/exchange
 
-Diagram interchange and reports. Version **0.5.0**, native ESM JavaScript, MIT license.
+Diagram interchange and reports. Version **0.7.0**, native ESM JavaScript, MIT license.
 
 SVG and BOM CSV export, directed connection graph extraction and portable project serialization.
 

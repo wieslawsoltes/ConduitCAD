@@ -1,5 +1,16 @@
 # Architecture and rendering contract
 
+## Multi-document ownership
+
+`workspace` owns independent session identities, order, dirty revisions and a
+serialized checkpoint queue. `workbench/document-workbench` captures and activates
+per-tab model/history/tool/view/block state while sharing one active renderer and
+pointer host. In-flight pointer edits are rolled back before activation; accepted
+command points and block drafts are retained. `storage` commits a manifest and all
+open snapshots in one IndexedDB transaction (or one fallback Web Storage value).
+Session contexts and histories are not implicitly serialized. See MULTI_DOCUMENT.md
+for recovery, close semantics, identity/locking, memory costs and embedding APIs.
+
 ## Native construction sessions
 
 `drawing` provides the 28 tool descriptors, native construction factories and

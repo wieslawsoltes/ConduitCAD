@@ -8,13 +8,13 @@ const number=n=>Number.isFinite(n)?Number(n.toPrecision(8)).toString():'—';
 const field=(name,label,value,type='input')=>`<label class="field">${E(label)}<${type} data-block-field="${name}" ${type==='input'?`value="${E(value)}"`:''}>${type==='textarea'?E(value):''}</${type}></label>`;
 const readFields=w=>Object.fromEntries([...w.modal.querySelectorAll('[data-block-field]')].map(e=>[e.dataset.blockField,e.value]));
 function cameraState(w){return {x:w.camera.x,y:w.camera.y,scale:w.camera.scale};}
-function restoreHistory(w){return new History({capture:()=>w.doc,restore:d=>{w.doc=d;w.selection=new Set([...w.selection].filter(id=>d.entities.some(e=>e.id===id)));w.renderer.setDocument(d);w.updateUI();},onChange:()=>{w.updateHistory();w.updateUI();}});}
+export function restoreHistory(w){return new History({capture:()=>w.doc,restore:d=>{w.doc=d;w.selection=new Set([...w.selection].filter(id=>d.entities.some(e=>e.id===id)));w.renderer.setDocument(d);w.updateUI();},onChange:()=>{w.updateHistory();w.updateUI();w.documentChanged?.();}});}
 export function startBlockEditor(w,name){
     if(w.blockSession)throw new Error('Save or close the current block editor first');
     const session=beginBlockEdit(w.doc,name);
     session.parentDocument=w.doc;session.parentHistory=w.history;session.parentSelection=[...w.selection];session.parentCamera=cameraState(w);session.parentLayer=w.currentLayer;session.parentCategory=w.category;
     w.closeModal();w.setTool('select');w.closePanels();w.blockSession=session;w.doc=session.draft;w.selection.clear();w.lastSolve=null;w.currentLayer='0';w.category='Custom';
-    w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);w.openPanel('inspector');
+    w.history=restoreHistory(w);w.renderer.setDocument(w.doc);w.updateUI();w.renderer.fit();renderBlockBar(w);w.openPanel('inspector');w.scheduleRecovery?.();
 }
 export function finishBlockEditor(w,save=false,stay=false,newName=null){
     const s=w.blockSession;if(!s)throw new Error('The block editor is not open');
@@ -41,13 +41,13 @@ export function finishBlockEditor(w,save=false,stay=false,newName=null){
         if(stay&&!newName){const again=beginBlockEdit(s.parentDocument,s.name);s.signature=again.signature;w.toast(`Saved block; ${report.updatedInserts} inserts updated`);renderBlockBar(w);return report;}
     }
     w.setTool('select');w.doc=s.parentDocument;w.history=s.parentHistory;w.selection=new Set(s.parentSelection);w.currentLayer=s.parentLayer;w.category=s.parentCategory;Object.assign(w.camera,s.parentCamera);w.blockSession=null;w.lastSolve=null;
-    w.$('.block-editor-bar')?.remove();for(const button of w.root.querySelectorAll('.appbar button:disabled'))button.disabled=false;w.renderer.setDocument(w.doc);w.updateUI();w.renderer.resize();w.renderer.invalidate();w.store.schedule(w.doc);
+    w.$('.block-editor-bar')?.remove();for(const button of w.root.querySelectorAll('.appbar button:disabled'))button.disabled=false;w.renderer.setDocument(w.doc);w.updateUI();w.renderer.resize();w.renderer.invalidate();w.scheduleRecovery?.();
     if(save)w.toast(`Block saved; ${report.updatedInserts} direct/nested inserts updated`);else w.toast('Block edit cancelled; drawing unchanged');
     return report;
 }
-function renderBlockBar(w){
+export function renderBlockBar(w){
     w.$('.block-editor-bar')?.remove();if(!w.blockSession)return;
-    for(const button of w.root.querySelectorAll('.appbar [data-action="open"],.appbar [data-action="new"],.appbar [data-action="export"]')){button.disabled=true;button.title='Save or close the block editor first';}
+    for(const button of w.root.querySelectorAll('.appbar [data-action="export"]')){button.disabled=true;button.title='Save or close the block editor first';}
     const bar=document.createElement('nav');bar.className='block-editor-bar';bar.setAttribute('aria-label','Block editor');
     bar.innerHTML=`<strong>${w.blockSession.testing?'TEST BLOCK':'BLOCK EDITOR'} · ${E(w.blockSession.name)}</strong><div>${w.blockSession.testing?B('block-test-close','Return to editor'):`${B('block-save','Save block')}${B('block-save-close','Save & close')}${B('block-test','Test block')}${B('block-settings','Base / ports / attributes')}${B('block-author','Parameters & actions')}${B('block-close','Discard & close')}`}</div>`;
     w.$('.workbar').after(bar);w.renderer.resize();

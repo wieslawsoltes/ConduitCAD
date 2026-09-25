@@ -1,17 +1,25 @@
+export interface WorkbenchOptions {
+    document?: import('@conduitcad/model').CadDocument;
+    backend?: 'auto' | 'canvas' | 'webgl2' | 'webgpu';
+    store?: import('@conduitcad/storage').ProjectStore;
+    workspaceKey?: string;
+    maxDocuments?: number;
+}
+export interface DocumentOpenOptions { context?: Record<string, any>; }
 export function symbolSVG(block: any, doc: any, extra?: string): string;
-export function mountWorkbench(element: any, options?: {}): Workbench;
+export function mountWorkbench(element: any, options?: WorkbenchOptions): Workbench;
 export class Workbench {
-    beginBlockEdit(name: string): void;
-    saveBlockEdit(close?: boolean): import("@conduitcad/model").BlockUpdateReport | null;
-    cancelBlockEdit(): void;
-    constructor(root: any, options?: {});
+    constructor(root: any, options?: WorkbenchOptions);
     root: any;
-    options: {};
+    options: WorkbenchOptions;
+    initializing: boolean;
+    documents: import('@conduitcad/workspace').DocumentWorkspace<any>;
+    drawingSession: import('@conduitcad/drawing').DrawingSession | null;
+    blockSession: any;
+    drawingOptions: Record<string, Record<string, any>>;
     doc: any;
     selection: Set<any>;
     tool: string;
-    drawingSession: import("@conduitcad/drawing").DrawingSession | null;
-    drawingOptions?: Partial<Record<import("@conduitcad/drawing").DrawingToolId, import("@conduitcad/drawing").DrawingOptions>>;
     category: string;
     librarySearch: string;
     inspectorTab: string;
@@ -25,6 +33,7 @@ export class Workbench {
     clipboard: {
         entities: any;
         blocks: any;
+        layers: any;
     };
     pointer: any;
     connectionStart: any;
@@ -33,7 +42,7 @@ export class Workbench {
     solver: ConstraintSolver;
     camera: Camera;
     renderer: CadRenderer;
-    store: ProjectStore;
+    store: any;
     history: History;
     input: PointerController;
     ready: Promise<this>;
@@ -44,7 +53,7 @@ export class Workbench {
     bindEvents(): void;
     space: boolean;
     onClick(event: any): Promise<void>;
-    suppressLibraryClick: boolean;
+    suppressLibraryClick: any;
     action(action: any): Promise<void>;
     updateUI(): void;
     updateStatus(): void;
@@ -52,53 +61,45 @@ export class Workbench {
     updateFrame(stats: any): void;
     rendererStatus(s: any): void;
     rendererMessage: any;
+    beginBlockEdit(name: any): void;
+    saveBlockEdit(close?: boolean): import("@conduitcad/model").BlockUpdateReport;
+    cancelBlockEdit(): import("@conduitcad/model").BlockUpdateReport;
     selected(): any;
-    eval(source: any): any;
+    eval(source: any): number;
     touch(changed?: any): void;
     edit(label: any, action: any): void;
     updateSelection(): void;
     selectEntity(id: any, focus?: boolean): void;
     setTool(tool: any): void;
-    previewSymbol: {
-        id: string;
-        type: any;
-        layer: string;
-    };
-    preview: import("@conduitcad/model").CadEntity | import("@conduitcad/model").PolylineEntity;
+    previewSymbol: import("@conduitcad/model").CadEntity;
+    preview: any;
     snap: any;
     updateTools(): void;
-    isMobile(): boolean;
+    isMobile(): any;
     togglePanel(name: any): void;
     openPanel(name: any): void;
     closePanels(): void;
     symbolName(id: any): any;
     renderLibrary(): void;
+    librarySymbolPreview(symbol: any): string;
+    libraryGuide(): void;
     pickSymbol(id: any): void;
     pendingSymbol: any;
-    symbolAt(id: any, x: any, y: any, tag?: boolean): {
-        id: string;
-        type: any;
-        layer: string;
-    };
+    symbolAt(id: any, x: any, y: any, tag?: boolean): import("@conduitcad/model").CadEntity;
     nextTag(id: any): string;
     placeSymbol(id: any, p: any): undefined;
     libraryPointerDown(event: any): void;
+    suppressLibraryClickUntil: number;
     field(name: any, label: any, value: any, full?: boolean, unit?: string): string;
     renderInspector(): void;
+    renderBaseInspector(): void;
     constraintsHTML(selected: any): string;
     onChange(event: any): void;
     setProperty(e: any, key: any, source: any): void;
     evaluateParametric(e: any): void;
+    constraintsForSolve(): any[];
     solveConstraints(): void;
-    lastSolve: {
-        converged: boolean;
-        iterations: number;
-        residual: number;
-        variables: number;
-        equations: number;
-        status: string;
-        rolledBack: boolean;
-    };
+    lastSolve: import("@conduitcad/constraints").SolveReport;
     checkDrawing(): any[];
     nearby(p: any, tolerance?: number): any[];
     hitTest(p: any, tolerance?: number): any;
@@ -133,11 +134,7 @@ export class Workbench {
         port?: undefined;
     };
     obstacles(): any;
-    routeConnection(start: any, end: any, waypoints?: any[]): {
-        points: any[];
-        status: string;
-        visited: number;
-    };
+    routeConnection(start: any, end: any, waypoints?: any[]): import("@conduitcad/routing").RouteResult;
     createConnector(start: any, end: any): undefined;
     reroute(changed?: any): void;
     lastRoutedIds: Set<any>;
@@ -316,6 +313,19 @@ export class Workbench {
     } | {
         kind: string;
         start: any;
+        last?: undefined;
+        id?: undefined;
+        grip?: undefined;
+        original?: undefined;
+        fromSelect?: undefined;
+        originals?: undefined;
+        current?: undefined;
+        additive?: undefined;
+        p?: undefined;
+        wasDraft?: undefined;
+    } | {
+        kind: string;
+        start: any;
         wasDraft: boolean;
         last?: undefined;
         id?: undefined;
@@ -331,7 +341,7 @@ export class Workbench {
     pointerHover(p: any): void;
     hoveredPort: import("@conduitcad/model").Port;
     pointerUp(p: any): void;
-    makePreview(a: any, b: any): import("@conduitcad/model").CadEntity;
+    makePreview(a: any, b: any): any;
     finishShape(a: any, b: any): void;
     finishPath(): void;
     cancelGesture(): void;
@@ -368,20 +378,28 @@ export class Workbench {
     toast(message: any, error?: boolean): void;
     toastTimer: number;
     newDialog(): void;
-    newDocument(kind: any): Promise<void>;
+    newDocument(kind: string): Promise<import("@conduitcad/workspace").DocumentSession<import("@conduitcad/model").CadDocument>>;
+    openDocument(document: import("@conduitcad/model").CadDocument, options?: DocumentOpenOptions): import("@conduitcad/workspace").DocumentSession<import("@conduitcad/model").CadDocument>;
+    activateDocument(id: string): import("@conduitcad/workspace").DocumentSession<import("@conduitcad/model").CadDocument>;
+    closeDocument(id?: string): void | Promise<void>;
+    saveAllDocuments(): Promise<import("@conduitcad/workspace").WorkspaceManifest>;
+    scheduleRecovery(): void;
+    documentChanged(): void;
     basename(): any;
     exportDialog(): void;
     doExport(format: any): Promise<void>;
-    openFile(file: any): Promise<void>;
+    openFiles(files: any): Promise<any[]>;
+    openFile(file: any): any;
+    documentImportQueue: any;
+    importFile(file: any): Promise<any>;
     commandDialog(): void;
     executeCommand(source: any): void;
     keyDown(e: any): void;
     helpDialog(): void;
-    dispose(): void;
+    dispose(): Promise<unknown>;
 }
 import { ConstraintSolver } from '@conduitcad/constraints';
 import { Camera } from '@conduitcad/renderer';
 import { CadRenderer } from '@conduitcad/renderer';
-import { ProjectStore } from '@conduitcad/storage';
 import { History } from '@conduitcad/history';
 import { PointerController } from '@conduitcad/input';

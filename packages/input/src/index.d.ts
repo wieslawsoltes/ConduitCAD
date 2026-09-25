@@ -47,5 +47,6 @@ export class PointerController {
     move(e: any): void;
     up(e: any, cancelled?: boolean): void;
     clearLong(): void;
+    reset(): void;
     dispose(): void;
 }

@@ -1,6 +1,6 @@
 # @conduitcad/constraints
 
-Parameters and sketch constraints. Version **0.5.0**, native ESM JavaScript, MIT license.
+Parameters and sketch constraints. Version **0.7.0**, native ESM JavaScript, MIT license.
 
 Safe bounded arithmetic/function expressions, memoized named dependencies and an analytic-Jacobian, normalized, component-partitioned Levenberg–Marquardt solver using pivoted Householder QR. Rank/DOF, redundancy, references and calculated annotations are exposed. Convergence and failed edits are explicit.
 

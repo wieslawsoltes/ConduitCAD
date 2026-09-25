@@ -19,5 +19,10 @@ export class ProjectStore {
     schedule(document: any, id?: string): void;
     load(id?: string): Promise<any>;
     list(): Promise<any>;
+    /** Atomically checkpoint open drawing records and their ordered workspace manifest. */
+    saveWorkspace(records: any, manifest: any, key?: string): Promise<void>;
+    loadWorkspace(key?: string): Promise<any>;
+    listWorkspace(key?: string): Promise<any>;
+    loadWorkspaceRecord(sessionId: any, key?: string): Promise<any>;
     dispose(): void;
 }

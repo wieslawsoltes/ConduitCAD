@@ -1,0 +1,20 @@
+{
+  "name": "@conduitcad/workspace",
+  "version": "0.7.0",
+  "type": "module",
+  "description": "DOM-free multi-document sessions and serialized recovery checkpoints",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT"
+}

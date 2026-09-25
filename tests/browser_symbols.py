@@ -56,7 +56,7 @@ with sync_playwright() as p:
     # Failure to persist must not replace the current project.
     page.evaluate("()=>{conduit.store.save=async()=>{throw new Error('test quota')}}")
     name=page.evaluate('conduit.doc.name');page.evaluate("async()=>{await conduit.newDocument('network')}")
-    ok('save failure leaves the previous drawing open',page.evaluate('conduit.doc.name')==name)
+    ok('storage failure keeps previous drawing open in its own tab',page.evaluate('(name)=>conduit.documents.sessions.some(s=>s.document.name===name)',name))
     ctx.close();ctx,page=setup(browser,True)
     page.get_by_role('button',name='Symbols',exact=True).tap();page.locator('#symbol-category').select_option('Pneumatics')
     ok('mobile category selector is a 44px touch target',page.locator('#symbol-category').bounding_box()['height']>=44)

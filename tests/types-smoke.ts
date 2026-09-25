@@ -91,3 +91,18 @@ const drawingResult = drawingSession.add(drawingPoint, {layer:'0'}, documentMode
 const drawingPreview = drawingSession.preview({x:20,y:50},{},documentModel);
 const nativeEllipse = createDrawingEntity('ellipse',[{x:0,y:0},{x:50,y:0},{x:0,y:20}],{}, {},documentModel);
 void [drawingResult,drawingPreview,nativeEllipse,hatchPattern({pattern:'cross'}).pattern,drawingSession.canFinish,app.drawingSession];
+
+// Multi-document sessions have a reusable generic persistence contract.
+import { DocumentWorkspace, type WorkspaceManifest } from '@conduitcad/workspace';
+const multiWorkspace = new DocumentWorkspace<{name: string; entities: {id:string}[]}>({
+    store: { async saveWorkspace(records, manifest, key) {
+        const ordered: string[] = manifest.ids;
+        const name: string = records[0].document.name;
+        void ordered; void name; void key;
+    } }
+});
+const multiSession = multiWorkspace.add({ name: 'Drawing', entities: [] });
+multiWorkspace.activate(multiSession.id);
+multiWorkspace.markChanged(multiSession.id);
+const multiSaved: Promise<WorkspaceManifest> = multiWorkspace.saveAll();
+void multiSaved;

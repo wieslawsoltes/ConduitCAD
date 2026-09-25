@@ -1,6 +1,6 @@
 # @conduitcad/geometry
 
-Planar CAD geometry kernel. Version **0.5.0**, native ESM JavaScript, MIT license.
+Planar CAD geometry kernel. Version **0.7.0**, native ESM JavaScript, MIT license.
 
 Float64 geometry, transforms, intersections, adaptive arc/bulge and NURBS tessellation, snapping, planar offsets and two-line fillets.
 

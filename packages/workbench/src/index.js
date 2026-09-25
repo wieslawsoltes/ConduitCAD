@@ -1,3 +1,6 @@
+import { initializeDocuments, claimWorkspace, createDocumentHistory, recoverDocuments, forkRecoveryWorkspace, captureActiveDocument, activateDocument, openDocument, renderDocuments, documentAction, documentKeyDown, documentChanged, scheduleRecovery, requestCloseDocument, disposeDocuments } from './document-workbench.js';
+import { bindMobileWorkspace, updateMobilePanels } from './mobile-workspace.js';
+import { mergeClipboardBlocks } from '@conduitcad/workspace';
 import { DRAWING_TOOLS, drawingTool } from '@conduitcad/drawing';
 import { beginDrawing, acceptDrawingPoint, drawingPointerUp, drawingPreview, updateDrawingControls, finishDrawing, drawingToolSections, bindDrawingSearch, drawingAction, drawingCommand, nativeGrips, changeNativeGrip, renderDrawingInspector, nativePropertyChange } from './drawing-workbench.js';
 import { parametricAction, renderParametricInspector, refreshCalculations, drawParametricOverlay, startBlockEditor, finishBlockEditor, parameterManager, constraintAuthor } from './parametric-workbench.js';
@@ -37,6 +40,7 @@ export class Workbench {
             throw new Error('A host element is required');
         this.root = root;
         this.options = options;
+        this.initializing = true;
         this.doc = options.document || createDemo('pid');
         this.selection = new Set();
         this.tool = 'select';
@@ -63,14 +67,15 @@ export class Workbench {
         this.renderer.drawOverlay = (ctx, cam) => this.drawOverlay(ctx, cam);
         this.renderer.onFrame = stats => this.updateFrame(stats);
         this.renderer.setDocument(this.doc);
-        this.store = new ProjectStore({ onStatus: (s, error) => {
+        this.store = options.store || new ProjectStore({ onStatus: (s, error) => {
                 const el = this.$('.save-status');
                 if (el)
                     el.innerHTML = s === 'saved' ? `${icon('check')} Saved on device` : s === 'saving' ? 'Saving…' : 'Storage unavailable';
                 if (error)
                     this.toast('Autosave unavailable. Export a project copy to keep your work.', true);
             } });
-        this.history = new History({ capture: () => this.doc, restore: d => { this.doc = d; this.selection = new Set([...this.selection].filter(id => d.entities.some(e => e.id === id))); refreshCalculations(this); this.lastSolve=null; this.renderer.setDocument(d); this.updateUI(); }, onChange: () => { this.updateHistory(); this.store.schedule(this.doc); this.root.dispatchEvent(new CustomEvent('conduit:change', { detail: { document: this.doc } })); } });
+        this.history = createDocumentHistory(this);
+        initializeDocuments(this);
         this.input = new PointerController(this.$('.viewport'), { down: p => this.pointerDown(p), move: p => {try{this.pointerMove(p);}catch(error){this.cancelGesture();this.toast(error.message,true);}}, up: p => this.pointerUp(p), hover: p => this.pointerHover(p), cancel: () => this.cancelGesture(), gesture: ({ previous, current, scale, dx, dy }) => { this.camera.zoom(scale, { x: previous.x, y: previous.y }); this.camera.pan(dx, dy); this.renderer.invalidate(); }, wheel: p => {
                 if (p.original.shiftKey)
                     this.camera.pan(-p.deltaY, 0);
@@ -79,27 +84,37 @@ export class Workbench {
                 this.renderer.invalidate();
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.bindEvents();
+        bindMobileWorkspace(this);
         this.updateUI();
         this.ready = this.initialize(params);
     }
     $(selector) { return this.root.querySelector(selector); }
     async initialize(params) {
         await this.renderer.ready;
+        if (this.disposed) return this;
+        await claimWorkspace(this);
+        let recovered = false;
         if (!this.options.document && params.get('fresh') !== '1') {
-            const saved = await this.store.load();
-            if (saved?.document) {
-                try {
-                    this.doc = validateDocument(saved.document);
-                    this.renderer.setDocument(this.doc);
-                    this.updateUI();
-                    this.toast('Recovered your last drawing from this device.');
+            recovered = await recoverDocuments(this);
+            if (this.recoveryIncomplete) await forkRecoveryWorkspace(this);
+            if (!recovered) {
+                const saved = await this.store.load();
+                if (saved?.document) {
+                    try {
+                        const document = validateDocument(saved.document);
+                        const session = this.documents.active;
+                        session.document = document; session.context.doc = document;
+                        this.doc = document; this.renderer.setDocument(document); this.updateUI();
+                        this.toast('Recovered your previous drawing in a document tab.');
+                    } catch {}
                 }
-                catch { }
             }
         }
         this.renderer.resize();
-        this.renderer.fit();
+        if (!recovered) this.renderer.fit();
         this.renderer.invalidate();
+        this.initializing = false;
+        captureActiveDocument(this); scheduleRecovery(this);
         return this;
     }
     renderShell() {
@@ -111,7 +126,7 @@ export class Workbench {
  ${this.toolButton('select', 'Select', 'select')}${this.toolButton('pan', 'Pan', 'pan', 'mobile-hidden')}${this.toolButton('line', 'Line', 'line')}${this.toolButton('connect', 'Connect', 'connect')}<span class="dock-divider"></span>${this.toolButton('rect', 'Rectangle', 'rect', 'mobile-hidden')}${this.toolButton('circle', 'Circle', 'circle', 'mobile-hidden')}${this.toolButton('text', 'Text', 'text', 'mobile-hidden')}${this.toolButton('dimension', 'Measure', 'dimension', 'desktop-only')}${btn('shapes', 'Shapes', 'rect', 'mobile-only')}${btn('toggle-library', 'Symbols', 'symbols', 'mobile-only')}${btn('toggle-inspector', 'Edit', 'properties', 'mobile-only')}<span class="dock-divider"></span>${btn('more', 'More', 'more', '')}
  </nav></section>
  <aside class="inspector" aria-label="Drawing properties"><div class="inspector-tabs"><button data-inspector="properties" class="active">Properties</button><button data-inspector="layers">Layers</button><button data-inspector="qa">Check</button>${iconButton('toggle-inspector', 'close', 'Close properties', 'mobile-only')}</div><div class="inspector-content"></div></aside><div class="sheet-backdrop" data-action="close-panels"></div></main>
- <footer class="statusbar"><div class="left"><select class="layout-select" aria-label="Drawing layout"></select><span class="status-document"></span><span class="coords">X 0.0   Y 0.0</span></div><div class="right"><button data-action="toggle-grid">GRID</button><button data-action="toggle-snap">SNAP</button><button data-action="toggle-ortho">ORTHO</button><span class="status-extra">1:1</span><span class="stats"></span>${btn('command', 'Command', 'code', 'desktop-only')}</div></footer><input class="file-input hide" type="file" accept=".dxf,.json,.conduit" aria-label="Open DXF or Conduit project"><div class="toast" role="status" aria-live="polite"></div></div>`;
+ <footer class="statusbar"><div class="left"><select class="layout-select" aria-label="Drawing layout"></select><span class="status-document"></span><span class="coords">X 0.0   Y 0.0</span></div><div class="right"><button data-action="toggle-grid">GRID</button><button data-action="toggle-snap">SNAP</button><button data-action="toggle-ortho">ORTHO</button><span class="status-extra">1:1</span><span class="stats"></span>${btn('command', 'Command', 'code', 'desktop-only')}</div></footer><input class="file-input hide" type="file" multiple accept=".dxf,.json,.conduit" aria-label="Open DXF or Conduit project"><div class="toast" role="status" aria-live="polite"></div></div>`;
     }
     toolButton(tool, label, ic, cls = '') { return `<button data-tool="${tool}" class="${tool === 'select' ? 'active ' : ''}${cls}" title="${E(label)}" aria-label="${E(label)}" aria-pressed="${tool === 'select'}">${icon(ic)}<span>${E(label)}</span></button>`; }
     bindEvents() {
@@ -120,9 +135,7 @@ export class Workbench {
         this.root.addEventListener('change', e => this.onChange(e), opt);
         this.$('#symbol-search').addEventListener('input', e => { this.librarySearch = e.target.value; this.renderLibrary(); }, opt);
         this.$('.file-input').addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (file)
-                this.openFile(file);
+            this.openFiles([...e.target.files]);
             e.target.value = '';
         }, opt);
         this.$('.library-scroll').addEventListener('pointerdown', e => this.libraryPointerDown(e), opt);
@@ -141,9 +154,7 @@ export class Workbench {
         this.$('.viewport').addEventListener('dragover', e => { e.preventDefault(); }, opt);
         this.$('.viewport').addEventListener('drop', e => {
             e.preventDefault();
-            const file = e.dataTransfer.files[0];
-            if (file)
-                this.openFile(file);
+            this.openFiles([...e.dataTransfer.files]);
         }, opt);
         document.addEventListener('keydown', e => this.keyDown(e), opt);
         document.addEventListener('keyup', e => {
@@ -152,16 +163,24 @@ export class Workbench {
         }, opt);
         window.addEventListener('blur', () => { this.space = false; this.cancelGesture(); }, opt);
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden)
-                this.store.save(this.blockSession?.parentDocument || this.doc).catch(() => { });
+            if (document.hidden && !this.initializing)
+                this.documents.saveAll().catch(() => { });
         }, opt);
     }
     async onClick(event) {
+        if (this.initializing || this.disposed) return;
         const target = event.target.closest('button,[data-action]');
         if (!target)
             return;
         if (target.disabled)
             return;
+        if (target.dataset.documentId) {
+            try {
+                if (target.dataset.documentOperation === 'close') await requestCloseDocument(this, target.dataset.documentId);
+                else activateDocument(this, target.dataset.documentId);
+            } catch (error) { this.toast(error.message, true); }
+            return;
+        }
         if (target.dataset.tool) {
             this.setTool(target.dataset.tool);
             return;
@@ -227,6 +246,9 @@ export class Workbench {
         }
     }
     async action(action) {
+        if (action.startsWith('document-')) { await documentAction(this, action); return; }
+        if (action === 'new') { this.newDialog(); return; }
+        if (action === 'open') { this.closeModal(); this.$('.file-input').click(); return; }
         if(drawingAction(this,action))return;
         if(parametricAction(this,action))return;
         if(cadEditingAction(this,action))return;
@@ -416,7 +438,7 @@ export class Workbench {
         }
         this.hideContext();
     }
-    updateUI() { this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); }
+    updateUI() { this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -469,7 +491,7 @@ export class Workbench {
         this.updateStatus();
     }
     edit(label, action) { this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
-    updateSelection() { this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
+    updateSelection() { scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
         if (focus) {
@@ -504,6 +526,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     updateTools() {
+        scheduleRecovery(this);
         this.root.querySelectorAll('[data-tool]').forEach(b => { b.classList.toggle('active', b.dataset.tool === this.tool); b.setAttribute('aria-pressed', String(b.dataset.tool === this.tool)); });
         this.$('.viewport')?.classList.toggle('drawing', !['select', 'pan'].includes(this.tool));
         this.$('.viewport')?.classList.toggle('panning', this.tool === 'pan');
@@ -520,12 +543,13 @@ export class Workbench {
         updateDrawingControls(this);
         this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
     }
-    isMobile() { return matchMedia('(max-width:720px)').matches; }
+    isMobile() { return this.mobileMedia?.matches ?? matchMedia('(max-width:720px), (max-height:540px) and (pointer:coarse)').matches; }
     togglePanel(name) {
         const panel = this.$('.' + name);
         if (panel.classList.contains('open')) {
             panel.classList.remove('open');
             this.$('.sheet-backdrop').classList.remove('visible');
+            updateMobilePanels(this);
         }
         else
             this.openPanel(name);
@@ -539,8 +563,9 @@ export class Workbench {
         this.$('.' + name).classList.add('open');
         if (name === 'inspector')
             this.renderInspector();
+        updateMobilePanels(this, name);
     }
-    closePanels() { this.$('.library').classList.remove('open'); this.$('.inspector').classList.remove('open'); this.$('.sheet-backdrop').classList.remove('visible'); }
+    closePanels() { const panelFocused = document.activeElement?.closest('.library,.inspector'); this.$('.library').classList.remove('open'); this.$('.inspector').classList.remove('open'); this.$('.sheet-backdrop').classList.remove('visible'); updateMobilePanels(this); if(panelFocused)this.panelPreviousFocus?.focus?.({preventScroll:true}); }
     symbolName(id) { return SYMBOLS.find(s => s.id === id)?.name || this.doc.blocks[id]?.symbol?.name || id || 'symbol'; }
     renderLibrary() {
         this.$('.library-count').textContent = String(SYMBOLS.length);
@@ -1587,16 +1612,18 @@ export class Workbench {
             this.reroute(this.selection);
         });
     }
-    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es), blocks: clone(this.doc.blocks) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied to the app clipboard`); }
+    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es), blocks: clone(this.doc.blocks), layers: clone(this.doc.layers) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied to the app clipboard`); }
     pasteSelection() {
         if (!this.clipboard)
             throw new Error('Copy objects in this workspace first');
         const cb = this.clipboard;
         this.edit('Paste', () => {
-            Object.assign(this.doc.blocks, clone(cb.blocks));
-            const map = new Map(cb.entities.map(e => [e.id, uid()])), es = clone(cb.entities);
+            const merged = mergeClipboardBlocks(this.doc.blocks, cb.blocks, cb.entities);
+            for(const [name,block] of Object.entries(merged.blocks))Object.defineProperty(this.doc.blocks,name,{value:block,writable:true,enumerable:true,configurable:true});
+            const map = new Map(merged.entities.map(e => [e.id, uid()])), es = merged.entities;
             for (const e of es) {
                 e.id = map.get(e.id);
+                e.layout = this.doc.activeLayout;
                 delete e._dxf;
                 moveEntity(e, 40, -40);
                 if (e.tag)
@@ -1607,6 +1634,7 @@ export class Workbench {
                         e.connector[key] = ref && map.has(ref.entityId) ? { ...ref, entityId: map.get(ref.entityId) } : null;
                     }
             }
+            for(const layer of cb.layers || [])if(!this.doc.layers.some(l=>l.name===layer.name))this.doc.layers.push(clone(layer));
             this.doc.entities.push(...es);
             this.selection = new Set(es.map(e => e.id));
         });
@@ -1786,7 +1814,7 @@ export class Workbench {
         backdrop.addEventListener('change', e => this.onChange(e));
         backdrop.addEventListener('keydown', e => {
             if (e.key === 'Tab') {
-                const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')], first = focus[0], last = focus.at(-1);
+                const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'), first = focus[0], last = focus.at(-1);
                 if (e.shiftKey && document.activeElement === first) {
                     e.preventDefault();
                     last.focus();
@@ -1801,7 +1829,10 @@ export class Workbench {
                 this.modalConfirm?.();
             }
         });
-        setTimeout(() => backdrop.querySelector('input,textarea,select,button')?.focus(), 30);
+        setTimeout(() => {
+            if (this.modal !== backdrop || backdrop.contains(document.activeElement)) return;
+            (backdrop.querySelector('input:not([type="checkbox"]),textarea,select') || backdrop.querySelector('button'))?.focus({ preventScroll: true });
+        }, 30);
     }
     closeModal() {
         if (this.modal) {
@@ -1812,9 +1843,9 @@ export class Workbench {
         }
     }
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }
-    toast(message, error = false) { const el = this.$('.toast'); el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
+    toast(message, error = false) { const el = this.$('.toast'); if (this.disposed || !el) return; el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
     newDialog() {
-        this.openModal('Create a drawing', `<p>Your current drawing is saved before switching. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
+        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
         const input = this.modal.querySelector('#template-search');
         input.addEventListener('input', () => {
             const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -1824,22 +1855,20 @@ export class Workbench {
         });
     }
     async newDocument(kind) {
-        if(this.blockSession)throw new Error('Close the block editor before creating another drawing');
-        if (this.switchingDocument) return;
-        this.switchingDocument = true;
-        try {
-            const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
-            try { await this.store.save(this.doc, uid('project')); }
-            catch { this.toast('Previous project could not be saved. Export it before starting a new drawing.', true); return; }
-            const profile = DRAWING_TYPES.find(p => p.id === kind);
-            this.closeModal(); this.closePanels(); this.cancelGesture();
-            this.doc = next; this.selection.clear(); this.history.clear();
-            this.category = profile?.categories[0] || 'P&ID'; this.lineStyle = profile?.defaultLineStyle || 'process';
-            this.currentLayer = LINE_STYLES.find(s => s.id === this.lineStyle)?.layer || 'Process';
-            this.librarySearch = ''; this.$('#symbol-search').value = '';
-            this.renderer.setDocument(this.doc); this.setTool('select'); this.updateUI(); this.renderer.fit(); this.store.schedule(this.doc);
-        } finally { this.switchingDocument = false; }
+        if (this.initializing) await this.ready;
+        const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
+        const profile = DRAWING_TYPES.find(p => p.id === kind), style = profile?.defaultLineStyle || 'process';
+        return openDocument(this, next, { context: {
+            category: profile?.categories[0] || 'P&ID', lineStyle: style,
+            currentLayer: LINE_STYLES.find(s => s.id === style)?.layer || 'Process'
+        } });
     }
+    openDocument(document, options = {}) { return openDocument(this, document, options); }
+    activateDocument(id) { return activateDocument(this, id); }
+    closeDocument(id = this.documents.activeId) { return requestCloseDocument(this, id); }
+    saveAllDocuments() { return this.documents.saveAll(); }
+    scheduleRecovery() { scheduleRecovery(this); }
+    documentChanged() { documentChanged(this); }
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
     exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
     async doExport(format) {
@@ -1881,8 +1910,22 @@ export class Workbench {
         else
             throw new Error('Unknown export format');
     }
-    async openFile(file) {
-        if(this.blockSession)throw new Error('Close the block editor before opening another drawing');
+    openFiles(files) {
+        return Promise.all(files.map(file => this.openFile(file)));
+    }
+    openFile(file) {
+        const operation = this.documentImportQueue.catch(() => {}).then(async () => {
+            if (this.initializing) await this.ready;
+            if (this.disposed) return null;
+            return this.importFile(file);
+        });
+        this.documentImportQueue = operation;
+        return operation;
+    }
+    async importFile(file) {
+        if (this.documents.sessions.length >= this.documents.maxDocuments) {
+            this.toast('Document limit reached. Close a drawing before importing more files.', true); return null;
+        }
         if (file.size > 128 * 1024 * 1024) {
             this.toast('The import limit is 128 MiB.', true);
             return;
@@ -1907,22 +1950,8 @@ export class Workbench {
                 await new Promise(r => setTimeout(r, 0));
                 doc = parseDXF(buffer, { name: file.name.replace(/\.dxf$/i, '') });
             }
-            try {
-                await this.store.save(this.doc, uid('project'));
-            }
-            catch {
-                throw new Error('Current drawing could not be backed up locally. Export it before replacing it.');
-            }
-            this.cancelGesture();
-            this.doc = doc;
-            this.selection.clear();
-            this.history.clear();
-            this.currentLayer = this.doc.layers.find(l => l.visible && !l.locked)?.name || '0';
-            this.renderer.setDocument(this.doc);
-            this.setTool('select');
-            this.updateUI();
-            this.renderer.fit();
-            this.store.schedule(this.doc);
+            if (this.disposed) return null;
+            openDocument(this, doc, { context: { currentLayer: doc.layers.find(l => l.visible && !l.locked)?.name || '0' } });
             const warnings = (doc.importDiagnostics || []).filter(i => i.severity === 'warning');
             this.toast(`${file.name} opened · ${doc.entities.length} entities${warnings.length ? ' · ' + warnings.length + ' import warnings (Check)' : ''}`, warnings.length > 0);
             if (warnings.length) {
@@ -2016,6 +2045,7 @@ export class Workbench {
         this.toast(cmd + ' completed');
     }
     keyDown(e) {
+        if (this.initializing || this.disposed) return;        if (documentKeyDown(this, e)) return;
         const input = e.target.closest?.('input,textarea,select,[contenteditable=true]');
         if (e.key === 'Escape') {
             e.preventDefault();
@@ -2119,7 +2149,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.6.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>14</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.store.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.7.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>15</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    dispose() { this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

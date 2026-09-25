@@ -1,3 +1,55 @@
+# Validation record — Conduit CAD 0.7.0
+
+`npm test`: **450 tests**, comprising 415 inherited and 35 new workspace/storage/
+clipboard cases. New cases cover independent identities, document caps, activation,
+close/reorder rules, immutable captures, delayed concurrent saves, later edits,
+failed-save retry, manifests, atomic fallback storage, quota failures, namespace
+isolation, synchronous IndexedDB abort and reachable/case-insensitive block merging.
+
+`tests/browser_documents.py`: **55 integrated workspace/mobile assertions**, plus
+**six native IndexedDB/multi-window assertions in localhost CI mode**. The suite exercises tab
+controls, independent histories/cameras/settings, accepted command points, block
+editor/Test Block switching, reload of multiple drawings and isolated block drafts,
+failed save-and-close retry, recently closed reopen, duplication, reordering,
+ordered multiple File inputs with one invalid file, active-only project download,
+44px controls, focus/inert sheets, portrait/narrow/landscape bounds and simulated
+keyboard resizing. No save/schedule methods are stubbed; only a targeted quota
+failure is injected and then removed. Local opaque-origin mode substitutes memory
+Web Storage and executes the real fallback serializer; CI uses native IndexedDB.
+
+The 246 inherited integrated browser checks and browser smoke suite also pass.
+The old save-failure/new-document regression now checks that opening an independent
+tab retains the old unsaved drawing instead of requiring a save before replacing it.
+This is the intended multi-document behavior, not removal of save-failure coverage.
+The new suite explicitly checks failed Save-and-close retains the unsaved tab.
+
+Existing independent DXF field/readback audits are unchanged. The new UI does not
+add DXF entities or vendor semantics. Package compilation and empty-cache offline
+installation/import cover all fifteen version-0.7.0 archives.
+
+```sh
+node scripts/bootstrap.mjs
+npm test
+npm run catalog
+node scripts/drawing-tool-samples.mjs
+npm run build
+npm run pack:packages
+node scripts/verify-packages.mjs
+tsc -p tests/tsconfig.json
+python tests/browser_documents.py
+# On a machine permitting browser HTTP navigation:
+CONDUIT_TEST_ORIGIN=localhost python tests/browser_documents.py
+```
+
+Raw reports are `artifacts/browser-documents.json`, `ci-unit-tests.log` and
+`package-consumer.json`. CI runs every inherited browser and independent audit
+script from `.github/workflows/pages.yml`, including the new real-origin suite.
+Reports identify actual backend/storage mode. These are Canvas 2D and emulated
+mobile tests, not physical phone/IME, crash-kill durability, eviction, multi-device
+sync or WebGPU/WebGL2-equivalence qualification. See MULTI_DOCUMENT.md for limits.
+
+---
+
 # Validation record — Conduit CAD 0.6.0
 
 `npm test`: **415 passing tests**, zero failures/skips (332 inherited + 83 new).
