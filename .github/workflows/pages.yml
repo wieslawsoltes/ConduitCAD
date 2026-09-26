@@ -69,6 +69,7 @@ jobs:
           python tests/browser_documents.py
           python tests/browser_mobile_ui.py
           python tests/browser_modeling3d.py
+          python tests/browser_authoring3d.py
           xvfb-run -a python tests/browser_modeling_backends.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
