@@ -1,0 +1,94 @@
+name: Validate final iconography touch polish
+on:
+  push:
+    branches: [work/iconography-091]
+    paths: [.github/workflows/polish-iconography-091.yml]
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-iconography-publication
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/iconography-091
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply exact touch-control refinement
+        run: |
+          git merge-base --is-ancestor 578b42c1d63dc0e573fd9a2be72ca9dd88881d3b HEAD
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          def digest(data):return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
+          p=Path('packages/workbench/src/styles.css')
+          assert digest(p.read_bytes())=='994f34613ad6ed8154e1ce8b41d98a2c2cf44acc'
+          old='.mobile-dialog .icon-preferences select { min-width:95px; width:0; padding-inline:6px; font-size:13px; }'
+          s=p.read_text();assert s.count(old)==1;p.write_text(s.replace(old,old.replace('font-size:13px','font-size:16px')))
+          assert digest(p.read_bytes())=='57ef27de781e1aa87dc44b2685a9f699bcffda67'
+          p=Path('tests/browser_iconography.py')
+          assert digest(p.read_bytes())=='7c297f86ae29070d384cd0c38d622c63ee6a587a'
+          anchor="   page.evaluate('conduit.model3d.toolsDialog()');page.wait_for_timeout(40)\n"
+          extra="   if touch:ok(prefix+' preference select retains readable touch text',page.locator('[data-icon-label-mode]').evaluate(\"e=>parseFloat(getComputedStyle(e).fontSize)>=16&&e.getBoundingClientRect().right<=innerWidth\"))\n"
+          s=p.read_text();assert s.count(anchor)==1;p.write_text(s.replace(anchor,anchor+extra))
+          assert digest(p.read_bytes())=='8c9e2a3da74bcf132e463d2c308e0cdcf368b754'
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add packages/workbench/src/styles.css tests/browser_iconography.py
+          git commit -m 'fix: keep icon label preference readable on phones and tablets'
+          git push origin HEAD:work/iconography-091
+      - name: Rebuild and validate package contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run icons
+          npm run build
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install native-origin browser tests
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: Validate iconography and existing adaptive mobile workflows
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/browser_iconography.py 2>&1 | tee artifacts/iconography-browser_iconography.log
+          python tests/browser_mobile_ui.py 2>&1 | tee artifacts/iconography-browser_mobile_ui.log
+      - name: Commit final distribution and evidence
+        run: |
+          git add -A -- artifacts docs
+          git add -f dist artifacts/npm
+          git commit -m 'build: final 0.9.1 iconography application and touch validation'
+          git push origin HEAD:work/iconography-091
+          echo "Validated checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Archive exact source checkpoint
+        if: always()
+        run: git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-0.9.1-source-checkpoint.zip"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-091-final-iconography
+          path: |
+            ${{ runner.temp }}/ConduitCAD-0.9.1-source-checkpoint.zip
+            artifacts
+          retention-days: 30
