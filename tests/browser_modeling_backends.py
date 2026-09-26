@@ -7,6 +7,7 @@ import http.server
 import json
 import os
 import shutil
+import sys
 import threading
 from pathlib import Path
 import numpy as np
@@ -17,9 +18,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
 server=http.server.ThreadingHTTPServer(('127.0.0.1',0),functools.partial(Handler,directory=str(ROOT/'dist')));threading.Thread(target=server.serve_forever,daemon=True).start()
 reports=[];errors=[]
+launch_args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-webgpu','--enable-unsafe-swiftshader']
+if sys.platform.startswith('linux'):
+ # Native Vulkan presentation needs a display (CI runs this test under Xvfb).
+ # https://github.com/visgl/luma.gl/issues/2874
+ launch_args += ['--enable-gpu','--enable-features=Vulkan','--use-vulkan=swiftshader']
 try:
  with sync_playwright() as p:
-  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_EXECUTABLE') or shutil.which('chromium'),headless=True,args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-webgpu','--enable-unsafe-swiftshader'])
+  browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_EXECUTABLE') or shutil.which('chromium'),headless=True,args=launch_args)
   for requested in ['canvas','webgl2','webgpu']:
    context=browser.new_context(viewport={'width':1000,'height':760},device_scale_factor=1);page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)));page.on('dialog',lambda d:d.accept())
    page.goto(f'http://127.0.0.1:{server.server_port}/?fresh=1&no-sw=1&renderer=canvas&renderer3d={requested}')
@@ -31,7 +37,7 @@ try:
    report=page.evaluate("()=>{const r=conduit.model3d.renderer;return {backend:r.backend,reasons:r.fallbackReasons,triangles:r.scene.triangles.length,stats:r.stats,secure:isSecureContext}}")
    executed=report['backend'].lower().startswith(requested)
    assert executed or not capability[requested],{'requested':requested,**report,**capability}
-   report.update(requested=requested,executedRequestedBackend=executed,capabilities=capability,physicalDevice=False)
+   report.update(requested=requested,executedRequestedBackend=executed,capabilities=capability,physicalDevice=False,browserVersion=browser.version,launchArguments=launch_args)
    # Camera changes must update uniforms/projection only, not rebuild or reupload geometry.
    stable=page.evaluate("()=>{const r=conduit.model3d.renderer,n=r.uploads,s=r.camera.snapshot();r.camera.orbit(31,13);r.draw();const stable=r.uploads===n;Object.assign(r.camera,s);r.draw();return stable}")
    assert stable,'Orbit reuploaded immutable geometry'
