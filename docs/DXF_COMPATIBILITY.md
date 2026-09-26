@@ -1,3 +1,10 @@
+# 0.8.0 spatial extension
+
+See [3D modeling and exchange](MODELING_3D.md) for native XYZ meshes, faces,
+curves, nested OCS blocks, hidden construction stock and editable Conduit history.
+Modeled bodies export as MESH, not proprietary ACIS 3DSOLID. This update does not
+remove the format limitations and record-preservation guards documented below.
+
 ## 0.5.0 authoring addition
 
 Shared block editing preserves native BLOCK/INSERT structure. Native attributes

@@ -1,3 +1,25 @@
+# 0.8.0 — 3D mesh modeling and editable industry drawings
+
+- Separate Z-up 3D workspace alongside the retained planar editor; independent
+  per-document cameras, shared undo, responsive tools, mode switching and recovery.
+- Native XYZ/OCS curves, polygon/mesh faces, nested inserts, depth picking and exact
+  WCS editing with guarded planar and attributed-INSERT boundaries.
+- Eighteen regenerating feature operations, downstream dependency evaluation,
+  transactional rejection, preview/cancel, suppression, bake and axis move handles.
+- WebGPU/WebGL2 depth rendering with software Z-buffer fallback, coplanar seam
+  suppression, section clipping, native section lines and mesh measurements.
+- Ten editable mechanical, process, HVAC, electrical, manufacturing and automation
+  examples; native ASCII/binary DXF with construction-stock visibility and
+  Conduit feature metadata, plus selected-mesh OBJ/STL.
+- Three reusable packages bring the workspace to eighteen modules, version 0.8.0.
+- Adds independent DXF audits, spatial geometry/history tests and actual browser
+  form/touch/backend tests. The source is reconstructed from verified 0.7.1; no
+  missing earlier 3D checkpoint is presented as recovered code.
+
+This is not full AutoCAD/Fusion parity. No ACIS/SAT/SAB 3DSOLID authoring, curved
+B-rep kernel, complete 3D constraints, assembly/CAM/simulation, or universal
+proprietary feature-graph interpretation is claimed. See `docs/MODELING_3D.md`.
+
 # 0.7.1 — Adaptive mobile tools, dialogs and document tabs
 
 - Shared touch policy extends to coarse-pointer portrait tablets and split-screen hosts.

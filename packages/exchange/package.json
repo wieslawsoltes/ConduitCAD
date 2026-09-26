@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/exchange",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Modular Conduit CAD exchange engine",
   "type": "module",
   "main": "./src/index.js",
@@ -26,8 +26,8 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.7.1",
-    "@conduitcad/model": "0.7.1",
-    "@conduitcad/renderer": "0.7.1"
+    "@conduitcad/geometry": "0.8.0",
+    "@conduitcad/model": "0.8.0",
+    "@conduitcad/renderer": "0.8.0"
   }
 }

@@ -1,14 +1,16 @@
 # Conduit CAD
 
+**3D modeling update (0.8.0):** a separate depth-aware spatial workspace, 18 feature operations, exact WCS editing, section analysis and ten editable industry examples. The 2D editor remains available. See [3D modeling](docs/MODELING_3D.md).
+
 **Mobile UI update (0.7.1):** responsive document tabs, phone/tablet tool and dialog layouts, keyboard-aware forms, expandable panels and accessible focus handling. See [Mobile UI](docs/MOBILE_UI.md).
 
-**Touch-first, DXF-native 2D CAD and diagramming. Version 0.7.0.**
+**Touch-first, DXF-native 2D/3D CAD and diagramming. Version 0.8.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar
 geometry kernel, parameter expressions and an analytic planar constraint solver.
 WebGPU strokes and compute culling are implemented, with WebGL2 and Canvas 2D
-fallbacks. The application is built from 15 independently packaged ES modules.
+fallbacks. The application is built from 18 independently packaged ES modules.
 
 This is an engineering foundation, **not full AutoCAD, Visio, universal DXF,
 or certified engineering-system parity**. Read [the exact compatibility

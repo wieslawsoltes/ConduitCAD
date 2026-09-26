@@ -37,7 +37,7 @@ with sync_playwright() as p:
     ok('placement lazily installs exactly the selected master',page.evaluate('Object.keys(conduit.doc.blocks).length===1 && conduit.doc.entities[0].type==="INSERT" && conduit.doc.entities[0].block==="CC_HYD_CYLINDER"'))
     ok('hydraulic insertion uses the hydraulic layer',page.evaluate('conduit.doc.entities[0].layer==="Hydraulics"'))
     page.evaluate('conduit.newDialog()')
-    ok('new drawing dialog exposes twenty starters and Blank',page.locator('[data-demo]').count()==21)
+    ok('new drawing dialog exposes twenty 2D and ten 3D starters and Blank',page.locator('[data-demo]').count()==31)
     page.locator('#template-search').fill('hydraulic')
     ok('industry search filters the actual starter buttons',page.locator('.template-card:visible').count()==1)
     page.locator('[data-demo="hydraulic-actuator"]').click();page.wait_for_function('conduit.doc.metadata.templateId==="hydraulic-actuator"')

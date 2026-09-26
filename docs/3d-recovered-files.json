@@ -1,0 +1,282 @@
+[
+  {
+    "path": ".github/workflows/pages.yml",
+    "gitBlob": "3a63cc878adc22f3b30bd9f3845c7217f3d692d9",
+    "recoveredExactly": true
+  },
+  {
+    "path": "README.md",
+    "gitBlob": "0363dee08e87bb5e3be46b9c6322504cdad80348",
+    "recoveredExactly": true
+  },
+  {
+    "path": "RELEASE_NOTES.md",
+    "gitBlob": "bdc24af045e19e70e59b10fabdaeb4569df2b700",
+    "recoveredExactly": true
+  },
+  {
+    "path": "docs/DXF_COMPATIBILITY.md",
+    "gitBlob": "230ae6b997578047a9fcd2fb01491fcf0f5de2e0",
+    "recoveredExactly": true
+  },
+  {
+    "path": "docs/MODELING_3D.md",
+    "gitBlob": "796dde9c53aa4f3851711d2fa577d55b634d1688",
+    "recoveredExactly": true
+  },
+  {
+    "path": "package.json",
+    "gitBlob": "e75d6da9abb8c08941a253729c69d63424e7efda",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/constraints/package.json",
+    "gitBlob": "705b27b2945a3ec9c60bdfae6d6886d9d6fd076c",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/drawing/package.json",
+    "gitBlob": "50cc6e75ef74fc22c6578bbf1bfeacaadf046762",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/dxf/package.json",
+    "gitBlob": "f6454de58bb20682bf58eb47836c69af7ab5e154",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/dxf/src/index.js",
+    "gitBlob": "ebf4c3713e5013c3200d1fbaf52ebd4ce82bf54e",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/exchange/package.json",
+    "gitBlob": "6bf55526955f9f0a14b2e3197534072f32c2fb6c",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry/package.json",
+    "gitBlob": "895daeb643354ca1696378783067ce51f26434be",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/LICENSE",
+    "gitBlob": "48acc83d94542b0c8b79f6fcf7dbea93154f7d56",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/README.md",
+    "gitBlob": "4ea413672c3480871de3ce2a57508ea017df21a1",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/package.json",
+    "gitBlob": "50f17173a2bbb814582581ac9cd1c6519e2657b5",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/src/csg.js",
+    "gitBlob": "e59eab8ddea0f68cff8d858714ac8ea2e8592820",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/src/index.d.ts",
+    "gitBlob": "083a60103b6f75b2e45bcaa5dc654fe0996283be",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/geometry3d/src/index.js",
+    "gitBlob": "78236533874da87547b407185948d82444c7a5c6",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/history/package.json",
+    "gitBlob": "cfb3ddf0535db0bd4e08f3bcca043767b428048a",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/input/package.json",
+    "gitBlob": "3e73c89d26f0cd456d5042c31d9936e147671873",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/model/package.json",
+    "gitBlob": "300ea5baf8b949504c04731b4b1c2ebfd6e203c7",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/model/src/index.js",
+    "gitBlob": "0b543f5ab6f99e1f8e4b473479f47dbd10d79a62",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/LICENSE",
+    "gitBlob": "48acc83d94542b0c8b79f6fcf7dbea93154f7d56",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/README.md",
+    "gitBlob": "0e1a34348cc0af0883aa9a2c67a88a2948c143ea",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/package.json",
+    "gitBlob": "ec578b34eb121d8f0552a028a4f78c5c9f4d94ec",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/src/examples.js",
+    "gitBlob": "36a869eb514ae06b957d0e8c92acf123716ed414",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/src/features.js",
+    "gitBlob": "4770e8861c18aa60fffee4f71953261699f3126b",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/src/index.d.ts",
+    "gitBlob": "620d56d8aacb292a77a07b2ae9194af40b67279a",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/src/index.js",
+    "gitBlob": "148c3e32eee867b55f1dbb7362dfdc4526f51383",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/modeling/src/vertices.js",
+    "gitBlob": "899452668826913fc34bd130dd79338c452a755a",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer/package.json",
+    "gitBlob": "2b5ae5358304beef1a2ffa56655937c54fd68626",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/LICENSE",
+    "gitBlob": "48acc83d94542b0c8b79f6fcf7dbea93154f7d56",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/README.md",
+    "gitBlob": "b004d06b268a40e311e4ac1becfc6559dbb3610e",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/package.json",
+    "gitBlob": "1f2fe20335e2b55a927165e55d1904a157935776",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/camera.js",
+    "gitBlob": "62a600a941a1f4218054d8ae07462fee36643c48",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/index.d.ts",
+    "gitBlob": "d18363d622dab1c19907ac5a10a2baa9da3c2342",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/index.js",
+    "gitBlob": "e0c8b221d12df7359aa4e5564d7fa0d78d251e8f",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/renderer.js",
+    "gitBlob": "fccd1c08593c5169d7fec5798734fa3a0a30fd50",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/scene.js",
+    "gitBlob": "825a970b094f01e4ac8a4d08ec7179ac97312201",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/renderer3d/src/software.js",
+    "gitBlob": "21c00f8368db62e54f806ba569b4b71079693464",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/routing/package.json",
+    "gitBlob": "1f0d1164170e20de06495db7f381a2370bb92025",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/spatial/package.json",
+    "gitBlob": "9730112f4dcf9fb27c3663ad742067957611203e",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/storage/package.json",
+    "gitBlob": "01ec96baad1d4eae64c783003cb2444f9c4a2f0a",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/symbols/package.json",
+    "gitBlob": "2e261d64f9be0cd1e1644c7cc9d3e7d53fc56ded",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/package.json",
+    "gitBlob": "5fb372119b8a85b99218df64b74c08c7809974c5",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/src/document-workbench.js",
+    "gitBlob": "fe2bf2611c1a94f685d8253d62c48d6a048660bf",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/src/index.d.ts",
+    "gitBlob": "8cc50ac3c00e841e6f1b4c63a7751e9295c72ca8",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/src/index.js",
+    "gitBlob": "4f1cd1e578f22f64e332e1d0353500dfc1b7b2a7",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/src/modeling-workbench.js",
+    "gitBlob": "5dc283674d0458628b5ed3fae1bf09b815ec5805",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workbench/src/styles.css",
+    "gitBlob": "54e785b2a73c9194d586241d58d325cb87608f32",
+    "recoveredExactly": true
+  },
+  {
+    "path": "packages/workspace/package.json",
+    "gitBlob": "37d7baad2191db27072747827c58d34f6e42db6e",
+    "recoveredExactly": true
+  },
+  {
+    "path": "scripts/modeling-samples.mjs",
+    "gitBlob": "00895ed3fa4138527a2255e96bab4302a0f40ad8",
+    "recoveredExactly": true
+  },
+  {
+    "path": "tests/audit_modeling3d.py",
+    "gitBlob": "524f6e1de1592ce384ece403a3d260464b942965",
+    "recoveredExactly": true
+  },
+  {
+    "path": "tests/browser_modeling3d.py",
+    "gitBlob": "8c0a19253bc2e69f32fb3655ea4404035f51a233",
+    "recoveredExactly": true
+  },
+  {
+    "path": "tests/browser_modeling_backends.py",
+    "gitBlob": "43b88ffb32da5ee33a88b59e83ba436a2be108dc",
+    "recoveredExactly": true
+  },
+  {
+    "path": "tests/browser_symbols.py",
+    "gitBlob": "28fc7c514e925a9de06a0ec345b4a2b9cd8de8dd",
+    "recoveredExactly": true
+  }
+]

@@ -5,7 +5,7 @@ import { DrawingSession } from '@conduitcad/drawing';
 import { renderBlockBar, restoreHistory, refreshCalculations } from './parametric-workbench.js';
 import { escapeHTML as E, icon } from './icons.js';
 
-const defaults = () => ({ tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
+const defaults = () => ({ viewMode: '2d', model3dCamera: null, tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
 const fields = Object.keys(defaults());
 const cameraState = w => ({ x: w.camera.x, y: w.camera.y, scale: w.camera.scale });
 const dirty = session => session.revision !== session.savedRevision;
@@ -45,8 +45,8 @@ export function captureActiveDocument(w) {
 }
 function snapshotSession(session) {
     const c = session.context, block = c.blockSession;
-    const state = { camera: c.camera, selection: [...(c.selection || [])], settings: {}, libraryScroll: c.libraryScroll, inspectorScroll: c.inspectorScroll };
-    for (const key of ['category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle', 'gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations', 'drawingOptions']) state.settings[key] = c[key];
+    const state = { model3dCamera: c.model3dCamera, camera: c.camera, selection: [...(c.selection || [])], settings: {}, libraryScroll: c.libraryScroll, inspectorScroll: c.inspectorScroll };
+    for (const key of ['viewMode', 'category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle', 'gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations', 'drawingOptions']) state.settings[key] = c[key];
     state.tool = block?.testing ? 'select' : c.tool;
     state.draft = block?.testing ? [] : c.draft;
     state.drawing = !block?.testing && c.drawingSession ? { tool: c.tool, options: c.drawingSession.options, points: c.drawingSession.points } : null;
@@ -61,9 +61,10 @@ function snapshotSession(session) {
 }
 function restoreContext(w, document, state = {}) {
     const context = { ...defaults(), doc: document, history: createDocumentHistory(w), selection: new Set(), camera: { x: 0, y: 0, scale: 1 } };
-    for (const key of ['category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle']) if (typeof state.settings?.[key] === 'string') context[key] = state.settings[key];
+    for (const key of ['viewMode', 'category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle']) if (typeof state.settings?.[key] === 'string') context[key] = state.settings[key];
     for (const key of ['gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations']) if (typeof state.settings?.[key] === 'boolean') context[key] = state.settings[key];
     for (const key of ['x', 'y', 'scale']) if (Number.isFinite(state.camera?.[key])) context.camera[key] = state.camera[key];
+    if(state.model3dCamera && typeof state.model3dCamera === "object") context.model3dCamera = clone(state.model3dCamera);
     context.camera.scale = Math.min(5000, Math.max(.00001, context.camera.scale));
     if (state.settings?.drawingOptions && typeof state.settings.drawingOptions === 'object') context.drawingOptions = clone(state.settings.drawingOptions);
     if (state.block) {
@@ -240,7 +241,7 @@ export function openDocument(w, document, options = {}) {
     if (w.documents.sessions.length >= w.documents.maxDocuments) throw new Error(`Close a drawing before opening more than ${w.documents.maxDocuments} documents`);
     validateDocument(document);
     w.closeModal(); w.closePanels(); w.input.reset(); w.cancelGesture(); captureActiveDocument(w);
-    const context = { ...defaults(), ...options.context, doc: document, history: createDocumentHistory(w), selection: new Set() };
+    const context = { ...defaults(), ...(document.metadata?.modeling?.preferredMode === "3d" ? {viewMode:"3d"} : {}), ...options.context, doc: document, history: createDocumentHistory(w), selection: new Set() };
     const session = w.documents.add(document, { context });
     applyDocument(w, session); captureActiveDocument(w); scheduleRecovery(w);
     w.root.dispatchEvent(new CustomEvent('conduit:documentchange', { detail: { documentId: session.id, document } }));

@@ -1,3 +1,5 @@
+import { ModelingWorkbench } from './modeling-workbench.js';
+import { regenerateFeatures, EXAMPLES_3D, create3DExample } from '@conduitcad/modeling';
 import { initializeDocuments, claimWorkspace, createDocumentHistory, recoverDocuments, forkRecoveryWorkspace, captureActiveDocument, activateDocument, openDocument, renderDocuments, documentAction, documentKeyDown, documentChanged, scheduleRecovery, requestCloseDocument, disposeDocuments } from './document-workbench.js';
 import { MOBILE_MEDIA, bindMobileWorkspace, updateMobilePanels, prepareMobileDialog } from './mobile-workspace.js';
 import { mergeClipboardBlocks } from '@conduitcad/workspace';
@@ -83,6 +85,7 @@ export class Workbench {
                     this.camera.zoom(Math.exp(-p.deltaY * .0015), p);
                 this.renderer.invalidate();
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
+        this.model3d = new ModelingWorkbench(this);
         this.bindEvents();
         bindMobileWorkspace(this);
         this.updateUI();
@@ -120,7 +123,7 @@ export class Workbench {
     renderShell() {
         this.root.innerHTML = `<div class="app">
  <header class="appbar"><div class="brand"><span class="logo">${icon('logo')}</span><span class="brand-name">conduit</span><small>CAD</small></div><div class="document-title"><span class="divider"></span><button class="doc-title-button" data-action="rename" title="Rename drawing"><span class="doc-name"></span>${icon('down')}</button><span class="save-status">${icon('check')} Local workspace</span></div><div class="appbar-actions">${btn('new', 'New', 'plus', 'desktop-only', 'Create a drawing')}${btn('open', 'Open DXF', 'folder', 'btn')}${btn('export', 'Export', 'export', 'btn primary')}${iconButton('help', 'help', 'Help & shortcuts', 'desktop-only')}<div class="avatar" title="Local workspace · no account">CC</div></div></header>
- <nav class="workbar" aria-label="Workspace tools"><div class="workspace-label">${icon('symbols')} Design workspace</div>${btn('mode-draw', 'Draw', 'line', 'tab active')}${btn('mode-connect', 'Connect', 'connect', 'tab')}${btn('mode-inspect', 'Inspect', 'properties', 'tab')}<span class="spacer"></span>${btn('parameters', 'Parameters', 'param', 'compact optional')}${btn('line-styles', 'Line styles', 'line', 'compact optional')}<span class="separator desktop-only"></span>${btn('toggle-library', 'Library', 'symbols', 'compact mobile-only')}${iconButton('toggle-inspector', 'properties', 'Properties and layers', 'compact inspector-toggle')}${iconButton('command', 'command', 'Command palette', 'compact optional')}${iconButton('more', 'more', 'More drawing tools', 'compact mobile-only')}</nav>
+ <nav class="workbar" aria-label="Workspace tools"><div class="workspace-label">${icon('symbols')} Design workspace</div>${btn('mode-draw', 'Draw', 'line', 'tab active')}${btn('mode-3d', '3D', 'rect', 'tab')}${btn('mode-connect', 'Connect', 'connect', 'tab')}${btn('mode-inspect', 'Inspect', 'properties', 'tab')}<span class="spacer"></span>${btn('parameters', 'Parameters', 'param', 'compact optional')}${btn('line-styles', 'Line styles', 'line', 'compact optional')}<span class="separator desktop-only"></span>${btn('toggle-library', 'Library', 'symbols', 'compact mobile-only')}${iconButton('toggle-inspector', 'properties', 'Properties and layers', 'compact inspector-toggle')}${iconButton('command', 'command', 'Command palette', 'compact optional')}${iconButton('more', 'more', 'More drawing tools', 'compact mobile-only')}</nav>
  <main class="workspace"><aside class="library" aria-label="Symbol library"><div class="panel-heading"><h2>Symbol library <small class="library-count"></small></h2>${iconButton('toggle-library', 'close', 'Close library', 'mobile-only')}</div><p class="panel-subtitle">Drag a symbol. Make a connection.</p><div class="searchbox">${icon('search')}<input id="symbol-search" type="search" placeholder="Find a symbol…" aria-label="Search symbols" autocomplete="off"></div><div class="category-tabs"><select id="symbol-category" aria-label="Symbol category"><option value="All">All categories</option>${CATEGORIES.map(c => `<option value="${E(c.id)}" ${c.id === this.category ? 'selected' : ''}>${E(c.name)} · ${SYMBOLS.filter(s => s.category === c.id).length}</option>`).join('')}<option value="Custom">Custom / imported blocks</option></select></div><div class="library-summary" role="status" aria-live="polite"></div><div class="library-scroll"></div><div class="library-footer">${btn('library-guide', 'Conventions & library updates', 'help')}</div></aside>
  <section class="canvas-area" aria-label="Drawing canvas"><div class="viewport" tabindex="0" role="application" aria-label="CAD drawing. Use toolbar tools, touch gestures, or keyboard shortcuts."></div><div class="canvas-head"><div class="undo-group">${iconButton('undo', 'undo', 'Undo · Ctrl/⌘ Z')}${iconButton('redo', 'redo', 'Redo · Ctrl/⌘ Shift Z')}</div><div class="render-badge"><span class="dot"></span><span class="backend-name">Initializing</span><span class="stats-text quiet"> · retained renderer</span></div></div><div class="view-label">MODEL SPACE / TOP</div><div class="axis"><svg viewBox="0 0 38 38"><path d="M8 29V5m0 24h24M5 8l3-3 3 3m18 18 3 3-3 3" fill="none" stroke="#9aafa0" stroke-width="1.2"/><text x="2" y="4" font-size="6" fill="#94aa99">Y</text><text x="33" y="33" font-size="6" fill="#94aa99">X</text></svg><span class="unit-label">mm</span></div><div class="zoom-controls">${iconButton('zoom-out', 'minus', 'Zoom out')}<span class="zoom-value">100%</span>${iconButton('zoom-in', 'plus', 'Zoom in')}<span class="separator"></span>${iconButton('fit', 'fit', 'Fit drawing · F')}</div><div class="tool-hint"></div><div class="drawing-session-controls hide" role="toolbar" aria-label="Active drawing command">${btn('draw-exact-point', 'Point…', 'ruler')}${btn('draw-back', 'Back', 'undo')}${btn('draw-close', 'Close', 'polyline')}${btn('draw-options', 'Options', 'properties')}${btn('draw-cancel', 'Cancel', 'close')}</div><button class="finish-button hide" data-action="finish">${icon('check')} Finish path</button><nav class="tool-dock" aria-label="Drawing tools">
  ${this.toolButton('select', 'Select', 'select')}${this.toolButton('pan', 'Pan', 'pan', 'mobile-hidden')}${this.toolButton('line', 'Line', 'line')}${this.toolButton('connect', 'Connect', 'connect')}<span class="dock-divider"></span>${this.toolButton('rect', 'Rectangle', 'rect', 'mobile-hidden')}${this.toolButton('circle', 'Circle', 'circle', 'mobile-hidden')}${this.toolButton('text', 'Text', 'text', 'mobile-hidden')}${this.toolButton('dimension', 'Measure', 'dimension', 'desktop-only')}${btn('shapes', 'Shapes', 'rect', 'mobile-only')}${btn('toggle-library', 'Symbols', 'symbols', 'mobile-only')}${btn('toggle-inspector', 'Edit', 'properties', 'mobile-only')}<span class="dock-divider"></span>${btn('more', 'More', 'more', '')}
@@ -246,6 +249,7 @@ export class Workbench {
         }
     }
     async action(action) {
+        if (action === 'mode-3d' || action.startsWith('3d-')) return this.model3d.action(action);
         if (action.startsWith('document-')) { await documentAction(this, action); return; }
         if (action === 'new') { this.newDialog(); return; }
         if (action === 'open') { this.closeModal(); this.$('.file-input').click(); return; }
@@ -438,7 +442,7 @@ export class Workbench {
         }
         this.hideContext();
     }
-    updateUI() { this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
+    updateUI() { this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -455,6 +459,7 @@ export class Workbench {
         }
     }
     updateFrame(stats) {
+        if(this.model3d?.active) return;
         const layout = this.doc.activeLayout || 'Model';
         this.$('.view-label').textContent = layout === 'Model' ? 'MODEL SPACE / TOP' : `PAPER SPACE / ${layout}`;
         const badge = this.$('.backend-name');
@@ -480,6 +485,8 @@ export class Workbench {
     eval(source) { return evaluateExpression(source, this.doc.parameters); }
     touch(changed = null) {
         refreshCalculations(this);
+        const spatial = regenerateFeatures(this.doc);
+        if(changed && spatial.updated.length) changed = new Set([...changed,...spatial.updated]);
         if(changed){changed=new Set(changed);for(const c of this.doc.constraints||[])if(!c.suppressed)for(const id of c.entities||[c.entityId])if(id)changed.add(id);for(const e of this.doc.entities)if(e.calculation)changed.add(e.id);}
         const regenerated=regenerateDimensions(this.doc);
         if(changed&&regenerated.length)changed=new Set([...changed,...regenerated]);
@@ -491,7 +498,7 @@ export class Workbench {
         this.updateStatus();
     }
     edit(label, action) { this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
-    updateSelection() { scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
+    updateSelection() { this.model3d?.selectionChanged(); scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
         if (focus) {
@@ -509,6 +516,7 @@ export class Workbench {
         this.updateSelection();
     }
     setTool(tool) {
+        if(this.model3d?.active) this.model3d.setActive(false);
         if (!TOOL_INFO[tool])
             return;
         this.cancelGesture();
@@ -541,7 +549,7 @@ export class Workbench {
         this.$('.tool-hint').classList.toggle('working', this.tool !== 'select' && this.tool !== 'pan');
         this.$('.finish-button').classList.toggle('hide', !(this.tool === 'polyline' && this.draft.length >= 2));
         updateDrawingControls(this);
-        this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
+        this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.model3d?.active ? 'mode-3d' : this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
     }
     isMobile() { return this.mobileMedia?.matches ?? matchMedia(MOBILE_MEDIA).matches; }
     togglePanel(name) {
@@ -682,7 +690,8 @@ export class Workbench {
         window.addEventListener('pointercancel', () => { clearTimeout(timer); abort.abort(); this.previewSymbol = null; this.renderer.invalidate(); }, { signal: abort.signal, once: true });
     }
     field(name, label, value, full = false, unit = '') { return `<label class="field ${full ? 'full' : ''}"><span>${E(label)}${unit ? `<span class="unit">${E(unit)}</span>` : ''}</span><input data-prop="${name}" value="${E(value ?? '')}" autocomplete="off" spellcheck="false" inputmode="${['tag', 'text'].includes(name) ? 'text' : 'decimal'}" aria-label="${E(label)}"></label>`; }
-    renderInspector() { this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); updateMobilePanels(this); }
+    renderInspector() {
+        if(this.model3d?.active && this.inspectorTab === "properties") { this.model3d.renderInspector(); return; } this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); updateMobilePanels(this); }
     renderBaseInspector() {
         const host = this.$('.inspector-content');
         if (!host)
@@ -1595,6 +1604,7 @@ export class Workbench {
                 const e = clone(old);
                 e.id = map.get(old.id);
                 delete e._dxf;
+                delete e.feature3d; delete e.model3dConsumed;
                 moveEntity(e, 30, -30);
                 if (e.tag)
                     e.tag += '-COPY';
@@ -1610,7 +1620,7 @@ export class Workbench {
             this.reroute(this.selection);
         });
     }
-    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es), blocks: clone(this.doc.blocks), layers: clone(this.doc.layers) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied to the app clipboard`); }
+    copySelection() { const es = this.requireSelection(); this.clipboard = { entities: clone(es).map(e=>{delete e.feature3d;delete e.model3dConsumed;return e;}), blocks: clone(this.doc.blocks), layers: clone(this.doc.layers) }; this.toast(`${es.length} object${es.length === 1 ? '' : 's'} copied${es.some(e=>e.feature3d)?' as static mesh geometry':''} to the app clipboard`); }
     pasteSelection() {
         if (!this.clipboard)
             throw new Error('Copy objects in this workspace first');
@@ -1623,6 +1633,7 @@ export class Workbench {
                 e.id = map.get(e.id);
                 e.layout = this.doc.activeLayout;
                 delete e._dxf;
+                delete e.feature3d; delete e.model3dConsumed;
                 moveEntity(e, 40, -40);
                 if (e.tag)
                     e.tag += '-COPY';
@@ -1782,7 +1793,7 @@ export class Workbench {
     lineStylesDialog() { this.openModal('Line & connection library', `<p>Choose a line type, then connect symbol ports or free points. Every connector is a native DXF polyline with optional application metadata.</p><div class="line-style-list">${LINE_STYLES.map(s => `<button data-style="${s.id}"><svg viewBox="0 0 90 20"><path d="M3 10h84" stroke="${s.color}" stroke-width="${s.width}" ${s.dash.length ? `stroke-dasharray="${s.dash.join(' ')}"` : ''}/>${s.arrow === 'end' ? `<path d="m77 5 9 5-9 5" fill="none" stroke="${s.color}" stroke-width="${s.width}"/>` : ''}</svg><span>${E(s.name)}</span>${s.id === this.lineStyle ? icon('check') : ''}</button>`).join('')}</div>`); }
     moreDialog(shapesOnly = false) {
         const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']];
-        const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate','Duplicate','copy'],['rotate-angle','Rotate','rotate'],['offset','Offset','offset'],['trim','Trim','trim'],['extend','Extend','extend'],['fillet','Fillet','fillet'],['constraint','Constraints','param'],['make-symbol','Make symbol','symbols'],['explode','Explode','symbols'],['parameters','Parameters','param'],['multi-select','Multi-select','select'],['select-all','Select all','select'],['delete','Delete','trash'],['command','Command','command'],['help','Help','help']];
+        const editing = [['3d-tools','3D modeling tools','rect'],['3d-examples','3D example drawings','rect'],['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate','Duplicate','copy'],['rotate-angle','Rotate','rotate'],['offset','Offset','offset'],['trim','Trim','trim'],['extend','Extend','extend'],['fillet','Fillet','fillet'],['constraint','Constraints','param'],['make-symbol','Make symbol','symbols'],['explode','Explode','symbols'],['parameters','Parameters','param'],['multi-select','Multi-select','select'],['select-all','Select all','select'],['delete','Delete','trash'],['command','Command','command'],['help','Help','help']];
         const section = (label, actions) => `<section class="drawing-tool-group"><h3>${E(label)}</h3><div class="operation-grid">${actions.map(([a,l,i]) => btn(a,l,i).replace('<button ', `<button data-tool-search="${E((label+' '+l+' '+a).toLowerCase())}" `)).join('')}</div></section>`;
         this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `${section('Quick drawing',drawing)}${drawingToolSections(this)}${shapesOnly ? '' : section('Edit & organize',editing)}`, { wide: !shapesOnly });
         const body = this.modal.querySelector('.modal-body'), search = body.querySelector('.drawing-tool-search');
@@ -1841,6 +1852,7 @@ export class Workbench {
         });
     }
     closeModal() {
+        this.model3d?.clearPreview();
         if (this.modal) {
             this.modalCleanup?.(); this.modalCleanup = null;
             this.modal.remove();
@@ -1853,7 +1865,7 @@ export class Workbench {
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }
     toast(message, error = false) { const el = this.$('.toast'); if (this.disposed || !el) return; el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
     newDialog() {
-        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length} drawing starters</div><div class="export-grid template-grid"><button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
+        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length + EXAMPLES_3D.length} drawing starters</div><div class="export-grid template-grid">${EXAMPLES_3D.map(t=>`<button class="export-option template-card" data-demo="3d:${E(t.id)}" data-search="${E(('3d '+t.name+' '+t.industry+' '+t.description).toLowerCase())}"><span class="template-content"><small class="template-industry">3D · ${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.description)}</small></span></button>`).join('')}<button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
         const input = this.modal.querySelector('#template-search');
         input.addEventListener('input', () => {
             const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -1863,6 +1875,7 @@ export class Workbench {
         });
     }
     async newDocument(kind) {
+        if(kind.startsWith('3d:')) { const next=create3DExample(kind.slice(3)); return openDocument(this,next,{context:{viewMode:'3d',currentLayer:'Annotations'}}); }
         if (this.initializing) await this.ready;
         const next = kind === 'blank' ? installSymbols(createDocument()) : createDemo(kind);
         const profile = DRAWING_TYPES.find(p => p.id === kind), style = profile?.defaultLineStyle || 'process';
@@ -2069,6 +2082,10 @@ export class Workbench {
             return;
         const cmd = e.ctrlKey || e.metaKey;
         try {
+            if(this.model3d?.active&&!cmd){
+                if(e.key.toLowerCase()==='f'){e.preventDefault();this.model3d.fitSelection();return;}
+                if(e.key==='Enter'){e.preventDefault();this.model3d.action('3d-edit');return;}
+            }
             if (cmd) {
                 const key = e.key.toLowerCase();
                 if (['z', 'y', 's', 'o', 'n', 'a', 'd', 'c', 'v', 'x', 'k'].includes(key))
@@ -2157,7 +2174,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.7.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>15</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release is a planar CAD and diagram editor, not full AutoCAD or Visio parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, solid modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.8.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>18</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    dispose() { this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/routing",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Modular Conduit CAD routing engine",
   "type": "module",
   "main": "./src/index.js",
@@ -26,7 +26,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.7.1",
-    "@conduitcad/spatial": "0.7.1"
+    "@conduitcad/geometry": "0.8.0",
+    "@conduitcad/spatial": "0.8.0"
   }
 }

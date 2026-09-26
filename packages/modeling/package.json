@@ -1,0 +1,34 @@
+{
+  "name": "@conduitcad/modeling",
+  "version": "0.8.0",
+  "description": "Transactional 3D feature history, editable engineering examples and interchange",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@conduitcad/geometry3d": "0.8.0",
+    "@conduitcad/geometry": "0.8.0",
+    "@conduitcad/model": "0.8.0",
+    "@conduitcad/constraints": "0.8.0"
+  }
+}

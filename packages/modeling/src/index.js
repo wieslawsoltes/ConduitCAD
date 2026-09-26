@@ -1,0 +1,18 @@
+import { EXAMPLES_3D as examples, create3DExample as createExample } from './examples.js';
+import { MODELING_TOOLS as tools, curvePoints3 as curve, regenerateFeatures as regenerate, addFeature as add, editFeature as edit, removeFeature as remove, bakeFeature as bake, offsetPlanarFace as offset, sectionEntities as section, writeOBJ as obj, writeSTL as stl } from './features.js';
+export const MODELING_TOOLS = tools;
+export const curvePoints3 = curve;
+export const regenerateFeatures = regenerate;
+export const addFeature = add;
+export const editFeature = edit;
+export const removeFeature = remove;
+export const bakeFeature = bake;
+export const offsetPlanarFace = offset;
+export const sectionEntities = section;
+export const writeOBJ = obj;
+export const writeSTL = stl;
+export const EXAMPLES_3D = examples;
+export const create3DExample = createExample;
+import { controlPoints3 as controls, setControlPoint3 as setControl } from './vertices.js';
+export const controlPoints3 = controls;
+export const setControlPoint3 = setControl;

@@ -106,3 +106,20 @@ multiWorkspace.activate(multiSession.id);
 multiWorkspace.markChanged(multiSession.id);
 const multiSaved: Promise<WorkspaceManifest> = multiWorkspace.saveAll();
 void multiSaved;
+
+// Recovered 3D public modules: compile the declarations through an independent consumer.
+import { V3, boxMesh, extrudeMesh, meshProperties, type Mesh, type Point3 } from '@conduitcad/geometry3d';
+import { EXAMPLES_3D, create3DExample, addFeature, editFeature, regenerateFeatures, controlPoints3, setControlPoint3, writeOBJ, type FeatureEntity } from '@conduitcad/modeling';
+import { OrbitCamera, SpatialRenderer, buildScene3D, pick3D, type Scene3D } from '@conduitcad/renderer3d';
+const spatialMesh: Mesh = boxMesh(10, 20, 30);
+const spatialDocument: CadDocument = create3DExample(EXAMPLES_3D[0].id);
+const spatialFeature: FeatureEntity = addFeature(spatialDocument, 'box', {width: '20+5', depth: 15, height: 10});
+editFeature(spatialDocument, spatialFeature.id, {parameters: {height: 20}});
+const spatialScene: Scene3D = buildScene3D(spatialDocument);
+const spatialCamera = new OrbitCamera({perspective: true, target: V3(1, 2, 3)});
+spatialCamera.resize(800, 600);
+const spatialPoints: Point3[] = controlPoints3(spatialFeature);
+const spatialRenderer = new SpatialRenderer(host, {backend: 'canvas', camera: spatialCamera});
+spatialRenderer.setDocument(spatialDocument);
+spatialRenderer.setSelection(new Set([spatialFeature.id]));
+void [extrudeMesh, meshProperties(spatialMesh).centroid, writeOBJ(spatialMesh), spatialPoints, setControlPoint3, regenerateFeatures, pick3D(spatialScene, spatialCamera, 400, 300), spatialRenderer.ready];

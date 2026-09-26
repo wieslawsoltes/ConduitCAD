@@ -1,6 +1,7 @@
 export interface WorkbenchOptions {
     document?: import('@conduitcad/model').CadDocument;
     backend?: 'auto' | 'canvas' | 'webgl2' | 'webgpu';
+    backend3d?: 'auto' | 'canvas' | 'webgl2' | 'webgpu';
     store?: import('@conduitcad/storage').ProjectStore;
     workspaceKey?: string;
     maxDocuments?: number;
@@ -12,6 +13,8 @@ export class Workbench {
     constructor(root: any, options?: WorkbenchOptions);
     root: any;
     options: WorkbenchOptions;
+    viewMode: "2d" | "3d";
+    model3dCamera: import("@conduitcad/renderer3d").CameraState3D | null;
     initializing: boolean;
     documents: import('@conduitcad/workspace').DocumentWorkspace<any>;
     drawingSession: import('@conduitcad/drawing').DrawingSession | null;
