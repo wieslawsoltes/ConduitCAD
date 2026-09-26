@@ -51,7 +51,9 @@ jobs:
           with sync_playwright() as playwright:
               print('CHROMIUM_EXECUTABLE=' + playwright.chromium.executable_path)
           PY
-      - name: Browser editing, mobile catalogue, pixel clipping, and independent DXF audits
+      - name: Browser editing, adaptive mobile UI, native workspace recovery and DXF audits
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
         shell: bash
         run: |
           set -euo pipefail
@@ -59,10 +61,12 @@ jobs:
           python tests/browser_workflows.py
           python tests/browser_fidelity.py
           python tests/browser_symbols.py
-          CONDUIT_TEST_ORIGIN=localhost python tests/browser_interop.py
-          CONDUIT_TEST_ORIGIN=localhost python tests/browser_cad_editing.py
-          CONDUIT_TEST_ORIGIN=localhost python tests/browser_parametric.py
-          CONDUIT_TEST_ORIGIN=localhost python tests/browser_drawing_tools.py
+          python tests/browser_interop.py
+          python tests/browser_cad_editing.py
+          python tests/browser_parametric.py
+          python tests/browser_drawing_tools.py
+          python tests/browser_documents.py
+          python tests/browser_mobile_ui.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
           python tests/audit_symbol_library.py
