@@ -72,6 +72,7 @@ try:
    page.evaluate("conduit.iconography.setMode('auto');conduit.model3d.camera.view('iso');conduit.model3d.renderer.fit();conduit.iconography.hide()")
    page.wait_for_timeout(80);page.screenshot(path=str(OUT/f'icons-{width}-3d.png'))
    page.evaluate('conduit.model3d.toolsDialog()');page.wait_for_timeout(40)
+   if touch:ok(prefix+' preference select retains readable touch text',page.locator('[data-icon-label-mode]').evaluate("e=>parseFloat(getComputedStyle(e).fontSize)>=16&&e.getBoundingClientRect().right<=innerWidth"))
    ok(prefix+' 3D tool catalogue has operation-specific glyphs',page.locator('.model3d-searchable [data-icon="hole"]').count()==1 and page.locator('.model3d-searchable [data-icon="extrude"]').count()==1)
    page.screenshot(path=str(OUT/f'icons-{width}-tools.png'))
    page.evaluate("conduit.closeModal();conduit.model3d.setActive(false);conduit.exportDialog()")
