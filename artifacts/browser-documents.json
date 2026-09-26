@@ -1,0 +1,255 @@
+{
+  "checks": [
+    {
+      "name": "first drawing has one accessible selected document tab",
+      "passed": true
+    },
+    {
+      "name": "New creates another tab without removing the previous drawing",
+      "passed": true
+    },
+    {
+      "name": "new drawing has independent empty undo history",
+      "passed": true
+    },
+    {
+      "name": "first tab retains its geometry and selection",
+      "passed": true
+    },
+    {
+      "name": "view, library category and snapping restore independently",
+      "passed": true
+    },
+    {
+      "name": "undo only edits the active drawing",
+      "passed": true
+    },
+    {
+      "name": "other drawing and its independent undo history are intact",
+      "passed": true
+    },
+    {
+      "name": "accepted native command points resume on return to a tab",
+      "passed": true
+    },
+    {
+      "name": "second camera and active layer restore",
+      "passed": true
+    },
+    {
+      "name": "resumed command completes in its owning document",
+      "passed": true
+    },
+    {
+      "name": "single renderer retains only three canvas layers regardless of tab count",
+      "passed": true
+    },
+    {
+      "name": "arrow/home navigation focuses tabs without activating expensive scenes",
+      "passed": true
+    },
+    {
+      "name": "Enter activates a focused document tab",
+      "passed": true
+    },
+    {
+      "name": "block editor is isolated inside its document tab",
+      "passed": true
+    },
+    {
+      "name": "switching away suspends the block authoring bar and draft",
+      "passed": true
+    },
+    {
+      "name": "switching back restores block draft and its private history",
+      "passed": true
+    },
+    {
+      "name": "Test Block scratch state survives a document switch",
+      "passed": true
+    },
+    {
+      "name": "returning from Test Block recovers the original draft",
+      "passed": true
+    },
+    {
+      "name": "shared master save is confined to its owning drawing",
+      "passed": true
+    },
+    {
+      "name": "cross-document paste never overwrites colliding block definitions",
+      "passed": true
+    },
+    {
+      "name": "save all marks every captured document revision as saved",
+      "passed": true
+    },
+    {
+      "name": "reload restores every open drawing and active tab order",
+      "passed": true
+    },
+    {
+      "name": "reload restores an uncommitted block draft without changing its master",
+      "passed": true
+    },
+    {
+      "name": "recovered draft has restored camera and clean new undo history",
+      "passed": true
+    },
+    {
+      "name": "unsaved close presents explicit save, discard and cancel choices",
+      "passed": true
+    },
+    {
+      "name": "Cancel close leaves the same document active",
+      "passed": true
+    },
+    {
+      "name": "failed save-and-close retains the drawing and dirty status",
+      "passed": true
+    },
+    {
+      "name": "save failure keeps the close dialog available for retry",
+      "passed": true
+    },
+    {
+      "name": "successful save-and-close selects the surviving tab",
+      "passed": true
+    },
+    {
+      "name": "recently closed saved drawing can be reopened without losing its geometry",
+      "passed": true
+    },
+    {
+      "name": "document switcher filters without deleting hidden sessions",
+      "passed": true
+    },
+    {
+      "name": "Duplicate opens an independent drawing rather than shared mutable model data",
+      "passed": true
+    },
+    {
+      "name": "batch imports are ordered and invalid files do not discard successful tabs",
+      "passed": true
+    },
+    {
+      "name": "file-import tabs retain native DXF entity types",
+      "passed": true
+    },
+    {
+      "name": "reordering tabs preserves active drawing identity",
+      "passed": true
+    },
+    {
+      "name": "export downloads only the active document, not a workspace wrapper",
+      "passed": true
+    },
+    {
+      "name": "mobile tabs and document management have at least 44px targets",
+      "passed": true
+    },
+    {
+      "name": "mobile workspace has no horizontal document overflow",
+      "passed": true
+    },
+    {
+      "name": "mobile removes redundant workspace mode bar for canvas space",
+      "passed": true
+    },
+    {
+      "name": "portrait canvas retains useful height with document tabs visible",
+      "passed": true
+    },
+    {
+      "name": "mobile library opens with reachable sheet expansion handle",
+      "passed": true
+    },
+    {
+      "name": "sheet expansion increases usable symbol-library height",
+      "passed": true
+    },
+    {
+      "name": "hidden sheets cannot receive keyboard focus",
+      "passed": true
+    },
+    {
+      "name": "mobile document switcher lists all open drawings",
+      "passed": true
+    },
+    {
+      "name": "mobile document switcher fits its visual viewport",
+      "passed": true
+    },
+    {
+      "name": "touch activates another document tab",
+      "passed": true
+    },
+    {
+      "name": "landscape uses a compact scrollable tool rail with reachable symbol controls",
+      "passed": true
+    },
+    {
+      "name": "landscape tabs and canvas remain within horizontal viewport",
+      "passed": true
+    },
+    {
+      "name": "landscape properties use a side sheet without replacing the document tab bar",
+      "passed": true
+    },
+    {
+      "name": "narrow 320px mobile layout stays within viewport",
+      "passed": true
+    },
+    {
+      "name": "narrow mobile primary tools retain 44px targets",
+      "passed": true
+    },
+    {
+      "name": "delayed modal autofocus does not steal an already-focused text field",
+      "passed": true
+    },
+    {
+      "name": "visual keyboard resize constrains the mobile modal height",
+      "passed": true
+    },
+    {
+      "name": "keyboard mode hides canvas-only tool chrome",
+      "passed": true
+    },
+    {
+      "name": "no uncaught JavaScript errors",
+      "passed": true
+    },
+    {
+      "name": "CI storage path actually uses IndexedDB",
+      "passed": true
+    },
+    {
+      "name": "duplicated browser page forks a live recovery namespace",
+      "passed": true
+    },
+    {
+      "name": "forked page recovers the same open drawing set without clearing its source",
+      "passed": true
+    },
+    {
+      "name": "independent page saves do not overwrite the original recovery records",
+      "passed": true
+    },
+    {
+      "name": "duplicating an already-forked browser page still acquires a new namespace",
+      "passed": true
+    },
+    {
+      "name": "all real-origin document pages complete without JavaScript exceptions",
+      "passed": true
+    }
+  ],
+  "passed": 61,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "origin": "localhost",
+  "storage": "real IndexedDB",
+  "keyboard": "synthetic VisualViewport event"
+}

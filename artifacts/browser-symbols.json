@@ -101,7 +101,7 @@
       "passed": true
     },
     {
-      "name": "save failure leaves the previous drawing open",
+      "name": "storage failure keeps previous drawing open in its own tab",
       "passed": true
     },
     {

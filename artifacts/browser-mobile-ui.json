@@ -1,0 +1,1950 @@
+{
+  "passed": 485,
+  "checks": [
+    {
+      "name": "320x568 uses compact touch workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 root has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 tool rail/dock is in viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 canvas has useful height",
+      "passed": true
+    },
+    {
+      "name": "320x568 new active document tab is revealed",
+      "passed": true
+    },
+    {
+      "name": "320x568 document chrome has 44px targets",
+      "passed": true
+    },
+    {
+      "name": "320x568 save status does not hijack tab scrolling",
+      "passed": true
+    },
+    {
+      "name": "320x568 opening chooser does not summon input focus",
+      "passed": true
+    },
+    {
+      "name": "320x568 document footer is outside scrolling body",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 documents closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 more dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 more form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 more modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 more header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 more visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 more closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 export dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 export form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 export modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 export header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 export visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 export closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameters closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 solver-report closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 blocks closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 help dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 help form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 help modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 help header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 help visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 help closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-styles closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 precision closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "320x568 properties sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 properties tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "320x568 layers sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 layers tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "320x568 qa sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 qa tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "320x568 library is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 sheet expands below actual chrome",
+      "passed": true
+    },
+    {
+      "name": "390x844 uses compact touch workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 root has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 tool rail/dock is in viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 canvas has useful height",
+      "passed": true
+    },
+    {
+      "name": "390x844 new active document tab is revealed",
+      "passed": true
+    },
+    {
+      "name": "390x844 document chrome has 44px targets",
+      "passed": true
+    },
+    {
+      "name": "390x844 save status does not hijack tab scrolling",
+      "passed": true
+    },
+    {
+      "name": "390x844 opening chooser does not summon input focus",
+      "passed": true
+    },
+    {
+      "name": "390x844 document footer is outside scrolling body",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 documents closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 more dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 more form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 more modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 more header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 more visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 more closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 export dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 export form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 export modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 export header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 export visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 export closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameters closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 solver-report closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 blocks closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 help dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 help form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 help modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 help header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 help visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 help closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-styles closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 precision closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "390x844 properties sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 properties tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "390x844 layers sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 layers tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "390x844 qa sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 qa tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "390x844 library is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 sheet expands below actual chrome",
+      "passed": true
+    },
+    {
+      "name": "844x390 uses compact touch workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 root has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 tool rail/dock is in viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 canvas has useful height",
+      "passed": true
+    },
+    {
+      "name": "844x390 new active document tab is revealed",
+      "passed": true
+    },
+    {
+      "name": "844x390 document chrome has 44px targets",
+      "passed": true
+    },
+    {
+      "name": "844x390 save status does not hijack tab scrolling",
+      "passed": true
+    },
+    {
+      "name": "844x390 opening chooser does not summon input focus",
+      "passed": true
+    },
+    {
+      "name": "844x390 document footer is outside scrolling body",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 documents closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 more dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 more form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 more modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 more header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 more visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 more closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 export dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 export form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 export modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 export header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 export visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 export closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameters closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 solver-report closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 blocks closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 help dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 help form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 help modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 help header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 help visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 help closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-styles closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 precision closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "844x390 properties sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 properties tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "844x390 layers sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 layers tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "844x390 qa sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 qa tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "844x390 library is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 uses compact touch workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 root has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 tool rail/dock is in viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 canvas has useful height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 new active document tab is revealed",
+      "passed": true
+    },
+    {
+      "name": "820x1180 document chrome has 44px targets",
+      "passed": true
+    },
+    {
+      "name": "820x1180 save status does not hijack tab scrolling",
+      "passed": true
+    },
+    {
+      "name": "820x1180 opening chooser does not summon input focus",
+      "passed": true
+    },
+    {
+      "name": "820x1180 document footer is outside scrolling body",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 documents closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 more closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 export closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 parameters closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 solver-report closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 blocks closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 help closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 line-styles closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 precision closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "820x1180 properties sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 properties tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "820x1180 layers sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 layers tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "820x1180 qa sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 qa tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "820x1180 library is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 sheet expands below actual chrome",
+      "passed": true
+    },
+    {
+      "name": "1024x768 uses compact touch workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 root has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "1024x768 tool rail/dock is in viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 canvas has useful height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 new active document tab is revealed",
+      "passed": true
+    },
+    {
+      "name": "1024x768 document chrome has 44px targets",
+      "passed": true
+    },
+    {
+      "name": "1024x768 save status does not hijack tab scrolling",
+      "passed": true
+    },
+    {
+      "name": "1024x768 opening chooser does not summon input focus",
+      "passed": true
+    },
+    {
+      "name": "1024x768 document footer is outside scrolling body",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 documents closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 more closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 export closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameters closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 solver-report closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 blocks closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 help closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-styles closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 precision closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "1024x768 properties sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 properties tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "1024x768 layers sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 layers tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "1024x768 qa sheet is bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 qa tab exposes selected state",
+      "passed": true
+    },
+    {
+      "name": "1024x768 library is bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 sheet expands below actual chrome",
+      "passed": true
+    },
+    {
+      "name": "tool search includes shared block editing",
+      "passed": true
+    },
+    {
+      "name": "tool search hides unrelated basic tools",
+      "passed": true
+    },
+    {
+      "name": "empty search has useful status",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "constraint authoring closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "calculated annotation closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editor closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block-settings dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "block-settings form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "block-settings modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "block-settings header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "block-settings visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "block-settings closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block-author dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "block-author form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "block-author modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "block-author header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "block-author visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "block-author closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block-attribute dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "block-attribute form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "block-attribute modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "block-attribute header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "block-attribute visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "block-attribute closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block-port dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "block-port form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "block-port modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "block-port header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "block-port visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "block-port closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block-save-as dialog stays inside viewport",
+      "passed": true
+    },
+    {
+      "name": "block-save-as form body does not overflow horizontally",
+      "passed": true
+    },
+    {
+      "name": "block-save-as modal makes underlying workspace inert",
+      "passed": true
+    },
+    {
+      "name": "block-save-as header and close remain reachable",
+      "passed": true
+    },
+    {
+      "name": "block-save-as visible controls meet touch height",
+      "passed": true
+    },
+    {
+      "name": "block-save-as closing restores non-modal workspace",
+      "passed": true
+    },
+    {
+      "name": "block editing chrome stays inside phone viewport",
+      "passed": true
+    },
+    {
+      "name": "all block actions remain horizontally reachable",
+      "passed": true
+    },
+    {
+      "name": "parameter cards keep full expression font size",
+      "passed": true
+    },
+    {
+      "name": "mobile parameter form calculates without truncating values",
+      "passed": true
+    },
+    {
+      "name": "parameter remove buttons are 44 by 44",
+      "passed": true
+    },
+    {
+      "name": "touch Apply preserves parameter expressions",
+      "passed": true
+    },
+    {
+      "name": "touch inspector switching updates accessible tab selection",
+      "passed": true
+    },
+    {
+      "name": "document manager renames drawing through history",
+      "passed": true
+    },
+    {
+      "name": "document rename can be undone",
+      "passed": true
+    },
+    {
+      "name": "touch document manager moves tabs right without changing identity",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: arc",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: arc",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: arc-center",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: arc-center",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: circle-3p",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: circle-3p",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: circle-diameter",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: circle-diameter",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: ellipse",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: ellipse",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: ellipse-arc",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: ellipse-arc",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: spline",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: spline",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: bezier",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: bezier",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: polygon",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: polygon",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: donut",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: donut",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: solid",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: solid",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: face",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: face",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: hatch",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: hatch",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: wipeout",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: wipeout",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: point",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: point",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: ray",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: ray",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: xline",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: xline",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: mtext",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: mtext",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: leader",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: leader",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-aligned",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-aligned",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-horizontal",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-horizontal",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-vertical",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-vertical",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-radius",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-radius",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-diameter",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-diameter",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-angular",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-angular",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-angular-lines",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-angular-lines",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-ordinate-x",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-ordinate-x",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls fit: dim-ordinate-y",
+      "passed": true
+    },
+    {
+      "name": "mobile active controls hide redundant zoom: dim-ordinate-y",
+      "passed": true
+    },
+    {
+      "name": "keyboard fits modal including viewport offset",
+      "passed": true
+    },
+    {
+      "name": "keyboard leaves exact coordinate expression intact",
+      "passed": true
+    },
+    {
+      "name": "keyboard keeps Apply and Cancel visible",
+      "passed": true
+    },
+    {
+      "name": "keyboard hides only drawing chrome",
+      "passed": true
+    },
+    {
+      "name": "exact entry applies once after keyboard resize",
+      "passed": true
+    },
+    {
+      "name": "double submit performs exactly one transaction",
+      "passed": true
+    },
+    {
+      "name": "modal focus cycles without leaking into canvas",
+      "passed": true
+    },
+    {
+      "name": "wide table has a labeled horizontal scrolling region",
+      "passed": true
+    },
+    {
+      "name": "wide table does not cause dialog overflow",
+      "passed": true
+    },
+    {
+      "name": "last table column can be reached by scrolling",
+      "passed": true
+    },
+    {
+      "name": "desktop does not use compact mode",
+      "passed": true
+    },
+    {
+      "name": "desktop retains permanent library and inspector",
+      "passed": true
+    },
+    {
+      "name": "desktop command dialog focuses its input",
+      "passed": true
+    },
+    {
+      "name": "no uncaught JavaScript exceptions",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "origin": "localhost",
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "keyboard": "synthetic VisualViewport metrics"
+}

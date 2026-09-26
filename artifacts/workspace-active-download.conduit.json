@@ -1,0 +1,232 @@
+{
+  "schema": "conduitcad/1",
+  "name": "batch-two",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "e-muhyoydv-1",
+      "type": "CIRCLE",
+      "layer": "0",
+      "layout": "Model",
+      "_dxf": {
+        "raw": [
+          [
+            0,
+            "CIRCLE"
+          ],
+          [
+            8,
+            "0"
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            40,
+            10
+          ]
+        ]
+      },
+      "dirty": false,
+      "colorIndex": 256,
+      "colorMode": "aci",
+      "lineweight": -1,
+      "linetype": "BYLAYER",
+      "c": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "r": 10,
+      "extrusion": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "thickness": 0,
+      "linetypeScale": 1,
+      "transparency": null
+    }
+  ],
+  "blocks": {},
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": []
+  },
+  "parameters": {
+    "grid": "10",
+    "pipeWidth": "2",
+    "valveSize": "64"
+  },
+  "constraints": [],
+  "metadata": {
+    "author": "",
+    "description": ""
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": [
+    {
+      "severity": "info",
+      "message": "1 model/layout entities, 0 blocks, 1 layers; 0 unsupported entities."
+    },
+    {
+      "severity": "info",
+      "message": "Original input remains available unchanged. Edited DXF export normalizes supported planar entities; normalized export rebuilds represented objects. Record-preserving export retains foreign graphs but rejects unsafe edits."
+    }
+  ],
+  "textStyles": {},
+  "signedLinetypes": true,
+  "source": {
+    "format": "ascii",
+    "base64": "MApTRUNUSU9OCjIKRU5USVRJRVMKMApDSVJDTEUKOAowCjEwCjAKMjAKMAo0MAoxMAowCkVORFNFQwowCkVPRgo=",
+    "encoding": "windows-1252"
+  },
+  "rawSections": {},
+  "dimstyles": {},
+  "layoutSettings": {},
+  "_dxfPreservation": {
+    "pairs": [
+      [
+        0,
+        "SECTION"
+      ],
+      [
+        2,
+        "ENTITIES"
+      ],
+      [
+        0,
+        "CIRCLE"
+      ],
+      [
+        8,
+        "0"
+      ],
+      [
+        10,
+        0
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        40,
+        10
+      ],
+      [
+        0,
+        "ENDSEC"
+      ],
+      [
+        0,
+        "EOF"
+      ]
+    ],
+    "state": {
+      "units": "mm",
+      "parameters": {
+        "grid": "10",
+        "pipeWidth": "2",
+        "valveSize": "64"
+      },
+      "constraints": [],
+      "metadata": {
+        "author": "",
+        "description": ""
+      },
+      "layers": [
+        {
+          "name": "0",
+          "color": "#344755",
+          "visible": true,
+          "locked": false
+        }
+      ],
+      "blocks": {},
+      "linetypes": {
+        "CONTINUOUS": []
+      },
+      "signedLinetypes": true,
+      "textStyles": {},
+      "dimstyles": {},
+      "layouts": [
+        "Model"
+      ],
+      "layoutSettings": {},
+      "rawSections": {},
+      "source": {
+        "format": "ascii",
+        "base64": "MApTRUNUSU9OCjIKRU5USVRJRVMKMApDSVJDTEUKOAowCjEwCjAKMjAKMAo0MAoxMAowCkVORFNFQwowCkVPRgo=",
+        "encoding": "windows-1252"
+      }
+    },
+    "entities": [
+      {
+        "id": "e-muhyoydv-1",
+        "raw": [
+          [
+            0,
+            "CIRCLE"
+          ],
+          [
+            8,
+            "0"
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            20,
+            0
+          ],
+          [
+            40,
+            10
+          ]
+        ],
+        "value": {
+          "id": "e-muhyoydv-1",
+          "type": "CIRCLE",
+          "layer": "0",
+          "layout": "Model",
+          "colorIndex": 256,
+          "colorMode": "aci",
+          "lineweight": -1,
+          "linetype": "BYLAYER",
+          "c": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "r": 10,
+          "extrusion": {
+            "x": 0,
+            "y": 0,
+            "z": 1
+          },
+          "thickness": 0,
+          "linetypeScale": 1,
+          "transparency": null
+        }
+      }
+    ]
+  }
+}

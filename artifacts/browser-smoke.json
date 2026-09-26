@@ -6,8 +6,8 @@
       "app": true,
       "stats": {
         "backend": "Canvas 2D",
-        "frameMs": 4.19999999999709,
-        "buildMs": 3.8000000000029104,
+        "frameMs": 2.8999999999941792,
+        "buildMs": 2,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -20,7 +20,7 @@
         "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819,
+        "height": 766,
         "clipInset": 22
       },
       "scroll": 1440,
@@ -34,8 +34,8 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 4.600000000005821,
-        "buildMs": 3.2000000000116415,
+        "frameMs": 2.6999999999825377,
+        "buildMs": 2.7999999999883585,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -48,7 +48,7 @@
         "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819,
+        "height": 766,
         "clipInset": 22
       },
       "scroll": 1440,
@@ -62,8 +62,8 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 3.5,
-        "buildMs": 3.1000000000058208,
+        "frameMs": 2.6000000000058208,
+        "buildMs": 2.3000000000174623,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -76,7 +76,7 @@
         "y": 358.8,
         "scale": 0.7528857479387515,
         "width": 939,
-        "height": 819,
+        "height": 766,
         "clipInset": 22
       },
       "scroll": 1440,
@@ -89,8 +89,8 @@
     "overflow": false,
     "stats": {
       "backend": "Canvas 2D",
-      "frameMs": 3.5,
-      "buildMs": 2.7000000000116415,
+      "frameMs": 2.599999999976717,
+      "buildMs": 2.8999999999941792,
       "segments": 252,
       "entities": 39,
       "draws": 2,
