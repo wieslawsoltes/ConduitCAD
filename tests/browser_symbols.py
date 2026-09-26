@@ -37,7 +37,12 @@ with sync_playwright() as p:
     ok('placement lazily installs exactly the selected master',page.evaluate('Object.keys(conduit.doc.blocks).length===1 && conduit.doc.entities[0].type==="INSERT" && conduit.doc.entities[0].block==="CC_HYD_CYLINDER"'))
     ok('hydraulic insertion uses the hydraulic layer',page.evaluate('conduit.doc.entities[0].layer==="Hydraulics"'))
     page.evaluate('conduit.newDialog()')
-    ok('new drawing dialog exposes twenty 2D and ten 3D starters and Blank',page.locator('[data-demo]').count()==31)
+    starters=page.locator('[data-demo]').evaluate_all('(items)=>items.map(item=>item.dataset.demo)')
+    expected3d={'3d:'+record['id'] for record in json.loads((OUT/'modeling-samples.json').read_text())}
+    ok('new drawing dialog exposes twenty 2D starters, Blank and every generated 3D starter',
+       len(starters)==len(set(starters))==21+len(expected3d) and
+       {value for value in starters if value.startswith('3d:')}==expected3d and
+       {'3d:hole-plate','3d:extrusion-study','3d:face-boss'}.issubset(expected3d))
     page.locator('#template-search').fill('hydraulic')
     ok('industry search filters the actual starter buttons',page.locator('.template-card:visible').count()==1)
     page.locator('[data-demo="hydraulic-actuator"]').click();page.wait_for_function('conduit.doc.metadata.templateId==="hydraulic-actuator"')

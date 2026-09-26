@@ -79,6 +79,12 @@ try:
   ok('Join shows the body selector',page.locator('[data-model-target-row]').is_visible())
   page.locator('[data-model-target]').select_option(page.evaluate('plateId'));apply(page)
   ok('Join produces one native feature retaining both inputs',page.evaluate('conduit.doc.entities.length===3&&conduit.doc.entities[2].feature3d.inputs.length===2&&Math.max(...conduit.doc.entities[2].points.map(p=>p.z))===30'))
+  # Imported expression-valued choices remain choices, not silently reset literals.
+  page.evaluate("conduit.doc.parameters={JoinMode:'1',NormalMode:'1'};const f=conduit.doc.entities[2].feature3d;f.parameters.operation='JoinMode';f.parameters.useNormal='NormalMode'")
+  action(page,'3d-edit')
+  ok('expression-valued choices retain the original expression',page.locator('[data-model-field=operation]').input_value()=='JoinMode' and page.locator('[data-model-target-row]').is_visible() and page.locator('[data-model-row=nx]').is_hidden())
+  apply(page)
+  ok('Apply preserves expression-driven operation and its target',page.evaluate('conduit.doc.entities[2].feature3d.parameters.operation==="JoinMode"&&conduit.doc.entities[2].feature3d.inputs.length===2'))
   # Timeline refresh does not replace focused buttons on autosave-style sync.
   page.evaluate('window.timelineButton=document.querySelector(".model3d-feature");timelineButton.focus();window.timelineScroll=document.querySelector(".model3d-timeline").scrollLeft;conduit.model3d.sync()')
   ok('unchanged timeline sync preserves button identity and keyboard focus',page.evaluate('document.activeElement===timelineButton&&document.querySelector(".model3d-feature")===timelineButton'))
@@ -102,6 +108,7 @@ try:
    ok(tag+' hole can be completed in a touch-sized form',page.evaluate('conduit.doc.entities.at(-1).feature3d.kind==="hole"'))
    action(page,'3d-pick:face');ok(tag+' selection toggle exposes pressed state',page.locator('.model3d-selection-tools [data-action="3d-pick:face"]').get_attribute('aria-pressed')=='true')
    action(page,'3d-nav-toggle');ok(tag+' navigation toggles directly to Pan',page.evaluate('conduit.model3d.navigation==="pan"'))
+   ok(tag+' gesture hint follows navigation and selection mode',page.locator('.model3d-hint').inner_text().startswith('Drag to pan') and 'select face' in page.locator('.viewport3d').get_attribute('aria-label'))
    action(page,'3d-clear');page.evaluate("conduit.model3d.camera.view('iso');conduit.model3d.renderer.fit()")
    rect=page.locator('.viewport3d').bounding_box();cx=rect['x']+rect['width']/2;cy=rect['y']+rect['height']/2;before=page.evaluate('JSON.stringify(conduit.doc)');distance=page.evaluate('conduit.model3d.camera.height');cdp=ctx.new_cdp_session(page)
    def touch(kind,pts):cdp.send('Input.dispatchTouchEvent',{'type':kind,'touchPoints':[{'x':x,'y':y,'id':i+1}for i,(x,y)in enumerate(pts)]})

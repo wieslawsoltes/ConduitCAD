@@ -5,7 +5,7 @@ import { escapeHTML as E } from './icons.js';
 const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra}>${E(label)}</button>`;
 export function fields3(values) {
     return values.map(f => `<label class="field" data-model-row="${E(f.name)}">${E(f.label)}${f.options
-        ? `<select data-model-field="${E(f.name)}">${f.options.map((label, i) => `<option value="${i}" ${String(f.value) === String(i) ? 'selected' : ''}>${E(label)}</option>`).join('')}</select>`
+        ? `<select data-model-field="${E(f.name)}">${f.options.some((_, i) => String(f.value) === String(i)) ? '' : `<option value="${E(String(f.value))}" selected>Expression: ${E(String(f.value))}</option>`}${f.options.map((label, i) => `<option value="${i}" ${String(f.value) === String(i) ? 'selected' : ''}>${E(label)}</option>`).join('')}</select>`
         : `<input data-model-field="${E(f.name)}" value="${E(String(f.value ?? ''))}" autocomplete="off" spellcheck="false">`}</label>`).join('');
 }
 const isProfile = e => ['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE'].includes(e.type);
@@ -18,7 +18,7 @@ export function readOperation3(m) {
     if (!modal) throw new Error('No modeling dialog');
     const parameters = Object.fromEntries([...modal.querySelectorAll('[data-model-field]')].map(e => [e.dataset.modelField, e.value]));
     const inputs = [...modal.querySelectorAll('[data-model-input]')].map(e => e.value);
-    if (m.operation?.kind === 'extrude' && Number(parameters.operation)) inputs.push(modal.querySelector('[data-model-target]')?.value || '');
+    if (m.operation?.kind === 'extrude' && m.w.eval(parameters.operation)) inputs.push(modal.querySelector('[data-model-target]')?.value || '');
     return { parameters, inputs, name: modal.querySelector('[data-model-name]')?.value || 'Feature', reattach: !!modal.querySelector('[data-model-reattach]')?.checked };
 }
 
@@ -67,12 +67,12 @@ export function openOperation3(m, kind, id = null) {
             });
             w.closeModal(); m.hit = null; m.sync();
             // Preserve view while modifying an existing body; only new standalone bodies refit.
-            if (!id && !Number(values.parameters.operation) && kind !== 'hole') { m.renderer.fit(); m.saveView(); }
+            if (!id && !w.eval(values.parameters.operation ?? 0) && kind !== 'hole') { m.renderer.fit(); m.saveView(); }
         } });
     m.operation = { kind, id };
     w.modal.querySelector('.modal').classList.add('model3d-operation-dialog');
     const updateFields = () => {
-        const value = n => Number(w.modal?.querySelector(`[data-model-field="${n}"]`)?.value);
+        const value = n => { try { return w.eval(w.modal?.querySelector(`[data-model-field="${n}"]`)?.value); } catch { return NaN; } };
         const visible = (name, shown) => { const el = w.modal?.querySelector(`[data-model-row="${name}"]`); if (el) el.hidden = !shown; };
         if (kind === 'extrude') {
             visible('distance2', value('extent') === 2);
@@ -112,6 +112,10 @@ export function syncAuthoring3(m) {
     const nav = m.stage.querySelector('[data-action="3d-nav-toggle"]');
     if (nav) { nav.textContent = m.navigation === 'pan' ? 'Pan' : 'Orbit'; nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
     m.stage.querySelector('[data-action="3d-multi"]')?.setAttribute('aria-pressed', String(w.multi));
+    const hint = m.stage.querySelector('.model3d-hint');
+    const gesture = m.navigation === 'pan' ? 'pan' : 'orbit';
+    if (hint) hint.textContent = `Drag to ${gesture} · two fingers pan / pinch · tap to select ${m.pickMode}`;
+    m.host?.setAttribute('aria-label', `3D CAD model. Drag to ${gesture}, two fingers pan and zoom; tap to select ${m.pickMode}.`);
     const context = m.stage.querySelector('.model3d-context');
     const actions = face ? [['3d-face-profile', 'Sketch on face'], ['3d-op-hole', 'Hole'], ['3d-op-offset-face', 'Press / pull'], ['3d-look-face', 'Look at face']]
         : one && isProfile(one) ? [['3d-op-extrude', 'Extrude'], ['3d-op-revolve', 'Revolve'], ['3d-vertex', 'Edit profile']]
