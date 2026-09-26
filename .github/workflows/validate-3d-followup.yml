@@ -1,0 +1,108 @@
+name: Validate recovered 3D publication follow-up
+on:
+  push:
+    branches: [feature/3d-modeling-080]
+    paths: [.github/workflows/validate-3d-followup.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-3d-publication
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/3d-modeling-080
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply and checkpoint mobile and test lifecycle repairs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor 2e247f366165e0467491fb143351d7a274e5d947 HEAD
+          if git apply --reverse --check .recovery/3d-080/followup.patch 2>/dev/null; then
+            echo 'Repairs already applied.'
+          else
+            git apply --check .recovery/3d-080/followup.patch
+            git apply .recovery/3d-080/followup.patch
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json packages/workbench/src/mobile-workspace.js tests/browser_parametric.py tests/browser_modeling_backends.py
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix: preserve mobile inspector across breakpoints and test GPU lifecycle events'
+            git push origin HEAD:feature/3d-modeling-080
+          fi
+      - name: Build and check all packages and examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run samples:3d
+          npm run build
+          rm -f artifacts/npm/*-0.7.1.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install independent validators
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: All browser suites with real-origin storage and backend comparisons
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=0
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_modeling_backends; do
+            if python "tests/$suite.py" > "artifacts/publication-$suite.log" 2>&1; then code=0; else code=$?; status=1; fi
+            tail -n 20 "artifacts/publication-$suite.log"
+            echo "$suite: exit $code" >> "$GITHUB_STEP_SUMMARY"
+          done
+          exit "$status"
+      - name: Independent DXF audits
+        if: success() || failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d render_symbol_atlas; do
+            python "tests/$suite.py"
+          done
+      - name: Commit validated generated deliverables
+        run: |
+          git add -A -- artifacts samples docs
+          git add -f dist artifacts/npm
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: validated 0.8.0 application, 18 packages, 3D examples and regression evidence'
+            git push origin HEAD:feature/3d-modeling-080
+          fi
+          echo "Validated checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Archive exact source checkpoint
+        if: always()
+        run: git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-0.8.0-source-checkpoint.zip"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-080-followup-validation
+          path: |
+            ${{ runner.temp }}/ConduitCAD-0.8.0-source-checkpoint.zip
+            artifacts
+          retention-days: 30

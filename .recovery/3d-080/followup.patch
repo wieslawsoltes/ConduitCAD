@@ -1,0 +1,68 @@
+diff --git a/package.json b/package.json
+index e75d6da..72c0add 100644
+--- a/package.json
++++ b/package.json
+@@ -17,7 +17,7 @@
+     "catalog": "node scripts/catalog-artifacts.mjs",
+     "test:symbols": "node --test tests/symbol-catalog.test.mjs",
+     "samples:3d": "node scripts/modeling-samples.mjs",
+-    "test:3d": "node --test tests/modeling3d.test.mjs"
++    "test:3d": "node --test tests/modeling3d*.test.mjs"
+   },
+   "engines": {
+     "node": ">=22"
+diff --git a/packages/workbench/src/mobile-workspace.js b/packages/workbench/src/mobile-workspace.js
+index a1310f4..8b40ee2 100644
+--- a/packages/workbench/src/mobile-workspace.js
++++ b/packages/workbench/src/mobile-workspace.js
+@@ -62,7 +62,17 @@ export function bindMobileWorkspace(w) {
+     window.visualViewport?.addEventListener('resize', schedule, { signal });
+     window.visualViewport?.addEventListener('scroll', schedule, { signal });
+     window.addEventListener('resize', schedule, { signal });
+-    media.addEventListener('change', () => { w.closePanels(); schedule(); }, { signal });
++    media.addEventListener('change', () => {
++        // A queued media event can arrive after the user explicitly opens a sheet.
++        // Preserve that intent across resizing instead of hiding the active editor.
++        const library = w.$('.library'), inspector = w.$('.inspector');
++        if (media.matches && library.classList.contains('open') && inspector.classList.contains('open'))
++            library.classList.remove('open');
++        w.$('.sheet-backdrop').classList.toggle('visible', media.matches &&
++            (library.classList.contains('open') || inspector.classList.contains('open')));
++        updateMobilePanels(w);
++        schedule();
++    }, { signal });
+     document.addEventListener('focusin', schedule, { signal });
+     document.addEventListener('focusout', schedule, { signal });
+     const observer = new ResizeObserver(schedule);
+diff --git a/tests/browser_modeling_backends.py b/tests/browser_modeling_backends.py
+index 43b88ff..6f0fc96 100644
+--- a/tests/browser_modeling_backends.py
++++ b/tests/browser_modeling_backends.py
+@@ -39,9 +39,11 @@ try:
+    data=page.evaluate("async()=>{const r=conduit.model3d.renderer;return await new Promise(resolve=>requestAnimationFrame(async()=>{r.draw();await r.device?.queue.onSubmittedWorkDone();resolve(r.canvas.toDataURL('image/png').split(',')[1]);}));}")
+    (OUT/f'modeling3d-backend-{requested}.png').write_bytes(base64.b64decode(data))
+    if executed and requested=='webgl2':
+-    page.evaluate("()=>{const r=conduit.model3d.renderer;r.gl.getExtension('WEBGL_lose_context').loseContext();setTimeout(()=>r.gl.getExtension('WEBGL_lose_context')?.restoreContext(),100)}")
+-    page.wait_for_timeout(600)
+-    assert page.evaluate("conduit.model3d.renderer.gl.isContextLost()===false"),'WebGL context was not restored'
++    page.evaluate("()=>{window.restore3DContext=conduit.model3d.renderer.gl.getExtension('WEBGL_lose_context');if(!window.restore3DContext)throw new Error('Context-loss extension unavailable');window.restore3DContext.loseContext()}")
++    page.wait_for_function('conduit.model3d.renderer.gl.isContextLost()')
++    # Extension lookup is unavailable during loss; retain the pre-loss extension object.
++    page.evaluate('window.restore3DContext.restoreContext()')
++    page.wait_for_function('conduit.model3d.renderer.gl.isContextLost()===false')
+     report['contextRestore']=True
+    if executed and requested=='webgpu':
+     page.evaluate('conduit.model3d.renderer.device.destroy()');page.wait_for_function('!conduit.model3d.renderer.device&&conduit.model3d.renderer.backend!==null')
+diff --git a/tests/browser_parametric.py b/tests/browser_parametric.py
+index 034d0b2..24b0d11 100644
+--- a/tests/browser_parametric.py
++++ b/tests/browser_parametric.py
+@@ -135,6 +135,8 @@ try:
+     page.evaluate('conduit.cancelBlockEdit()')
+     page.set_viewport_size({'width':390,'height':844})
+     page.evaluate("conduit.selectEntity('a');conduit.openPanel('inspector')")
++    page.evaluate("conduit.mobileMedia.dispatchEvent(new Event('change'))")
++    ok('queued breakpoint update preserves the explicitly opened property sheet',page.evaluate("document.querySelector('.inspector').classList.contains('open')&&!document.querySelector('.inspector').inert"))
+     page.locator('[data-action="block-edit"]').click()
+     ok('mobile block editor provides scrollable 44px action targets',page.locator('.block-editor-bar [data-action="block-save"]').bounding_box()['height']>=44)
+     page.evaluate("conduit.selectEntity('edge');conduit.openPanel('inspector')")
