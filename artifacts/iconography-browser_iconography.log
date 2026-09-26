@@ -56,6 +56,7 @@ storage denial cannot prevent label preference changes
 320x568 icon guide filters by meaningful glyph name
 320x568 user can retain all toolbar captions
 320x568 label preference persisted separately from drawing
+320x568 preference select retains readable touch text
 320x568 3D tool catalogue has operation-specific glyphs
 320x568 format icons distinguish native, binary and image outputs
 390x844 shell has only decorative unfocusable UI SVGs
@@ -83,6 +84,7 @@ storage denial cannot prevent label preference changes
 390x844 icon guide filters by meaningful glyph name
 390x844 user can retain all toolbar captions
 390x844 label preference persisted separately from drawing
+390x844 preference select retains readable touch text
 390x844 3D tool catalogue has operation-specific glyphs
 390x844 format icons distinguish native, binary and image outputs
 844x390 shell has only decorative unfocusable UI SVGs
@@ -110,6 +112,7 @@ storage denial cannot prevent label preference changes
 844x390 icon guide filters by meaningful glyph name
 844x390 user can retain all toolbar captions
 844x390 label preference persisted separately from drawing
+844x390 preference select retains readable touch text
 844x390 3D tool catalogue has operation-specific glyphs
 844x390 format icons distinguish native, binary and image outputs
 1024x768 shell has only decorative unfocusable UI SVGs
@@ -137,7 +140,8 @@ storage denial cannot prevent label preference changes
 1024x768 icon guide filters by meaningful glyph name
 1024x768 user can retain all toolbar captions
 1024x768 label preference persisted separately from drawing
+1024x768 preference select retains readable touch text
 1024x768 3D tool catalogue has operation-specific glyphs
 1024x768 format icons distinguish native, binary and image outputs
 no uncaught iconography JavaScript errors
-{"passed": 142, "errors": []}
+{"passed": 146, "errors": []}

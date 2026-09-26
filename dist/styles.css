@@ -540,6 +540,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 /* Preference controls use one compact row; the guide stays a labeled action. */
 .mobile-dialog .icon-preferences { flex-wrap:nowrap; gap:6px; }
 .mobile-dialog .icon-preferences > label { flex:1 1 0; gap:5px; font-size:11px; }
-.mobile-dialog .icon-preferences select { min-width:95px; width:0; padding-inline:6px; font-size:13px; }
+.mobile-dialog .icon-preferences select { min-width:95px; width:0; padding-inline:6px; font-size:16px; }
 .mobile-dialog .icon-preferences > button { padding:8px; gap:5px; font-size:11px; }
 .mobile-dialog .icon-preferences > button .command-label { max-width:35px; line-height:1.25; text-align:left; }

@@ -1,5 +1,5 @@
 {
-  "passed": 142,
+  "passed": 146,
   "checks": [
     {
       "name": "1728x1000 shell has only decorative unfocusable UI SVGs",
@@ -234,6 +234,10 @@
       "passed": true
     },
     {
+      "name": "320x568 preference select retains readable touch text",
+      "passed": true
+    },
+    {
       "name": "320x568 3D tool catalogue has operation-specific glyphs",
       "passed": true
     },
@@ -339,6 +343,10 @@
     },
     {
       "name": "390x844 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "390x844 preference select retains readable touch text",
       "passed": true
     },
     {
@@ -450,6 +458,10 @@
       "passed": true
     },
     {
+      "name": "844x390 preference select retains readable touch text",
+      "passed": true
+    },
+    {
       "name": "844x390 3D tool catalogue has operation-specific glyphs",
       "passed": true
     },
@@ -555,6 +567,10 @@
     },
     {
       "name": "1024x768 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "1024x768 preference select retains readable touch text",
       "passed": true
     },
     {
