@@ -1,0 +1,46 @@
+name: Recover interrupted iconography
+on:
+  push:
+    branches: [work/iconography-091]
+    paths: [.github/workflows/recover-iconography.yml]
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Retrieve and inspect original patch fragments
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import base64,hashlib,json,lzma,os,pathlib,re,subprocess,urllib.request
+          out=pathlib.Path('recovered');out.mkdir()
+          parts=[]
+          for sha in ['8c8ed8a192754977c9efcc6c6cb893e0410bd93b','7585681afe7f9fc5bf67f2ab06ce8996f9128493','d59fac23a07329b839410607b09720f966d0f823','e473f5a9aee4c2986c4cbbf22aa558abae2fa2eb']:
+              request=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request,timeout=60) as response:record=json.load(response)
+              data=base64.b64decode(record['content'])
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==sha
+              parts.append(data)
+          raw=b''.join(parts);(out/'uploaded.xz').write_bytes(raw)
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=2000000);(out/'prefix.patch').write_bytes(patch)
+          report={'complete':decoder.eof,'compressedBytes':len(raw),'patchBytes':len(patch),'sha256':hashlib.sha256(patch).hexdigest(),'files':[]}
+          for i,chunk in enumerate(re.split(rb'(?m)(?=^diff --git )',patch)):
+              if not chunk.startswith(b'diff --git '):continue
+              f=out/f'part-{i:03}.patch';f.write_bytes(chunk)
+              check=subprocess.run(['git','apply','--unidiff-zero','--check',str(f)],capture_output=True,text=True)
+              report['files'].append({'header':chunk.splitlines()[0].decode(),'applicable':check.returncode==0,'error':check.stderr})
+          (out/'report.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conduitcad-iconography-recovery
+          path: recovered
+          retention-days: 30
