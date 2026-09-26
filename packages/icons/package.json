@@ -1,7 +1,7 @@
 {
-  "name": "@conduitcad/renderer3d",
+  "name": "@conduitcad/icons",
   "version": "0.9.1",
-  "description": "Retained spatial scene, WebGPU/WebGL2 rendering and depth-aware picking",
+  "description": "Original accessible SVG icon primitives for CAD and engineering workspaces",
   "type": "module",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -24,11 +24,5 @@
   },
   "engines": {
     "node": ">=22"
-  },
-  "dependencies": {
-    "@conduitcad/geometry3d": "0.9.1",
-    "@conduitcad/geometry": "0.9.1",
-    "@conduitcad/model": "0.9.1",
-    "@conduitcad/modeling": "0.9.1"
   }
 }

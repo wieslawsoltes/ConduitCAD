@@ -1,11 +1,11 @@
 import { DRAWING_TOOLS, drawingTool, DrawingSession, createDrawingEntity, parseDrawingPoint, hatchFromEntities, validateBoundary } from '@conduitcad/drawing';
 import { entity, polyline, clone, isLocked } from '@conduitcad/model';
 import { distance, TAU } from '@conduitcad/geometry';
-import { icon, escapeHTML } from './icons.js';
+import { icon, escapeHTML, commandContent, toolIcon } from './icons.js';
 
 const E = escapeHTML;
 const number = n => Number(n.toFixed(6)).toString();
-const action = (id, label, ic = 'properties') => `<button type="button" data-action="${id}" aria-label="${E(label)}">${icon(ic)}<span>${E(label)}</span></button>`;
+const action = (id, label, ic = 'properties') => `<button type="button" data-action="${id}" aria-label="${E(label)}">${commandContent(id,label,ic)}</button>`;
 const finite = (value, name, positive = false) => {
     if (!Number.isFinite(value) || Math.abs(value) > 1e12 || (positive && value <= 1e-8)) throw new Error(`Invalid ${name}`);
     return value;
@@ -81,7 +81,7 @@ export function drawingToolSections(w) {
     const groups = new Map();
     for (const t of DRAWING_TOOLS) { if (!groups.has(t.group)) groups.set(t.group, []); groups.get(t.group).push(t); }
     return `<label class="field drawing-tool-search">Find a drawing tool<input data-drawing-search type="search" placeholder="Arc, hatch, spline, ordinate…" aria-label="Find a drawing tool"></label>` +
-        [...groups].map(([group, tools]) => `<section class="drawing-tool-group"><h3>${E(group)}</h3><div class="operation-grid">${tools.map(t => `<button type="button" data-tool="${t.id}" data-tool-search="${E((t.label + ' ' + group + ' ' + t.id).toLowerCase())}" title="${E(t.steps.join(' → '))}">${icon(t.icon)}<span>${E(t.label)}</span></button>`).join('')}</div></section>`).join('') +
+        [...groups].map(([group, tools]) => `<section class="drawing-tool-group"><h3>${E(group)}</h3><div class="operation-grid">${tools.map(t => `<button type="button" data-tool="${t.id}" data-tool-search="${E((t.label + ' ' + group + ' ' + t.id).toLowerCase())}" title="${E(t.steps.join(' → '))}">${icon(toolIcon(t.id,t.icon),'command-icon')}<span class="command-label">${E(t.label)}</span></button>`).join('')}</div></section>`).join('') +
         `<section class="drawing-tool-group"><h3>Existing boundaries</h3><div class="operation-grid">${action('hatch-selection', 'Hatch selected boundaries', 'hatch').replace('<button ', '<button data-tool-search="hatch selected boundaries" ')}</div></section>`;
 }
 export function bindDrawingSearch(w) {

@@ -4,12 +4,13 @@ import { createDocument, validateDocument, clone, beginBlockEdit } from '@condui
 import { DrawingSession } from '@conduitcad/drawing';
 import { renderBlockBar, restoreHistory, refreshCalculations } from './parametric-workbench.js';
 import { escapeHTML as E, icon } from './icons.js';
+import { commandButton, commandContent } from './icons.js';
 
 const defaults = () => ({ viewMode: '2d', model3dCamera: null, tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
 const fields = Object.keys(defaults());
 const cameraState = w => ({ x: w.camera.x, y: w.camera.y, scale: w.camera.scale });
 const dirty = session => session.revision !== session.savedRevision;
-const button = (action, label, cls = '') => `<button type="button" class="btn ${cls}" data-action="${action}">${E(label)}</button>`;
+const button = (action,label,cls='') => commandButton(action,label,`btn ${cls}`);
 
 export function createDocumentHistory(w) {
     return new History({
@@ -251,13 +252,13 @@ export function renderDocuments(w) {
     const workspace = w.documents, host = w.$('.document-tabs');
     if (!workspace || !host) return;
     const active = workspace.active;
-    const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
+    const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, spatial: (session.id === active?.id ? w.viewMode : session.context.viewMode) === '3d', dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
     const signature = JSON.stringify([workspace.activeId, data]);
     if (w.documentTabSignature !== signature) {
         const scroll = host.scrollLeft, focusedNode = host.contains(document.activeElement) ? document.activeElement : null;
         const focused = focusedNode?.dataset?.documentId, operation = focusedNode?.dataset?.documentOperation;
         const reveal = w.lastRevealedDocument !== workspace.activeId;
-        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation" data-dirty="${s.dirty}" data-recovery-error="${s.error}"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-label="${E(s.name || 'Untitled drawing')}${s.editing ? ' · Block editor' : ''}${s.error ? ' · Recovery failed' : s.dirty ? ' · Not saved on device' : ' · Saved on device'}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${s.editing ? '◇' : s.dirty ? '●' : '▱'}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
+        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation" data-dirty="${s.dirty}" data-recovery-error="${s.error}"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-label="${E(s.name || 'Untitled drawing')}${s.editing ? ' · Block editor' : ''}${s.error ? ' · Recovery failed' : s.dirty ? ' · Not saved on device' : ' · Saved on device'}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${icon(s.editing ? 'block-edit' : s.spatial ? 'file-3d' : 'file-cad')}${s.error || s.dirty ? `<i class="document-state">${icon(s.error ? 'warning' : 'dot')}</i>` : ''}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
         host.scrollLeft = scroll;
         if (focused) host.querySelector(`[data-document-id="${focused}"][data-document-operation="${operation}"]`)?.focus({ preventScroll: true });
         if (reveal) {
@@ -277,7 +278,8 @@ export function renderDocuments(w) {
     w.$('.workspace').setAttribute('aria-labelledby', `tab-${workspace.activeId}`);
     w.$('.doc-name').textContent = data.find(s=>s.id===workspace.activeId)?.name || w.doc.name;
     const status = active?.error ? 'Recovery failed' : active?.saving ? 'Saving on device…' : active && dirty(active) ? 'Not yet saved on device' : 'Saved on device';
-    w.$('.save-status').textContent = status;
+    const stateIcon=active?.error?'warning':active?.saving?'loading':active&&dirty(active)?'dot':'check-circle';
+    const save=w.$('.save-status'); if(save.dataset.state!==status){save.dataset.state=status;save.innerHTML=`${icon(stateIcon)}<span>${E(status)}</span>`;}
     w.$('.document-switcher').title = `${workspace.sessions.length} open drawings · ${status}`;
     document.title = `${w.doc.name} — Conduit CAD`;
 }

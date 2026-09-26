@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/modeling",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Transactional 3D feature history, editable engineering examples and interchange",
   "type": "module",
   "main": "./src/index.js",
@@ -26,9 +26,9 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry3d": "0.9.0",
-    "@conduitcad/geometry": "0.9.0",
-    "@conduitcad/model": "0.9.0",
-    "@conduitcad/constraints": "0.9.0"
+    "@conduitcad/geometry3d": "0.9.1",
+    "@conduitcad/geometry": "0.9.1",
+    "@conduitcad/model": "0.9.1",
+    "@conduitcad/constraints": "0.9.1"
   }
 }

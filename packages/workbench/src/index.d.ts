@@ -11,6 +11,7 @@ export function symbolSVG(block: any, doc: any, extra?: string): string;
 export function mountWorkbench(element: any, options?: WorkbenchOptions): Workbench;
 export class Workbench {
     constructor(root: any, options?: WorkbenchOptions);
+    iconography: import('./iconography.js').IconographyController;
     root: any;
     options: WorkbenchOptions;
     viewMode: "2d" | "3d";

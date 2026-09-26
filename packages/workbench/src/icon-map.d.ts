@@ -1,0 +1,10 @@
+import type { IconName } from '@conduitcad/icons';
+export declare const ACTION_ICONS: Readonly<Record<string, IconName>>;
+export declare const MODEL_ICONS: Readonly<Record<string, IconName>>;
+export declare const TOOL_ICONS: Readonly<Record<string, IconName>>;
+export declare const EXAMPLE_ICONS: Readonly<Record<string, IconName>>;
+export declare function actionIcon(action: string, fallback?: string): string;
+export declare function toolIcon(tool: string, fallback?: string): string;
+export declare function entityIcon(entity: {type?: string; feature3d?: {kind: string}}): string;
+export declare function fieldIcon(name: string, label?: string): IconName | null;
+export declare function headingIcon(title: string): IconName | null;

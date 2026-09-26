@@ -2,8 +2,8 @@ import { beginBlockEdit, editedBlockDefinition, updateBlockDefinition, inspectBl
 import { ConstraintSolver, resolveParameters, describeParameters, reservedParameterNames, constraintAnnotations, constraintMeasurement, evaluateExpression, inferSketchConstraints, evaluateCalculations } from '@conduitcad/constraints';
 import { History } from '@conduitcad/history';
 import { bounds } from '@conduitcad/geometry';
-import { escapeHTML as E } from './icons.js';
-const B=(action,label)=>`<button class="btn" data-action="${action}">${label}</button>`;
+import { escapeHTML as E, commandButton } from './icons.js';
+const B=(action,label)=>commandButton(action,label,'btn');
 const number=n=>Number.isFinite(n)?Number(n.toPrecision(8)).toString():'—';
 const field=(name,label,value,type='input')=>`<label class="field">${E(label)}<${type} data-block-field="${name}" ${type==='input'?`value="${E(value)}"`:''}>${type==='textarea'?E(value):''}</${type}></label>`;
 const readFields=w=>Object.fromEntries([...w.modal.querySelectorAll('[data-block-field]')].map(e=>[e.dataset.blockField,e.value]));

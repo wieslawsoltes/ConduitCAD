@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/geometry3d",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Double-precision spatial math and bounded faceted modeling kernel",
   "type": "module",
   "main": "./src/index.js",

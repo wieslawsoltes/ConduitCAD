@@ -127,3 +127,13 @@ void [extrudeMesh, meshProperties(spatialMesh).centroid, writeOBJ(spatialMesh), 
 import { faceFrame3, profileOnFace3, holeTool3, extrudeExtent3, type HoleParameters3 } from '@conduitcad/modeling';
 const holeParams:HoleParameters3={face:1,holeType:2,through:1,diameter:8};
 void [faceFrame3,profileOnFace3,holeTool3,extrudeExtent3,holeParams];
+
+// Independent icon package and typed workbench presentation preferences.
+import { ICON_NAMES, ICON_GROUPS, hasIcon, icon as cadIcon } from '@conduitcad/icons';
+import type { IconName } from '@conduitcad/icons';
+const glyph: IconName = 'extrude';
+const markup: string = cadIcon(glyph, 'command-icon');
+const known: boolean = hasIcon(glyph);
+const names: readonly IconName[] = ICON_NAMES;
+const groups: Readonly<Record<string, readonly IconName[]>> = ICON_GROUPS;
+void [markup, known, names, groups];

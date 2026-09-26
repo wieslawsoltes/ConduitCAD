@@ -315,3 +315,7 @@ The app is MIT licensed. See `LICENSE` and `THIRD_PARTY_NOTICES.md`; the numeric
 ACI palette includes an ezdxf attribution. All user documents are processed
 locally, with no accounts, telemetry or document uploads. Always keep an exported
 project backup: browser storage may be unavailable, quota-limited or cleared.
+
+## 0.9.1 — Coherent desktop/touch iconography
+
+180 original SVG UI glyphs in the reusable `@conduitcad/icons` package. Semantic command mapping spans drafting, 3D modeling, properties, feature history, block/constraint editing, document controls and file exchange. Adaptive, labeled and compact toolbar modes preserve accessible names. Open **More → Icon guide** (also available from 3D Create, View and Help). See [iconography](docs/ICONOGRAPHY.md) and the [offline icon atlas](docs/icon-atlas.html). The workspace now contains 19 local packages; no npm registry publication is claimed.

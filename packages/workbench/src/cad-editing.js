@@ -1,7 +1,8 @@
 import { entity, clone, editDimension, dimensionPicture, setDynamicParameters, dynamicValues, evaluateDynamicBlock, entityGeometry, isLocked, uid } from '@conduitcad/model';
 import { bounds } from '@conduitcad/geometry';
 import { escapeHTML as E } from './icons.js';
-const button=(action,text)=>`<button class="btn" data-action="${action}">${text}</button>`;
+import { commandButton, commandContent } from './icons.js';
+const button=(action,text)=>commandButton(action,text,"btn");
 const names=['Rotated','Aligned','Two-line angular','Diameter','Radius','Three-point angular','Ordinate'];
 const input=(key,label,value,kind='dim')=>`<label class="field"><span>${E(label)}</span><input data-${kind}="${E(key)}" aria-label="${E(label)}" value="${E(value)}" autocomplete="off" inputmode="${key==='text'?'text':'decimal'}"></label>`;
 export function renderCadEditing(w,e,host) {

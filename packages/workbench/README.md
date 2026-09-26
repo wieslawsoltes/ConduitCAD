@@ -1,6 +1,6 @@
 # @conduitcad/workbench
 
-Touch-first CAD and diagramming workbench. Version **0.7.0**, native ESM JavaScript, MIT license.
+Touch-first CAD and diagramming workbench. Version **0.9.1**, native ESM JavaScript, MIT license.
 
 Complete DOM UI with library, editing tools, numeric properties, routing, parameters, layer controls and local file workflows. CSS and keyboard handling expect one workbench per browser document (with multiple drawing sessions).
 
@@ -36,3 +36,7 @@ The full source workspace contains `docs/API.md` with integration examples,
 `docs/ARCHITECTURE.md`, `docs/DXF_COMPATIBILITY.md`, and `docs/VALIDATION.md`.
 Tests and raw validation reports are included there. These are original reusable
 2D engineering components, not a claim of complete AutoCAD/Visio compatibility.
+
+## Coherent iconography
+
+`@conduitcad/icons` provides original offline SVGs for drafting, modeling and workspace commands. The workbench centralizes action-to-glyph mapping, preserves accessible button text in compact layouts, and decorates only rendered control trees—not scene geometry or per-frame DOM. More / 3D Create / View / Help exposes label density and the searchable Icon guide. See `docs/ICONOGRAPHY.md`.

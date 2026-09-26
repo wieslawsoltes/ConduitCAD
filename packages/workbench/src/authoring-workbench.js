@@ -1,8 +1,8 @@
 import { MODELING_TOOLS, addFeature, editFeature, faceFrame3, faceCoordinates3, profileOnFace3 } from '@conduitcad/modeling';
 import { isLocked } from '@conduitcad/model';
-import { escapeHTML as E } from './icons.js';
+import { escapeHTML as E, commandContent, setCommandLabel } from './icons.js';
 
-const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra}>${E(label)}</button>`;
+const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra} title="${E(label)}">${commandContent(action,label)}</button>`;
 export function fields3(values) {
     return values.map(f => `<label class="field" data-model-row="${E(f.name)}">${E(f.label)}${f.options
         ? `<select data-model-field="${E(f.name)}">${f.options.some((_, i) => String(f.value) === String(i)) ? '' : `<option value="${E(String(f.value))}" selected>Expression: ${E(String(f.value))}</option>`}${f.options.map((label, i) => `<option value="${i}" ${String(f.value) === String(i) ? 'selected' : ''}>${E(label)}</option>`).join('')}</select>`
@@ -110,7 +110,7 @@ export function syncAuthoring3(m) {
     const face = one?.type === 'MESH' && m.hit?.id === one.id && m.hit?.face !== undefined && m.pickMode === 'face';
     for (const mode of ['body', 'face', 'vertex']) m.stage.querySelector(`[data-action="3d-pick:${mode}"]`)?.setAttribute('aria-pressed', String(m.pickMode === mode));
     const nav = m.stage.querySelector('[data-action="3d-nav-toggle"]');
-    if (nav) { nav.textContent = m.navigation === 'pan' ? 'Pan' : 'Orbit'; nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
+    if (nav) { setCommandLabel(nav, m.navigation === 'pan' ? 'Pan' : 'Orbit', m.navigation === 'pan' ? 'pan' : 'orbit'); nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
     m.stage.querySelector('[data-action="3d-multi"]')?.setAttribute('aria-pressed', String(w.multi));
     const hint = m.stage.querySelector('.model3d-hint');
     const gesture = m.navigation === 'pan' ? 'pan' : 'orbit';
@@ -123,8 +123,8 @@ export function syncAuthoring3(m) {
         : items.filter(e => e.type === 'MESH').length === 2 ? [['3d-op-union', 'Join'], ['3d-op-subtract', 'Cut'], ['3d-op-intersect', 'Intersect']]
         : [['3d-sketch', 'Create profile'], ['3d-op-box', 'Box'], ['3d-op-cylinder', 'Cylinder']];
     const label = face ? 'Face ' + m.hit.face : one ? one.label || one.type : items.length ? items.length + ' selected' : 'Start modeling';
-    const html = `<span class="model3d-selection-label" title="${E(label)}">${E(label)}</span>${actions.map(([a, b]) => button(a, b)).join('')}`;
-    if (context && context.innerHTML !== html) context.innerHTML = html;
+    const html = `<span class="model3d-selection-label" title="${E(label)}">${E(label)}</span>${actions.map(([a, b]) => a==='3d-visibility' ? `<button type="button" data-action="${a}" title="${E(b)}">${commandContent(a,b,one.hidden?'eye':'eye-off')}</button>` : button(a, b)).join('')}`;
+    if (context && m.contextMarkup !== html) { m.contextMarkup = html; context.innerHTML = html; }
     for (const action of ['3d-edit', '3d-op-transform', '3d-measure']) {
         const b = m.stage.querySelector(`.model3d-dock [data-action="${action}"]`);
         if (b) b.disabled = action === '3d-op-transform' ? one?.type !== 'MESH' : action === '3d-edit' ? !one : false;

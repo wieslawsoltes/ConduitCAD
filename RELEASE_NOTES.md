@@ -1,3 +1,12 @@
+# 0.9.1 — Coherent CAD iconography
+
+- Add a reusable, DOM-free `@conduitcad/icons` package with 180 original inline SVG glyphs. No icon fonts, CDN, sprite IDs or third-party assets.
+- Use semantic glyphs for every native drawing/modeling tool, 3D selection/view commands, editable feature history, body lists, block/constraint actions, parameter fields, document controls and export formats. Replace Unicode stand-ins in 3D example cards and document state indicators.
+- Add Adaptive / Icons and labels / Compact icons preferences and a searchable icon guide. Maintain text for operation forms, destructive actions, catalogues and inspector fields.
+- Add keyboard/fine-pointer tooltips with Escape dismissal, hover retention, preserved external descriptions, visual-viewport clamping and disposal cleanup. Do not hijack touch long-press or suppress editing gestures.
+- Keep rendered command identity and timeline focus during unchanged synchronization. Icon changes do not alter geometry, solver, DXF, undo or persistent document content.
+- Add Node semantic/asset safety checks, browser layout/naming/interaction regressions and an offline full-family atlas.
+
 # 0.9.0 — Face-based authoring and simpler desktop/touch 3D workflows
 
 - Simple, counterbore and countersink holes; blind/through-all depth; local U/V
