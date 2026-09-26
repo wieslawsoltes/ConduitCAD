@@ -1,0 +1,175 @@
+native category selector exposes eleven categories plus All and Custom True
+P&ID library contains all 45 masters True
+Electrical category has its complete master set True
+Flow category has its complete master set True
+Instrumentation category has its complete master set True
+Hydraulics category has its complete master set True
+Pneumatics category has its complete master set True
+HVAC category has its complete master set True
+Water category has its complete master set True
+Automation category has its complete master set True
+Fire category has its complete master set True
+Network category has its complete master set True
+family search returns hydraulic and pneumatic masters across categories True
+new category search exposes actual native block thumbnails True
+browsing missing masters does not mutate an imported document True
+placement lazily installs exactly the selected master True
+hydraulic insertion uses the hydraulic layer True
+new drawing dialog exposes twenty 2D starters, Blank and every generated 3D starter True
+industry search filters the actual starter buttons True
+starter selection creates routed editable hydraulic entities True
+starter selects appropriate symbol category and line style True
+rendering an older saved master does not overwrite it True
+guide identifies references as not normative certification True
+confirmed migration updates the used definition True
+one Undo restores the saved geometry and its revision True
+storage failure keeps previous drawing open in its own tab True
+mobile category selector is a 44px touch target True
+native touch drag places exactly one new pneumatic master True
+expanded mobile library has no horizontal page overflow True
+mobile industry selector remains within the viewport True
+industry selector retains multiple water-related matches True
+landscape symbol library has no horizontal overflow True
+no uncaught errors in catalogue, starters, migration or touch True
+{
+  "checks": [
+    {
+      "name": "native category selector exposes eleven categories plus All and Custom",
+      "passed": true
+    },
+    {
+      "name": "P&ID library contains all 45 masters",
+      "passed": true
+    },
+    {
+      "name": "Electrical category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Flow category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Instrumentation category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Hydraulics category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Pneumatics category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "HVAC category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Water category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Automation category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Fire category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "Network category has its complete master set",
+      "passed": true
+    },
+    {
+      "name": "family search returns hydraulic and pneumatic masters across categories",
+      "passed": true
+    },
+    {
+      "name": "new category search exposes actual native block thumbnails",
+      "passed": true
+    },
+    {
+      "name": "browsing missing masters does not mutate an imported document",
+      "passed": true
+    },
+    {
+      "name": "placement lazily installs exactly the selected master",
+      "passed": true
+    },
+    {
+      "name": "hydraulic insertion uses the hydraulic layer",
+      "passed": true
+    },
+    {
+      "name": "new drawing dialog exposes twenty 2D starters, Blank and every generated 3D starter",
+      "passed": true
+    },
+    {
+      "name": "industry search filters the actual starter buttons",
+      "passed": true
+    },
+    {
+      "name": "starter selection creates routed editable hydraulic entities",
+      "passed": true
+    },
+    {
+      "name": "starter selects appropriate symbol category and line style",
+      "passed": true
+    },
+    {
+      "name": "rendering an older saved master does not overwrite it",
+      "passed": true
+    },
+    {
+      "name": "guide identifies references as not normative certification",
+      "passed": true
+    },
+    {
+      "name": "confirmed migration updates the used definition",
+      "passed": true
+    },
+    {
+      "name": "one Undo restores the saved geometry and its revision",
+      "passed": true
+    },
+    {
+      "name": "storage failure keeps previous drawing open in its own tab",
+      "passed": true
+    },
+    {
+      "name": "mobile category selector is a 44px touch target",
+      "passed": true
+    },
+    {
+      "name": "native touch drag places exactly one new pneumatic master",
+      "passed": true
+    },
+    {
+      "name": "expanded mobile library has no horizontal page overflow",
+      "passed": true
+    },
+    {
+      "name": "mobile industry selector remains within the viewport",
+      "passed": true
+    },
+    {
+      "name": "industry selector retains multiple water-related matches",
+      "passed": true
+    },
+    {
+      "name": "landscape symbol library has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "no uncaught errors in catalogue, starters, migration or touch",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "passed": 33,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "persistence": "test-only memory adapter"
+}

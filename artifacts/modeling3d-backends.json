@@ -8,7 +8,7 @@
         "backend": "Canvas 2D \u00b7 software depth buffer",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 11.200000000011642,
+        "frameMs": 9.900000000023283,
         "uploads": 7
       },
       "secure": true,
@@ -48,7 +48,7 @@
         "backend": "WebGL2",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0.10000000000582077,
+        "frameMs": 0.20000000001164153,
         "uploads": 7
       },
       "secure": true,
@@ -89,7 +89,7 @@
         "backend": "WebGPU",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0.1999999999825377,
+        "frameMs": 0.09999999997671694,
         "uploads": 4
       },
       "secure": true,

@@ -3092,50 +3092,522 @@ const combineExtrusion3 = combine;
 
 return {MODELING_TOOLS,curvePoints3,regenerateFeatures,addFeature,editFeature,removeFeature,bakeFeature,offsetPlanarFace,sectionEntities,writeOBJ,writeSTL,EXAMPLES_3D,create3DExample,controlPoints3,setControlPoint3,faceFrame3,facePoint3,faceCoordinates3,profileOnFace3,holeTool3,drillHole3,extrudeExtent3,combineExtrusion3};
 })();
+// packages/icons/src/index.js
+__modules["packages/icons/src/index.js"]=(()=>{
+/** Original Conduit line icons. 24-unit optical grid, rounded 1.75-unit strokes.
+ * Pure ESM: no DOM, network, font, sprite IDs or runtime dependency. */
+const paths = {
+  "arc": "M3 18A9 9 0 0 1 21 18 M2 16h3v4H2z M19 16h3v4h-3z",
+  "ellipse": "M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M12 4v16 M2 12h20",
+  "spline": "M3 18C5-3 18 28 21 6 M3 18 7 3 M17 21l4-15 M5 1h4v4H5z M15 19h4v4h-4z",
+  "polygon": "M12 2l9 5v10l-9 5-9-5V7z",
+  "donut": "M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M17 12a5 5 0 1 0-10 0 5 5 0 0 0 10 0",
+  "solid": "M3 20 9 3l12 14-18 3 M5 16l5-11 M8 19l5-11 M12 18l4-6 M16 17l2-2",
+  "hatch": "M3 3h18v18H3z M3 11l8-8 M3 19 19 3 M9 21 21 9 M17 21l4-4",
+  "wipeout": "M3 5h18v14H3z M8 9l8 6 M16 9l-8 6",
+  "point": "M12 3v7 M12 14v7 M3 12h7 M14 12h7 M12 12h.01",
+  "ray": "M3 19 21 1 M2 17h4v4H2z M15 1h6v6",
+  "xline": "M2 22 22 2 M2 15v7h7 M15 2h7v7",
+  "mtext": "M3 4h18 M3 9h18 M3 14h14 M3 19h10",
+  "leader": "M3 20l9-12h10 M3 14v6h6",
+  "logo": "M5 5h6v6H5z M19 13h6v6h-6z M5 21h6v6H5z M11 8h5a6 6 0 0 1 6 5 M8 11v10 M11 24h5a6 6 0 0 0 6-5",
+  "select": "m5 3 14 11-7 1-4 7Z",
+  "pan": "M8 12V6a2 2 0 0 1 4 0v5 M12 11V4a2 2 0 0 1 4 0v8 M16 10V7a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-4-2-6-5l-3-4a2 2 0 0 1 3-2l2 3",
+  "line": "M5 19 19 5 M3 17h4v4H3z M17 3h4v4h-4z",
+  "polyline": "M4 18 9 5l7 11 5-10 M2 16h4v4H2z M7 3h4v4H7z M14 14h4v4h-4z",
+  "connect": "M3 7h5v5h8v5h5 M1 5h4v4H1z M19 15h4v4h-4z",
+  "rect": "M4 5h16v14H4z",
+  "circle": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 9v6 M9 12h6",
+  "text": "M4 5h16 M12 5v15 M8 20h8 M4 5v3 M20 5v3",
+  "undo": "M8 4 3 9l5 5 M3 9h10a7 7 0 0 1 0 14",
+  "redo": "M16 4l5 5-5 5 M21 9H11a7 7 0 0 0 0 14",
+  "folder": "M3 6h7l2 3h9v11H3z M3 6V4h7l2 2h8v3",
+  "export": "M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7",
+  "save": "M4 3h13l4 4v14H3V3z M7 3v6h10V3 M7 21v-8h10v8",
+  "plus": "M12 5v14 M5 12h14",
+  "minus": "M5 12h14",
+  "close": "M5 5l14 14 M19 5 5 19",
+  "chevron": "m8 4 8 8-8 8",
+  "down": "m5 9 7 7 7-7",
+  "search": "M16 10a6 6 0 1 1-12 0 6 6 0 0 1 12 0 M15 15l6 6",
+  "layers": "m12 3 10 5-10 5L2 8z M2 12l10 5 10-5 M2 17l10 5 10-5",
+  "eye": "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
+  "lock": "M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0v4",
+  "unlock": "M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0",
+  "properties": "M4 7h16 M4 17h16 M8 4v6 M16 14v6",
+  "grid": "M4 4h16v16H4z M4 12h16 M12 4v16",
+  "snap": "M5 4v10a7 7 0 0 0 14 0V4h-4v10a3 3 0 0 1-6 0V4z M5 8h4 M15 8h4",
+  "ortho": "M5 4v16h15 M5 15h5v5",
+  "fit": "M8 3H3v5 M16 3h5v5 M21 16v5h-5 M8 21H3v-5 M8 8h8v8H8z",
+  "more": "M5 12h.01 M12 12h.01 M19 12h.01",
+  "trash": "M4 6h16 M9 6V3h6v3 M6 6l1 15h10l1-15 M10 10v7 M14 10v7",
+  "copy": "M8 8h13v13H8z M4 16H2V2h14v2",
+  "rotate": "M4 11a8 8 0 1 1 3 7 M4 4v7h7",
+  "symbols": "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M17.5 13l5 4.5-5 4.5-5-4.5z",
+  "dimension": "M4 3v18 M20 3v18 M4 12h16 m-11-4-5 4 5 4 m6-8 5 4-5 4",
+  "ruler": "m3 17 14-14 4 4L7 21z M7 13l3 3 M11 9l3 3 M15 5l3 3",
+  "check": "m4 12 5 5L20 6",
+  "warning": "m12 3 10 18H2z M12 9v5 M12 17h.01",
+  "help": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M9 8a3 3 0 0 1 6 0c0 3-3 2-3 5 M12 17h.01",
+  "bolt": "m13 2-9 12h7l-1 8 10-13h-7z",
+  "code": "m8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18",
+  "command": "M8 8H5a3 3 0 1 1 3-3v14a3 3 0 1 1-3-3h14a3 3 0 1 1-3 3V5a3 3 0 1 1 3 3z",
+  "param": "M3 6h18 M5 12h14 M7 18h10 M8 3v6 M16 9v6 M12 15v6",
+  "offset": "M3 18 9 6h12 M7 21l6-11h10",
+  "trim": "M4 4 20 20 M4 20 20 4 M12 4v16",
+  "fillet": "M4 20V10a6 6 0 0 1 6-6h10",
+  "extend": "M3 20 21 2 M13 3h8v8 M3 13v7h7",
+  "new": "M14 2H4v20h16V8z M14 2v6h6 M8 15h8 M12 11v8",
+  "screen": "M3 4h18v14H3z M8 22h8 M12 18v4",
+  "touch": "M8 12V5a2 2 0 0 1 4 0v6l5-1 4 3-2 7H9l-6-7 2-2 3 3",
+  "graph": "M5 5h5v5H5z M15 15h5v5h-5z M5 17h5v5H5z M10 8h7v7 M7 10v7",
+  "arrow": "M4 12h16 M14 6l6 6-6 6",
+  "cube": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9",
+  "face": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9 M5 10v6l5 3v-5z",
+  "vertex": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 16v6 M10 11h4v4h-4z",
+  "edge": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9 M14 12l6-3",
+  "mesh": "M4 5h16v14H4z M4 5l8 7 8-7 M4 19l8-7 8 7 M12 5v14",
+  "orbit": "M14 7c-6-1-12 1-12 5s6 6 12 5 M18 7l4 2-4 2 M21 9c-2-3-4-4-6-3s-3 7-2 12 M12 17l1 5 4-4",
+  "multi": "M3 3h9v9H3z M8 8h9v9H8 M13 13h8v8h-8z",
+  "clear-selection": "M4 8V4h4 M16 4h4v4 M4 16v4h4 M16 20h4v-4 M9 9l6 6 M15 9l-6 6",
+  "view-iso": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9",
+  "view-top": "M4 5h16v14H4z M4 10h16 M8 5v5 M16 5v5",
+  "view-front": "M4 5h16v14H4z M4 14h16 M8 14v5 M16 14v5",
+  "view-right": "M4 5h16v14H4z M15 5v14 M15 9h5 M15 15h5",
+  "view-left": "M4 5h16v14H4z M9 5v14 M4 9h5 M4 15h5",
+  "view-back": "M4 5h16v14H4z M4 10h16 M4 15h16 M8 5v14",
+  "view-bottom": "M4 5h16v14H4z M4 14h16 M8 14v5 M16 14v5",
+  "look-face": "M3 14h10v7H3z M16 4h5v5 M21 4l-9 10 M12 10v4h4",
+  "sketch": "M3 6h10v15H3z M9 15l10-11 3 3-10 11-4 1z M17 6l3 3",
+  "sketch-face": "M3 9l9-5 9 5-9 5z M3 9v9l9 4 9-4V9 M12 14v8 M10 9l5-3",
+  "extrude": "M3 13l7-4 7 4-7 4z M3 13v6l7 4 7-4v-6 M10 17v6 M17 7V2 M14 5l3-3 3 3",
+  "revolve": "M9 4h5v6h4v10H9z M5 3v18 M3 13c-2 1 0 5 3 5 M6 18l-3-1 M6 18l-1 3 M18 3c6 2 4 6 0 6",
+  "loft": "M7 3h10l3 18H4z M7 3c0 3 10 3 10 0 M4 21c0-3 16-3 16 0 M7 5l5 14 5-14",
+  "sweep": "M3 7a4 2 0 1 1 8 0 4 2 0 0 1-8 0 M3 7v6c0 6 7 8 14 8 M11 7v6c0 2 2 2 6 2 M17 15a2 3 0 1 1 0 6 2 3 0 0 1 0-6",
+  "hole": "M3 7l9-4 9 4-9 5z M3 7v10l9 5 9-5V7 M12 12v10 M9 7a3 1.5 0 1 0 6 0 3 1.5 0 1 0-6 0",
+  "counterbore": "M3 4v16h18V4 M7 4v6h3v10 M17 4v6h-3v10 M3 4h4 M17 4h4",
+  "countersink": "M3 4v16h18V4 M6 4l4 6v10 M18 4l-4 6v10 M3 4h3 M18 4h3",
+  "press-pull": "M3 13l7-4 7 4-7 4z M3 13v6l7 4 7-4v-6 M10 17v6 M17 2v7 M14 5l3-3 3 3 M14 6l3 3 3-3",
+  "union": "M3 3h11v6h7v12H9v-7H3z",
+  "subtract": "M3 3h11v6H9v5H3z M14 3v6h7v12H9v-7 M16 15h4",
+  "intersect": "M3 3h11v11H3z M9 9h12v12H9z M9 9h5v5H9z",
+  "cylinder": "M4 6a8 3 0 1 1 16 0 8 3 0 1 1-16 0 M4 6v12c0 4 16 4 16 0V6",
+  "sphere": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 3c-6 4-6 14 0 18 6-4 6-14 0-18 M3 12c4 4 14 4 18 0",
+  "cone": "M4 19 12 3l8 16 M4 19a8 3 0 1 0 16 0 8 3 0 1 0-16 0",
+  "wedge": "M3 16l13-11 5 12-11 5z M3 16l7-4 11 5 M10 12v10",
+  "pyramid": "M3 18 12 3l9 15-9 4z M12 3v19 M3 18l9-4 9 4",
+  "torus": "M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M17 11a5 2 0 1 1-10 0 5 2 0 0 1 10 0 M7 11c0-3 10-3 10 0",
+  "helix": "M7 3c12 0 12 5 0 5S-5 13 7 13s12 5 0 5S0 22 17 22",
+  "move": "M12 2v20 M2 12h20 M9 5l3-3 3 3 M9 19l3 3 3-3 M5 9l-3 3 3 3 M19 9l3 3-3 3",
+  "scale": "M3 12v9h9 M3 21l18-18 M14 3h7v7 M3 12h9v9",
+  "mirror": "M12 2v20 M3 7l6-4v18l-6-4z M21 7l-6-4v18l6-4z",
+  "pattern-linear": "M3 3h6v6H3z M15 3h6v6h-6z M3 15h6v6H3z M15 15h6v6h-6z M11 6h2 M6 11v2",
+  "pattern-polar": "M10 2h4v4h-4z M18 10h4v4h-4z M10 18h4v4h-4z M2 10h4v4H2z M12 10v4 M10 12h4 M17 4l3 3 M20 7v-3",
+  "section": "M4 4h16v16H4z M3 18 21 6 M5 18l4-4 M10 18l4-4 M15 18l4-4",
+  "appearance": "M14 3 3 14v5h5L19 8z M11 6l5 5 M15 17c-2 3-2 5 0 5s2-2 0-5 M3 22h7",
+  "feature-edit": "M3 6l7-4 7 4-7 4z M3 6v8l7 4V10 M13 19l7-7 2 2-7 7-3 1z",
+  "feature-off": "M3 6l7-4 7 4-7 4z M3 6v8l7 4 7-4V6 M10 10v8 M16 18l5 5 M21 18l-5 5",
+  "history": "M4 9a8 8 0 1 1 0 6 M4 3v6h6 M12 7v5l4 2",
+  "unlink": "M10 14l4-4 M8 16 6 18a3 3 0 0 1-4-4l3-3 M16 8l2-2a3 3 0 0 1 4 4l-3 3 M3 3l5 5 M16 16l5 5",
+  "link": "M10 14l4-4 M8 16l-2 2a3 3 0 0 1-4-4l5-5a3 3 0 0 1 4 0 M16 8l2-2a3 3 0 0 1 4 4l-5 5a3 3 0 0 1-4 0",
+  "eye-off": "M3 8 2 12s4 7 10 7l4-1 M8 5l4-1c6 0 10 8 10 8l-2 3 M9 9a4 4 0 0 0 6 6 M3 3l18 18",
+  "inputs": "M3 3h6v6H3z M15 15h6v6h-6z M6 9v9h9 M11 14l4 4-4 4",
+  "bodies": "M9 3l7 4v8l-7 4-7-4V7z M2 7l7 4 7-4 M9 11v8 M18 7l4 2v9l-7 4",
+  "file": "M14 2H4v20h16V8z M14 2v6h6 M8 13h8 M8 17h5",
+  "file-3d": "M14 2H4v20h16V8z M14 2v6h6 M12 10l5 3v5l-5 3-5-3v-5z M7 13l5 3 5-3 M12 16v5",
+  "file-cad": "M14 2H4v20h16V8z M14 2v6h6 M7 17l3-6 3 6 4-3 M7 19h10",
+  "file-image": "M14 2H4v20h16V8z M14 2v6h6 M6 18l4-6 4 4 2-3 3 5 M7 8h.01",
+  "file-code": "M14 2H4v20h16V8z M14 2v6h6 M10 12l-3 3 3 3 M14 12l3 3-3 3",
+  "file-table": "M14 2H4v20h16V8z M14 2v6h6 M7 11h10v7H7z M7 14h10 M12 11v7",
+  "files": "M14 6H8v16h13V13z M14 6v7h7 M5 18H2V2h11v2",
+  "save-all": "M3 3h12l3 3v12H3z M7 3v5h7V3 M7 18v-6h7v6 M21 7v14H7",
+  "rename": "M14 3h7 M18 3v18 M14 21h7 M11 7H3v10h8",
+  "arrow-left": "M20 12H4 M10 6l-6 6 6 6",
+  "arrow-right": "M4 12h16 M14 6l6 6-6 6",
+  "chevron-up": "M5 15l7-7 7 7",
+  "drag": "M8 5h.01 M16 5h.01 M8 12h.01 M16 12h.01 M8 19h.01 M16 19h.01",
+  "block": "M4 5h16v14H4z M9 5v14 M9 12h11",
+  "block-edit": "M3 3h14v8 M3 3v14h8 M12 19l7-7 3 3-7 7-4 1z M17 14l3 3",
+  "attribute": "M2 5h12l8 7-8 7H2z M6 12h.01 M11 16l2-8 2 8 M12 13h2",
+  "port": "M2 8h8v8H2z M10 12h10 M16 8l4 4-4 4",
+  "constraint": "M3 5h7v7H3z M14 12h7v7h-7z M10 8h7v4 M8 17l4 4 M8 21l4-4",
+  "solve": "M4 4h16v16H4z M7 9h5 M9.5 6.5v5 M13 15l2 2 4-5",
+  "formula": "M8 21l3-17h8 M7 10h9 M3 21h5 M14 15l6 6 M20 15l-6 6",
+  "calculator": "M5 2h14v20H5z M8 5h8v4H8z M8 13h.01 M12 13h.01 M16 13h.01 M8 17h.01 M12 17h.01 M16 17h.01",
+  "play": "M7 3l14 9-14 9z",
+  "reset": "M4 10a8 8 0 1 1 1 8 M4 3v7h7",
+  "sync": "M4 8a8 8 0 0 1 14-3l3 3 M21 2v6h-6 M20 16a8 8 0 0 1-14 3l-3-3 M3 22v-6h6",
+  "width": "M3 4v16 M21 4v16 M3 12h18 M7 8l-4 4 4 4 M17 8l4 4-4 4",
+  "height": "M4 3h16 M4 21h16 M12 3v18 M8 7l4-4 4 4 M8 17l4 4 4-4",
+  "depth": "M4 19 20 3 M4 13v6h6 M14 3h6v6 M2 15l7 7 M15 2l7 7",
+  "radius": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 12l6-6 M14 6h4v4 M11 12h2",
+  "diameter": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M4 20 20 4 M4 16v4h4 M16 4h4v4",
+  "angle": "M4 3v17h17 M4 20 19 5 M4 11a9 9 0 0 1 6 3",
+  "axis-x": "M4 20V4 M4 20h17 M17 17l4 3-4 3 M12 5l6 6 M18 5l-6 6",
+  "axis-y": "M4 20V3 M1 7l3-4 3 4 M4 20h17 M13 4l3 4 3-4 M16 8v4",
+  "axis-z": "M3 21l17-17 M14 4h6v6 M3 21h11 M4 3h6L4 9h6",
+  "area": "M3 4h18v16H3z M3 12l8-8 M3 20 19 4 M11 20 21 10",
+  "volume": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9 M5 12l5 3 M5 16l5 3",
+  "boundary": "M3 3h6 M15 3h6v6 M21 15v6h-6 M9 21H3v-6 M3 9V3",
+  "angle-dimension": "M3 3v18h18 M3 21 20 4 M3 11a10 10 0 0 1 10 10 M4 8l-1 3 3 1",
+  "ordinate": "M4 3v17h17 M4 16h10V7h7 M18 4l3 3-3 3",
+  "dimension-horizontal": "M3 5v14 M21 5v14 M3 10h18 M7 7l-4 3 4 3 M17 7l4 3-4 3",
+  "dimension-vertical": "M5 3h14 M5 21h14 M10 3v18 M7 7l3-4 3 4 M7 17l3 4 3-4",
+  "bezier": "M3 18C3 2 21 22 21 6 M3 18V5 M21 6v13 M1 3h4v4H1z M19 17h4v4h-4z",
+  "face-3d": "M3 9l11-6 7 12-13 6z M3 9l18 6",
+  "close-path": "M3 5h14v14H3v-6 M3 5v4 M1 7l2 2 2-2 M3 11h.01",
+  "line-style": "M3 5h18 M3 12h5 M11 12h2 M16 12h5 M3 19h.01 M8 19h.01 M13 19h.01 M18 19h.01",
+  "reroute": "M3 6h5v12h8V6h5 M1 4h4v4H1z M19 4h4v4h-4z M11 3l3 3-3 3",
+  "explode": "M8 8h8v8H8z M3 3l4 4 M3 7V3h4 M17 7l4-4 M17 3h4v4 M3 17v4h4 M3 21l4-4 M17 17l4 4 M17 21h4v-4",
+  "paste": "M8 5H4v17h16V5h-4 M8 2h8v6H8z M8 12h8 M8 16h5",
+  "labels": "M3 5h18v14H3z M6 9h5 M8.5 9v6 M14 11h4 M14 15h4",
+  "icons": "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z",
+  "info": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 11v6 M12 7h.01",
+  "dot": "M13 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0",
+  "check-circle": "M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M7 12l3 3 7-7",
+  "loading": "M12 3a9 9 0 1 1-9 9 M3 8V3h5",
+  "settings": "M3 6h18 M7 3v6 M3 12h18 M16 9v6 M3 18h18 M10 15v6",
+  "speed": "M3 19a10 10 0 1 1 18 0 M12 15l6-8 M11 15h2 M5 10l2 1 M10 5l1 2",
+  "precision": "M5 5h14v14H5z M12 2v20 M2 12h20 M9 9h6v6H9z",
+  "filter": "M3 4h18l-7 8v7l-4 3V12z",
+  "section-view": "M3 5h18v14H3z M3 17l12-12 M9 19 21 7 M2 2l20 20",
+  "perspective": "M3 6l18-3v18L3 18z M3 6l9 4 9-7 M12 10v7L3 18 M12 17l9 4",
+  "wireframe": "M12 3 21 8v9l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v9 M12 3v10 M3 17l9-4 9 4",
+  "flange": "M12 2l9 5v10l-9 5-9-5V7z M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M12 5h.01 M18 9h.01 M18 16h.01 M12 19h.01 M6 16h.01 M6 9h.01",
+  "pipe": "M3 6a3 2 0 1 1 6 0 3 2 0 1 1-6 0 M3 6v8c0 6 6 7 15 7 M9 6v8c0 1 4 1 9 1 M18 15a2 3 0 1 1 0 6 2 3 0 1 1 0-6",
+  "vessel": "M6 6a6 3 0 1 1 12 0 M6 6v12c0 4 12 4 12 0V6 M12 3V1 M5 12h14 M9 21v2 M15 21v2",
+  "network": "M8 3h8v6H8z M3 16h6v5H3z M15 16h6v5h-6z M12 9v4 M6 16v-3h12v3"
+};
+const accents = {
+    face: 'M3 8l9 5v9l-9-5z',
+    'view-top': 'M4 5h16v5H4z',
+    'view-front': 'M4 14h16v5H4z',
+    'view-right': 'M15 5h5v14h-5z',
+    'view-left': 'M4 5h5v14H4z',
+    'view-bottom': 'M4 14h16v5H4z',
+    intersect: 'M9 9h5v5H9z'
+};
+const ICON_NAMES = Object.freeze(Object.keys(paths));
+const groups = {
+  "Drafting": [
+    "select",
+    "pan",
+    "line",
+    "polyline",
+    "rect",
+    "circle",
+    "arc",
+    "ellipse",
+    "spline",
+    "bezier",
+    "polygon",
+    "donut",
+    "solid",
+    "face-3d",
+    "hatch",
+    "wipeout",
+    "point",
+    "ray",
+    "xline",
+    "text",
+    "mtext",
+    "leader"
+  ],
+  "Modeling": [
+    "cube",
+    "cylinder",
+    "sphere",
+    "cone",
+    "wedge",
+    "pyramid",
+    "torus",
+    "helix",
+    "extrude",
+    "revolve",
+    "loft",
+    "sweep",
+    "hole",
+    "counterbore",
+    "countersink",
+    "press-pull",
+    "union",
+    "subtract",
+    "intersect",
+    "section",
+    "pattern-linear",
+    "pattern-polar"
+  ],
+  "Selection & views": [
+    "bodies",
+    "face",
+    "edge",
+    "vertex",
+    "orbit",
+    "multi",
+    "clear-selection",
+    "view-iso",
+    "view-top",
+    "view-front",
+    "view-right",
+    "view-left",
+    "view-back",
+    "view-bottom",
+    "look-face",
+    "fit",
+    "perspective",
+    "wireframe"
+  ],
+  "Parametric & editing": [
+    "move",
+    "rotate",
+    "scale",
+    "mirror",
+    "copy",
+    "paste",
+    "trim",
+    "extend",
+    "offset",
+    "fillet",
+    "block",
+    "block-edit",
+    "attribute",
+    "port",
+    "constraint",
+    "solve",
+    "formula",
+    "calculator",
+    "dimension",
+    "radius",
+    "diameter",
+    "angle",
+    "width",
+    "height",
+    "depth",
+    "axis-x",
+    "axis-y",
+    "axis-z",
+    "area",
+    "volume",
+    "boundary",
+    "history",
+    "feature-edit",
+    "feature-off"
+  ],
+  "Workspace": [
+    "file",
+    "file-cad",
+    "file-3d",
+    "file-image",
+    "file-code",
+    "file-table",
+    "files",
+    "new",
+    "folder",
+    "save",
+    "save-all",
+    "export",
+    "rename",
+    "layers",
+    "eye",
+    "eye-off",
+    "lock",
+    "unlock",
+    "undo",
+    "redo",
+    "trash",
+    "reset",
+    "sync",
+    "check",
+    "check-circle",
+    "warning",
+    "loading",
+    "help",
+    "info",
+    "search",
+    "labels",
+    "icons"
+  ]
+};
+const grouped = new Set(Object.values(groups).flat());
+groups['More controls'] = ICON_NAMES.filter(name => !grouped.has(name));
+const ICON_GROUPS = Object.freeze(Object.fromEntries(Object.entries(groups).map(([key,names]) => [key,Object.freeze(names)])));
+
+function hasIcon(name) { return typeof name === 'string' && Object.hasOwn(paths, name); }
+function escapeAttribute(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/** Decorative SVG. Its owning control supplies the name; an unknown name uses help. */
+function icon(name, className = '') {
+    const key = hasIcon(name) ? name : 'help', size = key === 'logo' ? 32 : 24;
+    return `<svg class="icon ${escapeAttribute(className)}" data-icon="${key}" viewBox="0 0 ${size} ${size}" fill="none" stroke="currentColor" stroke-width="${key === 'more' || key === 'drag' ? 2.6 : 1.75}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${accents[key] ? `<path d="${accents[key]}" stroke="none" fill="currentColor" fill-opacity=".16"/>` : ''}<path d="${paths[key]}"/></svg>`;
+}
+
+return {ICON_NAMES,ICON_GROUPS,hasIcon,icon};
+})();
+// packages/workbench/src/icon-map.js
+__modules["packages/workbench/src/icon-map.js"]=(()=>{
+/** Semantic names, not label guessing: the same command always has the same glyph. */
+const ACTION_ICONS = Object.freeze({
+    new:'new', open:'folder', export:'export', help:'help', rename:'rename', command:'command',
+    'mode-draw':'sketch', 'mode-3d':'cube', 'mode-connect':'connect', 'mode-inspect':'properties',
+    'dynamic-demo':'param', 'rotate-angle':'rotate', parameters:'param', 'line-styles':'line-style', 'toggle-library':'symbols', 'toggle-inspector':'properties',
+    more:'more', shapes:'polygon', 'library-guide':'info', 'icon-guide':'icons',
+    undo:'undo', redo:'redo', 'zoom-in':'plus', 'zoom-out':'minus', fit:'fit',
+    'toggle-grid':'grid', 'toggle-snap':'snap', 'toggle-ortho':'ortho', 'multi-select':'multi',
+    'select-all':'multi', 'draw-exact-point':'precision', 'draw-back':'undo', 'draw-close':'close-path',
+    'draw-options':'settings', 'draw-cancel':'close', finish:'check',
+    'modal-close':'close', 'modal-confirm':'check', 'close-panels':'close',
+    'add-layer':'layers', duplicate:'copy', copy:'copy', paste:'paste', delete:'trash', rotate:'rotate',
+    offset:'offset', trim:'trim', extend:'extend', fillet:'fillet', explode:'explode',
+    reroute:'reroute', graph:'graph', precision:'precision', 'make-symbol':'block',
+    'hatch-selection':'hatch', 'native-vertices':'vertex',
+    'dimension-source':'dimension', 'dimension-manage':'dimension', 'dimension-reset-text':'reset',
+    'dimension-drive':'formula', 'dynamic-author':'param', 'dynamic-reset':'reset',
+    constraint:'constraint', 'auto-constrain':'solve', 'constraint-display':'eye',
+    'calculated-text':'formula', 'calculation-bake':'unlink', 'solver-report':'calculator', 'solver-run':'solve',
+    'parametric-demo':'formula', blocks:'block', 'block-edit':'block-edit', 'block-copy':'copy',
+    'block-rename':'rename', 'block-sync-attributes':'sync', 'block-attribute':'attribute', 'block-port':'port',
+    'block-author':'param', 'block-save':'save', 'block-save-close':'save', 'block-save-as':'save-all',
+    'block-test':'play', 'block-test-close':'arrow-left', 'block-settings':'settings', 'block-close':'close',
+    'document-list':'files', 'document-save-all':'save-all',
+    '3d-2d':'sketch', '3d-fit':'fit', '3d-view-options':'settings', '3d-tools':'plus',
+    '3d-edit':'feature-edit', '3d-appearance':'appearance', '3d-bodies':'bodies', '3d-measure':'ruler',
+    '3d-examples':'files', '3d-undo':'undo', '3d-redo':'redo', '3d-bake':'unlink', '3d-remove':'trash',
+    '3d-vertex':'vertex', '3d-multi':'multi', '3d-inputs':'inputs', '3d-suppress':'feature-off',
+    '3d-nav-toggle':'orbit', '3d-clear':'clear-selection', '3d-face-profile':'sketch-face',
+    '3d-look-face':'look-face', '3d-sketch':'sketch', '3d-path':'polyline', '3d-section':'section',
+    '3d-obj':'file-3d', '3d-stl':'file-3d', '3d-preview':'eye', '3d-visibility':'eye-off'
+});
+const MODEL_ICONS = Object.freeze({box:'cube',cylinder:'cylinder',cone:'cone',sphere:'sphere',torus:'torus',wedge:'wedge',
+    extrude:'extrude',hole:'hole',revolve:'revolve',loft:'loft',sweep:'sweep',transform:'move','offset-face':'press-pull',
+    union:'union',subtract:'subtract',intersect:'intersect','linear-pattern':'pattern-linear','circular-pattern':'pattern-polar',mirror:'mirror'});
+const TOOL_ICONS = Object.freeze({select:'select',pan:'pan',line:'line',polyline:'polyline',rect:'rect',circle:'circle',
+    connect:'connect',text:'text',dimension:'dimension',insert:'block',arc:'arc','arc-center':'arc','circle-3p':'circle',
+    'circle-diameter':'diameter',ellipse:'ellipse','ellipse-arc':'ellipse',spline:'spline',bezier:'bezier',polygon:'polygon',
+    donut:'donut',solid:'solid',face:'face-3d',hatch:'hatch',wipeout:'wipeout',point:'point',ray:'ray',xline:'xline',
+    mtext:'mtext',leader:'leader','dim-aligned':'dimension','dim-horizontal':'dimension-horizontal',
+    'dim-vertical':'dimension-vertical','dim-radius':'radius','dim-diameter':'diameter','dim-angular':'angle-dimension',
+    'dim-angular-lines':'angle-dimension','dim-ordinate-x':'ordinate','dim-ordinate-y':'ordinate'});
+const EXAMPLE_ICONS = Object.freeze({'hole-plate':'counterbore','extrusion-study':'extrude','face-boss':'sketch-face',
+    bracket:'wedge',flange:'flange',vessel:'vessel',transition:'loft',conduit:'pipe',fixture:'pattern-linear',shaft:'revolve',
+    enclosure:'cube',manifold:'pipe',primitives:'bodies'});
+const documentIcons = Object.freeze({rename:'rename',duplicate:'copy',reorder:'arrow-left','reorder-right':'arrow-right',
+    close:'close','close-save':'save','close-discard':'trash',reopen:'history'});
+function actionIcon(action, fallback = 'settings') {
+    if (typeof action !== 'string') return fallback;
+    if (action.startsWith('tool-')) return toolIcon(action.slice(5), fallback);
+    if (Object.hasOwn(ACTION_ICONS, action)) return ACTION_ICONS[action];
+    if (action.startsWith('3d-op-')) return MODEL_ICONS[action.slice(6)] || fallback;
+    if (action.startsWith('3d-view-')) return 'view-' + action.slice(8);
+    if (action.startsWith('3d-pick:')) return ({body:'cube',face:'face',vertex:'vertex'})[action.slice(8)] || fallback;
+    if (action.startsWith('3d-select:')) return 'cube';
+    if (action.startsWith('3d-example:')) return EXAMPLE_ICONS[action.slice(11)] || 'file-3d';
+    if (action.startsWith('document-')) return documentIcons[action.slice(9).split(':')[0]] || 'files';
+    return fallback;
+}
+function toolIcon(tool, fallback = 'sketch') { return TOOL_ICONS[tool] || fallback; }
+function entityIcon(entity) {
+    if (entity?.feature3d) return MODEL_ICONS[entity.feature3d.kind] || 'cube';
+    return ({MESH:'mesh','3DFACE':'face-3d',SOLID:'solid',INSERT:'block',LINE:'line',POLYLINE:'polyline',LWPOLYLINE:'polyline',
+        CIRCLE:'circle',ARC:'arc',ELLIPSE:'ellipse',SPLINE:'spline',HELIX:'helix',TEXT:'text',MTEXT:'mtext',HATCH:'hatch',
+        DIMENSION:'dimension',LEADER:'leader',POINT:'point',XLINE:'xline',RAY:'ray',WIPEOUT:'wipeout',ATTDEF:'attribute'})[entity?.type] || 'file-cad';
+}
+function fieldIcon(name, label = '') {
+    const key = String(name).toLowerCase(), text = String(label).toLowerCase();
+    if (['x','x1','x2','cx','nx','dx','sx','u'].includes(key)) return 'axis-x';
+    if (['y','y1','y2','cy','ny','dy','sy','v'].includes(key)) return 'axis-y';
+    if (['z','z1','z2','cz','nz','dz','sz'].includes(key)) return 'axis-z';
+    if (/diameter/.test(text)) return 'diameter';
+    if (/radius/.test(text)) return 'radius';
+    if (/angle|rotation|yaw|pitch/.test(text)) return 'angle';
+    if (/width/.test(text)) return 'width';
+    if (/height/.test(text)) return 'height';
+    if (/length|depth|distance/.test(text)) return 'depth';
+    if (/offset|taper/.test(text)) return 'offset';
+    if (/expression|formula/.test(text)) return 'formula';
+    if (/layer/.test(text)) return 'layers';
+    if (/color|colour|appearance/.test(text)) return 'appearance';
+    if (/text|name|tag|prefix|suffix/.test(text)) return 'text';
+    if (/count|segments|precision|decimal/.test(text)) return 'calculator';
+    if (/target|body/.test(text)) return 'cube';
+    if (/face/.test(text)) return 'face';
+    if (/direction|normal|plane/.test(text)) return 'axis-z';
+    if (/find|search/.test(text)) return 'search';
+    if (/profile|shape/.test(text)) return 'sketch';
+    if (/extent/.test(text)) return 'extrude';
+    if (/operation/.test(text)) return 'union';
+    return null;
+}
+function headingIcon(title) {
+    const s = String(title).toLowerCase();
+    if (/hole/.test(s)) return 'hole';
+    if (/extrud/.test(s)) return 'extrude';
+    if (/revol/.test(s)) return 'revolve';
+    if (/loft/.test(s)) return 'loft';
+    if (/sweep/.test(s)) return 'sweep';
+    if (/vertices|vertex/.test(s)) return 'vertex';
+    if (/measure|dimension/.test(s)) return 'dimension';
+    if (/solve|constraint/.test(s)) return 'solve';
+    if (/parameter|calculat/.test(s)) return 'param';
+    if (/block/.test(s)) return 'block-edit';
+    if (/layer/.test(s)) return 'layers';
+    if (/export|exchange/.test(s)) return 'export';
+    if (/drawing|document/.test(s)) return 'files';
+    if (/3d|bodies|primitive/.test(s)) return 'bodies';
+    if (/sketch|profile/.test(s)) return 'sketch';
+    if (/view|camera/.test(s)) return 'view-iso';
+    if (/icon|toolbar/.test(s)) return 'icons';
+    if (/curve/.test(s)) return 'spline';
+    if (/shape|fill/.test(s)) return 'hatch';
+    if (/construct/.test(s)) return 'xline';
+    if (/annotation/.test(s)) return 'text';
+    if (/help|convention/.test(s)) return 'help';
+    return null;
+}
+
+return {ACTION_ICONS,MODEL_ICONS,TOOL_ICONS,EXAMPLE_ICONS,actionIcon,toolIcon,entityIcon,fieldIcon,headingIcon};
+})();
 // packages/workbench/src/icons.js
 __modules["packages/workbench/src/icons.js"]=(()=>{
-const paths = {
-    arc: 'M3 18A9 9 0 0 1 21 18 M2 16h3v4H2z M19 16h3v4h-3z',
-    ellipse: 'M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M12 4v16 M2 12h20',
-    spline: 'M3 18C5-3 18 28 21 6 M3 18 7 3 M17 21l4-15 M5 1h4v4H5z M15 19h4v4h-4z',
-    polygon: 'M12 2l9 5v10l-9 5-9-5V7z',
-    donut: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M17 12a5 5 0 1 0-10 0 5 5 0 0 0 10 0',
-    solid: 'M3 20 9 3l12 14-18 3 M5 16l5-11 M8 19l5-11 M12 18l4-6 M16 17l2-2',
-    hatch: 'M3 3h18v18H3z M3 11l8-8 M3 19 19 3 M9 21 21 9 M17 21l4-4',
-    wipeout: 'M3 5h18v14H3z M8 9l8 6 M16 9l-8 6',
-    point: 'M12 3v7 M12 14v7 M3 12h7 M14 12h7 M12 12h.01',
-    ray: 'M3 19 21 1 M2 17h4v4H2z M15 1h6v6',
-    xline: 'M2 22 22 2 M2 15v7h7 M15 2h7v7',
-    mtext: 'M3 4h18 M3 9h18 M3 14h14 M3 19h10',
-    leader: 'M3 20l9-12h10 M3 14v6h6',
-
-    logo: 'M5 5h6v6H5z M19 13h6v6h-6z M5 21h6v6H5z M11 8h5a6 6 0 0 1 6 5 M8 11v10 M11 24h5a6 6 0 0 0 6-5',
-    select: 'm5 3 14 11-7 1-4 7Z', pan: 'M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-2-7-5l-3-5a2 2 0 0 1 3-2l3 3',
-    line: 'M5 19 19 5 M3 17h4v4H3z M17 3h4v4h-4z', polyline: 'M4 18 9 5l7 11 5-10 M2 16h4v4H2z M7 3h4v4H7z M14 14h4v4h-4z',
-    connect: 'M3 7h5v5h8v5h5 M1 5h4v4H1z M19 15h4v4h-4z', rect: 'M4 5h16v14H4z', circle: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 9v6 M9 12h6', text: 'M4 5h16 M12 5v15 M8 20h8 M4 5v3 M20 5v3',
-    undo: 'M9 5 4 10l5 5 M4 10h10a6 6 0 0 1 0 12', redo: 'm15 5 5 5-5 5 M20 10H10a6 6 0 0 0 0 12',
-    folder: 'M3 6h7l2 3h9v11H3z M3 6V4h7l2 2h8v3', export: 'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7', save: 'M4 3h13l4 4v14H3V3z M7 3v6h10V3 M7 21v-8h10v8',
-    plus: 'M12 5v14 M5 12h14', minus: 'M5 12h14', close: 'M5 5l14 14 M19 5 5 19', chevron: 'm8 4 8 8-8 8', down: 'm5 9 7 7 7-7', search: 'M16 10a6 6 0 1 1-12 0 6 6 0 0 1 12 0 M15 15l6 6',
-    layers: 'm12 3 10 5-10 5L2 8z M2 12l10 5 10-5 M2 17l10 5 10-5', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0', lock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0v4', unlock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0',
-    properties: 'M4 7h16 M4 17h16 M8 4v6 M16 14v6', grid: 'M4 4h16v16H4z M4 12h16 M12 4v16', snap: 'M5 4v10a7 7 0 0 0 14 0V4h-4v10a3 3 0 0 1-6 0V4z M5 8h4 M15 8h4', ortho: 'M5 4v16h15 M5 15h5v5',
-    fit: 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M8 21H3v-5 M8 8h8v8H8z', more: 'M5 12h.01 M12 12h.01 M19 12h.01', trash: 'M4 6h16 M9 6V3h6v3 M6 6l1 15h10l1-15 M10 10v7 M14 10v7', copy: 'M8 8h13v13H8z M4 16H2V2h14v2', rotate: 'M4 11a8 8 0 1 1 3 7 M4 4v7h7',
-    symbols: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M17.5 13l5 4.5-5 4.5-5-4.5z', dimension: 'M4 3v18 M20 3v18 M4 12h16 m-11-4-5 4 5 4 m6-8 5 4-5 4', ruler: 'm3 17 14-14 4 4L7 21z M7 13l3 3 M11 9l3 3 M15 5l3 3',
-    check: 'm4 12 5 5L20 6', warning: 'm12 3 10 18H2z M12 9v5 M12 17h.01', help: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M9 8a3 3 0 0 1 6 0c0 3-3 2-3 5 M12 17h.01',
-    bolt: 'm13 2-9 12h7l-1 8 10-13h-7z', code: 'm8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18', command: 'M8 8H5a3 3 0 1 1 3-3v14a3 3 0 1 1-3-3h14a3 3 0 1 1-3 3V5a3 3 0 1 1 3 3z',
-    param: 'M3 6h18 M5 12h14 M7 18h10 M8 3v6 M16 9v6 M12 15v6', offset: 'M3 18 9 6h12 M7 21l6-11h10', trim: 'M4 4 20 20 M4 20 20 4 M12 4v16', fillet: 'M4 20V10a6 6 0 0 1 6-6h10', extend: 'M3 20 21 2 M13 3h8v8 M3 13v7h7',
-    new: 'M14 2H4v20h16V8z M14 2v6h6 M8 15h8 M12 11v8', screen: 'M3 4h18v14H3z M8 22h8 M12 18v4', touch: 'M8 12V5a2 2 0 0 1 4 0v6l5-1 4 3-2 7H9l-6-7 2-2 3 3', graph: 'M5 5h5v5H5z M15 15h5v5h-5z M5 17h5v5H5z M10 8h7v7 M7 10v7', arrow: 'M4 12h16 M14 6l6 6-6 6',
-};
-function icon(name, cls = '') { return `<svg class="icon ${cls}" viewBox="0 0 ${name === 'logo' ? 32 : 24} ${name === 'logo' ? 32 : 24}" fill="none" stroke="currentColor" stroke-width="${name === 'more' ? 3 : 1.65}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.rect}"/></svg>`; }
+const {icon:renderIcon} = __modules["packages/icons/src/index.js"];
+const {actionIcon, toolIcon:lookupToolIcon, entityIcon:lookupEntityIcon} = __modules["packages/workbench/src/icon-map.js"];
+function icon(name, cls = '') { return renderIcon(name, cls); }
 function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function toolIcon(name, fallback) { return lookupToolIcon(name, fallback); }
+function entityIcon(entity) { return lookupEntityIcon(entity); }
+/** Labels stay in the accessibility tree, even when visually compacted. */
+function commandContent(action, label, glyph = '') {
+    return `${icon(glyph || actionIcon(action), 'command-icon')}<span class="command-label">${escapeHTML(label)}</span>`;
+}
+/** extra is trusted internal attribute markup, never untrusted document data. */
+function commandButton(action, label, cls = '', extra = '', glyph = '') {
+    return `<button type="button" class="${escapeHTML(cls)}" data-action="${escapeHTML(action)}" title="${escapeHTML(label)}" ${extra}>${commandContent(action, label, glyph)}</button>`;
+}
+/** Preserve node identity, focus, listeners and selection state on unchanged syncs. */
+function setCommandLabel(button, label, glyph = '') {
+    if (!button) return;
+    let caption = button.querySelector(':scope > .command-label');
+    if (!caption) { button.innerHTML = commandContent(button.dataset.action || '', label, glyph); caption = button.querySelector('.command-label'); }
+    if (caption.textContent !== label) caption.textContent = label;
+    const key = glyph || actionIcon(button.dataset.action || '');
+    const current = button.querySelector(':scope > .icon');
+    if (current?.dataset.icon !== key) {
+        if (current) current.outerHTML = icon(key, 'command-icon');
+        else button.insertAdjacentHTML('afterbegin', icon(key, 'command-icon'));
+    }
+    // Keep explicitly supplied accessible names synchronized with changing state labels.
+    if (button.hasAttribute('aria-label')) button.setAttribute('aria-label', label);
+    if (button.hasAttribute('data-icon-tooltip-title')) {
+        if (button.dataset.iconTooltipTitle !== label) button.dataset.iconTooltipTitle = label;
+    } else if (button.title !== label) button.title = label;
+}
 
-return {icon,escapeHTML};
+return {icon,escapeHTML,toolIcon,entityIcon,commandContent,commandButton,setCommandLabel};
 })();
 // packages/workbench/src/authoring-workbench.js
 __modules["packages/workbench/src/authoring-workbench.js"]=(()=>{
 const {MODELING_TOOLS, addFeature, editFeature, faceFrame3, faceCoordinates3, profileOnFace3} = __modules["packages/modeling/src/index.js"];
 const {isLocked} = __modules["packages/model/src/index.js"];
-const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
-const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra}>${E(label)}</button>`;
+const {escapeHTML:E, commandContent, setCommandLabel} = __modules["packages/workbench/src/icons.js"];
+const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra} title="${E(label)}">${commandContent(action,label)}</button>`;
 function fields3(values) {
     return values.map(f => `<label class="field" data-model-row="${E(f.name)}">${E(f.label)}${f.options
         ? `<select data-model-field="${E(f.name)}">${f.options.some((_, i) => String(f.value) === String(i)) ? '' : `<option value="${E(String(f.value))}" selected>Expression: ${E(String(f.value))}</option>`}${f.options.map((label, i) => `<option value="${i}" ${String(f.value) === String(i) ? 'selected' : ''}>${E(label)}</option>`).join('')}</select>`
@@ -3243,7 +3715,7 @@ function syncAuthoring3(m) {
     const face = one?.type === 'MESH' && m.hit?.id === one.id && m.hit?.face !== undefined && m.pickMode === 'face';
     for (const mode of ['body', 'face', 'vertex']) m.stage.querySelector(`[data-action="3d-pick:${mode}"]`)?.setAttribute('aria-pressed', String(m.pickMode === mode));
     const nav = m.stage.querySelector('[data-action="3d-nav-toggle"]');
-    if (nav) { nav.textContent = m.navigation === 'pan' ? 'Pan' : 'Orbit'; nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
+    if (nav) { setCommandLabel(nav, m.navigation === 'pan' ? 'Pan' : 'Orbit', m.navigation === 'pan' ? 'pan' : 'orbit'); nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
     m.stage.querySelector('[data-action="3d-multi"]')?.setAttribute('aria-pressed', String(w.multi));
     const hint = m.stage.querySelector('.model3d-hint');
     const gesture = m.navigation === 'pan' ? 'pan' : 'orbit';
@@ -3256,8 +3728,8 @@ function syncAuthoring3(m) {
         : items.filter(e => e.type === 'MESH').length === 2 ? [['3d-op-union', 'Join'], ['3d-op-subtract', 'Cut'], ['3d-op-intersect', 'Intersect']]
         : [['3d-sketch', 'Create profile'], ['3d-op-box', 'Box'], ['3d-op-cylinder', 'Cylinder']];
     const label = face ? 'Face ' + m.hit.face : one ? one.label || one.type : items.length ? items.length + ' selected' : 'Start modeling';
-    const html = `<span class="model3d-selection-label" title="${E(label)}">${E(label)}</span>${actions.map(([a, b]) => button(a, b)).join('')}`;
-    if (context && context.innerHTML !== html) context.innerHTML = html;
+    const html = `<span class="model3d-selection-label" title="${E(label)}">${E(label)}</span>${actions.map(([a, b]) => a==='3d-visibility' ? `<button type="button" data-action="${a}" title="${E(b)}">${commandContent(a,b,one.hidden?'eye':'eye-off')}</button>` : button(a, b)).join('')}`;
+    if (context && m.contextMarkup !== html) { m.contextMarkup = html; context.innerHTML = html; }
     for (const action of ['3d-edit', '3d-op-transform', '3d-measure']) {
         const b = m.stage.querySelector(`.model3d-dock [data-action="${action}"]`);
         if (b) b.disabled = action === '3d-op-transform' ? one?.type !== 'MESH' : action === '3d-edit' ? !one : false;
@@ -4227,6 +4699,143 @@ function downloadFile(filename, contents, type = 'application/octet-stream') { c
 
 return {ProjectStore,downloadFile};
 })();
+// packages/workbench/src/iconography.js
+__modules["packages/workbench/src/iconography.js"]=(()=>{
+const {ICON_GROUPS} = __modules["packages/icons/src/index.js"];
+const {actionIcon, fieldIcon, headingIcon} = __modules["packages/workbench/src/icon-map.js"];
+const {icon, commandContent, escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
+const IDS = Object.freeze({'author-add-parameter':'param','author-add-action':'plus','manager-insert':'block',
+    'manager-delete':'trash','manager-create':'plus','add-parameter':'plus'});
+const EXPORTS = Object.freeze({dxf:'file-cad','dxf-binary':'file-code','dxf-graph':'graph',project:'save',svg:'file-image',
+    png:'file-image',bom:'file-table',graph:'graph',original:'file'});
+let instanceId = 0;
+const titleOf = name => name.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+/** Run only at UI render boundaries, never on camera frames or against drawing SVGs. */
+function decorateIconography(host) {
+    if (!host) return;
+    for (const b of host.querySelectorAll('button')) {
+        if (b.matches('.symbol-card,.template-card,.model3d-example,.document-list-open,[role="tab"][data-document-id]')) continue;
+        let glyph = b.dataset.iconName || IDS[b.id];
+        if (b.dataset.inspector) glyph = ({properties:'properties',layers:'layers',qa:'check-circle'})[b.dataset.inspector];
+        if (b.dataset.export) glyph = EXPORTS[b.dataset.export];
+        if (b.hasAttribute('data-constraint-delete') || b.classList.contains('remove-param')) {
+            glyph = 'trash'; b.setAttribute('aria-label', b.classList.contains('remove-param') ? 'Remove parameter' : 'Remove constraint');
+            if(b.querySelector(':scope > .icon')?.dataset.icon !== glyph) b.innerHTML = icon(glyph, 'command-icon'); b.classList.add('icon-btn');
+        } else if (b.dataset.constraintOperation) glyph = ({edit:'feature-edit',suppress:'feature-off',remove:'trash'})[b.dataset.constraintOperation];
+        if (!glyph && b.dataset.action && !b.querySelector('.icon')) glyph = actionIcon(b.dataset.action);
+        if (!glyph) continue;
+        const old = b.querySelector(':scope > .icon');
+        if (old && old.dataset.icon !== glyph) { old.outerHTML = icon(glyph, 'command-icon'); }
+        else if (old) old.classList.add('command-icon');
+        else if (b.children.length === 0) { b.innerHTML = commandContent('', b.textContent, glyph); }
+        else b.insertAdjacentHTML('afterbegin', icon(glyph, 'command-icon'));
+        if (!b.title && !b.hasAttribute('data-icon-tooltip-title') && b.textContent.trim()) b.title = b.getAttribute('aria-label') || b.textContent.trim();
+    }
+    for (const h of host.querySelectorAll('.inspector-content h3,.inspector-section h3,.modal h2,.modal h3')) {
+        const glyph = headingIcon(h.textContent);
+        if (glyph && !h.querySelector(':scope > .icon')) { h.classList.add('icon-heading'); h.insertAdjacentHTML('afterbegin',icon(glyph)); }
+    }
+    for (const label of host.querySelectorAll('label.field')) {
+        if (label.querySelector(':scope > .field-caption')) continue;
+        const input = label.querySelector('input,select,textarea,output');
+        if (!input || input.matches('[type="checkbox"],[type="radio"]')) continue;
+        const name = input.dataset.prop || input.dataset.modelField || input.dataset.field || input.dataset.dim || input.name || '';
+        const nodes = [...label.childNodes].filter(n => n.nodeType === 3 && n.textContent.trim());
+        const existing = label.querySelector(':scope > span:not(.unit)');
+        const text = existing?.textContent || nodes.map(n=>n.textContent).join('').trim();
+        const glyph = fieldIcon(name, text);
+        if (!glyph || !text) continue;
+        const caption = existing || document.createElement('span');
+        if (!existing) { label.insertBefore(caption, label.firstChild); for (const node of nodes) caption.append(node); }
+        caption.classList.add('field-caption'); caption.insertAdjacentHTML('afterbegin',icon(glyph));
+    }
+}
+
+function iconPreferencesMarkup() {
+    return `<div class="icon-preferences"><label>${icon('labels')}<span>Labels</span><select data-icon-label-mode aria-label="Toolbar label style"><option value="auto">Adaptive</option><option value="labels">Icons and labels</option><option value="compact">Compact icons</option></select></label><button type="button" class="btn" data-action="icon-guide">${commandContent('icon-guide','Icon guide')}</button></div>`;
+}
+
+function bindIconography(w) {
+    let mode = 'auto', tooltip = null, owner = null, timer = 0, hideTimer = 0, title = null;
+    const signal = w.abort.signal, tooltipId = 'conduit-command-tooltip-' + (++instanceId);
+    try { const saved = localStorage.getItem('conduit-toolbar-labels'); if (['auto','labels','compact'].includes(saved)) mode = saved; } catch { /* A preference must never prevent startup in restricted storage. */ }
+    const setMode = value => {
+        if (!['auto','labels','compact'].includes(value)) throw new RangeError('Unknown toolbar label style');
+        mode = value;
+        w.root.setAttribute('data-icon-labels',mode);
+        w.$('.app')?.setAttribute('data-icon-labels',mode);
+        w.modal?.setAttribute('data-icon-labels',mode);
+        for (const root of [w.root,w.modal]) root?.querySelectorAll('[data-icon-label-mode]').forEach(e=>{e.value=mode;});
+        try { localStorage.setItem('conduit-toolbar-labels',mode); } catch { /* Optional preference only. */ }
+    };
+    const hide = () => {
+        clearTimeout(timer); clearTimeout(hideTimer);
+        if (owner) {
+            const tokens=(owner.getAttribute('aria-describedby') || '').split(/\s+/).filter(t=>t && t!==tooltipId);
+            if (tokens.length) owner.setAttribute('aria-describedby',tokens.join(' ')); else owner.removeAttribute('aria-describedby');
+            const latestTitle = owner.getAttribute('data-icon-tooltip-title') ?? title;
+            if (latestTitle !== null && !owner.hasAttribute('title')) owner.setAttribute('title',latestTitle);
+            owner.removeAttribute('data-icon-tooltip-title');
+        }
+        tooltip?.remove(); tooltip=null; owner=null; title=null;
+    };
+    const position = () => {
+        if (!owner?.isConnected || owner.closest('[inert]') || !owner.getClientRects().length) { hide(); return; }
+        const box=owner.getBoundingClientRect(), r=tooltip.getBoundingClientRect(), vv=window.visualViewport;
+        const x=vv?.offsetLeft || 0, y=vv?.offsetTop || 0, width=vv?.width || innerWidth, height=vv?.height || innerHeight;
+        tooltip.style.left=Math.max(x+8,Math.min(box.x+box.width/2-r.width/2,x+width-r.width-8))+'px';
+        const top=box.bottom+7+r.height <= y+height-8 ? box.bottom+7 : box.top-r.height-7;
+        tooltip.style.top=Math.max(y+8,top)+'px';
+    };
+    const show = b => {
+        hide();
+        if (!b.isConnected || b.disabled || b.closest('[inert]')) return;
+        const text=b.title || b.getAttribute('aria-label') || b.textContent.trim();
+        if (!text) return;
+        owner=b; title=b.hasAttribute('title') ? b.title : null;
+        if (title!==null) { b.dataset.iconTooltipTitle=title; b.removeAttribute('title'); } // Avoid simultaneous browser and custom popups.
+        tooltip=document.createElement('div'); tooltip.className='command-tooltip'; tooltip.id=tooltipId;
+        tooltip.setAttribute('role','tooltip'); tooltip.textContent=text;
+        (w.modal?.contains(b) ? w.modal.querySelector('.modal') : w.$('.app')).append(tooltip);
+        b.setAttribute('aria-describedby', [...new Set((b.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean).concat(tooltipId))].join(' '));
+        tooltip.addEventListener('pointerenter',()=>clearTimeout(hideTimer));
+        tooltip.addEventListener('pointerleave',()=>{hideTimer=setTimeout(hide,100);});
+        position();
+    };
+    const trigger = event => {
+        const b=event.target?.closest?.('button');
+        if (!b || !(w.root.contains(b)||w.modal?.contains(b)) || !b.querySelector('.icon')) return null;
+        if (b.matches('.symbol-card,.template-card,.model3d-example,.document-list-open')) return null;
+        return b;
+    };
+    document.addEventListener('pointerover',e=>{
+        if(e.pointerType==='touch')return;
+        const b=trigger(e); if(b===owner){clearTimeout(hideTimer);return;} if(!b || b.contains(e.relatedTarget))return;
+        clearTimeout(timer); clearTimeout(hideTimer); timer=setTimeout(()=>show(b),350);
+    },{signal});
+    document.addEventListener('pointerout',e=>{
+        const b=trigger(e); if(!b || b.contains(e.relatedTarget))return;
+        clearTimeout(timer); hideTimer=setTimeout(hide,140);
+    },{signal});
+    document.addEventListener('focusin',e=>{const b=trigger(e);if(b && b.matches(':focus-visible'))show(b);},{signal});
+    document.addEventListener('focusout',()=>{hideTimer=setTimeout(hide,0);},{signal});
+    document.addEventListener('pointerdown',hide,{signal,capture:true});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape' && tooltip){hide();e.preventDefault();e.stopImmediatePropagation();}},{signal,capture:true});
+    document.addEventListener('scroll',hide,{signal,capture:true,passive:true});
+    window.addEventListener('resize',hide,{signal,passive:true});
+    document.addEventListener('change',e=>{if(e.target.matches?.('[data-icon-label-mode]') && (w.root.contains(e.target)||w.modal?.contains(e.target)))setMode(e.target.value);},{signal});
+    signal.addEventListener('abort',hide,{once:true});
+    const prepare = host => { decorateIconography(host); host?.setAttribute('data-icon-labels',mode); host?.querySelectorAll('[data-icon-label-mode]').forEach(e=>{e.value=mode;}); };
+    const guide = () => {
+        w.openModal('Icon guide & toolbar labels', `<p>One icon family across drawing, modeling and editing. Adaptive mode keeps unfamiliar commands labeled and compacts navigation on small screens. Choose Icons and labels to keep toolbar captions visible.</p>${iconPreferencesMarkup().replace(/<button[\s\S]*?<\/button>/,'')}<label class="field">Find an icon<input type="search" data-icon-search placeholder="Extrude, hole, dimension, block…" aria-label="Find an icon"></label><div class="icon-guide-grid">${Object.entries(ICON_GROUPS).map(([group,names])=>`<section><h3>${E(group)}</h3><div class="icon-guide-items">${names.map(name=>`<div class="icon-guide-item" data-icon-search-text="${E((name+' '+group).toLowerCase())}">${icon(name)}<span>${E(titleOf(name))}</span></div>`).join('')}</div></section>`).join('')}</div>`,{wide:true});
+        w.modal.querySelector('[data-icon-search]').addEventListener('input', e=>{ const words=e.target.value.toLowerCase().split(/\s+/); for(const item of w.modal.querySelectorAll('[data-icon-search-text]'))item.hidden=!words.every(v=>item.dataset.iconSearchText.includes(v)); for(const group of w.modal.querySelectorAll('.icon-guide-grid section'))group.hidden=![...group.querySelectorAll('.icon-guide-item')].some(i=>!i.hidden); });
+    };
+    setMode(mode); prepare(w.root);
+    return {prepare,setMode,guide,hide,dispose:hide,get mode(){return mode;}};
+}
+
+return {decorateIconography,iconPreferencesMarkup,bindIconography};
+})();
 // packages/workbench/src/modeling-workbench.js
 __modules["packages/workbench/src/modeling-workbench.js"]=(()=>{
 const {fields3, openOperation3, readOperation3, selectionToolbar3, syncAuthoring3, authoringAction3} = __modules["packages/workbench/src/authoring-workbench.js"];
@@ -4236,8 +4845,10 @@ const {SpatialRenderer, OrbitCamera} = __modules["packages/renderer3d/src/index.
 const {entity, clone, polyline, circle, isLocked} = __modules["packages/model/src/index.js"];
 const {PointerController} = __modules["packages/input/src/index.js"];
 const {downloadFile} = __modules["packages/storage/src/index.js"];
-const {escapeHTML:E, icon} = __modules["packages/workbench/src/icons.js"];
-const button = (action, label, cls = '') => `<button type="button" class="${cls}" data-action="${E(action)}">${E(label)}</button>`;
+const {escapeHTML:E, icon, commandButton, entityIcon} = __modules["packages/workbench/src/icons.js"];
+const {EXAMPLE_ICONS} = __modules["packages/workbench/src/icon-map.js"];
+const {iconPreferencesMarkup} = __modules["packages/workbench/src/iconography.js"];
+const button = (action, label, cls = '', glyph = '') => commandButton(action,label,cls,'',glyph);
 const format = n => Number.isFinite(n) ? Number(n.toPrecision(7)).toString() : '—';
 const fields = fields3;
 function xyz(source, evaluate) { const parts = []; let depth = 0, from = 0; for (let i = 0; i < source.length; i++) {
@@ -4264,7 +4875,7 @@ class ModelingWorkbench {
         this.stage = document.createElement('div');
         this.stage.className = 'model3d-stage';
         this.stage.hidden = true;
-        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', '＋ Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', 'Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
         const dock = this.stage.querySelector('.model3d-dock');
         dock.insertBefore(this.stage.querySelector('.model3d-context'), dock.children[1]);
         workbench.$('.canvas-area').append(this.stage);
@@ -4345,8 +4956,15 @@ class ModelingWorkbench {
         if (docChanged && !w.model3dCamera)
             this.renderer.fit();
         this.stage.querySelector('.model3d-info').textContent = this.renderer.scene.diagnostics.length ? `${this.renderer.scene.diagnostics.length} spatial display notice(s) · Inspect for details` : this.previewDocument ? 'PREVIEW · not committed' : `${w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed && !e.hidden).length} visible mesh bodies`;
+        this.syncTimeline();
+        syncAuthoring3(this);
+        this.stage.querySelector('[data-action="3d-undo"]').disabled = !w.history.canUndo;
+        this.stage.querySelector('[data-action="3d-redo"]').disabled = !w.history.canRedo;
+    }
+    syncTimeline() {
+        const w = this.w;
         const timeline = this.stage.querySelector('.model3d-timeline');
-        const timelineHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`)).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
+        const timelineHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`, entityIcon(e))).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
         const timelineKey = JSON.stringify([w.doc.id, w.doc.entities.filter(e => e.feature3d).map(e => [e.id, e.label, e.feature3d.kind, !!e.feature3d.suppressed, w.selection.has(e.id)])]);
         if (timeline.dataset.key !== timelineKey) {
             timeline.dataset.key = timelineKey;
@@ -4361,12 +4979,9 @@ class ModelingWorkbench {
             const active = timeline.querySelector('.active');
             if (active) { const a = active.getBoundingClientRect(), b = timeline.getBoundingClientRect(); if (a.left < b.left) timeline.scrollLeft += a.left - b.left; else if (a.right > b.right) timeline.scrollLeft += a.right - b.right; }
         }
-        syncAuthoring3(this);
-        this.stage.querySelector('[data-action="3d-undo"]').disabled = !w.history.canUndo;
-        this.stage.querySelector('[data-action="3d-redo"]').disabled = !w.history.canRedo;
     }
     selectionChanged() { if (!this.active)
-        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); syncAuthoring3(this); }
+        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); this.syncTimeline(); syncAuthoring3(this); }
     clearPreview() { const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
@@ -4622,8 +5237,8 @@ class ModelingWorkbench {
             default: throw new Error('Unknown 3D action ' + action);
         }
     }
-    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${['⌑', '◎', '♧', '▱', '〰', '▦', '▥', '▢', '╦', '◇'][i % 10]}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
-    toolsDialog() { const w = this.w; w.openModal('3D modeling tools', `<p>Create mesh features or use selected profiles and bodies. Source order matters for cuts and sweeps. New results retain their dependency history.</p><label class="field">Find a tool<input id="model3d-search" type="search" placeholder="Extrude, revolve, pattern, vertex…"></label>${[...new Set(MODELING_TOOLS.map(t => t.group))].map(group => `<section><h3>${E(group)}</h3><div class="operation-grid">${MODELING_TOOLS.filter(t => t.group === group).map(t => button('3d-op-' + t.id, t.label, 'btn model3d-searchable')).join('')}</div></section>`).join('')}<h3>Sketch, inspect & exchange</h3><div class="operation-grid">${[['3d-sketch', 'Planar profile'], ['3d-path', '3D polyline'], ['3d-vertex', 'Exact XYZ vertices'], ['3d-section', 'Section analysis'], ['3d-measure', 'Measure & topology'], ['3d-obj', 'Export OBJ'], ['3d-stl', 'Export STL'], ['3d-examples', 'Example drawings'], ['3d-2d', 'Edit sketch in 2D']].map(([a, l]) => button(a, l, 'btn model3d-searchable')).join('')}</div>`, { wide: true }); w.modal.querySelector('#model3d-search').addEventListener('input', e => { const words = e.target.value.toLowerCase().split(/\s+/); for (const b of w.modal.querySelectorAll('.model3d-searchable'))
+    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${icon(EXAMPLE_ICONS[e.id] || 'file-3d')}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
+    toolsDialog() { const w = this.w; w.openModal('3D modeling tools', `${iconPreferencesMarkup()}<p>Create mesh features or use selected profiles and bodies. Source order matters for cuts and sweeps. New results retain their dependency history.</p><label class="field">Find a tool<input id="model3d-search" type="search" placeholder="Extrude, revolve, pattern, vertex…"></label>${[...new Set(MODELING_TOOLS.map(t => t.group))].map(group => `<section><h3>${E(group)}</h3><div class="operation-grid">${MODELING_TOOLS.filter(t => t.group === group).map(t => button('3d-op-' + t.id, t.label, 'btn model3d-searchable')).join('')}</div></section>`).join('')}<h3>Sketch, inspect & exchange</h3><div class="operation-grid">${[['3d-sketch', 'Planar profile'], ['3d-path', '3D polyline'], ['3d-vertex', 'Exact XYZ vertices'], ['3d-section', 'Section analysis'], ['3d-measure', 'Measure & topology'], ['3d-obj', 'Export OBJ'], ['3d-stl', 'Export STL'], ['3d-examples', 'Example drawings'], ['3d-2d', 'Edit sketch in 2D']].map(([a, l]) => button(a, l, 'btn model3d-searchable')).join('')}</div>`, { wide: true }); w.modal.querySelector('#model3d-search').addEventListener('input', e => { const words = e.target.value.toLowerCase().split(/\s+/); for (const b of w.modal.querySelectorAll('.model3d-searchable'))
         b.hidden = !words.every(word => b.textContent.toLowerCase().includes(word)); }); }
     operationDialog(kind, id = null) { return openOperation3(this, kind, id); }
     readOperation() { return readOperation3(this); }
@@ -4653,12 +5268,12 @@ class ModelingWorkbench {
         if (e?.type === 'MESH')
             try {
                 const p = meshProperties(e);
-                report = `<dl class="model3d-properties"><dt>Vertices / faces</dt><dd>${p.vertices} / ${p.faces}</dd><dt>Surface area</dt><dd>${format(p.area)} ${E(w.doc.units)}²</dd><dt>Volume</dt><dd>${p.closed ? format(p.volume) + ' ' + E(w.doc.units) + '³' : 'Open / non-manifold'}</dd><dt>Boundary edges</dt><dd>${p.boundaryEdges}</dd></dl>`;
+                report = `<dl class="model3d-properties"><dt>${icon('mesh')}Vertices / faces</dt><dd>${p.vertices} / ${p.faces}</dd><dt>${icon('area')}Surface area</dt><dd>${format(p.area)} ${E(w.doc.units)}²</dd><dt>${icon('volume')}Volume</dt><dd>${p.closed ? format(p.volume) + ' ' + E(w.doc.units) + '³' : 'Open / non-manifold'}</dd><dt>${icon('boundary')}Boundary edges</dt><dd>${p.boundaryEdges}</dd></dl>`;
             }
             catch (error) {
                 report = `<p class="error-text">${E(error.message)}</p>`;
             }
-        w.$('.inspector-content').innerHTML = `<h3>${E(e?.label || e?.type || '3D design')}</h3><p class="muted-note">${selected.length ? selected.length + ' selected. ' + (this.hit?.vertex !== undefined ? 'Vertex ' + this.hit.vertex : this.hit?.face !== undefined ? 'Face ' + this.hit.face : 'Body selection') : 'Tap geometry to select. Drag empty space to orbit.'}</p>${report}<div class="model3d-inspector-actions">${button('3d-edit', 'Edit feature / geometry', 'btn primary')}${button('3d-appearance', 'Appearance / layer', 'btn')}${button('3d-vertex', 'Exact XYZ vertices', 'btn')}${button('3d-op-offset-face', 'Press / pull face', 'btn')}${button('3d-multi', w.multi ? 'Multi-select: on' : 'Multi-select: off', 'btn')}${button('3d-view-options', 'Selection & view options', 'btn')}${e?.feature3d ? button('3d-suppress', e.feature3d.suppressed ? 'Restore feature' : 'Suppress feature', 'btn') + button('3d-bake', 'Detach feature history…', 'btn') + button('3d-remove', 'Delete (guard dependents)', 'btn danger') : ''}</div><h3>Bodies & source sketches</h3>${button('3d-inputs', this.showInputs ? 'Hide consumed inputs' : 'Show consumed inputs', 'btn')}<div class="model3d-body-list">${w.doc.entities.filter(e => e.feature3d || ['MESH', 'POLYLINE', 'LWPOLYLINE', 'CIRCLE', 'ELLIPSE', 'SPLINE', 'INSERT'].includes(e.type)).slice(0, 256).map(e => button('3d-select:' + e.id, (e.feature3d?.suppressed ? '○ ' : e.model3dConsumed ? '↳ ' : '◇ ') + (e.label || e.type), w.selection.has(e.id) ? 'active' : '')).join('')}</div><p class="muted-note">Consumed source geometry remains in the document. Hidden bodies and complex features can be selected here.</p>`;
+        w.$('.inspector-content').innerHTML = `<h3 class="icon-heading">${icon(e ? entityIcon(e) : 'bodies')}${E(e?.label || e?.type || '3D design')}</h3><p class="muted-note">${selected.length ? selected.length + ' selected. ' + (this.hit?.vertex !== undefined ? 'Vertex ' + this.hit.vertex : this.hit?.face !== undefined ? 'Face ' + this.hit.face : 'Body selection') : 'Tap geometry to select. Drag empty space to orbit.'}</p>${report}<div class="model3d-inspector-actions">${button('3d-edit', 'Edit feature / geometry', 'btn primary')}${button('3d-appearance', 'Appearance / layer', 'btn')}${button('3d-vertex', 'Exact XYZ vertices', 'btn')}${button('3d-op-offset-face', 'Press / pull face', 'btn')}${button('3d-multi', w.multi ? 'Multi-select: on' : 'Multi-select: off', 'btn')}${button('3d-view-options', 'Selection & view options', 'btn')}${e?.feature3d ? button('3d-suppress', e.feature3d.suppressed ? 'Restore feature' : 'Suppress feature', 'btn', e.feature3d.suppressed ? 'play' : 'feature-off') + button('3d-bake', 'Detach feature history…', 'btn') + button('3d-remove', 'Delete (guard dependents)', 'btn danger') : ''}</div><h3>Bodies & source sketches</h3>${button('3d-inputs', this.showInputs ? 'Hide consumed inputs' : 'Show consumed inputs', 'btn', this.showInputs ? 'eye-off' : 'inputs')}<div class="model3d-body-list">${w.doc.entities.filter(e => e.feature3d || ['MESH', 'POLYLINE', 'LWPOLYLINE', 'CIRCLE', 'ELLIPSE', 'SPLINE', 'INSERT'].includes(e.type)).slice(0, 256).map(e => button('3d-select:' + e.id, (e.label || e.type), `${w.selection.has(e.id) ? 'active' : ''} ${e.model3dConsumed ? 'consumed' : ''} ${e.feature3d?.suppressed ? 'suppressed' : ''}`, e.feature3d?.suppressed ? 'feature-off' : entityIcon(e))).join('')}</div><p class="muted-note">Consumed source geometry remains in the document. Hidden bodies and complex features can be selected here.</p>`;
         return true;
     }
     vertexDialog() {
@@ -4689,7 +5304,7 @@ class ModelingWorkbench {
     appearanceDialog() { const w = this.w, e = w.selected()[0]; if (!e)
         throw new Error('Select an entity'); if (isLocked(e, w.doc))
         throw new Error('The selected entity is locked'); w.openModal('3D appearance', `<label class="field">Name<input id="model3d-label" value="${E(e.label || e.type)}"></label><label class="field">Surface / line color<input id="model3d-color" type="color" value="${E(/^#[0-9a-f]{6}$/i.test(e.color) ? e.color : '#648596')}"></label><label class="field">Layer<select id="model3d-layer">${w.doc.layers.map(l => `<option ${l.name === e.layer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></label>`, { confirm: 'Apply appearance', onConfirm: () => { const label = w.modal.querySelector('#model3d-label').value.slice(0, 160), color = w.modal.querySelector('#model3d-color').value, layer = w.modal.querySelector('#model3d-layer').value; w.edit('3D appearance', () => Object.assign(w.doc.entities.find(q => q.id === e.id), { label, color, layer })); w.closeModal(); } }); }
-    viewDialog() { const w = this.w; w.openModal('3D view and selection', `<label class="field">Projection<select id="model3d-projection"><option value="ortho">Orthographic</option><option value="perspective" ${this.camera.perspective ? 'selected' : ''}>Perspective</option></select></label><label class="field">Display style<select id="model3d-style">${['shaded-edges', 'shaded', 'wireframe'].map(s => `<option ${s === this.renderer.style ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">Selection mode<select id="model3d-pick">${['body', 'face', 'vertex'].map(s => `<option ${s === this.pickMode ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">One-finger / left-button drag<select id="model3d-nav"><option value="orbit">Orbit</option><option value="pan" ${this.navigation === 'pan' ? 'selected' : ''}>Pan</option></select></label><div class="operation-grid">${['iso', 'top', 'bottom', 'front', 'back', 'left', 'right'].map(s => button('3d-view-' + s, s, 'btn')).join('')}</div><p class="muted-note">${E(this.renderer.backend)}. CPU frame time does not measure GPU execution. Canvas fallback uses a bounded software Z-buffer; CPU timing is not GPU execution time.</p>`, { confirm: 'Apply view', onConfirm: () => { this.camera.perspective = w.modal.querySelector('#model3d-projection').value === 'perspective'; this.renderer.style = w.modal.querySelector('#model3d-style').value; this.pickMode = w.modal.querySelector('#model3d-pick').value; this.navigation = w.modal.querySelector('#model3d-nav').value; this.renderer.upload(); this.changedView(); this.saveView(); w.closeModal(); w.renderInspector(); } }); }
+    viewDialog() { const w = this.w; w.openModal('3D view and selection', `${iconPreferencesMarkup()}<label class="field">Projection<select id="model3d-projection"><option value="ortho">Orthographic</option><option value="perspective" ${this.camera.perspective ? 'selected' : ''}>Perspective</option></select></label><label class="field">Display style<select id="model3d-style">${['shaded-edges', 'shaded', 'wireframe'].map(s => `<option ${s === this.renderer.style ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">Selection mode<select id="model3d-pick">${['body', 'face', 'vertex'].map(s => `<option ${s === this.pickMode ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">One-finger / left-button drag<select id="model3d-nav"><option value="orbit">Orbit</option><option value="pan" ${this.navigation === 'pan' ? 'selected' : ''}>Pan</option></select></label><div class="operation-grid">${['iso', 'top', 'bottom', 'front', 'back', 'left', 'right'].map(s => button('3d-view-' + s, s, 'btn')).join('')}</div><p class="muted-note">${E(this.renderer.backend)}. CPU frame time does not measure GPU execution. Canvas fallback uses a bounded software Z-buffer; CPU timing is not GPU execution time.</p>`, { confirm: 'Apply view', onConfirm: () => { this.camera.perspective = w.modal.querySelector('#model3d-projection').value === 'perspective'; this.renderer.style = w.modal.querySelector('#model3d-style').value; this.pickMode = w.modal.querySelector('#model3d-pick').value; this.navigation = w.modal.querySelector('#model3d-nav').value; this.renderer.upload(); this.changedView(); this.saveView(); w.closeModal(); w.renderInspector(); } }); }
     measureDialog() { const w = this.w, selected = w.selected().filter(e => e.type === 'MESH'), items = (selected.length ? selected : w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed)); const values = items.map(e => { try {
         const p = meshProperties(e);
         return `<section><h3>${E(e.label || e.id)}</h3><p>${p.closed ? 'Closed oriented mesh' : 'Open or non-manifold mesh'} · ${p.vertices} vertices · ${p.faces} faces</p><p>Area: ${format(p.area)} ${E(w.doc.units)}²<br>Volume: ${p.volume === null ? 'not reported for an open mesh' : format(p.volume) + ' ' + E(w.doc.units) + '³'}<br>Boundary edges: ${p.boundaryEdges}; non-manifold/orientation edges: ${p.nonManifoldEdges}</p>${p.centroid ? '<p>Volume centroid: ' + [p.centroid.x, p.centroid.y, p.centroid.z].map(format).join(', ') + '</p>' : ''}</section>`;
@@ -5250,8 +5865,8 @@ const {beginBlockEdit, editedBlockDefinition, updateBlockDefinition, inspectBloc
 const {ConstraintSolver, resolveParameters, describeParameters, reservedParameterNames, constraintAnnotations, constraintMeasurement, evaluateExpression, inferSketchConstraints, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
 const {History} = __modules["packages/history/src/index.js"];
 const {bounds} = __modules["packages/geometry/src/index.js"];
-const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
-const B=(action,label)=>`<button class="btn" data-action="${action}">${label}</button>`;
+const {escapeHTML:E, commandButton} = __modules["packages/workbench/src/icons.js"];
+const B=(action,label)=>commandButton(action,label,'btn');
 const number=n=>Number.isFinite(n)?Number(n.toPrecision(8)).toString():'—';
 const field=(name,label,value,type='input')=>`<label class="field">${E(label)}<${type} data-block-field="${name}" ${type==='input'?`value="${E(value)}"`:''}>${type==='textarea'?E(value):''}</${type}></label>`;
 const readFields=w=>Object.fromEntries([...w.modal.querySelectorAll('[data-block-field]')].map(e=>[e.dataset.blockField,e.value]));
@@ -5460,11 +6075,12 @@ const {createDocument, validateDocument, clone, beginBlockEdit} = __modules["pac
 const {DrawingSession} = __modules["packages/drawing/src/index.js"];
 const {renderBlockBar, restoreHistory, refreshCalculations} = __modules["packages/workbench/src/parametric-workbench.js"];
 const {escapeHTML:E, icon} = __modules["packages/workbench/src/icons.js"];
+const {commandButton, commandContent} = __modules["packages/workbench/src/icons.js"];
 const defaults = () => ({ viewMode: '2d', model3dCamera: null, tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
 const fields = Object.keys(defaults());
 const cameraState = w => ({ x: w.camera.x, y: w.camera.y, scale: w.camera.scale });
 const dirty = session => session.revision !== session.savedRevision;
-const button = (action, label, cls = '') => `<button type="button" class="btn ${cls}" data-action="${action}">${E(label)}</button>`;
+const button = (action,label,cls='') => commandButton(action,label,`btn ${cls}`);
 
 function createDocumentHistory(w) {
     return new History({
@@ -5706,13 +6322,13 @@ function renderDocuments(w) {
     const workspace = w.documents, host = w.$('.document-tabs');
     if (!workspace || !host) return;
     const active = workspace.active;
-    const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
+    const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, spatial: (session.id === active?.id ? w.viewMode : session.context.viewMode) === '3d', dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
     const signature = JSON.stringify([workspace.activeId, data]);
     if (w.documentTabSignature !== signature) {
         const scroll = host.scrollLeft, focusedNode = host.contains(document.activeElement) ? document.activeElement : null;
         const focused = focusedNode?.dataset?.documentId, operation = focusedNode?.dataset?.documentOperation;
         const reveal = w.lastRevealedDocument !== workspace.activeId;
-        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation" data-dirty="${s.dirty}" data-recovery-error="${s.error}"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-label="${E(s.name || 'Untitled drawing')}${s.editing ? ' · Block editor' : ''}${s.error ? ' · Recovery failed' : s.dirty ? ' · Not saved on device' : ' · Saved on device'}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${s.editing ? '◇' : s.dirty ? '●' : '▱'}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
+        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation" data-dirty="${s.dirty}" data-recovery-error="${s.error}"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-label="${E(s.name || 'Untitled drawing')}${s.editing ? ' · Block editor' : ''}${s.error ? ' · Recovery failed' : s.dirty ? ' · Not saved on device' : ' · Saved on device'}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${icon(s.editing ? 'block-edit' : s.spatial ? 'file-3d' : 'file-cad')}${s.error || s.dirty ? `<i class="document-state">${icon(s.error ? 'warning' : 'dot')}</i>` : ''}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
         host.scrollLeft = scroll;
         if (focused) host.querySelector(`[data-document-id="${focused}"][data-document-operation="${operation}"]`)?.focus({ preventScroll: true });
         if (reveal) {
@@ -5732,7 +6348,8 @@ function renderDocuments(w) {
     w.$('.workspace').setAttribute('aria-labelledby', `tab-${workspace.activeId}`);
     w.$('.doc-name').textContent = data.find(s=>s.id===workspace.activeId)?.name || w.doc.name;
     const status = active?.error ? 'Recovery failed' : active?.saving ? 'Saving on device…' : active && dirty(active) ? 'Not yet saved on device' : 'Saved on device';
-    w.$('.save-status').textContent = status;
+    const stateIcon=active?.error?'warning':active?.saving?'loading':active&&dirty(active)?'dot':'check-circle';
+    const save=w.$('.save-status'); if(save.dataset.state!==status){save.dataset.state=status;save.innerHTML=`${icon(stateIcon)}<span>${E(status)}</span>`;}
     w.$('.document-switcher').title = `${workspace.sessions.length} open drawings · ${status}`;
     document.title = `${w.doc.name} — Conduit CAD`;
 }
@@ -6038,10 +6655,10 @@ __modules["packages/workbench/src/drawing-workbench.js"]=(()=>{
 const {DRAWING_TOOLS, drawingTool, DrawingSession, createDrawingEntity, parseDrawingPoint, hatchFromEntities, validateBoundary} = __modules["packages/drawing/src/index.js"];
 const {entity, polyline, clone, isLocked} = __modules["packages/model/src/index.js"];
 const {distance, TAU} = __modules["packages/geometry/src/index.js"];
-const {icon, escapeHTML} = __modules["packages/workbench/src/icons.js"];
+const {icon, escapeHTML, commandContent, toolIcon} = __modules["packages/workbench/src/icons.js"];
 const E = escapeHTML;
 const number = n => Number(n.toFixed(6)).toString();
-const action = (id, label, ic = 'properties') => `<button type="button" data-action="${id}" aria-label="${E(label)}">${icon(ic)}<span>${E(label)}</span></button>`;
+const action = (id, label, ic = 'properties') => `<button type="button" data-action="${id}" aria-label="${E(label)}">${commandContent(id,label,ic)}</button>`;
 const finite = (value, name, positive = false) => {
     if (!Number.isFinite(value) || Math.abs(value) > 1e12 || (positive && value <= 1e-8)) throw new Error(`Invalid ${name}`);
     return value;
@@ -6117,7 +6734,7 @@ function drawingToolSections(w) {
     const groups = new Map();
     for (const t of DRAWING_TOOLS) { if (!groups.has(t.group)) groups.set(t.group, []); groups.get(t.group).push(t); }
     return `<label class="field drawing-tool-search">Find a drawing tool<input data-drawing-search type="search" placeholder="Arc, hatch, spline, ordinate…" aria-label="Find a drawing tool"></label>` +
-        [...groups].map(([group, tools]) => `<section class="drawing-tool-group"><h3>${E(group)}</h3><div class="operation-grid">${tools.map(t => `<button type="button" data-tool="${t.id}" data-tool-search="${E((t.label + ' ' + group + ' ' + t.id).toLowerCase())}" title="${E(t.steps.join(' → '))}">${icon(t.icon)}<span>${E(t.label)}</span></button>`).join('')}</div></section>`).join('') +
+        [...groups].map(([group, tools]) => `<section class="drawing-tool-group"><h3>${E(group)}</h3><div class="operation-grid">${tools.map(t => `<button type="button" data-tool="${t.id}" data-tool-search="${E((t.label + ' ' + group + ' ' + t.id).toLowerCase())}" title="${E(t.steps.join(' → '))}">${icon(toolIcon(t.id,t.icon),'command-icon')}<span class="command-label">${E(t.label)}</span></button>`).join('')}</div></section>`).join('') +
         `<section class="drawing-tool-group"><h3>Existing boundaries</h3><div class="operation-grid">${action('hatch-selection', 'Hatch selected boundaries', 'hatch').replace('<button ', '<button data-tool-search="hatch selected boundaries" ')}</div></section>`;
 }
 function bindDrawingSearch(w) {
@@ -6287,7 +6904,8 @@ __modules["packages/workbench/src/cad-editing.js"]=(()=>{
 const {entity, clone, editDimension, dimensionPicture, setDynamicParameters, dynamicValues, evaluateDynamicBlock, entityGeometry, isLocked, uid} = __modules["packages/model/src/index.js"];
 const {bounds} = __modules["packages/geometry/src/index.js"];
 const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
-const button=(action,text)=>`<button class="btn" data-action="${action}">${text}</button>`;
+const {commandButton, commandContent} = __modules["packages/workbench/src/icons.js"];
+const button=(action,text)=>commandButton(action,text,"btn");
 const names=['Rotated','Aligned','Two-line angular','Diameter','Radius','Three-point angular','Ordinate'];
 const input=(key,label,value,kind='dim')=>`<label class="field"><span>${E(label)}</span><input data-${kind}="${E(key)}" aria-label="${E(label)}" value="${E(value)}" autocomplete="off" inputmode="${key==='text'?'text':'decimal'}"></label>`;
 function renderCadEditing(w,e,host) {
@@ -9671,11 +10289,13 @@ const {CadRenderer, Camera, drawPath, drawText} = __modules["packages/renderer/s
 const {PointerController} = __modules["packages/input/src/index.js"];
 const {ProjectStore, downloadFile} = __modules["packages/storage/src/index.js"];
 const {writeSVG, renderPNG, writeBOM} = __modules["packages/exchange/src/index.js"];
-const {icon, escapeHTML} = __modules["packages/workbench/src/icons.js"];
+const {icon, escapeHTML, commandContent, toolIcon} = __modules["packages/workbench/src/icons.js"];
+const {actionIcon, EXAMPLE_ICONS} = __modules["packages/workbench/src/icon-map.js"];
+const {bindIconography, iconPreferencesMarkup} = __modules["packages/workbench/src/iconography.js"];
 const E = escapeHTML;
 const TOOL_INFO = { ...Object.fromEntries(DRAWING_TOOLS.map(t => [t.id, [t.label, t.steps[0]]])), select: ['Select', 'Tap an object to select · drag to move'], pan: ['Pan', 'Drag the drawing · pinch to zoom'], line: ['Line', 'Tap two endpoints, or drag to draw a line'], polyline: ['Polyline', 'Tap vertices · Finish to complete the path'], rect: ['Rectangle', 'Tap opposite corners, or drag a rectangle'], circle: ['Circle', 'Tap the center, then set the radius'], connect: ['Connect', 'Tap a port, then a destination · routes avoid equipment'], text: ['Text', 'Tap the drawing to place editable text'], dimension: ['Dimension', 'Pick two points for an aligned dimension'], insert: ['Place symbol', 'Tap to place · Escape cancels'] };
-const btn = (action, label, ic, cls = '', title = label) => `<button type="button" data-action="${action}" class="${cls}" title="${E(title)}" aria-label="${E(label)}">${ic ? icon(ic) : ''}<span>${E(label)}</span></button>`;
-const iconButton = (action, ic, label, cls = '') => `<button type="button" data-action="${action}" class="icon-btn ${cls}" title="${E(label)}" aria-label="${E(label)}">${icon(ic)}</button>`;
+const btn = (action, label, ic, cls = '', title = label) => `<button type="button" data-action="${action}" class="${cls}" title="${E(title)}" aria-label="${E(label)}">${commandContent(action, label, actionIcon(action,ic || 'settings'))}</button>`;
+const iconButton = (action, ic, label, cls = '') => `<button type="button" data-action="${action}" class="icon-btn ${cls}" title="${E(label)}" aria-label="${E(label)}">${icon(ic,'command-icon')}</button>`;
 const filledContains = (p, contours) => { let inside=false; for (const poly of contours) for(let i=0,j=poly.length-1;i<poly.length;j=i++) {const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;} return inside; };
 const format = n => Number.isFinite(n) ? Number(n.toFixed(3)).toString() : '0';
 function symbolSVG(block, doc, extra = '') {
@@ -9738,6 +10358,7 @@ class Workbench {
                 this.renderer.invalidate();
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.model3d = new ModelingWorkbench(this);
+        this.iconography = bindIconography(this);
         this.bindEvents();
         bindMobileWorkspace(this);
         this.updateUI();
@@ -9783,7 +10404,7 @@ class Workbench {
  <aside class="inspector" aria-label="Drawing properties"><div class="inspector-tabs"><button data-inspector="properties" class="active">Properties</button><button data-inspector="layers">Layers</button><button data-inspector="qa">Check</button>${iconButton('toggle-inspector', 'close', 'Close properties', 'mobile-only')}</div><div class="inspector-content"></div></aside><div class="sheet-backdrop" data-action="close-panels"></div></main>
  <footer class="statusbar"><div class="left"><select class="layout-select" aria-label="Drawing layout"></select><span class="status-document"></span><span class="coords">X 0.0   Y 0.0</span></div><div class="right"><button data-action="toggle-grid">GRID</button><button data-action="toggle-snap">SNAP</button><button data-action="toggle-ortho">ORTHO</button><span class="status-extra">1:1</span><span class="stats"></span>${btn('command', 'Command', 'code', 'desktop-only')}</div></footer><input class="file-input hide" type="file" multiple accept=".dxf,.json,.conduit" aria-label="Open DXF or Conduit project"><div class="toast" role="status" aria-live="polite"></div></div>`;
     }
-    toolButton(tool, label, ic, cls = '') { return `<button data-tool="${tool}" class="${tool === 'select' ? 'active ' : ''}${cls}" title="${E(label)}" aria-label="${E(label)}" aria-pressed="${tool === 'select'}">${icon(ic)}<span>${E(label)}</span></button>`; }
+    toolButton(tool, label, ic, cls = '') { return `<button data-tool="${tool}" class="${tool === 'select' ? 'active ' : ''}${cls}" title="${E(label)}" aria-label="${E(label)}" aria-pressed="${tool === 'select'}">${commandContent('', label, toolIcon(tool,ic))}</button>`; }
     bindEvents() {
         const opt = { signal: this.abort.signal };
         this.root.addEventListener('click', e => this.onClick(e), opt);
@@ -9901,6 +10522,7 @@ class Workbench {
         }
     }
     async action(action) {
+        if (action === 'icon-guide') { this.iconography.guide(); return; }
         if (action === 'mode-3d' || action.startsWith('3d-')) return this.model3d.action(action);
         if (action.startsWith('document-')) { await documentAction(this, action); return; }
         if (action === 'new') { this.newDialog(); return; }
@@ -10238,7 +10860,7 @@ class Workbench {
             const group = query || this.category === 'All' ? (CATEGORIES.find(c => c.id === s.category)?.name || s.category) : s.symbol?.group || (this.category === 'Custom' ? 'Your DXF blocks' : 'Components');
             (groups[group] ??= []).push(s);
         }
-        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${this.librarySymbolPreview(s)}<span>${E(s.name)}</span><small class="symbol-convention">${E(s.symbol?.standardRefs?.filter(r => r !== 'NFPC-FLUID').join(' / ') || 'Custom')}</small><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">⠿</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
+        this.$('.library-scroll').innerHTML = Object.entries(groups).map(([name, items]) => `<section class="library-group"><div class="section-label">${E(name)}<span>${items.length}</span></div><div class="symbol-grid">${items.map(s => `<button class="symbol-card ${this.pendingSymbol === s.id && this.tool === 'insert' ? 'selected' : ''}" data-symbol="${E(s.id)}" title="Place ${E(s.name)}" aria-label="Place ${E(s.name)}">${this.librarySymbolPreview(s)}<span>${E(s.name)}</span><small class="symbol-convention">${E(s.symbol?.standardRefs?.filter(r => r !== 'NFPC-FLUID').join(' / ') || 'Custom')}</small><span class="symbol-drag-handle" title="Drag symbol onto drawing" aria-hidden="true">${icon('drag')}</span></button>`).join('')}</div></section>`).join('') || `<div class="list-empty">${icon('symbols')}<br>${this.category === 'Custom' ? 'Select geometry and use Make symbol, or open a DXF with blocks.' : 'No matching symbols.'}</div>`;
     }
     librarySymbolPreview(symbol) {
         const existing = this.doc.blocks[symbol.block];
@@ -10343,7 +10965,11 @@ class Workbench {
     }
     field(name, label, value, full = false, unit = '') { return `<label class="field ${full ? 'full' : ''}"><span>${E(label)}${unit ? `<span class="unit">${E(unit)}</span>` : ''}</span><input data-prop="${name}" value="${E(value ?? '')}" autocomplete="off" spellcheck="false" inputmode="${['tag', 'text'].includes(name) ? 'text' : 'decimal'}" aria-label="${E(label)}"></label>`; }
     renderInspector() {
-        if(this.model3d?.active && this.inspectorTab === "properties") { this.model3d.renderInspector(); return; } this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); updateMobilePanels(this); }
+        if(this.model3d?.active && this.inspectorTab === "properties") this.model3d.renderInspector();
+        else { this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); }
+        this.iconography?.prepare(this.$('.inspector'));
+        updateMobilePanels(this);
+    }
     renderBaseInspector() {
         const host = this.$('.inspector-content');
         if (!host)
@@ -10351,7 +10977,7 @@ class Workbench {
         const scroll = host.scrollTop;
         this.root.querySelectorAll('[data-inspector]').forEach(b => b.classList.toggle('active', b.dataset.inspector === this.inspectorTab));
         if (this.inspectorTab === 'layers') {
-            host.innerHTML = `<div class="section-label">DRAWING LAYERS <span>${this.doc.layers.length}</span></div><p class="muted-note">Hidden layers do not render. Locked layers can be inspected but not moved.</p>${this.doc.layers.map(l => `<div class="layer-row"><input type="color" value="${E(l.color)}" data-layer-color="${E(l.name)}" aria-label="Color of ${E(l.name)}"><span title="${E(l.name)}">${E(l.name)}</span><button data-layer-visible="${E(l.name)}" class="${l.visible ? 'active' : ''}" title="${l.visible ? 'Hide' : 'Show'} ${E(l.name)}" aria-label="${l.visible ? 'Hide' : 'Show'} ${E(l.name)}" aria-pressed="${l.visible}">${icon('eye')}</button><button data-layer-lock="${E(l.name)}" class="${l.locked ? 'active' : ''}" title="${l.locked ? 'Unlock' : 'Lock'} ${E(l.name)}" aria-label="${l.locked ? 'Unlock' : 'Lock'} ${E(l.name)}" aria-pressed="${l.locked}">${icon(l.locked ? 'lock' : 'unlock')}</button></div>`).join('')}<div style="margin-top:14px">${btn('add-layer', 'Add layer', 'plus', 'btn')}</div><div class="inspector-section"><h3>Active drawing layer</h3><select data-active-layer aria-label="Active drawing layer">${this.doc.layers.map(l => `<option ${l.name === this.currentLayer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></div>`;
+            host.innerHTML = `<div class="section-label">DRAWING LAYERS <span>${this.doc.layers.length}</span></div><p class="muted-note">Hidden layers do not render. Locked layers can be inspected but not moved.</p>${this.doc.layers.map(l => `<div class="layer-row"><input type="color" value="${E(l.color)}" data-layer-color="${E(l.name)}" aria-label="Color of ${E(l.name)}"><span title="${E(l.name)}">${E(l.name)}</span><button data-layer-visible="${E(l.name)}" class="${l.visible ? 'active' : ''}" title="${l.visible ? 'Hide' : 'Show'} ${E(l.name)}" aria-label="${l.visible ? 'Hide' : 'Show'} ${E(l.name)}" aria-pressed="${l.visible}">${icon(l.visible ? 'eye' : 'eye-off')}</button><button data-layer-lock="${E(l.name)}" class="${l.locked ? 'active' : ''}" title="${l.locked ? 'Unlock' : 'Lock'} ${E(l.name)}" aria-label="${l.locked ? 'Unlock' : 'Lock'} ${E(l.name)}" aria-pressed="${l.locked}">${icon(l.locked ? 'lock' : 'unlock')}</button></div>`).join('')}<div style="margin-top:14px">${btn('add-layer', 'Add layer', 'plus', 'btn')}</div><div class="inspector-section"><h3>Active drawing layer</h3><select data-active-layer aria-label="Active drawing layer">${this.doc.layers.map(l => `<option ${l.name === this.currentLayer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></div>`;
             return;
         }
         if (this.inspectorTab === 'qa') {
@@ -11447,7 +12073,7 @@ class Workbench {
         const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']];
         const editing = [['3d-tools','3D modeling tools','rect'],['3d-examples','3D example drawings','rect'],['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate','Duplicate','copy'],['rotate-angle','Rotate','rotate'],['offset','Offset','offset'],['trim','Trim','trim'],['extend','Extend','extend'],['fillet','Fillet','fillet'],['constraint','Constraints','param'],['make-symbol','Make symbol','symbols'],['explode','Explode','symbols'],['parameters','Parameters','param'],['multi-select','Multi-select','select'],['select-all','Select all','select'],['delete','Delete','trash'],['command','Command','command'],['help','Help','help']];
         const section = (label, actions) => `<section class="drawing-tool-group"><h3>${E(label)}</h3><div class="operation-grid">${actions.map(([a,l,i]) => btn(a,l,i).replace('<button ', `<button data-tool-search="${E((label+' '+l+' '+a).toLowerCase())}" `)).join('')}</div></section>`;
-        this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `${section('Quick drawing',drawing)}${drawingToolSections(this)}${shapesOnly ? '' : section('Edit & organize',editing)}`, { wide: !shapesOnly });
+        this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `${iconPreferencesMarkup()}${section('Quick drawing',drawing)}${drawingToolSections(this)}${shapesOnly ? '' : section('Edit & organize',editing)}`, { wide: !shapesOnly });
         const body = this.modal.querySelector('.modal-body'), search = body.querySelector('.drawing-tool-search');
         search.querySelector('input').placeholder = shapesOnly ? 'Arc, hatch, spline, dimension…' : 'Find any tool, edit or command…';
         body.prepend(search); bindDrawingSearch(this);
@@ -11460,6 +12086,7 @@ class Workbench {
         backdrop.innerHTML = `<section class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="modal-title"><header class="modal-head"><h2 id="modal-title">${E(title)}</h2>${iconButton('modal-close', 'close', 'Close dialog')}</header><div class="modal-body">${body}</div>${confirm ? `<footer class="modal-foot">${btn('modal-close', 'Cancel', null, 'btn')}${btn('modal-confirm', confirm, 'check', 'btn primary')}</footer>` : ''}</section>`;
         document.body.append(backdrop);
         this.modal = backdrop;
+        this.iconography?.prepare(backdrop);
         this.previousFocus = document.activeElement;
         this.modalCleanup = prepareMobileDialog(this, backdrop);
         let confirming = false;
@@ -11504,6 +12131,7 @@ class Workbench {
         });
     }
     closeModal() {
+        this.iconography?.hide();
         this.model3d?.clearPreview();
         if (this.modal) {
             this.modalCleanup?.(); this.modalCleanup = null;
@@ -11517,7 +12145,7 @@ class Workbench {
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }
     toast(message, error = false) { const el = this.$('.toast'); if (this.disposed || !el) return; el.textContent = message; el.classList.toggle('error', error); el.classList.add('show'); clearTimeout(this.toastTimer); this.toastTimer = setTimeout(() => el.classList.remove('show'), error ? 6500 : 3500); }
     newDialog() {
-        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length + EXAMPLES_3D.length} drawing starters</div><div class="export-grid template-grid">${EXAMPLES_3D.map(t=>`<button class="export-option template-card" data-demo="3d:${E(t.id)}" data-search="${E(('3d '+t.name+' '+t.industry+' '+t.description).toLowerCase())}"><span class="template-content"><small class="template-industry">3D · ${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.description)}</small></span></button>`).join('')}<button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
+        this.openModal('Create a drawing', `<p>Creates a new tab. Your other drawings remain open with their own undo history. These are editable concept schematics, not engineered or construction-approved designs.</p><label class="field">Find an industry or drawing type<input id="template-search" type="search" placeholder="Water, hydraulic, single-line, HVAC…" autocomplete="off"></label><div class="template-count" role="status" aria-live="polite">${DRAWING_TYPES.length + EXAMPLES_3D.length} drawing starters</div><div class="export-grid template-grid">${EXAMPLES_3D.map(t=>`<button class="export-option template-card" data-demo="3d:${E(t.id)}" data-search="${E(('3d '+t.name+' '+t.industry+' '+t.description).toLowerCase())}"><span class="template-content"><small class="template-industry">${icon(EXAMPLE_ICONS[t.id] || 'file-3d')}3D · ${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.description)}</small></span></button>`).join('')}<button class="export-option" data-demo="blank">${icon('new')}<span><strong>Blank drawing</strong><small>Empty model with all symbol libraries.</small></span></button>${DRAWING_TYPES.map(t => `<button class="export-option template-card" data-demo="${E(t.id)}" data-search="${E([t.name, t.industry, t.drawingType, ...t.categories, ...t.standardRefs, t.description].join(' ').toLowerCase())}"><span class="template-content"><small class="template-industry">${E(t.industry)}</small><strong>${E(t.name)}</strong><small>${E(t.drawingType)}</small><span class="template-preview">${t.nodes.slice(0, 3).map(n => this.librarySymbolPreview(SYMBOLS.find(s => s.id === n.symbol))).join('') || icon('graph')}</span><small>${E(t.description)}</small></span></button>`).join('')}</div>`, { wide: true });
         const input = this.modal.querySelector('#template-search');
         input.addEventListener('input', () => {
             const words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -11826,7 +12454,7 @@ class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.8.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>18</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div><div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.9.1', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>19</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
     dispose() { this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

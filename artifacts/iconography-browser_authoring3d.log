@@ -1,0 +1,84 @@
+canvas face pick selects a planar top face
+face mode has no body translation handles
+face actions are discoverable without opening a catalogue
+hole form inherits the picked face and local center
+simple through hole hides unused recess and blind fields
+counterbore and distance controls show only relevant fields
+hole preview is a noncommitting evaluated result
+changing a field invalidates old preview and restores camera
+invalid preview removes old geometry and reports failure
+hole Apply commits one attached native mesh feature
+hole creation preserves current camera
+undo removes hole and restores stock visibility
+redo restores executable hole history
+upstream form edit regenerates the attached hole
+countersink changes relevant form controls
+canvas face pick selects a planar top face
+look-at-face is orthographic and points along the selected normal
+face sketch creates a native elevated OCS polyline
+new extrusion defaults to profile normal
+Join shows the body selector
+Join produces one native feature retaining both inputs
+expression-valued choices retain the original expression
+Apply preserves expression-driven operation and its target
+unchanged timeline sync preserves button identity and keyboard focus
+timeline End moves focus without activating a different body
+2D drawing remains editable beside 3D features
+symmetric extent is editable through named controls
+two-side extrusion form produces independent opposite extents
+body visibility is an undoable edit
+undo restores body visibility
+320x568 reclaims space reserved for the hidden fixed 2D dock
+320x568 .model3d-selection-tools is bounded
+320x568 .model3d-dock is bounded
+320x568 .model3d-timeline is bounded
+320x568 context actions have touch-sized targets
+320x568 dialog and confirmation stay within visual viewport
+320x568 opening a form does not force the touch keyboard
+320x568 hole can be completed in a touch-sized form
+320x568 selection toggle exposes pressed state
+320x568 navigation toggles directly to Pan
+320x568 gesture hint follows navigation and selection mode
+320x568 two-finger gesture reaches canvas without edits
+320x568 2D dock and its reserved space return
+390x844 reclaims space reserved for the hidden fixed 2D dock
+390x844 .model3d-selection-tools is bounded
+390x844 .model3d-dock is bounded
+390x844 .model3d-timeline is bounded
+390x844 context actions have touch-sized targets
+390x844 dialog and confirmation stay within visual viewport
+390x844 opening a form does not force the touch keyboard
+390x844 hole can be completed in a touch-sized form
+390x844 selection toggle exposes pressed state
+390x844 navigation toggles directly to Pan
+390x844 gesture hint follows navigation and selection mode
+390x844 two-finger gesture reaches canvas without edits
+390x844 2D dock and its reserved space return
+844x390 reclaims space reserved for the hidden fixed 2D dock
+844x390 .model3d-selection-tools is bounded
+844x390 .model3d-dock is bounded
+844x390 .model3d-timeline is bounded
+844x390 context actions have touch-sized targets
+844x390 dialog and confirmation stay within visual viewport
+844x390 opening a form does not force the touch keyboard
+844x390 hole can be completed in a touch-sized form
+844x390 selection toggle exposes pressed state
+844x390 navigation toggles directly to Pan
+844x390 gesture hint follows navigation and selection mode
+844x390 two-finger gesture reaches canvas without edits
+844x390 2D dock and its reserved space return
+820x1180 reclaims space reserved for the hidden fixed 2D dock
+820x1180 .model3d-selection-tools is bounded
+820x1180 .model3d-dock is bounded
+820x1180 .model3d-timeline is bounded
+820x1180 context actions have touch-sized targets
+820x1180 dialog and confirmation stay within visual viewport
+820x1180 opening a form does not force the touch keyboard
+820x1180 hole can be completed in a touch-sized form
+820x1180 selection toggle exposes pressed state
+820x1180 navigation toggles directly to Pan
+820x1180 gesture hint follows navigation and selection mode
+820x1180 two-finger gesture reaches canvas without edits
+820x1180 2D dock and its reserved space return
+no uncaught authoring JavaScript errors
+{"passed": 83, "errors": []}

@@ -1,0 +1,577 @@
+{
+  "passed": 142,
+  "checks": [
+    {
+      "name": "1728x1000 shell has only decorative unfocusable UI SVGs",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 every primary command is named and has an icon",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 drawing tool catalogue retains icons and visible names",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 icon tool activation retains actual drawing behavior",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 feature timeline selection updates immediately",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 feature glyph reflects operation, not generic body",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 native document title and 3D type stay visible",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 root does not overflow",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 bounded .model3d-views",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 bounded .model3d-selection-tools",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 bounded .model3d-dock",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 bounded .model3d-timeline",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 state toggle changes both glyph and label",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 compact view button executes actual camera command",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 unchanged sync preserves button, caption and glyph nodes",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 explicit compact preference collapses only toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 hole dialog retains visible field captions and confirmation",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 dialog and footer stay in viewport",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 geometric property icons map to diameter",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 guide covers every registered glyph",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 icon guide filters by meaningful glyph name",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 user can retain all toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 3D tool catalogue has operation-specific glyphs",
+      "passed": true
+    },
+    {
+      "name": "1728x1000 format icons distinguish native, binary and image outputs",
+      "passed": true
+    },
+    {
+      "name": "keyboard focus opens a named accessible tooltip",
+      "passed": true
+    },
+    {
+      "name": "tooltip does not replace unrelated description references",
+      "passed": true
+    },
+    {
+      "name": "repeated decoration does not duplicate tooltips or restore the suppressed native title",
+      "passed": true
+    },
+    {
+      "name": "Escape dismisses tooltip but does not cancel its parent dialog",
+      "passed": true
+    },
+    {
+      "name": "tooltip restores the native title and prior description",
+      "passed": true
+    },
+    {
+      "name": "second Escape closes the parent dialog",
+      "passed": true
+    },
+    {
+      "name": "unsupported label preferences reject without changing the active mode",
+      "passed": true
+    },
+    {
+      "name": "storage denial cannot prevent label preference changes",
+      "passed": true
+    },
+    {
+      "name": "320x568 shell has only decorative unfocusable UI SVGs",
+      "passed": true
+    },
+    {
+      "name": "320x568 every primary command is named and has an icon",
+      "passed": true
+    },
+    {
+      "name": "320x568 drawing tool catalogue retains icons and visible names",
+      "passed": true
+    },
+    {
+      "name": "320x568 icon tool activation retains actual drawing behavior",
+      "passed": true
+    },
+    {
+      "name": "320x568 feature timeline selection updates immediately",
+      "passed": true
+    },
+    {
+      "name": "320x568 feature glyph reflects operation, not generic body",
+      "passed": true
+    },
+    {
+      "name": "320x568 native document title and 3D type stay visible",
+      "passed": true
+    },
+    {
+      "name": "320x568 root does not overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 bounded .model3d-views",
+      "passed": true
+    },
+    {
+      "name": "320x568 bounded .model3d-selection-tools",
+      "passed": true
+    },
+    {
+      "name": "320x568 bounded .model3d-dock",
+      "passed": true
+    },
+    {
+      "name": "320x568 bounded .model3d-timeline",
+      "passed": true
+    },
+    {
+      "name": "320x568 compact camera caption remains in accessibility tree",
+      "passed": true
+    },
+    {
+      "name": "320x568 touch command targets remain at least 44 pixels",
+      "passed": true
+    },
+    {
+      "name": "320x568 state toggle changes both glyph and label",
+      "passed": true
+    },
+    {
+      "name": "320x568 compact view button executes actual camera command",
+      "passed": true
+    },
+    {
+      "name": "320x568 unchanged sync preserves button, caption and glyph nodes",
+      "passed": true
+    },
+    {
+      "name": "320x568 explicit compact preference collapses only toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "320x568 hole dialog retains visible field captions and confirmation",
+      "passed": true
+    },
+    {
+      "name": "320x568 dialog and footer stay in viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 geometric property icons map to diameter",
+      "passed": true
+    },
+    {
+      "name": "320x568 guide covers every registered glyph",
+      "passed": true
+    },
+    {
+      "name": "320x568 icon guide filters by meaningful glyph name",
+      "passed": true
+    },
+    {
+      "name": "320x568 user can retain all toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "320x568 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "320x568 3D tool catalogue has operation-specific glyphs",
+      "passed": true
+    },
+    {
+      "name": "320x568 format icons distinguish native, binary and image outputs",
+      "passed": true
+    },
+    {
+      "name": "390x844 shell has only decorative unfocusable UI SVGs",
+      "passed": true
+    },
+    {
+      "name": "390x844 every primary command is named and has an icon",
+      "passed": true
+    },
+    {
+      "name": "390x844 drawing tool catalogue retains icons and visible names",
+      "passed": true
+    },
+    {
+      "name": "390x844 icon tool activation retains actual drawing behavior",
+      "passed": true
+    },
+    {
+      "name": "390x844 feature timeline selection updates immediately",
+      "passed": true
+    },
+    {
+      "name": "390x844 feature glyph reflects operation, not generic body",
+      "passed": true
+    },
+    {
+      "name": "390x844 native document title and 3D type stay visible",
+      "passed": true
+    },
+    {
+      "name": "390x844 root does not overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 bounded .model3d-views",
+      "passed": true
+    },
+    {
+      "name": "390x844 bounded .model3d-selection-tools",
+      "passed": true
+    },
+    {
+      "name": "390x844 bounded .model3d-dock",
+      "passed": true
+    },
+    {
+      "name": "390x844 bounded .model3d-timeline",
+      "passed": true
+    },
+    {
+      "name": "390x844 compact camera caption remains in accessibility tree",
+      "passed": true
+    },
+    {
+      "name": "390x844 touch command targets remain at least 44 pixels",
+      "passed": true
+    },
+    {
+      "name": "390x844 state toggle changes both glyph and label",
+      "passed": true
+    },
+    {
+      "name": "390x844 compact view button executes actual camera command",
+      "passed": true
+    },
+    {
+      "name": "390x844 unchanged sync preserves button, caption and glyph nodes",
+      "passed": true
+    },
+    {
+      "name": "390x844 explicit compact preference collapses only toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "390x844 hole dialog retains visible field captions and confirmation",
+      "passed": true
+    },
+    {
+      "name": "390x844 dialog and footer stay in viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 geometric property icons map to diameter",
+      "passed": true
+    },
+    {
+      "name": "390x844 guide covers every registered glyph",
+      "passed": true
+    },
+    {
+      "name": "390x844 icon guide filters by meaningful glyph name",
+      "passed": true
+    },
+    {
+      "name": "390x844 user can retain all toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "390x844 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "390x844 3D tool catalogue has operation-specific glyphs",
+      "passed": true
+    },
+    {
+      "name": "390x844 format icons distinguish native, binary and image outputs",
+      "passed": true
+    },
+    {
+      "name": "844x390 shell has only decorative unfocusable UI SVGs",
+      "passed": true
+    },
+    {
+      "name": "844x390 every primary command is named and has an icon",
+      "passed": true
+    },
+    {
+      "name": "844x390 drawing tool catalogue retains icons and visible names",
+      "passed": true
+    },
+    {
+      "name": "844x390 icon tool activation retains actual drawing behavior",
+      "passed": true
+    },
+    {
+      "name": "844x390 feature timeline selection updates immediately",
+      "passed": true
+    },
+    {
+      "name": "844x390 feature glyph reflects operation, not generic body",
+      "passed": true
+    },
+    {
+      "name": "844x390 native document title and 3D type stay visible",
+      "passed": true
+    },
+    {
+      "name": "844x390 root does not overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 bounded .model3d-views",
+      "passed": true
+    },
+    {
+      "name": "844x390 bounded .model3d-selection-tools",
+      "passed": true
+    },
+    {
+      "name": "844x390 bounded .model3d-dock",
+      "passed": true
+    },
+    {
+      "name": "844x390 bounded .model3d-timeline",
+      "passed": true
+    },
+    {
+      "name": "844x390 compact camera caption remains in accessibility tree",
+      "passed": true
+    },
+    {
+      "name": "844x390 touch command targets remain at least 44 pixels",
+      "passed": true
+    },
+    {
+      "name": "844x390 state toggle changes both glyph and label",
+      "passed": true
+    },
+    {
+      "name": "844x390 compact view button executes actual camera command",
+      "passed": true
+    },
+    {
+      "name": "844x390 unchanged sync preserves button, caption and glyph nodes",
+      "passed": true
+    },
+    {
+      "name": "844x390 explicit compact preference collapses only toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "844x390 hole dialog retains visible field captions and confirmation",
+      "passed": true
+    },
+    {
+      "name": "844x390 dialog and footer stay in viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 geometric property icons map to diameter",
+      "passed": true
+    },
+    {
+      "name": "844x390 guide covers every registered glyph",
+      "passed": true
+    },
+    {
+      "name": "844x390 icon guide filters by meaningful glyph name",
+      "passed": true
+    },
+    {
+      "name": "844x390 user can retain all toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "844x390 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "844x390 3D tool catalogue has operation-specific glyphs",
+      "passed": true
+    },
+    {
+      "name": "844x390 format icons distinguish native, binary and image outputs",
+      "passed": true
+    },
+    {
+      "name": "1024x768 shell has only decorative unfocusable UI SVGs",
+      "passed": true
+    },
+    {
+      "name": "1024x768 every primary command is named and has an icon",
+      "passed": true
+    },
+    {
+      "name": "1024x768 drawing tool catalogue retains icons and visible names",
+      "passed": true
+    },
+    {
+      "name": "1024x768 icon tool activation retains actual drawing behavior",
+      "passed": true
+    },
+    {
+      "name": "1024x768 feature timeline selection updates immediately",
+      "passed": true
+    },
+    {
+      "name": "1024x768 feature glyph reflects operation, not generic body",
+      "passed": true
+    },
+    {
+      "name": "1024x768 native document title and 3D type stay visible",
+      "passed": true
+    },
+    {
+      "name": "1024x768 root does not overflow",
+      "passed": true
+    },
+    {
+      "name": "1024x768 bounded .model3d-views",
+      "passed": true
+    },
+    {
+      "name": "1024x768 bounded .model3d-selection-tools",
+      "passed": true
+    },
+    {
+      "name": "1024x768 bounded .model3d-dock",
+      "passed": true
+    },
+    {
+      "name": "1024x768 bounded .model3d-timeline",
+      "passed": true
+    },
+    {
+      "name": "1024x768 compact camera caption remains in accessibility tree",
+      "passed": true
+    },
+    {
+      "name": "1024x768 touch command targets remain at least 44 pixels",
+      "passed": true
+    },
+    {
+      "name": "1024x768 state toggle changes both glyph and label",
+      "passed": true
+    },
+    {
+      "name": "1024x768 compact view button executes actual camera command",
+      "passed": true
+    },
+    {
+      "name": "1024x768 unchanged sync preserves button, caption and glyph nodes",
+      "passed": true
+    },
+    {
+      "name": "1024x768 explicit compact preference collapses only toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "1024x768 hole dialog retains visible field captions and confirmation",
+      "passed": true
+    },
+    {
+      "name": "1024x768 dialog and footer stay in viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 geometric property icons map to diameter",
+      "passed": true
+    },
+    {
+      "name": "1024x768 guide covers every registered glyph",
+      "passed": true
+    },
+    {
+      "name": "1024x768 icon guide filters by meaningful glyph name",
+      "passed": true
+    },
+    {
+      "name": "1024x768 user can retain all toolbar captions",
+      "passed": true
+    },
+    {
+      "name": "1024x768 label preference persisted separately from drawing",
+      "passed": true
+    },
+    {
+      "name": "1024x768 3D tool catalogue has operation-specific glyphs",
+      "passed": true
+    },
+    {
+      "name": "1024x768 format icons distinguish native, binary and image outputs",
+      "passed": true
+    },
+    {
+      "name": "no uncaught iconography JavaScript errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "origin": "localhost",
+  "renderer": "canvas",
+  "physicalDevice": false
+}

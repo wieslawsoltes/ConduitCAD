@@ -1,0 +1,87 @@
+search isolates ellipse tool choices
+palette closes and starts staged command
+arc: pointer workflow creates one native ARC
+arc: repeat remains armed without stale draft
+arc-center: pointer workflow creates one native ARC
+arc-center: repeat remains armed without stale draft
+circle-3p: pointer workflow creates one native CIRCLE
+circle-3p: repeat remains armed without stale draft
+circle-diameter: pointer workflow creates one native CIRCLE
+circle-diameter: repeat remains armed without stale draft
+ellipse: pointer workflow creates one native ELLIPSE
+ellipse: repeat remains armed without stale draft
+ellipse-arc: pointer workflow creates one native ELLIPSE
+ellipse-arc: repeat remains armed without stale draft
+spline: pointer workflow creates one native SPLINE
+spline: repeat remains armed without stale draft
+bezier: pointer workflow creates one native SPLINE
+bezier: repeat remains armed without stale draft
+polygon: pointer workflow creates one native LWPOLYLINE
+polygon: repeat remains armed without stale draft
+donut: pointer workflow creates one native LWPOLYLINE
+donut: repeat remains armed without stale draft
+solid: pointer workflow creates one native SOLID
+solid: repeat remains armed without stale draft
+face: pointer workflow creates one native 3DFACE
+face: repeat remains armed without stale draft
+hatch: pointer workflow creates one native HATCH
+hatch: repeat remains armed without stale draft
+wipeout: pointer workflow creates one native WIPEOUT
+wipeout: repeat remains armed without stale draft
+point: pointer workflow creates one native POINT
+point: repeat remains armed without stale draft
+ray: pointer workflow creates one native RAY
+ray: repeat remains armed without stale draft
+xline: pointer workflow creates one native XLINE
+xline: repeat remains armed without stale draft
+mtext: pointer workflow creates one native MTEXT
+mtext: repeat remains armed without stale draft
+leader: pointer workflow creates one native LEADER
+leader: repeat remains armed without stale draft
+dim-aligned: pointer workflow creates one native DIMENSION
+dim-aligned: repeat remains armed without stale draft
+dim-horizontal: pointer workflow creates one native DIMENSION
+dim-horizontal: repeat remains armed without stale draft
+dim-vertical: pointer workflow creates one native DIMENSION
+dim-vertical: repeat remains armed without stale draft
+dim-radius: pointer workflow creates one native DIMENSION
+dim-radius: repeat remains armed without stale draft
+dim-diameter: pointer workflow creates one native DIMENSION
+dim-diameter: repeat remains armed without stale draft
+dim-angular: pointer workflow creates one native DIMENSION
+dim-angular: repeat remains armed without stale draft
+dim-angular-lines: pointer workflow creates one native DIMENSION
+dim-angular-lines: repeat remains armed without stale draft
+dim-ordinate-x: pointer workflow creates one native DIMENSION
+dim-ordinate-x: repeat remains armed without stale draft
+dim-ordinate-y: pointer workflow creates one native DIMENSION
+dim-ordinate-y: repeat remains armed without stale draft
+invalid collinear arc keeps first two picks
+Back removes exactly one staged pick
+relative exact point and NEXT complete the same session
+Close creates native closed spline and clears draft
+drag shows native polygon preview
+drag commits configured polygon exactly once
+new drawing transaction supports undo redo
+multiline options produce native paragraph content
+native MTEXT inspector keeps paragraph semantics
+ellipse axis inspector changes native ratio
+invalid native property rolls back without corrupting entity
+control table edits spline without flattening
+spline control grip changes the native curve
+selected circular boundaries keep native arcs and island topology
+all drawn tools save as a real independently audited binary DXF
+binary download contains all fifteen native entity families
+new tools author native entities inside isolated block canvas
+block save retains new entity types on shared references
+mobile shape palette exposes searched native arc tool
+native touch taps draw a single arc on mobile
+mobile active command has 44px controls and no overflow
+Finish and touch command bar do not overlap
+two-finger gesture creates neither entity nor accidental draft point
+Cancel returns to select without stale preview
+no uncaught browser exceptions
+{
+  "passed": 83,
+  "errors": []
+}
