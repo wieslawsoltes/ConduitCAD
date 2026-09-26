@@ -323,14 +323,28 @@ export function booleanMesh(left, right, operation = 'union') {
         throw new Error('Boolean result exceeds topology-conformance budget');
     // Include split points on both sides of every edge to avoid BSP T-junctions.
     let work = 0;
-    const conformed = faces.map(face => face.flatMap((a, i) => { const b = face[(i + 1) % face.length], d = sub3(points[b], points[a]), den = dot3(d, d), inner = []; for (let j = 0; j < points.length; j++) {
-        if (++work > 40000000)
-            throw new Error('Boolean topology budget exceeded');
-        if (j === a || j === b)
-            continue;
-        const t = dot3(sub3(points[j], points[a]), d) / den;
-        if (t > 1e-7 && t < 1 - 1e-7 && distance3(points[j], lerp3(points[a], points[b], t)) < 2e-7)
-            inner.push([t, j]);
-    } return [a, ...inner.sort((x, y) => x[0] - y[0]).map(x => x[1])]; }));
+    const conformed = faces.map(face => {
+        const original = new Set(face), splits = face.map(() => []);
+        // Near a corner a tolerance ball may touch two edges. Assign each split vertex
+        // to its nearest edge once; inserting it twice creates a self-touching polygon.
+        const edges = face.map((a, i) => { const b = face[(i + 1) % face.length], d = sub3(points[b], points[a]); return { a, b, d, den: dot3(d, d) }; });
+        for (let j = 0; j < points.length; j++) {
+            if (original.has(j)) continue;
+            let best = null;
+            for (let i = 0; i < edges.length; i++) {
+                if (++work > 40000000) throw new Error('Boolean topology budget exceeded');
+                const { a, b, d, den } = edges[i];
+                if (!den) continue;
+                const t = dot3(sub3(points[j], points[a]), d) / den;
+                if (t <= 1e-7 || t >= 1 - 1e-7) continue;
+                const gap = distance3(points[j], lerp3(points[a], points[b], t));
+                // Edge incidence needs a tighter tolerance than BSP half-space classification:
+                // a nearby point is not necessarily on the same geometric edge.
+                if (gap < 1e-9 && (!best || gap < best.gap)) best = { edge: i, t, gap };
+            }
+            if (best) splits[best.edge].push([best.t, j]);
+        }
+        return face.flatMap((a, i) => [a, ...splits[i].sort((x, y) => x[0] - y[0]).map(x => x[1])]);
+    });
     return validateMesh({ points: points.map(p => add3(center, mul3(p, scale))), faces: conformed });
 }

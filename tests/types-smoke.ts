@@ -123,3 +123,7 @@ const spatialRenderer = new SpatialRenderer(host, {backend: 'canvas', camera: sp
 spatialRenderer.setDocument(spatialDocument);
 spatialRenderer.setSelection(new Set([spatialFeature.id]));
 void [extrudeMesh, meshProperties(spatialMesh).centroid, writeOBJ(spatialMesh), spatialPoints, setControlPoint3, regenerateFeatures, pick3D(spatialScene, spatialCamera, 400, 300), spatialRenderer.ready];
+
+import { faceFrame3, profileOnFace3, holeTool3, extrudeExtent3, type HoleParameters3 } from '@conduitcad/modeling';
+const holeParams:HoleParameters3={face:1,holeType:2,through:1,diameter:8};
+void [faceFrame3,profileOnFace3,holeTool3,extrudeExtent3,holeParams];

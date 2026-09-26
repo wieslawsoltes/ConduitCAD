@@ -1,3 +1,4 @@
+import { faceFrame3, extrudeExtent3, combineExtrusion3, drillHole3 } from './authoring.js';
 import { V3, add3, sub3, mul3, dot3, cross3, unit3, distance3, lerp3, translation3, scaling3, rotation3, multiply4, transform3, ocs3, validateMesh, meshProperties, boxMesh, cylinderMesh, sphereMesh, torusMesh, extrudeMesh, revolveMesh, loftMesh, sweepMesh, booleanMesh, transformMesh, mergeMeshes, spline3, triangles3, faceNormal, sliceMesh } from '@conduitcad/geometry3d';
 import { entity, clone } from '@conduitcad/model';
 import { tessellatePolyline } from '@conduitcad/geometry';
@@ -10,7 +11,8 @@ export const MODELING_TOOLS = [
     { id: 'sphere', label: 'Sphere', group: 'Primitives', fields: [field('radius', 'Radius', 35), field('segments', 'Radial segments', 32)] },
     { id: 'torus', label: 'Torus', group: 'Primitives', fields: [field('major', 'Major radius', 45), field('minor', 'Tube radius', 12), field('segments', 'Radial segments', 48)] },
     { id: 'wedge', label: 'Wedge', group: 'Primitives', fields: [field('width', 'Width', 100), field('depth', 'Depth', 60), field('height', 'Height', 50)] },
-    { id: 'extrude', label: 'Extrude profile', group: 'Create', inputs: 1, fields: [field('height', 'Signed distance', 45), field('taper', 'Top scale change (0 = parallel)', 0), field('nx', 'Direction X', 0), field('ny', 'Direction Y', 0), field('nz', 'Direction Z', 1)] },
+    { id: 'extrude', label: 'Extrude profile', group: 'Create', inputs: 1, maxInputs: 2, fields: [field('height', 'Distance / symmetric total', 45), { ...field('extent', 'Direction', 0), options: ['One side', 'Symmetric (total)', 'Two sides'] }, field('distance2', 'Side two distance', 20), field('startOffset', 'Start offset', 0), { ...field('operation', 'Operation', 0), options: ['New body', 'Join', 'Cut', 'Intersect'] }, { ...field('useNormal', 'Direction axis', 0), options: ['Custom XYZ', 'Profile normal'] }, field('taper', 'Top scale change (0 = parallel)', 0), field('nx', 'Direction X', 0), field('ny', 'Direction Y', 0), field('nz', 'Direction Z', 1)] },
+    { id: 'hole', label: 'Hole', group: 'Create', inputs: 1, fields: [field('face', 'Attached face index', 1), field('u', 'Face U offset', 0), field('v', 'Face V offset', 0), field('diameter', 'Hole diameter', 10), { ...field('through', 'Extent', 1), options: ['Distance', 'Through all'] }, field('depth', 'Hole depth', 15), { ...field('holeType', 'Hole type', 0), options: ['Simple', 'Counterbore', 'Countersink'] }, field('counterDiameter', 'Recess diameter', 18), field('counterDepth', 'Counterbore depth', 4), field('sinkAngle', 'Countersink included angle', 90), field('segments', 'Radial segments', 24)] },
     { id: 'revolve', label: 'Revolve profile', group: 'Create', inputs: 1, fields: [field('angle', 'Angle · degrees', 360), field('segments', 'Angular segments', 48)] },
     { id: 'loft', label: 'Loft profiles', group: 'Create', inputs: 2, multiple: true, fields: [field('samples', 'Vertices per section', 32)] },
     { id: 'sweep', label: 'Sweep along path', group: 'Create', inputs: 2, fields: [] },
@@ -133,7 +135,7 @@ function evaluateFeature(f, inputs, variables) {
     const tool = MODELING_TOOLS.find(t => t.id === f.kind);
     if (!tool || f.version !== 1)
         throw new Error('Unsupported 3D feature schema or operation');
-    if ((tool.inputs || 0) !== inputs.length && !(tool.multiple && inputs.length >= tool.inputs))
+    if ((tool.inputs || 0) !== inputs.length && !(tool.multiple && inputs.length >= tool.inputs) && !(tool.maxInputs && inputs.length >= tool.inputs && inputs.length <= tool.maxInputs))
         throw new Error(tool.label + ': incorrect number of inputs');
     const p = { ...defaults(f.kind), ...f.parameters };
     for (const [k, v] of Object.entries(p)) {
@@ -143,7 +145,7 @@ function evaluateFeature(f, inputs, variables) {
         if (!Number.isFinite(p[k]))
             throw new Error('Non-finite ' + k);
     }
-    const key = JSON.stringify([f.kind, p, inputs.map(e => ({ type: e.type, points: e.points, faces: e.faces, a: e.a, b: e.b, c: e.c, r: e.r, major: e.major, ratio: e.ratio, start: e.start, end: e.end, extrusion: e.extrusion, elevation: e.elevation, flags: e.flags, closed: e.closed, controlPoints: e.controlPoints, knots: e.knots, weights: e.weights, degree: e.degree, clockwise: e.clockwise, helixSpline: e.helixSpline, axis: e.axis, axisBase: e.axisBase, startPoint: e.startPoint, turns: e.turns, turnHeight: e.turnHeight, handedness: e.handedness }))]);
+    const key = JSON.stringify([f.kind, p, f.attachment || null, inputs.map(e => ({ type: e.type, points: e.points, faces: e.faces, a: e.a, b: e.b, c: e.c, r: e.r, major: e.major, ratio: e.ratio, start: e.start, end: e.end, extrusion: e.extrusion, elevation: e.elevation, flags: e.flags, closed: e.closed, controlPoints: e.controlPoints, knots: e.knots, weights: e.weights, degree: e.degree, clockwise: e.clockwise, helixSpline: e.helixSpline, axis: e.axis, axisBase: e.axisBase, startPoint: e.startPoint, turns: e.turns, turnHeight: e.turnHeight, handedness: e.handedness }))]);
     return cached(key, () => {
         let m;
         if (f.kind === 'box')
@@ -156,8 +158,13 @@ function evaluateFeature(f, inputs, variables) {
             m = sphereMesh(p.radius, p.segments);
         else if (f.kind === 'torus')
             m = torusMesh(p.major, p.minor, p.segments);
-        else if (f.kind === 'extrude')
-            m = extrudeMesh(curvePoints3(inputs[0], { closed: true }).points, p.height, V3(p.nx, p.ny, p.nz), p.taper);
+        else if (f.kind === 'extrude') {
+            if ((p.operation ? 2 : 1) !== inputs.length) throw new Error('Extrusion target does not match the operation');
+            const toolMesh = extrudeExtent3(curvePoints3(inputs[0], { closed: true }).points, { ...p, profileNormal: inputs[0].extrusion });
+            m = combineExtrusion3(toolMesh, inputs[1], p.operation);
+        }
+        else if (f.kind === 'hole')
+            m = drillHole3(inputs[0], p, f.attachment);
         else if (f.kind === 'revolve')
             m = revolveMesh(curvePoints3(inputs[0], { closed: true }).points, p.angle, p.segments);
         else if (f.kind === 'loft')
@@ -258,6 +265,11 @@ export function regenerateFeatures(doc) {
 }
 export function addFeature(doc, kind, parameters = {}, inputs = [], options = {}) {
     const e = entity('MESH', { points: [], faces: [], layer: options.layer || 'Equipment', label: options.name || MODELING_TOOLS.find(t => t.id === kind)?.label || kind, color: options.color || '#5496a4', feature3d: { version: 1, kind, parameters: clone(parameters), inputs: inputs.slice(), suppressed: false } }), draft = { ...doc, entities: [...clone(doc.entities), e] };
+    if (kind === 'hole') {
+        const target = draft.entities.find(q => q.id === inputs[0]), variables = resolveParameters(doc.parameters || {});
+        if (!target) throw new Error('Select a target body for the hole');
+        e.feature3d.attachment = faceFrame3(target, evaluateExpression(String(parameters.face ?? 1), variables)).reference;
+    }
     regenerateFeatures(draft);
     doc.entities = draft.entities;
     return doc.entities.find(x => x.id === e.id);
@@ -267,7 +279,13 @@ export function editFeature(doc, id, patch) { const draft = { ...doc, entities: 
     f.parameters = { ...f.parameters, ...clone(patch.parameters) }; if (patch.inputs)
     f.inputs = patch.inputs.slice(); if (patch.suppressed !== undefined)
     f.suppressed = !!patch.suppressed; if (patch.name !== undefined)
-    e.label = String(patch.name).slice(0, 160); regenerateFeatures(draft); doc.entities = draft.entities; return doc.entities.find(q => q.id === id); }
+    e.label = String(patch.name).slice(0, 160);
+    if (f.kind === 'hole' && (patch.reattach || !f.attachment || (patch.parameters?.face !== undefined && String(patch.parameters.face) !== String(doc.entities.find(q => q.id === id).feature3d.parameters.face ?? 1)) || (patch.inputs && patch.inputs[0] !== doc.entities.find(q => q.id === id).feature3d.inputs[0]))) {
+        const target = draft.entities.find(q => q.id === f.inputs[0]);
+        if (!target) throw new Error('Select a target body for the hole');
+        f.attachment = faceFrame3(target, evaluateExpression(String(f.parameters.face ?? 1), resolveParameters(doc.parameters || {}))).reference;
+    }
+    regenerateFeatures(draft); doc.entities = draft.entities; return doc.entities.find(q => q.id === id); }
 export function removeFeature(doc, id, { cascade = false } = {}) { const ids = new Set([id]); let changed = true; while (changed) {
     changed = false;
     for (const e of doc.entities)

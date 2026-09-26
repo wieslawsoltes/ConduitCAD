@@ -1,3 +1,4 @@
+import { fields3, openOperation3, readOperation3, selectionToolbar3, syncAuthoring3, authoringAction3 } from './authoring-workbench.js';
 import { V3, add3, sub3, mul3, dot3, unit3, distance3, bounds3, meshProperties, validateMesh, triangles3 } from '@conduitcad/geometry3d';
 import { MODELING_TOOLS, EXAMPLES_3D, create3DExample, addFeature, editFeature, removeFeature, bakeFeature, regenerateFeatures, sectionEntities, writeOBJ, writeSTL, controlPoints3, setControlPoint3 } from '@conduitcad/modeling';
 import { SpatialRenderer, OrbitCamera } from '@conduitcad/renderer3d';
@@ -7,7 +8,7 @@ import { downloadFile } from '@conduitcad/storage';
 import { escapeHTML as E, icon } from './icons.js';
 const button = (action, label, cls = '') => `<button type="button" class="${cls}" data-action="${E(action)}">${E(label)}</button>`;
 const format = n => Number.isFinite(n) ? Number(n.toPrecision(7)).toString() : '—';
-function fields(values) { return values.map(f => `<label class="field">${E(f.label)}<input data-model-field="${E(f.name)}" value="${E(String(f.value ?? ''))}" autocomplete="off" spellcheck="false"></label>`).join(''); }
+const fields = fields3;
 function xyz(source, evaluate) { const parts = []; let depth = 0, from = 0; for (let i = 0; i < source.length; i++) {
     if (source[i] === '(')
         depth++;
@@ -32,8 +33,19 @@ export class ModelingWorkbench {
         this.stage = document.createElement('div');
         this.stage.className = 'model3d-stage';
         this.stage.hidden = true;
-        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div><div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', '＋ Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', '＋ Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        const dock = this.stage.querySelector('.model3d-dock');
+        dock.insertBefore(this.stage.querySelector('.model3d-context'), dock.children[1]);
         workbench.$('.canvas-area').append(this.stage);
+        this.stage.querySelector('.model3d-timeline').addEventListener('dblclick', event => { if (event.target.closest('[data-action^="3d-select:"]')) this.action('3d-edit').catch(error => workbench.toast(error.message, true)); }, { signal: workbench.abort.signal });
+        this.stage.querySelector('.model3d-timeline').addEventListener('keydown', event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const items = [...this.stage.querySelectorAll('.model3d-feature')], index = items.indexOf(document.activeElement);
+            if (index < 0) return;
+            event.preventDefault(); event.stopPropagation();
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : Math.max(0, Math.min(items.length - 1, index + (event.key === 'ArrowRight' ? 1 : -1)));
+            items[next]?.focus({ preventScroll: true }); items[next]?.scrollIntoView({ block:'nearest', inline:'nearest' });
+        }, { signal: workbench.abort.signal });
         this.host = this.stage.querySelector('.viewport3d');
         this.input = new PointerController(this.host, { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), cancel: () => this.cancelDrag(), gesture: ({ scale, dx, dy }) => { this.camera.zoom(scale); this.camera.pan(dx, dy); this.changedView(); }, gestureEnd: () => this.saveView(), wheel: p => { this.camera.zoom(Math.exp(-p.deltaY * .0015)); this.changedView(); this.saveView(); } });
         this.host.addEventListener('dblclick', () => this.fitSelection(), { signal: workbench.abort.signal });
@@ -102,12 +114,28 @@ export class ModelingWorkbench {
         if (docChanged && !w.model3dCamera)
             this.renderer.fit();
         this.stage.querySelector('.model3d-info').textContent = this.renderer.scene.diagnostics.length ? `${this.renderer.scene.diagnostics.length} spatial display notice(s) · Inspect for details` : this.previewDocument ? 'PREVIEW · not committed' : `${w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed && !e.hidden).length} visible mesh bodies`;
-        this.stage.querySelector('.model3d-timeline').innerHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`)).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
+        const timeline = this.stage.querySelector('.model3d-timeline');
+        const timelineHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`)).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
+        const timelineKey = JSON.stringify([w.doc.id, w.doc.entities.filter(e => e.feature3d).map(e => [e.id, e.label, e.feature3d.kind, !!e.feature3d.suppressed, w.selection.has(e.id)])]);
+        if (timeline.dataset.key !== timelineKey) {
+            timeline.dataset.key = timelineKey;
+            const left = timeline.scrollLeft, focus = document.activeElement?.closest('.model3d-feature')?.dataset.action;
+            timeline.innerHTML = timelineHTML; timeline.scrollLeft = left;
+            if (focus) [...timeline.children].find(el => el.dataset.action === focus)?.focus({ preventScroll: true });
+        }
+        for (const item of timeline.querySelectorAll('.model3d-feature')) item.setAttribute('aria-pressed', String(item.classList.contains('active')));
+        const selectedKey = [...w.selection].join('|');
+        if (selectedKey !== this.lastTimelineSelection) {
+            this.lastTimelineSelection = selectedKey;
+            const active = timeline.querySelector('.active');
+            if (active) { const a = active.getBoundingClientRect(), b = timeline.getBoundingClientRect(); if (a.left < b.left) timeline.scrollLeft += a.left - b.left; else if (a.right > b.right) timeline.scrollLeft += a.right - b.right; }
+        }
+        syncAuthoring3(this);
         this.stage.querySelector('[data-action="3d-undo"]').disabled = !w.history.canUndo;
         this.stage.querySelector('[data-action="3d-redo"]').disabled = !w.history.canRedo;
     }
     selectionChanged() { if (!this.active)
-        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); }
+        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); syncAuthoring3(this); }
     clearPreview() { const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
@@ -115,7 +143,7 @@ export class ModelingWorkbench {
         this.sync(); }
     selectionCenter() { const points = this.renderer?.scene.items.filter(i => this.w.selection.has(i.id)).flatMap(i => i.points) || []; if (!points.length)
         return null; const b = bounds3(points); return mul3(add3(b.min, b.max), .5); }
-    gizmo() { const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode === 'vertex')
+    gizmo() { const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
         return []; if (isLocked(this.w.selected()[0], this.w.doc))
         return []; const length = this.camera.height * .15; return [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)].map((axis, i) => ({ origin, axis, label: ['X', 'Y', 'Z'][i], color: ['#c46655', '#448f71', '#4d81b8'][i], a: this.camera.project(origin), b: this.camera.project(add3(origin, mul3(axis, length))) })); }
     drawGizmo(ctx) { for (const g of this.gizmo()) {
@@ -136,7 +164,7 @@ export class ModelingWorkbench {
     } }
     axisParameter(p, axis, origin) { const r = this.camera.ray(p.x, p.y), o = sub3(r.origin, origin), ad = dot3(axis, r.direction), den = 1 - ad * ad; if (den < 1e-8)
         throw new Error('This axis is parallel to the camera; use exact coordinates or orbit first'); return (dot3(axis, o) - ad * dot3(r.direction, o)) / den; }
-    pointerDown(p) { this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
+    pointerDown(p) { this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
         const dx = g.b.x - g.a.x, dy = g.b.y - g.a.y, den = dx * dx + dy * dy, t = den ? ((p.x - g.a.x) * dx + (p.y - g.a.y) * dy) / den : 0;
         if (t > .2 && t < 1.25 && Math.hypot(g.a.x + dx * t - p.x, g.a.y + dy * t - p.y) < 12) {
             try {
@@ -151,6 +179,8 @@ export class ModelingWorkbench {
     pointerMove(p) {
         if (!this.start)
             return;
+        if (!this.drag && !this.navigating && Math.hypot(p.x - this.start.x, p.y - this.start.y) < 7) return;
+        this.navigating = true;
         const dx = p.x - this.last.x, dy = p.y - this.last.y;
         this.last = p;
         if (this.drag) {
@@ -195,7 +225,7 @@ export class ModelingWorkbench {
             this.saveView();
             return;
         }
-        if (start && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
+        if (start && !this.navigating && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
             this.hit = this.renderer.pick(p.x, p.y, { mode: this.pickMode, radius: p.pointerType === 'touch' ? 18 : 9 });
             if (!this.w.multi && !p.ctrl && !p.shift)
                 this.w.selection.clear();
@@ -243,6 +273,7 @@ export class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
+        if (authoringAction3(this, action)) return;
         if (action.startsWith('3d-op-')) {
             this.operationDialog(action.slice(6));
             return;
@@ -294,6 +325,7 @@ export class ModelingWorkbench {
             case '3d-multi':
                 w.multi = !w.multi;
                 this.renderInspector();
+                syncAuthoring3(this);
                 break;
             case '3d-bake': {
                 const e = w.selected()[0];
@@ -359,34 +391,11 @@ export class ModelingWorkbench {
             default: throw new Error('Unknown 3D action ' + action);
         }
     }
-    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${['⌑', '◎', '♧', '▱', '〰', '▦', '▥', '▢', '╦', '◇'][i]}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
+    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${['⌑', '◎', '♧', '▱', '〰', '▦', '▥', '▢', '╦', '◇'][i % 10]}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
     toolsDialog() { const w = this.w; w.openModal('3D modeling tools', `<p>Create mesh features or use selected profiles and bodies. Source order matters for cuts and sweeps. New results retain their dependency history.</p><label class="field">Find a tool<input id="model3d-search" type="search" placeholder="Extrude, revolve, pattern, vertex…"></label>${[...new Set(MODELING_TOOLS.map(t => t.group))].map(group => `<section><h3>${E(group)}</h3><div class="operation-grid">${MODELING_TOOLS.filter(t => t.group === group).map(t => button('3d-op-' + t.id, t.label, 'btn model3d-searchable')).join('')}</div></section>`).join('')}<h3>Sketch, inspect & exchange</h3><div class="operation-grid">${[['3d-sketch', 'Planar profile'], ['3d-path', '3D polyline'], ['3d-vertex', 'Exact XYZ vertices'], ['3d-section', 'Section analysis'], ['3d-measure', 'Measure & topology'], ['3d-obj', 'Export OBJ'], ['3d-stl', 'Export STL'], ['3d-examples', 'Example drawings'], ['3d-2d', 'Edit sketch in 2D']].map(([a, l]) => button(a, l, 'btn model3d-searchable')).join('')}</div>`, { wide: true }); w.modal.querySelector('#model3d-search').addEventListener('input', e => { const words = e.target.value.toLowerCase().split(/\s+/); for (const b of w.modal.querySelectorAll('.model3d-searchable'))
         b.hidden = !words.every(word => b.textContent.toLowerCase().includes(word)); }); }
-    operationDialog(kind, id = null) {
-        const w = this.w, tool = MODELING_TOOLS.find(t => t.id === kind);
-        if (!tool)
-            throw new Error('Unknown modeling tool');
-        const existing = id ? w.doc.entities.find(e => e.id === id) : null;
-        if (existing && isLocked(existing, w.doc))
-            throw new Error('The selected body is locked');
-        const selected = [...w.selection], count = tool.multiple ? Math.max(tool.inputs, selected.length, existing?.feature3d.inputs.length || 0) : tool.inputs || 0;
-        const candidates = w.doc.entities.filter(e => e.id !== id && !e.feature3d?.suppressed && (['extrude', 'revolve', 'loft'].includes(kind) ? ['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE'].includes(e.type) : kind === 'sweep' ? ['CIRCLE', 'LWPOLYLINE', 'POLYLINE', 'LINE', 'SPLINE'].includes(e.type) : e.type === 'MESH'));
-        const inputs = Array.from({ length: count }, (_, i) => { const chosen = existing?.feature3d.inputs[i] || selected[i] || candidates[i]?.id; return `<label class="field">${kind === 'subtract' ? (i ? 'Cutting body' : 'Target body') : kind === 'sweep' ? (i ? 'Path' : 'Profile') : 'Input ' + (i + 1)}<select data-model-input>${candidates.map(e => `<option value="${E(e.id)}" ${e.id === chosen ? 'selected' : ''}>${E(e.label || e.type + ' ' + e.id)}${e.model3dConsumed ? ' · history input' : ''}</option>`).join('')}</select></label>`; }).join('');
-        const inputFields = tool.fields.map(f => ({ ...f, value: existing?.feature3d.parameters?.[f.name] ?? f.value }));
-        if (!count)
-            for (const axis of ['x', 'y', 'z'])
-                inputFields.push({ name: axis, label: 'Position ' + axis.toUpperCase(), value: existing?.feature3d.parameters?.[axis] ?? 0 });
-        if (kind === 'offset-face' && this.hit?.face !== undefined && !id)
-            inputFields.find(f => f.name === 'face').value = this.hit.face;
-        w.openModal((id ? 'Edit ' : 'Create ') + tool.label, `<p>All numeric fields accept design parameter expressions. Geometry changes only after Apply. Mesh results are faceted, not ACIS solids.</p>${inputs}<div class="model3d-fields">${fields(inputFields)}</div><label class="field">Feature name<input data-model-name value="${E(existing?.label || tool.label)}"></label>${button('3d-preview', 'Preview without saving', 'btn')}<div class="model3d-preview-state" role="status"></div><div class="error-text"></div>`, { confirm: id ? 'Apply feature edit' : 'Create feature', onConfirm: () => { const values = this.readOperation(); let result; w.edit(id ? 'Edit 3D feature' : 'Create ' + tool.label, () => { result = id ? editFeature(w.doc, id, { parameters: values.parameters, inputs: values.inputs, name: values.name }) : addFeature(w.doc, kind, values.parameters, values.inputs, { name: values.name, color: w.selected()[0]?.color }); w.selection = new Set([result.id]); }); w.closeModal(); this.hit = null; this.sync(); if (!id) {
-                this.renderer.fit();
-                this.saveView();
-            } } });
-        this.operation = { kind, id };
-        w.modal.querySelector('.modal').classList.add('model3d-operation-dialog');
-    }
-    readOperation() { const modal = this.w.modal; if (!modal)
-        throw new Error('No modeling dialog'); return { parameters: Object.fromEntries([...modal.querySelectorAll('[data-model-field]')].map(e => [e.dataset.modelField, e.value])), inputs: [...modal.querySelectorAll('[data-model-input]')].map(e => e.value), name: modal.querySelector('[data-model-name]')?.value || 'Feature' }; }
+    operationDialog(kind, id = null) { return openOperation3(this, kind, id); }
+    readOperation() { return readOperation3(this); }
     previewOperation() { if (!this.operation)
         throw new Error('No active operation'); const v = this.readOperation(), doc = { ...this.w.doc, entities: clone(this.w.doc.entities) }; try {
         if (this.operation.id)
@@ -401,6 +410,8 @@ export class ModelingWorkbench {
         this.w.modal.querySelector('.model3d-preview-state').textContent = 'Preview shown behind this dialog. The document is unchanged.';
     }
     catch (error) {
+        const operation = this.operation; this.clearPreview(); this.operation = operation;
+        this.w.modal.querySelector('.model3d-preview-state').textContent = 'Preview rejected · drawing unchanged';
         this.w.modal.querySelector('.error-text').textContent = error.message;
     } }
     renderInspector() {

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/drawing",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Native CAD drawing factories and touch-ready point-session state machines",
   "type": "module",
   "main": "./src/index.js",
@@ -26,7 +26,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.8.0",
-    "@conduitcad/model": "0.8.0"
+    "@conduitcad/geometry": "0.9.0",
+    "@conduitcad/model": "0.9.0"
   }
 }

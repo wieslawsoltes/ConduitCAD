@@ -1,10 +1,12 @@
 # Conduit CAD
 
+**3D authoring update (0.9.0):** face-based sketches and holes, symmetric/two-side extrusions with New Body/Join/Cut/Intersect, contextual touch controls, and thirteen editable 3D starters. See [3D authoring](docs/AUTHORING_3D_090.md).
+
 **3D modeling update (0.8.0):** a separate depth-aware spatial workspace, 18 feature operations, exact WCS editing, section analysis and ten editable industry examples. The 2D editor remains available. See [3D modeling](docs/MODELING_3D.md).
 
 **Mobile UI update (0.7.1):** responsive document tabs, phone/tablet tool and dialog layouts, keyboard-aware forms, expandable panels and accessible focus handling. See [Mobile UI](docs/MOBILE_UI.md).
 
-**Touch-first, DXF-native 2D/3D CAD and diagramming. Version 0.8.0.**
+**Touch-first, DXF-native 2D/3D CAD and diagramming. Version 0.9.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,
 ports, routed connectors, eleven original engineering symbol libraries, a planar

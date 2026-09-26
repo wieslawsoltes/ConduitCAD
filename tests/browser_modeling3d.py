@@ -106,7 +106,7 @@ try:
     page.evaluate('conduit.model3d.renderer.section=null;conduit.model3d.renderer.invalidate()')
     action(page,'3d-sketch');page.locator('#model3d-plane').select_option('XZ');field(page,'origin','0,0,20');apply(page)
     ok('plane profile is native OCS geometry with elevation',page.evaluate('conduit.doc.entities.at(-1).type==="LWPOLYLINE"&&conduit.doc.entities.at(-1).elevation===20&&conduit.doc.entities.at(-1).extrusion.y===-1'))
-    action(page,'3d-op-extrude');field(page,'nx',0);field(page,'ny',-1);field(page,'nz',0);field(page,'height',15);apply(page)
+    action(page,'3d-op-extrude');page.locator('[data-model-field=useNormal]').select_option('0');field(page,'nx',0);field(page,'ny',-1);field(page,'nz',0);field(page,'height',15);apply(page)
     ok('tilted profile extrudes along explicit spatial direction',page.evaluate('conduit.doc.entities.at(-1).type==="MESH"&&conduit.doc.entities.at(-1).points.some(p=>p.y< -20)'))
     action(page,'3d-path');page.locator('#model3d-path').fill('0, 0, 0\n0, 10, 30\n40, 30, 60');apply(page)
     ok('3D path is a native spatial POLYLINE',page.evaluate('conduit.doc.entities.at(-1).flags===8&&conduit.doc.entities.at(-1).points[2].z===60'))

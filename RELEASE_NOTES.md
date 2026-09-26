@@ -1,3 +1,27 @@
+# 0.9.0 — Face-based authoring and simpler desktop/touch 3D workflows
+
+- Simple, counterbore and countersink holes; blind/through-all depth; local U/V
+  placement on planar mesh faces; expression-driven dimensions and atomic regeneration.
+- Face-incidence guards reject detectable topology changes; explicit reattachment
+  and upstream dimensional edits are supported, without claiming persistent B-rep naming.
+- One-side, symmetric total-distance and independent two-side extrusion, offset
+  starts, profile-normal/custom direction, and New Body/Join/Cut/Intersect operations.
+- Native OCS rectangle/circle profile snapshots on picked faces and Look at Face.
+- Contextual commands, direct Body/Face/Vertex selection and Orbit/Pan controls,
+  stale-preview invalidation, camera-preserving body edits and stable keyboard timeline.
+- Phones regain canvas space previously reserved for the hidden 2D dock; the dock
+  returns unchanged on switching to planar drawing. Forms show relevant fields only.
+- Repair BSP conforming-edge insertion: assign a split vertex to its nearest incident
+  edge only; use edge-incidence tolerance rather than half-space classification tolerance.
+- Three new example drawings: hole workshop, extrusion extents study and face-mounted
+  boss. All thirteen starters export native projects plus ASCII and binary DXFs.
+- New headless/public APIs and independent-volume, OCS, rollback, round-trip and
+  actual-browser regressions. All eighteen package contracts are version 0.9.0.
+
+The kernel remains faceted and bounded. Hole drill tips/threads, To Object extents,
+arbitrary persistent face naming, associative face-sketch support, curved ACIS and
+full Autodesk feature graphs are not implemented. See `docs/AUTHORING_3D_090.md`.
+
 # 0.8.0 — 3D mesh modeling and editable industry drawings
 
 - Separate Z-up 3D workspace alongside the retained planar editor; independent

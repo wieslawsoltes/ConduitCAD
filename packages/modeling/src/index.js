@@ -16,3 +16,13 @@ export const create3DExample = createExample;
 import { controlPoints3 as controls, setControlPoint3 as setControl } from './vertices.js';
 export const controlPoints3 = controls;
 export const setControlPoint3 = setControl;
+
+import { faceFrame3 as frame, facePoint3 as point, faceCoordinates3 as coords, profileOnFace3 as profile, holeTool3 as holeTool, drillHole3 as drill, extrudeExtent3 as extent, combineExtrusion3 as combine } from './authoring.js';
+export const faceFrame3 = frame;
+export const facePoint3 = point;
+export const faceCoordinates3 = coords;
+export const profileOnFace3 = profile;
+export const holeTool3 = holeTool;
+export const drillHole3 = drill;
+export const extrudeExtent3 = extent;
+export const combineExtrusion3 = combine;

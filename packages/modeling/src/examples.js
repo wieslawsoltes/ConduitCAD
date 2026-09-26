@@ -1,7 +1,11 @@
+import { profileOnFace3 } from './authoring.js';
 import { V3 } from '@conduitcad/geometry3d';
 import { createDocument, entity, polyline, circle, text } from '@conduitcad/model';
 import { addFeature, regenerateFeatures } from './features.js';
 export const EXAMPLES_3D = [
+    { id: 'hole-plate', name: 'Hole design workshop', industry: 'Mechanical detailing', description: 'Three editable plates compare simple, counterbore and countersink holes. Change HoleDiameter or PlateThickness.', operations: ['box', 'hole'] },
+    { id: 'extrusion-study', name: 'Extrusion direction study', industry: 'Learning', description: 'One-sided, symmetric-total and independent two-sided extrusions share named distance parameters.', operations: ['extrude'] },
+    { id: 'face-boss', name: 'Face profile and boss', industry: 'Fixture design', description: 'Native face-aligned profile joined to a stock body with an editable extrusion operation.', operations: ['box', 'extrude'] },
     { id: 'bracket', name: 'Mounting bracket', industry: 'Mechanical design', description: 'L-shaped bracket with a patterned through-hole cut. Edit Width, Thickness and HoleRadius.', operations: ['box', 'union', 'cylinder', 'linear-pattern', 'subtract'] },
     { id: 'flange', name: 'Four-bolt flange', industry: 'Piping & equipment', description: 'Revolved annular hub with a circular bolt-hole pattern and native mesh Boolean cut.', operations: ['revolve', 'cylinder', 'circular-pattern', 'subtract'] },
     { id: 'vessel', name: 'Process vessel', industry: 'Process engineering', description: 'Revolved vessel, support legs and nozzle bodies. A concept model, not a pressure-vessel design.', operations: ['revolve', 'cylinder', 'linear-pattern'] },
@@ -23,7 +27,26 @@ export function create3DExample(id) {
     const feature = (kind, parameters = {}, inputs = [], name, color) => addFeature(d, kind, parameters, inputs.map(e => typeof e === 'string' ? e : e.id), { name, color });
     const profile = (name, points, closed = true, spatial = false) => { const e = spatial ? entity('POLYLINE', { points, closed, flags: 8 }) : polyline(points, closed); e.label = name; e.layer = 'Annotations'; d.entities.push(e); return e; };
     const round = (name, r, p = V3()) => { const e = circle(p, r, { layer: 'Annotations', label: name }); d.entities.push(e); return e; };
-    if (id === 'bracket') {
+    if (id === 'hole-plate') {
+        Object.assign(d.parameters, { HoleDiameter: '10', PlateThickness: '20' });
+        for (let type = 0; type < 3; type++) {
+            const b = feature('box', { width: 65, depth: 45, height: 'PlateThickness', x: type * 85 }, [], 'Plate ' + (type + 1));
+            feature('hole', { holeType: type, diameter: 'HoleDiameter', counterDiameter: 'HoleDiameter+8', counterDepth: 4, segments: 24 }, [b], ['Simple through hole', 'Counterbored hole', 'Countersunk hole'][type], ['#71958e', '#748fad', '#ab9169'][type]);
+        }
+    }
+    else if (id === 'extrusion-study') {
+        Object.assign(d.parameters, { Distance: '40', SecondSide: '15' });
+        for (let extent = 0; extent < 3; extent++) {
+            const x = extent * 70, p = profile('Source plane ' + (extent + 1), [V3(x,0),V3(x+40,0),V3(x+40,30),V3(x,30)]);
+            feature('extrude', { height: 'Distance', extent, distance2: 'SecondSide' }, [p], ['One side', 'Symmetric total', 'Two independent sides'][extent]);
+        }
+    }
+    else if (id === 'face-boss') {
+        const b = feature('box', { width:80, depth:60, height:15 }, [], 'Fixture base');
+        const p = profileOnFace3(b, 1, { shape:'rectangle', width:30, height:20 }); p.label = 'Native top-face profile'; d.entities.push(p);
+        feature('extrude', { height:25, operation:1, useNormal:1 }, [p,b], 'Joined mounting boss');
+    }
+    else if (id === 'bracket') {
         Object.assign(d.parameters, { Width: '100', Depth: '65', Thickness: '8', Rise: '65', HoleRadius: '6' });
         const foot = feature('box', { width: 'Width', depth: 'Depth', height: 'Thickness' }, [], 'Foot plate');
         const back = feature('box', { width: 'Width', depth: 'Thickness', height: 'Rise', y: 'Depth-Thickness' }, [], 'Upright');

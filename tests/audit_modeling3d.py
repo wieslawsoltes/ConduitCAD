@@ -47,6 +47,8 @@ for project in sorted((ROOT/'samples/3d').glob('*.conduit.json')):
             elif actual.dxftype()=='CIRCLE':
                 ok(prefix+' retains circle elevation',abs(actual.dxf.center.z-expected['c'].get('z',0))<1e-10)
         files.append({'file':label,'entities':len(native),'meshes':meshes,'auditErrors':len(audit.errors),'auditRepairs':len(audit.fixes)})
-assert len(files)==20,'Expected ten examples in both native encodings'
+manifest=json.loads((ROOT/'artifacts/modeling-samples.json').read_text())
+assert len(files)==2*len(manifest) and len(manifest)>=13,'Every registered 3D example must have both native encodings'
+assert {f['file'].removesuffix('-binary.dxf').removesuffix('.dxf') for f in files}=={e['id'] for e in manifest},'Example audit must match generated manifest'
 (ROOT/'artifacts/modeling3d-dxf-audit.json').write_text(json.dumps({'files':files,'passed':len(checks),'checks':checks,'reader':'ezdxf '+ezdxf.__version__,'nativeAutodeskValidation':False},indent=2))
 print(json.dumps({'files':len(files),'checks':len(checks),'errors':0,'repairs':0}))
