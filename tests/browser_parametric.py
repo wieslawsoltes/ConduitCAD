@@ -135,6 +135,8 @@ try:
     page.evaluate('conduit.cancelBlockEdit()')
     page.set_viewport_size({'width':390,'height':844})
     page.evaluate("conduit.selectEntity('a');conduit.openPanel('inspector')")
+    page.evaluate("conduit.mobileMedia.dispatchEvent(new Event('change'))")
+    ok('queued breakpoint update preserves the explicitly opened property sheet',page.evaluate("document.querySelector('.inspector').classList.contains('open')&&!document.querySelector('.inspector').inert"))
     page.locator('[data-action="block-edit"]').click()
     ok('mobile block editor provides scrollable 44px action targets',page.locator('.block-editor-bar [data-action="block-save"]').bounding_box()['height']>=44)
     page.evaluate("conduit.selectEntity('edge');conduit.openPanel('inspector')")

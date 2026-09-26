@@ -62,7 +62,17 @@ export function bindMobileWorkspace(w) {
     window.visualViewport?.addEventListener('resize', schedule, { signal });
     window.visualViewport?.addEventListener('scroll', schedule, { signal });
     window.addEventListener('resize', schedule, { signal });
-    media.addEventListener('change', () => { w.closePanels(); schedule(); }, { signal });
+    media.addEventListener('change', () => {
+        // A queued media event can arrive after the user explicitly opens a sheet.
+        // Preserve that intent across resizing instead of hiding the active editor.
+        const library = w.$('.library'), inspector = w.$('.inspector');
+        if (media.matches && library.classList.contains('open') && inspector.classList.contains('open'))
+            library.classList.remove('open');
+        w.$('.sheet-backdrop').classList.toggle('visible', media.matches &&
+            (library.classList.contains('open') || inspector.classList.contains('open')));
+        updateMobilePanels(w);
+        schedule();
+    }, { signal });
     document.addEventListener('focusin', schedule, { signal });
     document.addEventListener('focusout', schedule, { signal });
     const observer = new ResizeObserver(schedule);

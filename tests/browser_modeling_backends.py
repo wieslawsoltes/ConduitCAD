@@ -39,9 +39,11 @@ try:
    data=page.evaluate("async()=>{const r=conduit.model3d.renderer;return await new Promise(resolve=>requestAnimationFrame(async()=>{r.draw();await r.device?.queue.onSubmittedWorkDone();resolve(r.canvas.toDataURL('image/png').split(',')[1]);}));}")
    (OUT/f'modeling3d-backend-{requested}.png').write_bytes(base64.b64decode(data))
    if executed and requested=='webgl2':
-    page.evaluate("()=>{const r=conduit.model3d.renderer;r.gl.getExtension('WEBGL_lose_context').loseContext();setTimeout(()=>r.gl.getExtension('WEBGL_lose_context')?.restoreContext(),100)}")
-    page.wait_for_timeout(600)
-    assert page.evaluate("conduit.model3d.renderer.gl.isContextLost()===false"),'WebGL context was not restored'
+    page.evaluate("()=>{window.restore3DContext=conduit.model3d.renderer.gl.getExtension('WEBGL_lose_context');if(!window.restore3DContext)throw new Error('Context-loss extension unavailable');window.restore3DContext.loseContext()}")
+    page.wait_for_function('conduit.model3d.renderer.gl.isContextLost()')
+    # Extension lookup is unavailable during loss; retain the pre-loss extension object.
+    page.evaluate('window.restore3DContext.restoreContext()')
+    page.wait_for_function('conduit.model3d.renderer.gl.isContextLost()===false')
     report['contextRestore']=True
    if executed and requested=='webgpu':
     page.evaluate('conduit.model3d.renderer.device.destroy()');page.wait_for_function('!conduit.model3d.renderer.device&&conduit.model3d.renderer.backend!==null')

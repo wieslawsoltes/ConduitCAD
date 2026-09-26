@@ -17,7 +17,7 @@
     "catalog": "node scripts/catalog-artifacts.mjs",
     "test:symbols": "node --test tests/symbol-catalog.test.mjs",
     "samples:3d": "node scripts/modeling-samples.mjs",
-    "test:3d": "node --test tests/modeling3d.test.mjs"
+    "test:3d": "node --test tests/modeling3d*.test.mjs"
   },
   "engines": {
     "node": ">=22"
