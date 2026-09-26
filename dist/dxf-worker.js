@@ -1446,7 +1446,7 @@ const circle = (c, r, props = {}) => entity('CIRCLE', { c: { ...c }, r, ...props
 const text = (p, value, height = 14, props = {}) => entity('TEXT', { p: { ...p }, text: value, height, rotation: 0, ...props });
 const rect = (x, y, w, h, props = {}) => polyline([{ x, y }, { x: x + w, y }, { x: x + w, y: y + h }, { x, y: y + h }], true, props);
 function layerFor(e, doc) { return doc.layers.find(l => l.name === (e.layer || '0')) || doc.layers[0]; }
-function isVisible(e, doc) { return !e.hidden && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }
+function isVisible(e, doc) { return !e.hidden && !e.feature3d?.suppressed && !(e.type==='MESH'&&e.model3dConsumed) && layerFor(e, doc)?.visible !== false && (e.layout || 'Model') === (doc.activeLayout || 'Model'); }
 function isLocked(e, doc) { return !!e.locked || !!layerFor(e, doc)?.locked; }
 function cleanText(value = '') { return String(value).replace(/\\P/g, '\n').replace(/\\U\+([0-9a-f]{4})/gi, (_, x) => String.fromCharCode(parseInt(x, 16))).replace(/%%d/gi, '°').replace(/%%p/gi, '±').replace(/%%c/gi, '⌀').replace(/\\[ACFHQTW][^;]*;/g, '').replace(/\\[LlOoKk]/g, '').replace(/\\S([^;]+);/g, (_, s) => s.replace(/[\/#^]/g, '/')).replace(/[{}]/g, '').replace(/\\~/g, ' '); }
 function resolveStyle(e, doc, parentStyle = null, parentLayer = null) {
@@ -2868,9 +2868,10 @@ function parseEntity(original, diagnostics, options = {}) {
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed'])
         if (k in meta)
             e[k] = meta[k];
+    if (typeof meta.model3dUserHidden === 'boolean') e.hidden = meta.model3dUserHidden;
     readEntityFidelity(e, raw, diagnostics, options);
     if(type === 'MTEXT') {
         const pos=raw.findIndex(p=>p[0]===100&&p[1]==='AcDbMText');
@@ -3257,7 +3258,7 @@ function writeDXF(doc, options = {}) {
             pair(62, 7);
             pair(420, parseInt(e.color.slice(1), 16));
         }
-        if (e.hidden)
+        if (e.hidden || e.model3dConsumed || e.feature3d?.suppressed)
             pair(60, 1);
         if (e.opacity !== undefined) pair(440, 0x02000000 | Math.round(255 * Math.max(0, Math.min(1, e.opacity))));
         else if (e.transparency != null) pair(440, e.transparency);
@@ -3430,9 +3431,10 @@ function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed'])
             if (e[k] !== undefined)
                 m[k] = e[k];
+        if(e.feature3d || e.model3dConsumed) m.model3dUserHidden = !!e.hidden;
         if(e.type==='DIMENSION')writeDimensionOverrides(e.dimstyleOverrides,pair);
         meta(m);
         if (type === 'POLYLINE') {

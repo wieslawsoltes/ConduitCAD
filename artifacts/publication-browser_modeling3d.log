@@ -1,0 +1,189 @@
+2D editor is initial mode
+new drawing chooser finds 3D industry examples
+new example opens a new document instead of replacing 2D drawing
+3D uses separate canvas and hides 2D drawing dock
+3D mode has one selected mode tab
+bracket has six editable features and native mesh triangles
+flange opens with its expected metadata
+flange tessellates without unsupported spatial diagnostics
+flange retains editable feature history
+vessel opens with its expected metadata
+vessel tessellates without unsupported spatial diagnostics
+vessel retains editable feature history
+transition opens with its expected metadata
+transition tessellates without unsupported spatial diagnostics
+transition retains editable feature history
+conduit opens with its expected metadata
+conduit tessellates without unsupported spatial diagnostics
+conduit retains editable feature history
+fixture opens with its expected metadata
+fixture tessellates without unsupported spatial diagnostics
+fixture retains editable feature history
+shaft opens with its expected metadata
+shaft tessellates without unsupported spatial diagnostics
+shaft retains editable feature history
+enclosure opens with its expected metadata
+enclosure tessellates without unsupported spatial diagnostics
+enclosure retains editable feature history
+manifold opens with its expected metadata
+manifold tessellates without unsupported spatial diagnostics
+manifold retains editable feature history
+primitives opens with its expected metadata
+primitives tessellates without unsupported spatial diagnostics
+primitives retains editable feature history
+returning to 2D document restores the original editor
+3D document switching restores orbit state
+preview adds geometry only to transient display
+cancel clears preview and restores camera
+Apply creates native MESH and a feature definition
+transform result retains source dependency and Z
+editing parent regenerates transformed child
+one undo restores parent and downstream result
+redo restores regenerated child
+invalid model parameter reports validation failure
+failed parent edit changes neither geometry nor feature history
+canvas depth pick selects front mesh result
+axis drag commits one dependent transform
+axis move undo removes only the transform
+exact vertex editing keeps XYZ and explicitly detaches feature
+vertex edit undo restores executable feature definition
+press pull creates a regenerating face operation
+section analysis emits native LINE intersections
+section plane is active in spatial renderer
+plane profile is native OCS geometry with elevation
+tilted profile extrudes along explicit spatial direction
+3D path is a native spatial POLYLINE
+2D circle authoring still works in a mixed 3D drawing
+returning to 3D keeps all spatial bodies
+actual browser binary DXF download opens without repairs
+download contains native MESH and 3D polyline
+320x568 entire app stays inside horizontal viewport
+320x568 3D tool dock remains visible and scrollable
+320x568 3D history strip remains bounded
+320x568 old 2D dock does not occlude 3D tools
+320x568 buttons have 44px touch height
+320x568 3d-tools dialog fits
+320x568 3d-tools body avoids horizontal overflow
+320x568 3d-tools retains close action
+320x568 3d-examples dialog fits
+320x568 3d-examples body avoids horizontal overflow
+320x568 3d-examples retains close action
+320x568 3d-op-box dialog fits
+320x568 3d-op-box body avoids horizontal overflow
+320x568 3d-op-box retains close action
+320x568 3d-view-options dialog fits
+320x568 3d-view-options body avoids horizontal overflow
+320x568 3d-view-options retains close action
+320x568 3d-sketch dialog fits
+320x568 3d-sketch body avoids horizontal overflow
+320x568 3d-sketch retains close action
+320x568 3d-path dialog fits
+320x568 3d-path body avoids horizontal overflow
+320x568 3d-path retains close action
+320x568 3d-section dialog fits
+320x568 3d-section body avoids horizontal overflow
+320x568 3d-section retains close action
+320x568 3d-measure dialog fits
+320x568 3d-measure body avoids horizontal overflow
+320x568 3d-measure retains close action
+320x568 two-finger gesture zooms without document edits
+320x568 body inspector opens within viewport
+320x568 switch back restores touch drawing dock
+390x844 entire app stays inside horizontal viewport
+390x844 3D tool dock remains visible and scrollable
+390x844 3D history strip remains bounded
+390x844 old 2D dock does not occlude 3D tools
+390x844 buttons have 44px touch height
+390x844 3d-tools dialog fits
+390x844 3d-tools body avoids horizontal overflow
+390x844 3d-tools retains close action
+390x844 3d-examples dialog fits
+390x844 3d-examples body avoids horizontal overflow
+390x844 3d-examples retains close action
+390x844 3d-op-box dialog fits
+390x844 3d-op-box body avoids horizontal overflow
+390x844 3d-op-box retains close action
+390x844 3d-view-options dialog fits
+390x844 3d-view-options body avoids horizontal overflow
+390x844 3d-view-options retains close action
+390x844 3d-sketch dialog fits
+390x844 3d-sketch body avoids horizontal overflow
+390x844 3d-sketch retains close action
+390x844 3d-path dialog fits
+390x844 3d-path body avoids horizontal overflow
+390x844 3d-path retains close action
+390x844 3d-section dialog fits
+390x844 3d-section body avoids horizontal overflow
+390x844 3d-section retains close action
+390x844 3d-measure dialog fits
+390x844 3d-measure body avoids horizontal overflow
+390x844 3d-measure retains close action
+390x844 two-finger gesture zooms without document edits
+390x844 body inspector opens within viewport
+390x844 switch back restores touch drawing dock
+844x390 entire app stays inside horizontal viewport
+844x390 3D tool dock remains visible and scrollable
+844x390 3D history strip remains bounded
+844x390 old 2D dock does not occlude 3D tools
+844x390 buttons have 44px touch height
+844x390 3d-tools dialog fits
+844x390 3d-tools body avoids horizontal overflow
+844x390 3d-tools retains close action
+844x390 3d-examples dialog fits
+844x390 3d-examples body avoids horizontal overflow
+844x390 3d-examples retains close action
+844x390 3d-op-box dialog fits
+844x390 3d-op-box body avoids horizontal overflow
+844x390 3d-op-box retains close action
+844x390 3d-view-options dialog fits
+844x390 3d-view-options body avoids horizontal overflow
+844x390 3d-view-options retains close action
+844x390 3d-sketch dialog fits
+844x390 3d-sketch body avoids horizontal overflow
+844x390 3d-sketch retains close action
+844x390 3d-path dialog fits
+844x390 3d-path body avoids horizontal overflow
+844x390 3d-path retains close action
+844x390 3d-section dialog fits
+844x390 3d-section body avoids horizontal overflow
+844x390 3d-section retains close action
+844x390 3d-measure dialog fits
+844x390 3d-measure body avoids horizontal overflow
+844x390 3d-measure retains close action
+844x390 two-finger gesture zooms without document edits
+844x390 body inspector opens within viewport
+844x390 switch back restores touch drawing dock
+820x1180 entire app stays inside horizontal viewport
+820x1180 3D tool dock remains visible and scrollable
+820x1180 3D history strip remains bounded
+820x1180 old 2D dock does not occlude 3D tools
+820x1180 buttons have 44px touch height
+820x1180 3d-tools dialog fits
+820x1180 3d-tools body avoids horizontal overflow
+820x1180 3d-tools retains close action
+820x1180 3d-examples dialog fits
+820x1180 3d-examples body avoids horizontal overflow
+820x1180 3d-examples retains close action
+820x1180 3d-op-box dialog fits
+820x1180 3d-op-box body avoids horizontal overflow
+820x1180 3d-op-box retains close action
+820x1180 3d-view-options dialog fits
+820x1180 3d-view-options body avoids horizontal overflow
+820x1180 3d-view-options retains close action
+820x1180 3d-sketch dialog fits
+820x1180 3d-sketch body avoids horizontal overflow
+820x1180 3d-sketch retains close action
+820x1180 3d-path dialog fits
+820x1180 3d-path body avoids horizontal overflow
+820x1180 3d-path retains close action
+820x1180 3d-section dialog fits
+820x1180 3d-section body avoids horizontal overflow
+820x1180 3d-section retains close action
+820x1180 3d-measure dialog fits
+820x1180 3d-measure body avoids horizontal overflow
+820x1180 3d-measure retains close action
+820x1180 two-finger gesture zooms without document edits
+820x1180 body inspector opens within viewport
+820x1180 switch back restores touch drawing dock
+no uncaught 3D workbench JavaScript exceptions
+{"passed": 188, "errors": []}

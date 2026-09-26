@@ -1,0 +1,761 @@
+{
+  "checks": [
+    {
+      "name": "2D editor is initial mode",
+      "passed": true
+    },
+    {
+      "name": "new drawing chooser finds 3D industry examples",
+      "passed": true
+    },
+    {
+      "name": "new example opens a new document instead of replacing 2D drawing",
+      "passed": true
+    },
+    {
+      "name": "3D uses separate canvas and hides 2D drawing dock",
+      "passed": true
+    },
+    {
+      "name": "3D mode has one selected mode tab",
+      "passed": true
+    },
+    {
+      "name": "bracket has six editable features and native mesh triangles",
+      "passed": true
+    },
+    {
+      "name": "flange opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "flange tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "flange retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "vessel opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "vessel tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "vessel retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "transition opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "transition tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "transition retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "conduit opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "conduit tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "conduit retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "fixture opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "fixture tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "fixture retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "shaft opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "shaft tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "shaft retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "enclosure opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "enclosure tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "enclosure retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "manifold opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "manifold tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "manifold retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "primitives opens with its expected metadata",
+      "passed": true
+    },
+    {
+      "name": "primitives tessellates without unsupported spatial diagnostics",
+      "passed": true
+    },
+    {
+      "name": "primitives retains editable feature history",
+      "passed": true
+    },
+    {
+      "name": "returning to 2D document restores the original editor",
+      "passed": true
+    },
+    {
+      "name": "3D document switching restores orbit state",
+      "passed": true
+    },
+    {
+      "name": "preview adds geometry only to transient display",
+      "passed": true
+    },
+    {
+      "name": "cancel clears preview and restores camera",
+      "passed": true
+    },
+    {
+      "name": "Apply creates native MESH and a feature definition",
+      "passed": true
+    },
+    {
+      "name": "transform result retains source dependency and Z",
+      "passed": true
+    },
+    {
+      "name": "editing parent regenerates transformed child",
+      "passed": true
+    },
+    {
+      "name": "one undo restores parent and downstream result",
+      "passed": true
+    },
+    {
+      "name": "redo restores regenerated child",
+      "passed": true
+    },
+    {
+      "name": "invalid model parameter reports validation failure",
+      "passed": true
+    },
+    {
+      "name": "failed parent edit changes neither geometry nor feature history",
+      "passed": true
+    },
+    {
+      "name": "canvas depth pick selects front mesh result",
+      "passed": true
+    },
+    {
+      "name": "axis drag commits one dependent transform",
+      "passed": true
+    },
+    {
+      "name": "axis move undo removes only the transform",
+      "passed": true
+    },
+    {
+      "name": "exact vertex editing keeps XYZ and explicitly detaches feature",
+      "passed": true
+    },
+    {
+      "name": "vertex edit undo restores executable feature definition",
+      "passed": true
+    },
+    {
+      "name": "press pull creates a regenerating face operation",
+      "passed": true
+    },
+    {
+      "name": "section analysis emits native LINE intersections",
+      "passed": true
+    },
+    {
+      "name": "section plane is active in spatial renderer",
+      "passed": true
+    },
+    {
+      "name": "plane profile is native OCS geometry with elevation",
+      "passed": true
+    },
+    {
+      "name": "tilted profile extrudes along explicit spatial direction",
+      "passed": true
+    },
+    {
+      "name": "3D path is a native spatial POLYLINE",
+      "passed": true
+    },
+    {
+      "name": "2D circle authoring still works in a mixed 3D drawing",
+      "passed": true
+    },
+    {
+      "name": "returning to 3D keeps all spatial bodies",
+      "passed": true
+    },
+    {
+      "name": "actual browser binary DXF download opens without repairs",
+      "passed": true
+    },
+    {
+      "name": "download contains native MESH and 3D polyline",
+      "passed": true
+    },
+    {
+      "name": "320x568 entire app stays inside horizontal viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 3D tool dock remains visible and scrollable",
+      "passed": true
+    },
+    {
+      "name": "320x568 3D history strip remains bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 old 2D dock does not occlude 3D tools",
+      "passed": true
+    },
+    {
+      "name": "320x568 buttons have 44px touch height",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-tools dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-tools body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-tools retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-examples dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-examples body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-examples retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-op-box dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-op-box body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-op-box retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-view-options dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-view-options body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-view-options retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-sketch dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-sketch body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-sketch retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-path dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-path body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-path retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-section dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-section body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-section retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-measure dialog fits",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-measure body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "320x568 3d-measure retains close action",
+      "passed": true
+    },
+    {
+      "name": "320x568 two-finger gesture zooms without document edits",
+      "passed": true
+    },
+    {
+      "name": "320x568 body inspector opens within viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 switch back restores touch drawing dock",
+      "passed": true
+    },
+    {
+      "name": "390x844 entire app stays inside horizontal viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 3D tool dock remains visible and scrollable",
+      "passed": true
+    },
+    {
+      "name": "390x844 3D history strip remains bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 old 2D dock does not occlude 3D tools",
+      "passed": true
+    },
+    {
+      "name": "390x844 buttons have 44px touch height",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-tools dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-tools body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-tools retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-examples dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-examples body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-examples retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-op-box dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-op-box body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-op-box retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-view-options dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-view-options body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-view-options retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-sketch dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-sketch body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-sketch retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-path dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-path body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-path retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-section dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-section body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-section retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-measure dialog fits",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-measure body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "390x844 3d-measure retains close action",
+      "passed": true
+    },
+    {
+      "name": "390x844 two-finger gesture zooms without document edits",
+      "passed": true
+    },
+    {
+      "name": "390x844 body inspector opens within viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 switch back restores touch drawing dock",
+      "passed": true
+    },
+    {
+      "name": "844x390 entire app stays inside horizontal viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 3D tool dock remains visible and scrollable",
+      "passed": true
+    },
+    {
+      "name": "844x390 3D history strip remains bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 old 2D dock does not occlude 3D tools",
+      "passed": true
+    },
+    {
+      "name": "844x390 buttons have 44px touch height",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-tools dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-tools body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-tools retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-examples dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-examples body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-examples retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-op-box dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-op-box body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-op-box retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-view-options dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-view-options body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-view-options retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-sketch dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-sketch body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-sketch retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-path dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-path body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-path retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-section dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-section body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-section retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-measure dialog fits",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-measure body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "844x390 3d-measure retains close action",
+      "passed": true
+    },
+    {
+      "name": "844x390 two-finger gesture zooms without document edits",
+      "passed": true
+    },
+    {
+      "name": "844x390 body inspector opens within viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 switch back restores touch drawing dock",
+      "passed": true
+    },
+    {
+      "name": "820x1180 entire app stays inside horizontal viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3D tool dock remains visible and scrollable",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3D history strip remains bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 old 2D dock does not occlude 3D tools",
+      "passed": true
+    },
+    {
+      "name": "820x1180 buttons have 44px touch height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-tools dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-tools body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-tools retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-examples dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-examples body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-examples retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-op-box dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-op-box body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-op-box retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-view-options dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-view-options body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-view-options retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-sketch dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-sketch body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-sketch retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-path dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-path body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-path retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-section dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-section body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-section retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-measure dialog fits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-measure body avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "820x1180 3d-measure retains close action",
+      "passed": true
+    },
+    {
+      "name": "820x1180 two-finger gesture zooms without document edits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 body inspector opens within viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 switch back restores touch drawing dock",
+      "passed": true
+    },
+    {
+      "name": "no uncaught 3D workbench JavaScript exceptions",
+      "passed": true
+    }
+  ],
+  "passed": 188,
+  "errors": [],
+  "origin": "localhost",
+  "physicalDevice": false,
+  "renderer": "canvas-software-depth"
+}

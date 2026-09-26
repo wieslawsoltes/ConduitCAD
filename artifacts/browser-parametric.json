@@ -133,6 +133,10 @@
       "passed": true
     },
     {
+      "name": "queued breakpoint update preserves the explicitly opened property sheet",
+      "passed": true
+    },
+    {
       "name": "mobile block editor provides scrollable 44px action targets",
       "passed": true
     },
@@ -153,7 +157,7 @@
       "passed": true
     }
   ],
-  "passed": 38,
+  "passed": 39,
   "errors": [],
   "backend": "Canvas 2D",
   "physicalDevice": false,

@@ -1,0 +1,651 @@
+[
+  {
+    "id": "bracket",
+    "features": 6,
+    "bodies": [
+      {
+        "name": "Finished bracket",
+        "vertices": 388,
+        "faces": 311,
+        "edges": 701,
+        "triangles": 780,
+        "area": 28106.22538381277,
+        "volume": 95811.04276025164,
+        "signedVolume": 95811.04276025164,
+        "centroid": {
+          "x": 49.999999999999986,
+          "y": 46.06419847399004,
+          "z": 19.467945628234347
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 100,
+            "y": 65,
+            "z": 65
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "flange",
+    "features": 4,
+    "bodies": [
+      {
+        "name": "Flanged hub",
+        "vertices": 1574,
+        "faces": 1636,
+        "edges": 3218,
+        "triangles": 3164,
+        "area": 22582.000140567066,
+        "volume": 99587.74779036437,
+        "signedVolume": 99587.74779036437,
+        "centroid": {
+          "x": -6.6667953340187535e-15,
+          "y": 5.479557808782537e-17,
+          "z": 11.975086607768421
+        },
+        "bounds": {
+          "min": {
+            "x": -45,
+            "y": -45,
+            "z": 0
+          },
+          "max": {
+            "x": 45,
+            "y": 45,
+            "z": 38
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "vessel",
+    "features": 6,
+    "bodies": [
+      {
+        "name": "Vessel body",
+        "vertices": 290,
+        "faces": 336,
+        "edges": 624,
+        "triangles": 576,
+        "area": 45203.52436944871,
+        "volume": 759766.859674478,
+        "signedVolume": 759766.859674478,
+        "centroid": {
+          "x": -7.900667099737895e-17,
+          "y": -2.3306967944226792e-15,
+          "z": 101.65523639362287
+        },
+        "bounds": {
+          "min": {
+            "x": -42,
+            "y": -42,
+            "z": 25
+          },
+          "max": {
+            "x": 42,
+            "y": 42,
+            "z": 195
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Four supports",
+        "vertices": 128,
+        "faces": 72,
+        "edges": 192,
+        "triangles": 240,
+        "area": 5606.605735397021,
+        "volume": 12245.869835682865,
+        "signedVolume": 12245.869835682865,
+        "centroid": {
+          "x": -3.1935887528609458e-15,
+          "y": 2.2280851764146133e-15,
+          "z": 20
+        },
+        "bounds": {
+          "min": {
+            "x": -28,
+            "y": -28,
+            "z": 0
+          },
+          "max": {
+            "x": 28,
+            "y": 28,
+            "z": 40
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Side nozzle",
+        "vertices": 48,
+        "faces": 26,
+        "edges": 72,
+        "triangles": 92,
+        "area": 2758.6368252417933,
+        "volume": 10062.884473586008,
+        "signedVolume": 10062.884473586008,
+        "centroid": {
+          "x": 55,
+          "y": -3.177461014596157e-16,
+          "z": 100
+        },
+        "bounds": {
+          "min": {
+            "x": 35,
+            "y": -9,
+            "z": 91
+          },
+          "max": {
+            "x": 75,
+            "y": 9,
+            "z": 109
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "transition",
+    "features": 1,
+    "bodies": [
+      {
+        "name": "Transition duct",
+        "vertices": 96,
+        "faces": 188,
+        "edges": 282,
+        "triangles": 188,
+        "area": 62401.97716754156,
+        "volume": 374689.9855992349,
+        "signedVolume": 374689.9855992349,
+        "centroid": {
+          "x": 7.480553486436199,
+          "y": 4.488332091861727,
+          "z": 34.41054603760658
+        },
+        "bounds": {
+          "min": {
+            "x": -65,
+            "y": -45,
+            "z": 0
+          },
+          "max": {
+            "x": 65,
+            "y": 50,
+            "z": 115
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "conduit",
+    "features": 1,
+    "bodies": [
+      {
+        "name": "Routed conduit",
+        "vertices": 192,
+        "faces": 380,
+        "edges": 570,
+        "triangles": 380,
+        "area": 9593.938877009085,
+        "volume": 31843.237519152288,
+        "signedVolume": 31843.237519152288,
+        "centroid": {
+          "x": 57.25770606068038,
+          "y": 18.0547230070239,
+          "z": 66.04214809632751
+        },
+        "bounds": {
+          "min": {
+            "x": -7,
+            "y": -7,
+            "z": 0
+          },
+          "max": {
+            "x": 150,
+            "y": 46.977283704778884,
+            "z": 91.97728370477888
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "fixture",
+    "features": 4,
+    "bodies": [
+      {
+        "name": "Fixture base",
+        "vertices": 8,
+        "faces": 6,
+        "edges": 12,
+        "triangles": 12,
+        "area": 47900,
+        "volume": 210000,
+        "signedVolume": 210000,
+        "centroid": {
+          "x": 87.5,
+          "y": 60,
+          "z": 5
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 175,
+            "y": 120,
+            "z": 10
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Row pattern",
+        "vertices": 480,
+        "faces": 264,
+        "edges": 720,
+        "triangles": 912,
+        "area": 16774.5349172288,
+        "volume": 45425.49817311739,
+        "signedVolume": 45425.49817311739,
+        "centroid": {
+          "x": 87.50000000000001,
+          "y": 59.99999999999999,
+          "z": 22.5
+        },
+        "bounds": {
+          "min": {
+            "x": 13,
+            "y": 13,
+            "z": 10
+          },
+          "max": {
+            "x": 162,
+            "y": 107,
+            "z": 35
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "shaft",
+    "features": 1,
+    "bodies": [
+      {
+        "name": "Stepped shaft",
+        "vertices": 450,
+        "faces": 504,
+        "edges": 952,
+        "triangles": 896,
+        "area": 17164.43786407623,
+        "volume": 115242.79596361243,
+        "signedVolume": 115242.79596361243,
+        "centroid": {
+          "x": 3.018685207342485e-16,
+          "y": 6.000376723418517e-16,
+          "z": 62.71898803046788
+        },
+        "bounds": {
+          "min": {
+            "x": -22,
+            "y": -22,
+            "z": 0
+          },
+          "max": {
+            "x": 22,
+            "y": 22,
+            "z": 145
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "enclosure",
+    "features": 6,
+    "bodies": [
+      {
+        "name": "Ventilated enclosure",
+        "vertices": 470,
+        "faces": 433,
+        "edges": 915,
+        "triangles": 964,
+        "area": 64039.99999999994,
+        "volume": 121695.99999999996,
+        "signedVolume": 121695.99999999996,
+        "centroid": {
+          "x": 59.983894293978395,
+          "y": 46.38509071785435,
+          "z": 19.721864317643963
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 120,
+            "y": 90,
+            "z": 55
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "manifold",
+    "features": 8,
+    "bodies": [
+      {
+        "name": "Horizontal header",
+        "vertices": 538,
+        "faces": 517,
+        "edges": 1055,
+        "triangles": 1076,
+        "area": 26745.344033011883,
+        "volume": 51940.847333574144,
+        "signedVolume": 51940.847333574144,
+        "centroid": {
+          "x": 80.00000000000001,
+          "y": -2.1274894796331543e-15,
+          "z": 35.00000000000001
+        },
+        "bounds": {
+          "min": {
+            "x": -9.18485099360515e-16,
+            "y": -15,
+            "z": 20
+          },
+          "max": {
+            "x": 160,
+            "y": 15,
+            "z": 50.000000000000014
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Branch array",
+        "vertices": 1098,
+        "faces": 1059,
+        "edges": 2157,
+        "triangles": 2196,
+        "area": 23317.351832444518,
+        "volume": 33263.42367657615,
+        "signedVolume": 33263.42367657615,
+        "centroid": {
+          "x": 80.00000000000001,
+          "y": -3.034982594647526e-15,
+          "z": 70
+        },
+        "bounds": {
+          "min": {
+            "x": 15,
+            "y": -10,
+            "z": 35
+          },
+          "max": {
+            "x": 145,
+            "y": 10,
+            "z": 105
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "primitives",
+    "features": 6,
+    "bodies": [
+      {
+        "name": "Box",
+        "vertices": 8,
+        "faces": 6,
+        "edges": 12,
+        "triangles": 12,
+        "area": 13800,
+        "volume": 108000,
+        "signedVolume": 108000,
+        "centroid": {
+          "x": 30,
+          "y": 22.5,
+          "z": 20
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 60,
+            "y": 45,
+            "z": 40
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cylinder",
+        "vertices": 96,
+        "faces": 50,
+        "edges": 144,
+        "triangles": 188,
+        "area": 13333.83637574215,
+        "volume": 117473.57299804638,
+        "signedVolume": 117473.57299804638,
+        "centroid": {
+          "x": 115,
+          "y": 8.23568198633953e-16,
+          "z": 30
+        },
+        "bounds": {
+          "min": {
+            "x": 90,
+            "y": -25,
+            "z": 0
+          },
+          "max": {
+            "x": 140,
+            "y": 25,
+            "z": 60
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Cone",
+        "vertices": 49,
+        "faces": 49,
+        "edges": 96,
+        "triangles": 94,
+        "area": 9081.145458733909,
+        "volume": 57306.21943229141,
+        "signedVolume": 57306.21943229141,
+        "centroid": {
+          "x": 210,
+          "y": 1.825140303095102e-16,
+          "z": 17.500000000000004
+        },
+        "bounds": {
+          "min": {
+            "x": 182,
+            "y": -28,
+            "z": 0
+          },
+          "max": {
+            "x": 238,
+            "y": 28,
+            "z": 70
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Sphere",
+        "vertices": 482,
+        "faces": 512,
+        "edges": 992,
+        "triangles": 960,
+        "area": 9773.10416550206,
+        "volume": 90484.86509373126,
+        "signedVolume": 90484.86509373126,
+        "centroid": {
+          "x": 29.999999999999996,
+          "y": 110,
+          "z": 30
+        },
+        "bounds": {
+          "min": {
+            "x": 2,
+            "y": 82,
+            "z": 2
+          },
+          "max": {
+            "x": 58,
+            "y": 138,
+            "z": 58
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Torus",
+        "vertices": 768,
+        "faces": 768,
+        "edges": 1536,
+        "triangles": 1536,
+        "area": 10571.927485988866,
+        "volume": 46609.54112376014,
+        "signedVolume": 46609.54112376014,
+        "centroid": {
+          "x": 120,
+          "y": 110,
+          "z": 15
+        },
+        "bounds": {
+          "min": {
+            "x": 81,
+            "y": 71,
+            "z": 6
+          },
+          "max": {
+            "x": 159,
+            "y": 149,
+            "z": 24
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Wedge",
+        "vertices": 6,
+        "faces": 5,
+        "edges": 9,
+        "triangles": 8,
+        "area": 9900,
+        "volume": 54000,
+        "signedVolume": 54000,
+        "centroid": {
+          "x": 210,
+          "y": 115,
+          "z": 15
+        },
+        "bounds": {
+          "min": {
+            "x": 190,
+            "y": 95,
+            "z": 0
+          },
+          "max": {
+            "x": 250,
+            "y": 135,
+            "z": 45
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  }
+]
