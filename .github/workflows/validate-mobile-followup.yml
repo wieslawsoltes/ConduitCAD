@@ -43,8 +43,6 @@ jobs:
               except Exception:
                   print('STARTUP DIAGNOSTICS ' + json.dumps(page.evaluate("async()=>({ready:document.documentElement.dataset.ready,error:window.appError||null,mounted:!!window.conduit,key:window.conduit?.documents?.key,locks:await navigator.locks?.query?.(),text:document.body.innerText.slice(-2000)})")), flush=True)
                   raise'''
-          # Dedent the YAML-contained Python multiline replacement to the function body.
-          new='\n'.join(line[10:] if i else line for i,line in enumerate(new.splitlines()))
           if 'STARTUP DIAGNOSTICS' not in s:
               assert s.count(old)==1
               s=s.replace(old,new)
