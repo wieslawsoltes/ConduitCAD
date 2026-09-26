@@ -1,5 +1,5 @@
 import { initializeDocuments, claimWorkspace, createDocumentHistory, recoverDocuments, forkRecoveryWorkspace, captureActiveDocument, activateDocument, openDocument, renderDocuments, documentAction, documentKeyDown, documentChanged, scheduleRecovery, requestCloseDocument, disposeDocuments } from './document-workbench.js';
-import { bindMobileWorkspace, updateMobilePanels } from './mobile-workspace.js';
+import { MOBILE_MEDIA, bindMobileWorkspace, updateMobilePanels, prepareMobileDialog } from './mobile-workspace.js';
 import { mergeClipboardBlocks } from '@conduitcad/workspace';
 import { DRAWING_TOOLS, drawingTool } from '@conduitcad/drawing';
 import { beginDrawing, acceptDrawingPoint, drawingPointerUp, drawingPreview, updateDrawingControls, finishDrawing, drawingToolSections, bindDrawingSearch, drawingAction, drawingCommand, nativeGrips, changeNativeGrip, renderDrawingInspector, nativePropertyChange } from './drawing-workbench.js';
@@ -543,13 +543,11 @@ export class Workbench {
         updateDrawingControls(this);
         this.root.querySelectorAll('.workbar .tab').forEach(b => b.classList.toggle('active', b.dataset.action === (this.tool === 'connect' ? 'mode-connect' : this.inspectorTab === 'qa' && this.$('.inspector').classList.contains('open') ? 'mode-inspect' : 'mode-draw')));
     }
-    isMobile() { return this.mobileMedia?.matches ?? matchMedia('(max-width:720px), (max-height:540px) and (pointer:coarse)').matches; }
+    isMobile() { return this.mobileMedia?.matches ?? matchMedia(MOBILE_MEDIA).matches; }
     togglePanel(name) {
         const panel = this.$('.' + name);
         if (panel.classList.contains('open')) {
-            panel.classList.remove('open');
-            this.$('.sheet-backdrop').classList.remove('visible');
-            updateMobilePanels(this);
+            this.closePanels();
         }
         else
             this.openPanel(name);
@@ -684,7 +682,7 @@ export class Workbench {
         window.addEventListener('pointercancel', () => { clearTimeout(timer); abort.abort(); this.previewSymbol = null; this.renderer.invalidate(); }, { signal: abort.signal, once: true });
     }
     field(name, label, value, full = false, unit = '') { return `<label class="field ${full ? 'full' : ''}"><span>${E(label)}${unit ? `<span class="unit">${E(unit)}</span>` : ''}</span><input data-prop="${name}" value="${E(value ?? '')}" autocomplete="off" spellcheck="false" inputmode="${['tag', 'text'].includes(name) ? 'text' : 'decimal'}" aria-label="${E(label)}"></label>`; }
-    renderInspector() { this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); }
+    renderInspector() { this.renderBaseInspector(); renderParametricInspector(this,this.$('.inspector-content')); updateMobilePanels(this); }
     renderBaseInspector() {
         const host = this.$('.inspector-content');
         if (!host)
@@ -1782,7 +1780,15 @@ export class Workbench {
             } });
     }
     lineStylesDialog() { this.openModal('Line & connection library', `<p>Choose a line type, then connect symbol ports or free points. Every connector is a native DXF polyline with optional application metadata.</p><div class="line-style-list">${LINE_STYLES.map(s => `<button data-style="${s.id}"><svg viewBox="0 0 90 20"><path d="M3 10h84" stroke="${s.color}" stroke-width="${s.width}" ${s.dash.length ? `stroke-dasharray="${s.dash.join(' ')}"` : ''}/>${s.arrow === 'end' ? `<path d="m77 5 9 5-9 5" fill="none" stroke="${s.color}" stroke-width="${s.width}"/>` : ''}</svg><span>${E(s.name)}</span>${s.id === this.lineStyle ? icon('check') : ''}</button>`).join('')}</div>`); }
-    moreDialog(shapesOnly = false) { const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']]; const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate', 'Duplicate', 'copy'], ['rotate-angle', 'Rotate', 'rotate'], ['offset', 'Offset', 'offset'], ['trim', 'Trim', 'trim'], ['extend', 'Extend', 'extend'], ['fillet', 'Fillet', 'fillet'], ['constraint', 'Constraints', 'param'], ['make-symbol', 'Make symbol', 'symbols'], ['explode', 'Explode', 'symbols'], ['parameters', 'Parameters', 'param'], ['multi-select', 'Multi-select', 'select'], ['select-all', 'Select all', 'select'], ['delete', 'Delete', 'trash'], ['command', 'Command', 'command'], ['help', 'Help', 'help']]; this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `<div class="section-label">DRAW</div><div class="operation-grid">${drawing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>${drawingToolSections(this)}${shapesOnly ? '' : `<div class="section-label" style="margin-top:22px">EDIT & ORGANIZE</div><div class="operation-grid">${editing.map(([a, l, i]) => btn(a, l, i)).join('')}</div>`}`, { wide: !shapesOnly }); bindDrawingSearch(this); }
+    moreDialog(shapesOnly = false) {
+        const drawing = [['tool-line', 'Line', 'line'], ['tool-polyline', 'Polyline', 'polyline'], ['tool-rect', 'Rectangle', 'rect'], ['tool-circle', 'Circle', 'circle'], ['tool-text', 'Text', 'text'], ['tool-dimension', 'Dimension', 'dimension'], ['tool-pan', 'Pan', 'pan'], ['precision', 'Exact values', 'ruler']];
+        const editing = [['blocks','Block editor','symbols'],['solver-report','Solve status','param'],['parametric-demo','Constrained bracket','param'],['calculated-text','Calculation label','text'],['dynamic-demo','Parametric duct','symbols'],['duplicate','Duplicate','copy'],['rotate-angle','Rotate','rotate'],['offset','Offset','offset'],['trim','Trim','trim'],['extend','Extend','extend'],['fillet','Fillet','fillet'],['constraint','Constraints','param'],['make-symbol','Make symbol','symbols'],['explode','Explode','symbols'],['parameters','Parameters','param'],['multi-select','Multi-select','select'],['select-all','Select all','select'],['delete','Delete','trash'],['command','Command','command'],['help','Help','help']];
+        const section = (label, actions) => `<section class="drawing-tool-group"><h3>${E(label)}</h3><div class="operation-grid">${actions.map(([a,l,i]) => btn(a,l,i).replace('<button ', `<button data-tool-search="${E((label+' '+l+' '+a).toLowerCase())}" `)).join('')}</div></section>`;
+        this.openModal(shapesOnly ? 'Draw a shape' : 'Drawing & editing tools', `${section('Quick drawing',drawing)}${drawingToolSections(this)}${shapesOnly ? '' : section('Edit & organize',editing)}`, { wide: !shapesOnly });
+        const body = this.modal.querySelector('.modal-body'), search = body.querySelector('.drawing-tool-search');
+        search.querySelector('input').placeholder = shapesOnly ? 'Arc, hatch, spline, dimension…' : 'Find any tool, edit or command…';
+        body.prepend(search); bindDrawingSearch(this);
+    }
     editText(e) { this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false } = {}) {
         this.closeModal();
@@ -1792,54 +1798,56 @@ export class Workbench {
         document.body.append(backdrop);
         this.modal = backdrop;
         this.previousFocus = document.activeElement;
+        this.modalCleanup = prepareMobileDialog(this, backdrop);
+        let confirming = false;
         this.modalConfirm = async () => {
+            if (confirming || this.modal !== backdrop) return;
+            confirming = true;
+            const submit = backdrop.querySelector('[data-action="modal-confirm"]');
+            if (submit) submit.disabled = true;
+            backdrop.querySelector('.modal').setAttribute('aria-busy', 'true');
             try {
                 await onConfirm?.();
             }
             catch (e) {
                 const target = backdrop.querySelector('.error-text');
                 if (target)
-                    target.textContent = e.message;
+                    { target.textContent = e.message; target.scrollIntoView({ block: 'nearest' }); }
                 else
                     this.toast(e.message, true);
+            } finally {
+                confirming = false;
+                if (submit) submit.disabled = false;
+                backdrop.querySelector('.modal').removeAttribute('aria-busy');
             }
         };
+        let backdropPress = null;
+        backdrop.addEventListener('pointerdown', e => { backdropPress = e.target === backdrop ? { x: e.clientX, y: e.clientY } : null; });
+        backdrop.addEventListener('pointercancel', () => { backdropPress = null; });
         backdrop.addEventListener('click', e => {
             if (e.target === backdrop) {
-                this.closeModal();
+                if (backdropPress && Math.hypot(e.clientX - backdropPress.x, e.clientY - backdropPress.y) < 8) this.closeModal();
+                backdropPress = null;
                 return;
             }
             this.onClick(e);
         });
         backdrop.addEventListener('change', e => this.onChange(e));
         backdrop.addEventListener('keydown', e => {
-            if (e.key === 'Tab') {
-                const focus = [...backdrop.querySelectorAll('button:not([disabled]),input,select,textarea,[tabindex="0"]')].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden'), first = focus[0], last = focus.at(-1);
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault();
-                    last.focus();
-                }
-                else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault();
-                    first.focus();
-                }
-            }
             if (e.key === 'Enter' && confirm && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT' && e.target.tagName !== 'BUTTON') {
                 e.preventDefault();
                 this.modalConfirm?.();
             }
         });
-        setTimeout(() => {
-            if (this.modal !== backdrop || backdrop.contains(document.activeElement)) return;
-            (backdrop.querySelector('input:not([type="checkbox"]),textarea,select') || backdrop.querySelector('button'))?.focus({ preventScroll: true });
-        }, 30);
     }
     closeModal() {
         if (this.modal) {
+            this.modalCleanup?.(); this.modalCleanup = null;
             this.modal.remove();
             this.modal = null;
             this.modalConfirm = null;
-            this.previousFocus?.focus?.({ preventScroll: true });
+            if (this.previousFocus?.isConnected && !this.previousFocus.closest('[inert]')) this.previousFocus.focus?.({ preventScroll: true });
+            this.updateMobileViewport?.();
         }
     }
     ask(title, fields, onConfirm) { const body = fields.map(f => `<label class="field">${E(f.label)}${f.multiline ? `<textarea data-field="${f.name}">${E(f.value)}</textarea>` : `<input data-field="${f.name}" value="${E(f.value)}" autocomplete="off" spellcheck="false">`}</label>`).join('') + '<div class="error-text"></div>'; this.openModal(title, body, { confirm: 'Apply', onConfirm: async () => { const values = Object.fromEntries([...this.modal.querySelectorAll('[data-field]')].map(el => [el.dataset.field, el.value])); await onConfirm(values); this.closeModal(); } }); }

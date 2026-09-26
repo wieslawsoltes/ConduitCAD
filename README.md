@@ -1,5 +1,7 @@
 # Conduit CAD
 
+**Mobile UI update (0.7.1):** responsive document tabs, phone/tablet tool and dialog layouts, keyboard-aware forms, expandable panels and accessible focus handling. See [Mobile UI](docs/MOBILE_UI.md).
+
 **Touch-first, DXF-native 2D CAD and diagramming. Version 0.7.0.**
 
 A working local-first HTML/JavaScript application with editable CAD entities,

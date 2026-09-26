@@ -1,3 +1,15 @@
+# 0.7.1 — Adaptive mobile tools, dialogs and document tabs
+
+- Shared touch policy extends to coarse-pointer portrait tablets and split-screen hosts.
+- Restyled document tabs, reliable active-tab reveal, nonintrusive save-state updates, accessible names, and document-manager rename/rightward reordering.
+- Every dialog uses viewport-bound scroll regions, an inert background, trapped/restored focus, keyboard-aware footer placement and serialized confirmation.
+- Search covers quick, native and editing tools; mobile command strips preserve exact input, next-point guidance and Finish without redundant zoom overlays.
+- Expandable sheets follow measured document/block chrome; inspector tabs expose selected state; dense tables scroll and parameter forms use readable stacked cards.
+- Added mobile viewport unit tests and comprehensive browser coverage; permanent Pages CI gates include workspace recovery and mobile tests. Removed the obsolete source-checkpoint importer.
+- Fixed an existing browser recovery test race: reopening waits for its asynchronous IndexedDB operation before checking the active document.
+
+See `docs/MOBILE_UI.md` for interaction contracts and physical-device validation limits.
+
 # Conduit CAD 0.7.0 — multiple drawings and mobile workspace
 
 - Independent document tabs retain document/history/selection/camera/layout,

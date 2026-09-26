@@ -253,10 +253,23 @@ export function renderDocuments(w) {
     const data = workspace.sessions.map(session => ({ id: session.id, name: session.id === active?.id ? (w.blockSession?.parentDocument || w.doc).name : session.document.name, dirty: dirty(session), error: !!session.error, editing: session.id === active?.id ? !!w.blockSession : !!session.context.blockSession }));
     const signature = JSON.stringify([workspace.activeId, data]);
     if (w.documentTabSignature !== signature) {
-        const scroll = host.scrollLeft, focused = document.activeElement?.dataset?.documentId;
-        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${s.editing ? '◇' : s.dirty ? '●' : '▱'}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
+        const scroll = host.scrollLeft, focusedNode = host.contains(document.activeElement) ? document.activeElement : null;
+        const focused = focusedNode?.dataset?.documentId, operation = focusedNode?.dataset?.documentOperation;
+        const reveal = w.lastRevealedDocument !== workspace.activeId;
+        host.innerHTML = data.map(s => `<div class="document-tab-item ${s.id === workspace.activeId ? 'active' : ''}" role="presentation" data-dirty="${s.dirty}" data-recovery-error="${s.error}"><button type="button" role="tab" id="tab-${s.id}" data-document-id="${s.id}" data-document-operation="activate" aria-selected="${s.id === workspace.activeId}" aria-label="${E(s.name || 'Untitled drawing')}${s.editing ? ' · Block editor' : ''}${s.error ? ' · Recovery failed' : s.dirty ? ' · Not saved on device' : ' · Saved on device'}" aria-controls="document-panel" tabindex="${s.id === workspace.activeId ? 0 : -1}" title="${E(s.name)}${s.editing ? ' · Block editor' : ''}${s.dirty ? ' · Not saved on device' : ''}"><span class="document-indicator ${s.error ? 'error' : s.dirty ? 'dirty' : ''}" aria-hidden="true">${s.editing ? '◇' : s.dirty ? '●' : '▱'}</span><span class="document-tab-name">${E(s.name || 'Untitled drawing')}</span>${s.editing ? '<span class="document-editing">Block</span>' : ''}</button><button type="button" class="document-tab-close" data-document-id="${s.id}" data-document-operation="close" tabindex="-1" aria-label="Close ${E(s.name)}">${icon('close')}</button></div>`).join('');
         host.scrollLeft = scroll;
-        if (focused) host.querySelector(`[data-document-id="${focused}"][role="tab"]`)?.focus({ preventScroll: true });
+        if (focused) host.querySelector(`[data-document-id="${focused}"][data-document-operation="${operation}"]`)?.focus({ preventScroll: true });
+        if (reveal) {
+            w.lastRevealedDocument = workspace.activeId;
+            requestAnimationFrame(() => {
+                if (w.disposed) return;
+                const tab = host.querySelector('.document-tab-item.active');
+                if (!tab) return;
+                const a = tab.getBoundingClientRect(), b = host.getBoundingClientRect();
+                if (a.right > b.right) host.scrollLeft += a.right - b.right + 4;
+                else if (a.left < b.left) host.scrollLeft += a.left - b.left - 4;
+            });
+        }
         w.documentTabSignature = signature;
     }
     w.$('.document-count').textContent = String(workspace.sessions.length);
@@ -296,7 +309,7 @@ export function requestCloseDocument(w, id) {
 }
 export function documentList(w) {
     captureActiveDocument(w);
-    w.openModal('Open drawings', `<p>Each drawing keeps its own undo history, view, selection and block-editing draft. Device recovery is not a downloaded project backup.</p><input type="search" id="document-search" aria-label="Find open drawing" placeholder="Find a drawing…"><div class="document-list">${w.documents.sessions.map((session, index) => `<section data-document-search="${E(session.document.name.toLowerCase())}"><button class="document-list-open" data-document-id="${session.id}" data-document-operation="activate"><strong>${E(session.document.name)}</strong><small>${session.id === w.documents.activeId ? 'Active · ' : ''}${session.document.entities.length} entities · ${session.document.units} · ${session.error ? 'Recovery failed' : dirty(session) ? 'Not saved' : 'Saved on device'}${session.context.blockSession ? ' · Block draft' : ''}</small></button><div class="document-list-actions">${button('document-duplicate:'+session.id,'Duplicate')}${button('document-reorder:'+session.id,'Move left',index === 0 ? 'first-document' : '')}${button('document-close:'+session.id,'Close')}</div></section>`).join('')}</div><details class="document-recent"><summary>Recently closed on this device</summary><div class="document-recent-list">Loading saved drawings…</div></details><div class="document-list-footer">${button('new','New drawing','primary')}${button('open','Open files')}${button('document-save-all','Save all on device')}</div>`, { wide: true });
+    w.openModal('Open drawings', `<p>Each drawing keeps its own undo history, view, selection and block-editing draft. Device recovery is not a downloaded project backup.</p><input type="search" id="document-search" aria-label="Find open drawing" placeholder="Find a drawing…"><div class="document-list">${w.documents.sessions.map((session, index) => `<section data-document-search="${E(session.document.name.toLowerCase())}"><button class="document-list-open" aria-current="${session.id === w.documents.activeId}" data-document-id="${session.id}" data-document-operation="activate"><strong>${E(session.document.name)}</strong><small>${session.id === w.documents.activeId ? 'Active · ' : ''}${session.document.entities.length} entities · ${session.document.units} · ${session.error ? 'Recovery failed' : dirty(session) ? 'Not saved' : 'Saved on device'}${session.context.blockSession ? ' · Block draft' : ''}</small></button><div class="document-list-actions">${button('document-rename:'+session.id,'Rename')}${button('document-duplicate:'+session.id,'Duplicate')}${button('document-reorder:'+session.id,'Move left',index === 0 ? 'first-document' : '')}${button('document-reorder-right:'+session.id,'Move right',index === w.documents.sessions.length - 1 ? 'first-document' : '')}${button('document-close:'+session.id,'Close')}</div></section>`).join('')}</div><details class="document-recent"><summary>Recently closed on this device</summary><div class="document-recent-list">Loading saved drawings…</div></details><div class="document-list-footer">${button('new','New drawing','primary')}${button('open','Open files')}${button('document-save-all','Save all on device')}</div>`, { wide: true });
     const modal = w.modal;
     w.store.listWorkspace?.(w.documents.key).then(records => {
         if (w.modal !== modal) return;
@@ -330,6 +343,17 @@ export async function documentAction(w, action) {
         const session = w.documents.get(id); if (!session) throw new Error('Drawing is no longer open');
         const copied = clone(session.document); copied.name += ' — copy';
         openDocument(w, copied); w.toast('Independent copy opened; unsaved block drafts are not committed into the copy.');
+    } else if (command === 'document-rename') {
+        const session = w.documents.get(id); if (!session) throw new Error('Drawing is no longer open');
+        if (session.context.blockSession || id === w.documents.activeId && w.blockSession) throw new Error('Save or close this drawing’s block editor before renaming');
+        w.ask('Rename drawing', [{ name: 'name', label: 'Drawing name', value: session.document.name }], values => {
+            const name = values.name.trim(); if (!name || name.length > 200) throw new Error('Enter a drawing name of 1–200 characters');
+            activateDocument(w, id);
+            w.edit('Rename drawing', () => { (w.blockSession?.parentDocument || w.doc).name = name; });
+        });
+    } else if (command === 'document-reorder-right') {
+        const index = w.documents.sessions.findIndex(session => session.id === id);
+        if (index >= 0 && index < w.documents.sessions.length - 1) { w.documents.move(id, index + 1); scheduleRecovery(w); documentList(w); }
     } else if (command === 'document-reorder') {
         const index = w.documents.sessions.findIndex(session => session.id === id);
         if (index > 0) { w.documents.move(id, index - 1); scheduleRecovery(w); documentList(w); }

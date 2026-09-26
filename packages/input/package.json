@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/input",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Modular Conduit CAD input engine",
   "type": "module",
   "main": "./src/index.js",
@@ -26,6 +26,6 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry": "0.7.0"
+    "@conduitcad/geometry": "0.7.1"
   }
 }

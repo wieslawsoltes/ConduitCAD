@@ -144,6 +144,8 @@ try:
         page.locator('[data-action=document-list]').click()
         page.locator('.document-recent summary').click()
         page.locator(f'[data-action="document-reopen:{first}"]').click()
+        # Reopening reads IndexedDB asynchronously; click completion is not read completion.
+        page.wait_for_function('(id)=>conduit.documents.activeId===id', arg=first)
         ok('recently closed saved drawing can be reopened without losing its geometry', page.evaluate(f'conduit.documents.activeId==="{first}" && conduit.doc.name==="Unsaved drawing"'))
         page.locator('[data-action=document-list]').click()
         page.locator('#document-search').fill('not-found-name')

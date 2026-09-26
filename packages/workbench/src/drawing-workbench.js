@@ -53,6 +53,8 @@ export function updateDrawingControls(w) {
     const session = w.drawingSession, path = w.tool === 'polyline', active = !!session || path;
     const hint = w.$('.tool-hint');
     if (session) hint.textContent = `${session.tool.label} · ${session.points.length + 1}${session.tool.count ? '/' + session.tool.count : ''}: ${session.prompt}`;
+    w.$('.canvas-area').classList.toggle('drawing-active', active);
+    hint.setAttribute('role', 'status'); hint.setAttribute('aria-live', 'polite');
     const controls = w.$('.drawing-session-controls');
     if (!controls) return;
     controls.classList.toggle('hide', !active);
@@ -80,13 +82,17 @@ export function drawingToolSections(w) {
     for (const t of DRAWING_TOOLS) { if (!groups.has(t.group)) groups.set(t.group, []); groups.get(t.group).push(t); }
     return `<label class="field drawing-tool-search">Find a drawing tool<input data-drawing-search type="search" placeholder="Arc, hatch, spline, ordinate…" aria-label="Find a drawing tool"></label>` +
         [...groups].map(([group, tools]) => `<section class="drawing-tool-group"><h3>${E(group)}</h3><div class="operation-grid">${tools.map(t => `<button type="button" data-tool="${t.id}" data-tool-search="${E((t.label + ' ' + group + ' ' + t.id).toLowerCase())}" title="${E(t.steps.join(' → '))}">${icon(t.icon)}<span>${E(t.label)}</span></button>`).join('')}</div></section>`).join('') +
-        `<div class="operation-grid">${action('hatch-selection', 'Hatch selected boundaries', 'hatch')}</div>`;
+        `<section class="drawing-tool-group"><h3>Existing boundaries</h3><div class="operation-grid">${action('hatch-selection', 'Hatch selected boundaries', 'hatch').replace('<button ', '<button data-tool-search="hatch selected boundaries" ')}</div></section>`;
 }
 export function bindDrawingSearch(w) {
+    const status = document.createElement('div'); status.className = 'drawing-search-status'; status.setAttribute('role', 'status');
+    w.modal?.querySelector('.drawing-tool-search')?.append(status);
     w.modal?.querySelector('[data-drawing-search]')?.addEventListener('input', event => {
-        const q = event.target.value.toLowerCase().trim();
-        for (const b of w.modal.querySelectorAll('[data-tool-search]')) b.hidden = !b.dataset.toolSearch.includes(q);
+        const words = event.target.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+        for (const b of w.modal.querySelectorAll('[data-tool-search]')) b.hidden = !words.every(word => b.dataset.toolSearch.includes(word));
         for (const section of w.modal.querySelectorAll('.drawing-tool-group')) section.hidden = ![...section.querySelectorAll('[data-tool-search]')].some(b => !b.hidden);
+        const count = [...w.modal.querySelectorAll('[data-tool-search]')].filter(b => !b.hidden).length;
+        status.textContent = count ? `${count} matching tools` : 'No matching tools. Try a shape or editing command.';
     });
 }
 export function drawingOptionsDialog(w, selected = false) {

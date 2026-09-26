@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/workspace",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "type": "module",
   "description": "DOM-free multi-document sessions and serialized recovery checkpoints",
   "main": "./src/index.js",
