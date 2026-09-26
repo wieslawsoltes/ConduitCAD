@@ -36,6 +36,7 @@ jobs:
           npm test 2>&1 | tee artifacts/ci-unit-tests.log
           npm run catalog
           node scripts/drawing-tool-samples.mjs
+          npm run samples:3d
           npm run build
           npm run pack:packages
       - name: Clean offline installation and integration of all reusable packages
@@ -67,6 +68,8 @@ jobs:
           python tests/browser_drawing_tools.py
           python tests/browser_documents.py
           python tests/browser_mobile_ui.py
+          python tests/browser_modeling3d.py
+          xvfb-run -a python tests/browser_modeling_backends.py
           python tests/audit_dxf.py
           python tests/audit_fidelity.py
           python tests/audit_symbol_library.py
@@ -74,6 +77,7 @@ jobs:
           python tests/audit_cad_editing.py
           python tests/audit_parametric.py
           python tests/audit_drawing_tools.py
+          python tests/audit_modeling3d.py
           python tests/render_symbol_atlas.py
       - name: Configure GitHub Pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
