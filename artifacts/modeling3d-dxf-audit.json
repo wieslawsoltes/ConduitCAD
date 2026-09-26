@@ -20,7 +20,7 @@
           "index": 2,
           "vertices": 23,
           "faces": 26,
-          "volume": 97600.0
+          "volume": 97599.99999999999
         },
         {
           "index": 3,
@@ -64,7 +64,7 @@
           "index": 2,
           "vertices": 23,
           "faces": 26,
-          "volume": 97600.0
+          "volume": 97599.99999999999
         },
         {
           "index": 3,
@@ -96,7 +96,7 @@
           "index": 2,
           "vertices": 192,
           "faces": 380,
-          "volume": 31843.237519152277
+          "volume": 31843.237519152288
         }
       ],
       "auditErrors": 0,
@@ -110,7 +110,7 @@
           "index": 2,
           "vertices": 192,
           "faces": 380,
-          "volume": 31843.237519152277
+          "volume": 31843.237519152288
         }
       ],
       "auditErrors": 0,
@@ -154,7 +154,7 @@
           "index": 5,
           "vertices": 470,
           "faces": 433,
-          "volume": 121695.99999999997
+          "volume": 121695.99999999999
         }
       ],
       "auditErrors": 0,
@@ -198,7 +198,99 @@
           "index": 5,
           "vertices": 470,
           "faces": 433,
-          "volume": 121695.99999999997
+          "volume": 121695.99999999999
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "extrusion-study.dxf",
+      "entities": 6,
+      "meshes": [
+        {
+          "index": 1,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 48000.0
+        },
+        {
+          "index": 3,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 48000.0
+        },
+        {
+          "index": 5,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 66000.0
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "extrusion-study-binary.dxf",
+      "entities": 6,
+      "meshes": [
+        {
+          "index": 1,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 48000.0
+        },
+        {
+          "index": 3,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 48000.0
+        },
+        {
+          "index": 5,
+          "vertices": 8,
+          "faces": 8,
+          "volume": 66000.0
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "face-boss.dxf",
+      "entities": 3,
+      "meshes": [
+        {
+          "index": 0,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 72000.0
+        },
+        {
+          "index": 2,
+          "vertices": 38,
+          "faces": 42,
+          "volume": 87000.00000000003
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "face-boss-binary.dxf",
+      "entities": 3,
+      "meshes": [
+        {
+          "index": 0,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 72000.0
+        },
+        {
+          "index": 2,
+          "vertices": 38,
+          "faces": 42,
+          "volume": 87000.00000000003
         }
       ],
       "auditErrors": 0,
@@ -224,13 +316,13 @@
           "index": 2,
           "vertices": 160,
           "faces": 88,
-          "volume": 15141.832724372405
+          "volume": 15141.832724372407
         },
         {
           "index": 3,
           "vertices": 480,
           "faces": 264,
-          "volume": 45425.4981731174
+          "volume": 45425.498173117405
         }
       ],
       "auditErrors": 0,
@@ -256,13 +348,13 @@
           "index": 2,
           "vertices": 160,
           "faces": 88,
-          "volume": 15141.832724372405
+          "volume": 15141.832724372407
         },
         {
           "index": 3,
           "vertices": 480,
           "faces": 264,
-          "volume": 45425.4981731174
+          "volume": 45425.498173117405
         }
       ],
       "auditErrors": 0,
@@ -294,7 +386,7 @@
           "index": 4,
           "vertices": 1574,
           "faces": 1636,
-          "volume": 99587.74779036423
+          "volume": 99587.74779036421
         }
       ],
       "auditErrors": 0,
@@ -326,7 +418,95 @@
           "index": 4,
           "vertices": 1574,
           "faces": 1636,
-          "volume": 99587.74779036423
+          "volume": 99587.74779036421
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "hole-plate.dxf",
+      "entities": 6,
+      "meshes": [
+        {
+          "index": 0,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 1,
+          "vertices": 185,
+          "faces": 152,
+          "volume": 56947.08572938516
+        },
+        {
+          "index": 2,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 3,
+          "vertices": 461,
+          "faces": 470,
+          "volume": 56251.38013614968
+        },
+        {
+          "index": 4,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 5,
+          "vertices": 532,
+          "faces": 557,
+          "volume": 56632.36177054002
+        }
+      ],
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "hole-plate-binary.dxf",
+      "entities": 6,
+      "meshes": [
+        {
+          "index": 0,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 1,
+          "vertices": 185,
+          "faces": 152,
+          "volume": 56947.08572938516
+        },
+        {
+          "index": 2,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 3,
+          "vertices": 461,
+          "faces": 470,
+          "volume": 56251.38013614968
+        },
+        {
+          "index": 4,
+          "vertices": 8,
+          "faces": 6,
+          "volume": 58500.0
+        },
+        {
+          "index": 5,
+          "vertices": 532,
+          "faces": 557,
+          "volume": 56632.36177054002
         }
       ],
       "auditErrors": 0,
@@ -358,7 +538,7 @@
           "index": 3,
           "vertices": 538,
           "faces": 517,
-          "volume": 51940.847333574144
+          "volume": 51940.84733357413
         },
         {
           "index": 4,
@@ -376,13 +556,13 @@
           "index": 6,
           "vertices": 366,
           "faces": 353,
-          "volume": 11087.807892191962
+          "volume": 11087.807892191959
         },
         {
           "index": 7,
           "vertices": 1098,
           "faces": 1059,
-          "volume": 33263.42367657609
+          "volume": 33263.423676576065
         }
       ],
       "auditErrors": 0,
@@ -414,7 +594,7 @@
           "index": 3,
           "vertices": 538,
           "faces": 517,
-          "volume": 51940.847333574144
+          "volume": 51940.84733357413
         },
         {
           "index": 4,
@@ -432,13 +612,13 @@
           "index": 6,
           "vertices": 366,
           "faces": 353,
-          "volume": 11087.807892191962
+          "volume": 11087.807892191959
         },
         {
           "index": 7,
           "vertices": 1098,
           "faces": 1059,
-          "volume": 33263.42367657609
+          "volume": 33263.423676576065
         }
       ],
       "auditErrors": 0,
@@ -458,7 +638,7 @@
           "index": 1,
           "vertices": 96,
           "faces": 50,
-          "volume": 117473.57299804638
+          "volume": 117473.57299804637
         },
         {
           "index": 2,
@@ -470,7 +650,7 @@
           "index": 3,
           "vertices": 482,
           "faces": 512,
-          "volume": 90484.86509373125
+          "volume": 90484.86509373126
         },
         {
           "index": 4,
@@ -502,7 +682,7 @@
           "index": 1,
           "vertices": 96,
           "faces": 50,
-          "volume": 117473.57299804638
+          "volume": 117473.57299804637
         },
         {
           "index": 2,
@@ -514,7 +694,7 @@
           "index": 3,
           "vertices": 482,
           "faces": 512,
-          "volume": 90484.86509373125
+          "volume": 90484.86509373126
         },
         {
           "index": 4,
@@ -568,7 +748,7 @@
           "index": 2,
           "vertices": 96,
           "faces": 188,
-          "volume": 374689.9855992348
+          "volume": 374689.9855992349
         }
       ],
       "auditErrors": 0,
@@ -582,7 +762,7 @@
           "index": 2,
           "vertices": 96,
           "faces": 188,
-          "volume": 374689.9855992348
+          "volume": 374689.9855992349
         }
       ],
       "auditErrors": 0,
@@ -596,7 +776,7 @@
           "index": 1,
           "vertices": 290,
           "faces": 336,
-          "volume": 759766.859674478
+          "volume": 759766.8596744781
         },
         {
           "index": 2,
@@ -614,19 +794,19 @@
           "index": 4,
           "vertices": 128,
           "faces": 72,
-          "volume": 12245.869835682868
+          "volume": 12245.869835682872
         },
         {
           "index": 5,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586011
+          "volume": 10062.88447358601
         },
         {
           "index": 6,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586006
+          "volume": 10062.884473586004
         }
       ],
       "auditErrors": 0,
@@ -640,7 +820,7 @@
           "index": 1,
           "vertices": 290,
           "faces": 336,
-          "volume": 759766.859674478
+          "volume": 759766.8596744781
         },
         {
           "index": 2,
@@ -658,26 +838,26 @@
           "index": 4,
           "vertices": 128,
           "faces": 72,
-          "volume": 12245.869835682868
+          "volume": 12245.869835682872
         },
         {
           "index": 5,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586011
+          "volume": 10062.88447358601
         },
         {
           "index": 6,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586006
+          "volume": 10062.884473586004
         }
       ],
       "auditErrors": 0,
       "auditRepairs": 0
     }
   ],
-  "passed": 686,
+  "passed": 866,
   "checks": [
     {
       "name": "bracket.dxf opens with no repairs or errors",
@@ -1520,6 +1700,366 @@
       "passed": true
     },
     {
+      "name": "extrusion-study.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 1 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 3 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 4 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study.dxf entity 5 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 1 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 3 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 4 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "extrusion-study-binary.dxf entity 5 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 0 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "face-boss.dxf entity 2 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 0 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "face-boss-binary.dxf entity 2 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
       "name": "fixture.dxf opens with no repairs or errors",
       "passed": true
     },
@@ -2021,6 +2561,366 @@
     },
     {
       "name": "flange-binary.dxf entity 4 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 0 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 1 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 2 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 3 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 4 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate.dxf entity 5 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf opens with no repairs or errors",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf uses DXF R2018 version",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf preserves entity count",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 0 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 1 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 2 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 3 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 4 hidden construction stock flag matches",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 retains native entity type",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 exact XYZ readback",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 native polygon indices match",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 no false subdivision level",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 positive independent volume",
+      "passed": true
+    },
+    {
+      "name": "hole-plate-binary.dxf entity 5 hidden construction stock flag matches",
       "passed": true
     },
     {

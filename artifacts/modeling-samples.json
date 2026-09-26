@@ -1,5 +1,240 @@
 [
   {
+    "id": "hole-plate",
+    "features": 6,
+    "bodies": [
+      {
+        "name": "Simple through hole",
+        "vertices": 185,
+        "faces": 152,
+        "edges": 337,
+        "triangles": 370,
+        "area": 10721.234295594682,
+        "volume": 56947.08572938511,
+        "signedVolume": 56947.08572938511,
+        "centroid": {
+          "x": 32.5,
+          "y": 22.5,
+          "z": 10
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 65,
+            "y": 45,
+            "z": 20
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Counterbored hole",
+        "vertices": 461,
+        "faces": 470,
+        "edges": 931,
+        "triangles": 922,
+        "area": 10821.4784112198,
+        "volume": 56251.38013614927,
+        "signedVolume": 56251.38013614927,
+        "centroid": {
+          "x": 117.5,
+          "y": 22.5,
+          "z": 9.90105763214318
+        },
+        "bounds": {
+          "min": {
+            "x": 85,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 150,
+            "y": 45,
+            "z": 20
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Countersunk hole",
+        "vertices": 532,
+        "faces": 557,
+        "edges": 1089,
+        "triangles": 1064,
+        "area": 10669.035332287865,
+        "volume": 56632.36177054041,
+        "signedVolume": 56632.36177054041,
+        "centroid": {
+          "x": 202.5,
+          "y": 22.5,
+          "z": 9.951446603157567
+        },
+        "bounds": {
+          "min": {
+            "x": 170,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 235,
+            "y": 45,
+            "z": 20
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "extrusion-study",
+    "features": 3,
+    "bodies": [
+      {
+        "name": "One side",
+        "vertices": 8,
+        "faces": 8,
+        "edges": 14,
+        "triangles": 12,
+        "area": 8000,
+        "volume": 48000,
+        "signedVolume": 48000,
+        "centroid": {
+          "x": 20,
+          "y": 15,
+          "z": 20
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 40,
+            "y": 30,
+            "z": 40
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Symmetric total",
+        "vertices": 8,
+        "faces": 8,
+        "edges": 14,
+        "triangles": 12,
+        "area": 8000,
+        "volume": 48000,
+        "signedVolume": 48000,
+        "centroid": {
+          "x": 90,
+          "y": 15,
+          "z": 0
+        },
+        "bounds": {
+          "min": {
+            "x": 70,
+            "y": 0,
+            "z": -20
+          },
+          "max": {
+            "x": 110,
+            "y": 30,
+            "z": 20
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      },
+      {
+        "name": "Two independent sides",
+        "vertices": 8,
+        "faces": 8,
+        "edges": 14,
+        "triangles": 12,
+        "area": 10100,
+        "volume": 66000,
+        "signedVolume": 66000,
+        "centroid": {
+          "x": 160,
+          "y": 15,
+          "z": 12.5
+        },
+        "bounds": {
+          "min": {
+            "x": 140,
+            "y": 0,
+            "z": -15
+          },
+          "max": {
+            "x": 180,
+            "y": 30,
+            "z": 40
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
+    "id": "face-boss",
+    "features": 2,
+    "bodies": [
+      {
+        "name": "Joined mounting boss",
+        "vertices": 38,
+        "faces": 42,
+        "edges": 78,
+        "triangles": 72,
+        "area": 16300,
+        "volume": 87000.00000000003,
+        "signedVolume": 87000.00000000003,
+        "centroid": {
+          "x": 40,
+          "y": 30,
+          "z": 10.948275862068968
+        },
+        "bounds": {
+          "min": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "max": {
+            "x": 80,
+            "y": 60,
+            "z": 40
+          },
+          "empty": false
+        },
+        "closed": true,
+        "boundaryEdges": 0,
+        "nonManifoldEdges": 0
+      }
+    ]
+  },
+  {
     "id": "bracket",
     "features": 6,
     "bodies": [

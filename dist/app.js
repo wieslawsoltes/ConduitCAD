@@ -438,15 +438,29 @@ function booleanMesh(left, right, operation = 'union') {
         throw new Error('Boolean result exceeds topology-conformance budget');
     // Include split points on both sides of every edge to avoid BSP T-junctions.
     let work = 0;
-    const conformed = faces.map(face => face.flatMap((a, i) => { const b = face[(i + 1) % face.length], d = sub3(points[b], points[a]), den = dot3(d, d), inner = []; for (let j = 0; j < points.length; j++) {
-        if (++work > 40000000)
-            throw new Error('Boolean topology budget exceeded');
-        if (j === a || j === b)
-            continue;
-        const t = dot3(sub3(points[j], points[a]), d) / den;
-        if (t > 1e-7 && t < 1 - 1e-7 && distance3(points[j], lerp3(points[a], points[b], t)) < 2e-7)
-            inner.push([t, j]);
-    } return [a, ...inner.sort((x, y) => x[0] - y[0]).map(x => x[1])]; }));
+    const conformed = faces.map(face => {
+        const original = new Set(face), splits = face.map(() => []);
+        // Near a corner a tolerance ball may touch two edges. Assign each split vertex
+        // to its nearest edge once; inserting it twice creates a self-touching polygon.
+        const edges = face.map((a, i) => { const b = face[(i + 1) % face.length], d = sub3(points[b], points[a]); return { a, b, d, den: dot3(d, d) }; });
+        for (let j = 0; j < points.length; j++) {
+            if (original.has(j)) continue;
+            let best = null;
+            for (let i = 0; i < edges.length; i++) {
+                if (++work > 40000000) throw new Error('Boolean topology budget exceeded');
+                const { a, b, d, den } = edges[i];
+                if (!den) continue;
+                const t = dot3(sub3(points[j], points[a]), d) / den;
+                if (t <= 1e-7 || t >= 1 - 1e-7) continue;
+                const gap = distance3(points[j], lerp3(points[a], points[b], t));
+                // Edge incidence needs a tighter tolerance than BSP half-space classification:
+                // a nearby point is not necessarily on the same geometric edge.
+                if (gap < 1e-9 && (!best || gap < best.gap)) best = { edge: i, t, gap };
+            }
+            if (best) splits[best.edge].push([best.t, j]);
+        }
+        return face.flatMap((a, i) => [a, ...splits[i].sort((x, y) => x[0] - y[0]).map(x => x[1])]);
+    });
     return validateMesh({ points: points.map(p => add3(center, mul3(p, scale))), faces: conformed });
 }
 
@@ -2403,8 +2417,141 @@ function syncInsertAttributes(e,doc) {
 
 return {textLayout,objectCoordinateTransform,uid,clone,createDocument,validateDocument,entity,line,polyline,circle,text,rect,layerFor,isVisible,isLocked,cleanText,resolveStyle,entityGeometry,entityBounds,documentBounds,ports,moveEntity,transformEntity,explodeEntity,detachReferences,dimensionPicture,editDimension,dimensionGrips,regenerateDimensions,validateDynamicBlock,dynamicValues,evaluateDynamicBlock,setDynamicParameters,dynamicParameterGrips,dynamicGripValue,blockDefinitionSignature,inspectBlockReferences,beginBlockEdit,editedBlockDefinition,prepareBlockUpdate,updateBlockDefinition,renameBlockDefinition,duplicateBlockDefinition,createBlockDefinition,deleteBlockDefinition,syncInsertAttributes};
 })();
+// packages/modeling/src/authoring.js
+__modules["packages/modeling/src/authoring.js"]=(()=>{
+const {V3, add3, sub3, mul3, dot3, cross3, unit3, distance3, finite3, faceNormal, validateMesh, triangulateFace, rayTriangle, extrudeMesh, revolveMesh, transformMesh, booleanMesh, meshProperties, ocs3} = __modules["packages/geometry3d/src/index.js"];
+const {entity} = __modules["packages/model/src/index.js"];
+const positive = (value, label) => {
+    if (!Number.isFinite(value) || value <= 0) throw new Error(label + ' must be positive');
+    return value;
+};
+const choice = (value, choices, label) => {
+    if (!choices.includes(value)) throw new Error('Unsupported ' + label);
+    return value;
+};
+
+/** A local face frame follows dimensional edits while retaining the selected face's incidence.
+ * Topology edits require explicit reattachment: a face index alone is not persistent naming.
+ */
+function faceFrame3(mesh, index, reference = null) {
+    validateMesh(mesh);
+    if (!Number.isInteger(index) || !mesh.faces[index]) throw new Error('Select a valid planar face');
+    const indices = mesh.faces[index];
+    if (reference && (reference.face !== index || reference.vertexCount !== mesh.points.length ||
+        reference.faceCount !== mesh.faces.length || !Array.isArray(reference.vertices) ||
+        reference.vertices.length !== indices.length || indices.some((v, i) => reference.vertices[i] !== v)))
+        throw new Error('Attached face topology changed; reselect the face before regenerating');
+    const normal = faceNormal(mesh.points, indices), anchor = mesh.points[indices[0]];
+    const size = Math.max(...indices.map(i => distance3(mesh.points[i], anchor)));
+    const tolerance = Math.max(size * 1e-8, Math.max(...Object.values(anchor).map(Math.abs)) * Number.EPSILON * 16, 1e-10);
+    if (indices.some(i => Math.abs(dot3(sub3(mesh.points[i], anchor), normal)) > tolerance))
+        throw new Error('The selected face is not planar');
+    const u = unit3(sub3(mesh.points[indices[1]], anchor)), v = unit3(cross3(normal, u));
+    // Use translated coordinates to avoid summing large global origins.
+    const center = add3(anchor, mul3(indices.reduce((sum, i) => add3(sum, sub3(mesh.points[i], anchor)), V3()), 1 / indices.length));
+    return { origin: center, u, v, normal, tolerance,
+        reference: { face: index, vertices: indices.slice(), vertexCount: mesh.points.length, faceCount: mesh.faces.length } };
+}
+
+function faceCoordinates3(frame, point) {
+    const delta = sub3(finite3(point), frame.origin);
+    return { u: dot3(delta, frame.u), v: dot3(delta, frame.v), offset: dot3(delta, frame.normal) };
+}
+
+function facePoint3(frame, u = 0, v = 0, offset = 0) {
+    if (![u, v, offset].every(Number.isFinite)) throw new Error('Face coordinates must be finite');
+    return add3(frame.origin, add3(mul3(frame.u, u), add3(mul3(frame.v, v), mul3(frame.normal, offset))));
+}
+
+/** Native snapshot of a rectangle/circle on a picked face. Does not create a hidden association. */
+function profileOnFace3(mesh, face, { shape = 'rectangle', width = 30, height = 20, radius = 10, u = 0, v = 0, offset = 0 } = {}) {
+    const frame = faceFrame3(mesh, face), center = facePoint3(frame, u, v, offset), m = ocs3(frame.normal);
+    const project = p => V3(dot3(p, V3(m[0], m[1], m[2])), dot3(p, V3(m[4], m[5], m[6])), dot3(p, frame.normal));
+    const c = project(center), common = { layer: 'Annotations', label: 'Face profile', extrusion: frame.normal, elevation: c.z };
+    if (shape === 'circle') return entity('CIRCLE', { ...common, c, r: positive(radius, 'Radius') });
+    if (shape !== 'rectangle') throw new Error('Unsupported profile shape');
+    positive(width, 'Width'); positive(height, 'Height');
+    const points = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => {
+        const p = project(add3(center, add3(mul3(frame.u, a * width / 2), mul3(frame.v, b * height / 2))));
+        return { x: p.x, y: p.y };
+    });
+    return entity('LWPOLYLINE', { ...common, points, closed: true });
+}
+
+/** Extrusion extent in drawing units. Symmetric means total length, not per-side length. */
+function extrudeExtent3(profile, p) {
+    const extent = choice(p.extent ?? 0, [0, 1, 2], 'extrusion extent');
+    const direction = p.useNormal === 1 ? unit3(p.profileNormal || faceNormal(profile, profile.map((_, i) => i))) : unit3(V3(p.nx ?? 0, p.ny ?? 0, p.nz ?? 1));
+    choice(p.useNormal ?? 0, [0, 1], 'extrusion direction mode');
+    let height = p.height ?? 45, shift = p.startOffset ?? 0;
+    if (!Number.isFinite(shift)) throw new Error('Start offset must be finite');
+    if (extent === 1) { positive(height, 'Symmetric total distance'); shift -= height / 2; }
+    if (extent === 2) { positive(height, 'Side one distance'); const second = positive(p.distance2 ?? 20, 'Side two distance'); shift -= second; height += second; }
+    return extrudeMesh(profile.map(point => add3(point, mul3(direction, shift))), height, direction, p.taper ?? 0);
+}
+
+function combineExtrusion3(tool, target, operation = 0) {
+    choice(operation, [0, 1, 2, 3], 'extrusion operation');
+    if (!operation) { if (target) throw new Error('New Body does not accept a target'); return tool; }
+    if (!target || target.type !== 'MESH') throw new Error('Select a target mesh for Join, Cut or Intersect');
+    const result = booleanMesh(target, tool, ['new', 'union', 'subtract', 'intersect'][operation]);
+    const properties = meshProperties(result);
+    if (!properties.closed || !(properties.signedVolume > 0)) throw new Error('Operation produced no closed body');
+    if (operation === 2) {
+        const before = meshProperties(target).volume;
+        if (before - properties.volume <= Math.max(before * 1e-9, 1e-12)) throw new Error('The extrusion does not cut the target body');
+    }
+    return result;
+}
+
+/** One closed revolved cutter, not overlapping cylinders. Its local +Z is inward. */
+function holeTool3(target, parameters = {}, reference = null) {
+    if (target.type && target.type !== 'MESH') throw new Error('Hole requires a native mesh body');
+    const p = { face: 1, u: 0, v: 0, diameter: 10, depth: 15, through: 1, holeType: 0, counterDiameter: 18, counterDepth: 4, sinkAngle: 90, segments: 24, ...parameters };
+    choice(p.through, [0, 1], 'hole extent'); choice(p.holeType, [0, 1, 2], 'hole type');
+    const frame = faceFrame3(target, p.face, reference), center = facePoint3(frame, p.u, p.v), inward = mul3(frame.normal, -1);
+    positive(p.diameter, 'Hole diameter');
+    const properties = meshProperties(target);
+    if (!properties.closed || properties.signedVolume <= 0) throw new Error('Hole target must be closed and outward oriented');
+    const eps = Math.max(distance3(properties.bounds.min, properties.bounds.max) * 1e-5, frame.tolerance * 8);
+    // Reject an out-of-face center rather than silently creating an unrelated cut elsewhere.
+    const pointOnFace = triangulateFace(target.points, target.faces[p.face]).some(f => rayTriangle(add3(center, mul3(frame.normal, eps)), inward, ...f.map(i => target.points[i])));
+    if (!pointOnFace) throw new Error('Hole center lies outside the selected face');
+    const span = target.points.reduce((max, point) => Math.max(max, dot3(sub3(point, center), inward)), 0);
+    const depth = p.through ? span + eps : positive(p.depth, 'Hole depth');
+    if (!(depth > frame.tolerance)) throw new Error('No inward material along this face normal');
+    const r = p.diameter / 2, top = p.holeType ? positive(p.counterDiameter, 'Counter diameter') / 2 : r;
+    if (p.holeType && !(top > r)) throw new Error('Counter diameter must exceed hole diameter');
+    let step = 0;
+    if (p.holeType === 1) step = positive(p.counterDepth, 'Counterbore depth');
+    if (p.holeType === 2) {
+        if (!Number.isFinite(p.sinkAngle) || p.sinkAngle <= 1 || p.sinkAngle >= 179) throw new Error('Countersink included angle must be between 1 and 179 degrees');
+        step = (top - r) / Math.tan(p.sinkAngle * Math.PI / 360);
+    }
+    if (step >= depth - eps) throw new Error('Counter recess must be shallower than the hole');
+    const section = [V3(0, -eps), V3(top, -eps)];
+    if (p.holeType === 1) section.push(V3(top, step), V3(r, step));
+    else if (p.holeType === 2) section.push(V3(top, 0), V3(r, step));
+    section.push(V3(r, depth), V3(0, depth));
+    const local = revolveMesh(section, 360, p.segments), { u, v } = frame;
+    const matrix = [u.x, u.y, u.z, 0, -v.x, -v.y, -v.z, 0, inward.x, inward.y, inward.z, 0, center.x, center.y, center.z, 1];
+    return { mesh: transformMesh(local, matrix), frame, center, depth };
+}
+
+function drillHole3(target, parameters, reference = null) {
+    const { mesh, frame, center } = holeTool3(target, parameters, reference);
+    const { u } = frame, v = mul3(frame.v, -1), inward = mul3(frame.normal, -1);
+    // Perform clipping in the face frame. This also avoids global-origin cancellation.
+    const local = source => ({ points: source.points.map(p => { const d = sub3(p, center); return V3(dot3(d, u), dot3(d, v), dot3(d, inward)); }), faces: source.faces });
+    const result = combineExtrusion3(local(mesh), { ...local(target), type: 'MESH' }, 2);
+    return transformMesh(result, [u.x,u.y,u.z,0,v.x,v.y,v.z,0,inward.x,inward.y,inward.z,0,center.x,center.y,center.z,1]);
+}
+
+return {faceFrame3,faceCoordinates3,facePoint3,profileOnFace3,extrudeExtent3,combineExtrusion3,holeTool3,drillHole3};
+})();
 // packages/modeling/src/features.js
 __modules["packages/modeling/src/features.js"]=(()=>{
+const {faceFrame3, extrudeExtent3, combineExtrusion3, drillHole3} = __modules["packages/modeling/src/authoring.js"];
 const {V3, add3, sub3, mul3, dot3, cross3, unit3, distance3, lerp3, translation3, scaling3, rotation3, multiply4, transform3, ocs3, validateMesh, meshProperties, boxMesh, cylinderMesh, sphereMesh, torusMesh, extrudeMesh, revolveMesh, loftMesh, sweepMesh, booleanMesh, transformMesh, mergeMeshes, spline3, triangles3, faceNormal, sliceMesh} = __modules["packages/geometry3d/src/index.js"];
 const {entity, clone} = __modules["packages/model/src/index.js"];
 const {tessellatePolyline} = __modules["packages/geometry/src/index.js"];
@@ -2417,7 +2564,8 @@ const MODELING_TOOLS = [
     { id: 'sphere', label: 'Sphere', group: 'Primitives', fields: [field('radius', 'Radius', 35), field('segments', 'Radial segments', 32)] },
     { id: 'torus', label: 'Torus', group: 'Primitives', fields: [field('major', 'Major radius', 45), field('minor', 'Tube radius', 12), field('segments', 'Radial segments', 48)] },
     { id: 'wedge', label: 'Wedge', group: 'Primitives', fields: [field('width', 'Width', 100), field('depth', 'Depth', 60), field('height', 'Height', 50)] },
-    { id: 'extrude', label: 'Extrude profile', group: 'Create', inputs: 1, fields: [field('height', 'Signed distance', 45), field('taper', 'Top scale change (0 = parallel)', 0), field('nx', 'Direction X', 0), field('ny', 'Direction Y', 0), field('nz', 'Direction Z', 1)] },
+    { id: 'extrude', label: 'Extrude profile', group: 'Create', inputs: 1, maxInputs: 2, fields: [field('height', 'Distance / symmetric total', 45), { ...field('extent', 'Direction', 0), options: ['One side', 'Symmetric (total)', 'Two sides'] }, field('distance2', 'Side two distance', 20), field('startOffset', 'Start offset', 0), { ...field('operation', 'Operation', 0), options: ['New body', 'Join', 'Cut', 'Intersect'] }, { ...field('useNormal', 'Direction axis', 0), options: ['Custom XYZ', 'Profile normal'] }, field('taper', 'Top scale change (0 = parallel)', 0), field('nx', 'Direction X', 0), field('ny', 'Direction Y', 0), field('nz', 'Direction Z', 1)] },
+    { id: 'hole', label: 'Hole', group: 'Create', inputs: 1, fields: [field('face', 'Attached face index', 1), field('u', 'Face U offset', 0), field('v', 'Face V offset', 0), field('diameter', 'Hole diameter', 10), { ...field('through', 'Extent', 1), options: ['Distance', 'Through all'] }, field('depth', 'Hole depth', 15), { ...field('holeType', 'Hole type', 0), options: ['Simple', 'Counterbore', 'Countersink'] }, field('counterDiameter', 'Recess diameter', 18), field('counterDepth', 'Counterbore depth', 4), field('sinkAngle', 'Countersink included angle', 90), field('segments', 'Radial segments', 24)] },
     { id: 'revolve', label: 'Revolve profile', group: 'Create', inputs: 1, fields: [field('angle', 'Angle · degrees', 360), field('segments', 'Angular segments', 48)] },
     { id: 'loft', label: 'Loft profiles', group: 'Create', inputs: 2, multiple: true, fields: [field('samples', 'Vertices per section', 32)] },
     { id: 'sweep', label: 'Sweep along path', group: 'Create', inputs: 2, fields: [] },
@@ -2540,7 +2688,7 @@ function evaluateFeature(f, inputs, variables) {
     const tool = MODELING_TOOLS.find(t => t.id === f.kind);
     if (!tool || f.version !== 1)
         throw new Error('Unsupported 3D feature schema or operation');
-    if ((tool.inputs || 0) !== inputs.length && !(tool.multiple && inputs.length >= tool.inputs))
+    if ((tool.inputs || 0) !== inputs.length && !(tool.multiple && inputs.length >= tool.inputs) && !(tool.maxInputs && inputs.length >= tool.inputs && inputs.length <= tool.maxInputs))
         throw new Error(tool.label + ': incorrect number of inputs');
     const p = { ...defaults(f.kind), ...f.parameters };
     for (const [k, v] of Object.entries(p)) {
@@ -2550,7 +2698,7 @@ function evaluateFeature(f, inputs, variables) {
         if (!Number.isFinite(p[k]))
             throw new Error('Non-finite ' + k);
     }
-    const key = JSON.stringify([f.kind, p, inputs.map(e => ({ type: e.type, points: e.points, faces: e.faces, a: e.a, b: e.b, c: e.c, r: e.r, major: e.major, ratio: e.ratio, start: e.start, end: e.end, extrusion: e.extrusion, elevation: e.elevation, flags: e.flags, closed: e.closed, controlPoints: e.controlPoints, knots: e.knots, weights: e.weights, degree: e.degree, clockwise: e.clockwise, helixSpline: e.helixSpline, axis: e.axis, axisBase: e.axisBase, startPoint: e.startPoint, turns: e.turns, turnHeight: e.turnHeight, handedness: e.handedness }))]);
+    const key = JSON.stringify([f.kind, p, f.attachment || null, inputs.map(e => ({ type: e.type, points: e.points, faces: e.faces, a: e.a, b: e.b, c: e.c, r: e.r, major: e.major, ratio: e.ratio, start: e.start, end: e.end, extrusion: e.extrusion, elevation: e.elevation, flags: e.flags, closed: e.closed, controlPoints: e.controlPoints, knots: e.knots, weights: e.weights, degree: e.degree, clockwise: e.clockwise, helixSpline: e.helixSpline, axis: e.axis, axisBase: e.axisBase, startPoint: e.startPoint, turns: e.turns, turnHeight: e.turnHeight, handedness: e.handedness }))]);
     return cached(key, () => {
         let m;
         if (f.kind === 'box')
@@ -2563,8 +2711,13 @@ function evaluateFeature(f, inputs, variables) {
             m = sphereMesh(p.radius, p.segments);
         else if (f.kind === 'torus')
             m = torusMesh(p.major, p.minor, p.segments);
-        else if (f.kind === 'extrude')
-            m = extrudeMesh(curvePoints3(inputs[0], { closed: true }).points, p.height, V3(p.nx, p.ny, p.nz), p.taper);
+        else if (f.kind === 'extrude') {
+            if ((p.operation ? 2 : 1) !== inputs.length) throw new Error('Extrusion target does not match the operation');
+            const toolMesh = extrudeExtent3(curvePoints3(inputs[0], { closed: true }).points, { ...p, profileNormal: inputs[0].extrusion });
+            m = combineExtrusion3(toolMesh, inputs[1], p.operation);
+        }
+        else if (f.kind === 'hole')
+            m = drillHole3(inputs[0], p, f.attachment);
         else if (f.kind === 'revolve')
             m = revolveMesh(curvePoints3(inputs[0], { closed: true }).points, p.angle, p.segments);
         else if (f.kind === 'loft')
@@ -2665,6 +2818,11 @@ function regenerateFeatures(doc) {
 }
 function addFeature(doc, kind, parameters = {}, inputs = [], options = {}) {
     const e = entity('MESH', { points: [], faces: [], layer: options.layer || 'Equipment', label: options.name || MODELING_TOOLS.find(t => t.id === kind)?.label || kind, color: options.color || '#5496a4', feature3d: { version: 1, kind, parameters: clone(parameters), inputs: inputs.slice(), suppressed: false } }), draft = { ...doc, entities: [...clone(doc.entities), e] };
+    if (kind === 'hole') {
+        const target = draft.entities.find(q => q.id === inputs[0]), variables = resolveParameters(doc.parameters || {});
+        if (!target) throw new Error('Select a target body for the hole');
+        e.feature3d.attachment = faceFrame3(target, evaluateExpression(String(parameters.face ?? 1), variables)).reference;
+    }
     regenerateFeatures(draft);
     doc.entities = draft.entities;
     return doc.entities.find(x => x.id === e.id);
@@ -2674,7 +2832,13 @@ function editFeature(doc, id, patch) { const draft = { ...doc, entities: clone(d
     f.parameters = { ...f.parameters, ...clone(patch.parameters) }; if (patch.inputs)
     f.inputs = patch.inputs.slice(); if (patch.suppressed !== undefined)
     f.suppressed = !!patch.suppressed; if (patch.name !== undefined)
-    e.label = String(patch.name).slice(0, 160); regenerateFeatures(draft); doc.entities = draft.entities; return doc.entities.find(q => q.id === id); }
+    e.label = String(patch.name).slice(0, 160);
+    if (f.kind === 'hole' && (patch.reattach || !f.attachment || (patch.parameters?.face !== undefined && String(patch.parameters.face) !== String(doc.entities.find(q => q.id === id).feature3d.parameters.face ?? 1)) || (patch.inputs && patch.inputs[0] !== doc.entities.find(q => q.id === id).feature3d.inputs[0]))) {
+        const target = draft.entities.find(q => q.id === f.inputs[0]);
+        if (!target) throw new Error('Select a target body for the hole');
+        f.attachment = faceFrame3(target, evaluateExpression(String(f.parameters.face ?? 1), resolveParameters(doc.parameters || {}))).reference;
+    }
+    regenerateFeatures(draft); doc.entities = draft.entities; return doc.entities.find(q => q.id === id); }
 function removeFeature(doc, id, { cascade = false } = {}) { const ids = new Set([id]); let changed = true; while (changed) {
     changed = false;
     for (const e of doc.entities)
@@ -2703,10 +2867,14 @@ return {MODELING_TOOLS,curvePoints3,offsetPlanarFace,regenerateFeatures,addFeatu
 })();
 // packages/modeling/src/examples.js
 __modules["packages/modeling/src/examples.js"]=(()=>{
+const {profileOnFace3} = __modules["packages/modeling/src/authoring.js"];
 const {V3} = __modules["packages/geometry3d/src/index.js"];
 const {createDocument, entity, polyline, circle, text} = __modules["packages/model/src/index.js"];
 const {addFeature, regenerateFeatures} = __modules["packages/modeling/src/features.js"];
 const EXAMPLES_3D = [
+    { id: 'hole-plate', name: 'Hole design workshop', industry: 'Mechanical detailing', description: 'Three editable plates compare simple, counterbore and countersink holes. Change HoleDiameter or PlateThickness.', operations: ['box', 'hole'] },
+    { id: 'extrusion-study', name: 'Extrusion direction study', industry: 'Learning', description: 'One-sided, symmetric-total and independent two-sided extrusions share named distance parameters.', operations: ['extrude'] },
+    { id: 'face-boss', name: 'Face profile and boss', industry: 'Fixture design', description: 'Native face-aligned profile joined to a stock body with an editable extrusion operation.', operations: ['box', 'extrude'] },
     { id: 'bracket', name: 'Mounting bracket', industry: 'Mechanical design', description: 'L-shaped bracket with a patterned through-hole cut. Edit Width, Thickness and HoleRadius.', operations: ['box', 'union', 'cylinder', 'linear-pattern', 'subtract'] },
     { id: 'flange', name: 'Four-bolt flange', industry: 'Piping & equipment', description: 'Revolved annular hub with a circular bolt-hole pattern and native mesh Boolean cut.', operations: ['revolve', 'cylinder', 'circular-pattern', 'subtract'] },
     { id: 'vessel', name: 'Process vessel', industry: 'Process engineering', description: 'Revolved vessel, support legs and nozzle bodies. A concept model, not a pressure-vessel design.', operations: ['revolve', 'cylinder', 'linear-pattern'] },
@@ -2728,7 +2896,26 @@ function create3DExample(id) {
     const feature = (kind, parameters = {}, inputs = [], name, color) => addFeature(d, kind, parameters, inputs.map(e => typeof e === 'string' ? e : e.id), { name, color });
     const profile = (name, points, closed = true, spatial = false) => { const e = spatial ? entity('POLYLINE', { points, closed, flags: 8 }) : polyline(points, closed); e.label = name; e.layer = 'Annotations'; d.entities.push(e); return e; };
     const round = (name, r, p = V3()) => { const e = circle(p, r, { layer: 'Annotations', label: name }); d.entities.push(e); return e; };
-    if (id === 'bracket') {
+    if (id === 'hole-plate') {
+        Object.assign(d.parameters, { HoleDiameter: '10', PlateThickness: '20' });
+        for (let type = 0; type < 3; type++) {
+            const b = feature('box', { width: 65, depth: 45, height: 'PlateThickness', x: type * 85 }, [], 'Plate ' + (type + 1));
+            feature('hole', { holeType: type, diameter: 'HoleDiameter', counterDiameter: 'HoleDiameter+8', counterDepth: 4, segments: 24 }, [b], ['Simple through hole', 'Counterbored hole', 'Countersunk hole'][type], ['#71958e', '#748fad', '#ab9169'][type]);
+        }
+    }
+    else if (id === 'extrusion-study') {
+        Object.assign(d.parameters, { Distance: '40', SecondSide: '15' });
+        for (let extent = 0; extent < 3; extent++) {
+            const x = extent * 70, p = profile('Source plane ' + (extent + 1), [V3(x,0),V3(x+40,0),V3(x+40,30),V3(x,30)]);
+            feature('extrude', { height: 'Distance', extent, distance2: 'SecondSide' }, [p], ['One side', 'Symmetric total', 'Two independent sides'][extent]);
+        }
+    }
+    else if (id === 'face-boss') {
+        const b = feature('box', { width:80, depth:60, height:15 }, [], 'Fixture base');
+        const p = profileOnFace3(b, 1, { shape:'rectangle', width:30, height:20 }); p.label = 'Native top-face profile'; d.entities.push(p);
+        feature('extrude', { height:25, operation:1, useNormal:1 }, [p,b], 'Joined mounting boss');
+    }
+    else if (id === 'bracket') {
         Object.assign(d.parameters, { Width: '100', Depth: '65', Thickness: '8', Rise: '65', HoleRadius: '6' });
         const foot = feature('box', { width: 'Width', depth: 'Depth', height: 'Thickness' }, [], 'Foot plate');
         const back = feature('box', { width: 'Width', depth: 'Thickness', height: 'Rise', y: 'Depth-Thickness' }, [], 'Upright');
@@ -2893,7 +3080,234 @@ const {controlPoints3:controls, setControlPoint3:setControl} = __modules["packag
 const controlPoints3 = controls;
 const setControlPoint3 = setControl;
 
-return {MODELING_TOOLS,curvePoints3,regenerateFeatures,addFeature,editFeature,removeFeature,bakeFeature,offsetPlanarFace,sectionEntities,writeOBJ,writeSTL,EXAMPLES_3D,create3DExample,controlPoints3,setControlPoint3};
+const {faceFrame3:frame, facePoint3:point, faceCoordinates3:coords, profileOnFace3:profile, holeTool3:holeTool, drillHole3:drill, extrudeExtent3:extent, combineExtrusion3:combine} = __modules["packages/modeling/src/authoring.js"];
+const faceFrame3 = frame;
+const facePoint3 = point;
+const faceCoordinates3 = coords;
+const profileOnFace3 = profile;
+const holeTool3 = holeTool;
+const drillHole3 = drill;
+const extrudeExtent3 = extent;
+const combineExtrusion3 = combine;
+
+return {MODELING_TOOLS,curvePoints3,regenerateFeatures,addFeature,editFeature,removeFeature,bakeFeature,offsetPlanarFace,sectionEntities,writeOBJ,writeSTL,EXAMPLES_3D,create3DExample,controlPoints3,setControlPoint3,faceFrame3,facePoint3,faceCoordinates3,profileOnFace3,holeTool3,drillHole3,extrudeExtent3,combineExtrusion3};
+})();
+// packages/workbench/src/icons.js
+__modules["packages/workbench/src/icons.js"]=(()=>{
+const paths = {
+    arc: 'M3 18A9 9 0 0 1 21 18 M2 16h3v4H2z M19 16h3v4h-3z',
+    ellipse: 'M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M12 4v16 M2 12h20',
+    spline: 'M3 18C5-3 18 28 21 6 M3 18 7 3 M17 21l4-15 M5 1h4v4H5z M15 19h4v4h-4z',
+    polygon: 'M12 2l9 5v10l-9 5-9-5V7z',
+    donut: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M17 12a5 5 0 1 0-10 0 5 5 0 0 0 10 0',
+    solid: 'M3 20 9 3l12 14-18 3 M5 16l5-11 M8 19l5-11 M12 18l4-6 M16 17l2-2',
+    hatch: 'M3 3h18v18H3z M3 11l8-8 M3 19 19 3 M9 21 21 9 M17 21l4-4',
+    wipeout: 'M3 5h18v14H3z M8 9l8 6 M16 9l-8 6',
+    point: 'M12 3v7 M12 14v7 M3 12h7 M14 12h7 M12 12h.01',
+    ray: 'M3 19 21 1 M2 17h4v4H2z M15 1h6v6',
+    xline: 'M2 22 22 2 M2 15v7h7 M15 2h7v7',
+    mtext: 'M3 4h18 M3 9h18 M3 14h14 M3 19h10',
+    leader: 'M3 20l9-12h10 M3 14v6h6',
+
+    logo: 'M5 5h6v6H5z M19 13h6v6h-6z M5 21h6v6H5z M11 8h5a6 6 0 0 1 6 5 M8 11v10 M11 24h5a6 6 0 0 0 6-5',
+    select: 'm5 3 14 11-7 1-4 7Z', pan: 'M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-2-7-5l-3-5a2 2 0 0 1 3-2l3 3',
+    line: 'M5 19 19 5 M3 17h4v4H3z M17 3h4v4h-4z', polyline: 'M4 18 9 5l7 11 5-10 M2 16h4v4H2z M7 3h4v4H7z M14 14h4v4h-4z',
+    connect: 'M3 7h5v5h8v5h5 M1 5h4v4H1z M19 15h4v4h-4z', rect: 'M4 5h16v14H4z', circle: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 9v6 M9 12h6', text: 'M4 5h16 M12 5v15 M8 20h8 M4 5v3 M20 5v3',
+    undo: 'M9 5 4 10l5 5 M4 10h10a6 6 0 0 1 0 12', redo: 'm15 5 5 5-5 5 M20 10H10a6 6 0 0 0 0 12',
+    folder: 'M3 6h7l2 3h9v11H3z M3 6V4h7l2 2h8v3', export: 'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7', save: 'M4 3h13l4 4v14H3V3z M7 3v6h10V3 M7 21v-8h10v8',
+    plus: 'M12 5v14 M5 12h14', minus: 'M5 12h14', close: 'M5 5l14 14 M19 5 5 19', chevron: 'm8 4 8 8-8 8', down: 'm5 9 7 7 7-7', search: 'M16 10a6 6 0 1 1-12 0 6 6 0 0 1 12 0 M15 15l6 6',
+    layers: 'm12 3 10 5-10 5L2 8z M2 12l10 5 10-5 M2 17l10 5 10-5', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0', lock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0v4', unlock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0',
+    properties: 'M4 7h16 M4 17h16 M8 4v6 M16 14v6', grid: 'M4 4h16v16H4z M4 12h16 M12 4v16', snap: 'M5 4v10a7 7 0 0 0 14 0V4h-4v10a3 3 0 0 1-6 0V4z M5 8h4 M15 8h4', ortho: 'M5 4v16h15 M5 15h5v5',
+    fit: 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M8 21H3v-5 M8 8h8v8H8z', more: 'M5 12h.01 M12 12h.01 M19 12h.01', trash: 'M4 6h16 M9 6V3h6v3 M6 6l1 15h10l1-15 M10 10v7 M14 10v7', copy: 'M8 8h13v13H8z M4 16H2V2h14v2', rotate: 'M4 11a8 8 0 1 1 3 7 M4 4v7h7',
+    symbols: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M17.5 13l5 4.5-5 4.5-5-4.5z', dimension: 'M4 3v18 M20 3v18 M4 12h16 m-11-4-5 4 5 4 m6-8 5 4-5 4', ruler: 'm3 17 14-14 4 4L7 21z M7 13l3 3 M11 9l3 3 M15 5l3 3',
+    check: 'm4 12 5 5L20 6', warning: 'm12 3 10 18H2z M12 9v5 M12 17h.01', help: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M9 8a3 3 0 0 1 6 0c0 3-3 2-3 5 M12 17h.01',
+    bolt: 'm13 2-9 12h7l-1 8 10-13h-7z', code: 'm8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18', command: 'M8 8H5a3 3 0 1 1 3-3v14a3 3 0 1 1-3-3h14a3 3 0 1 1-3 3V5a3 3 0 1 1 3 3z',
+    param: 'M3 6h18 M5 12h14 M7 18h10 M8 3v6 M16 9v6 M12 15v6', offset: 'M3 18 9 6h12 M7 21l6-11h10', trim: 'M4 4 20 20 M4 20 20 4 M12 4v16', fillet: 'M4 20V10a6 6 0 0 1 6-6h10', extend: 'M3 20 21 2 M13 3h8v8 M3 13v7h7',
+    new: 'M14 2H4v20h16V8z M14 2v6h6 M8 15h8 M12 11v8', screen: 'M3 4h18v14H3z M8 22h8 M12 18v4', touch: 'M8 12V5a2 2 0 0 1 4 0v6l5-1 4 3-2 7H9l-6-7 2-2 3 3', graph: 'M5 5h5v5H5z M15 15h5v5h-5z M5 17h5v5H5z M10 8h7v7 M7 10v7', arrow: 'M4 12h16 M14 6l6 6-6 6',
+};
+function icon(name, cls = '') { return `<svg class="icon ${cls}" viewBox="0 0 ${name === 'logo' ? 32 : 24} ${name === 'logo' ? 32 : 24}" fill="none" stroke="currentColor" stroke-width="${name === 'more' ? 3 : 1.65}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.rect}"/></svg>`; }
+function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+return {icon,escapeHTML};
+})();
+// packages/workbench/src/authoring-workbench.js
+__modules["packages/workbench/src/authoring-workbench.js"]=(()=>{
+const {MODELING_TOOLS, addFeature, editFeature, faceFrame3, faceCoordinates3, profileOnFace3} = __modules["packages/modeling/src/index.js"];
+const {isLocked} = __modules["packages/model/src/index.js"];
+const {escapeHTML:E} = __modules["packages/workbench/src/icons.js"];
+const button = (action, label, extra = '') => `<button type="button" data-action="${E(action)}" ${extra}>${E(label)}</button>`;
+function fields3(values) {
+    return values.map(f => `<label class="field" data-model-row="${E(f.name)}">${E(f.label)}${f.options
+        ? `<select data-model-field="${E(f.name)}">${f.options.some((_, i) => String(f.value) === String(i)) ? '' : `<option value="${E(String(f.value))}" selected>Expression: ${E(String(f.value))}</option>`}${f.options.map((label, i) => `<option value="${i}" ${String(f.value) === String(i) ? 'selected' : ''}>${E(label)}</option>`).join('')}</select>`
+        : `<input data-model-field="${E(f.name)}" value="${E(String(f.value ?? ''))}" autocomplete="off" spellcheck="false">`}</label>`).join('');
+}
+const isProfile = e => ['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE'].includes(e.type);
+function options(entities, chosen) {
+    return entities.map(e => `<option value="${E(e.id)}" ${e.id === chosen ? 'selected' : ''}>${E(e.label || e.type + ' ' + e.id)}${e.model3dConsumed ? ' · history input' : ''}</option>`).join('');
+}
+
+function readOperation3(m) {
+    const modal = m.w.modal;
+    if (!modal) throw new Error('No modeling dialog');
+    const parameters = Object.fromEntries([...modal.querySelectorAll('[data-model-field]')].map(e => [e.dataset.modelField, e.value]));
+    const inputs = [...modal.querySelectorAll('[data-model-input]')].map(e => e.value);
+    if (m.operation?.kind === 'extrude' && m.w.eval(parameters.operation)) inputs.push(modal.querySelector('[data-model-target]')?.value || '');
+    return { parameters, inputs, name: modal.querySelector('[data-model-name]')?.value || 'Feature', reattach: !!modal.querySelector('[data-model-reattach]')?.checked };
+}
+
+/** A single inspector form for desktop and touch; preview and apply share the exact evaluator. */
+function openOperation3(m, kind, id = null) {
+    const w = m.w, tool = MODELING_TOOLS.find(t => t.id === kind), doc = w.doc;
+    if (!tool) throw new Error('Unknown modeling tool');
+    const existing = id ? doc.entities.find(e => e.id === id) : null;
+    if (id && !existing?.feature3d) throw new Error('Feature no longer exists');
+    if (existing && isLocked(existing, doc)) throw new Error('The selected body is locked');
+    const candidates = doc.entities.filter(e => e.id !== id && !e.feature3d?.suppressed &&
+        (['extrude', 'revolve', 'loft'].includes(kind) ? isProfile(e) : kind === 'sweep' ? isProfile(e) || e.type === 'LINE' : e.type === 'MESH'));
+    const selected = [...w.selection].filter(id => candidates.some(e => e.id === id));
+    const count = tool.multiple ? Math.max(tool.inputs, selected.length, existing?.feature3d.inputs.length || 0) : tool.inputs || 0;
+    const chosenInputs = Array.from({ length: count }, (_, i) => existing?.feature3d.inputs[i] || selected[i] || candidates[i]?.id);
+    const names = kind === 'subtract' ? ['Target body', 'Cutting body'] : kind === 'sweep' ? ['Profile', 'Path'] : kind === 'hole' ? ['Target body'] : ['extrude', 'revolve'].includes(kind) ? ['Profile'] : [];
+    const inputs = chosenInputs.map((chosen, i) => `<label class="field">${names[i] || 'Input ' + (i + 1)}<select data-model-input>${options(candidates, chosen)}</select></label>`).join('');
+    const inputFields = tool.fields.map(f => ({ ...f, value: existing?.feature3d.parameters?.[f.name] ?? f.value }));
+    if (!count) for (const axis of ['x', 'y', 'z']) inputFields.push({ name: axis, label: 'Position ' + axis.toUpperCase(), value: existing?.feature3d.parameters?.[axis] ?? 0 });
+    const set = (name, value) => { const f = inputFields.find(f => f.name === name); if (f) f.value = value; };
+    if (!id && kind === 'extrude') set('useNormal', 1);
+    if (!id && ['offset-face', 'hole'].includes(kind) && m.hit?.id === chosenInputs[0] && m.hit.face !== undefined) {
+        set('face', m.hit.face);
+        if (kind === 'hole') {
+            const uv = faceCoordinates3(faceFrame3(candidates.find(e => e.id === m.hit.id), m.hit.face), m.hit.point);
+            set('u', Number(uv.u.toPrecision(12))); set('v', Number(uv.v.toPrecision(12)));
+        }
+    }
+    const bodies = doc.entities.filter(e => e.type === 'MESH' && e.id !== id && !e.feature3d?.suppressed);
+    const target = existing?.feature3d.inputs[1] || [...w.selection].find(id => bodies.some(e => e.id === id)) || bodies.find(e => !e.model3dConsumed)?.id;
+    const targetField = kind === 'extrude' ? `<label class="field" data-model-target-row>Target body<select data-model-target><option value="">Select target…</option>${options(bodies, target)}</select></label>` : '';
+    const help = kind === 'extrude' ? 'Choose a profile, extent and operation. Symmetric distance is the total length. Cut/Join/Intersect requires a target mesh.'
+        : kind === 'hole' ? 'Pick a planar face first, or choose its index. U/V offsets are measured from the face center along its local axes. Through all follows target thickness.'
+        : 'Numeric fields accept design parameter expressions. Apply commits a single undoable feature.';
+    w.openModal((id ? 'Edit ' : 'Create ') + tool.label,
+        `<p class="model3d-operation-help">${E(help)}</p>${inputs}<div class="model3d-fields">${fields3(inputFields)}</div>${targetField}
+        ${existing?.feature3d.attachment ? '<label class="model3d-reattach"><input type="checkbox" data-model-reattach> Reattach to the current face topology</label>' : ''}
+        <label class="field">Feature name<input data-model-name value="${E(existing?.label || tool.label)}"></label>
+        ${button('3d-preview', 'Preview without saving', 'class="btn"')}<div class="model3d-preview-state" role="status">Not applied</div><div class="error-text" role="alert"></div>`,
+        { confirm: id ? 'Apply feature edit' : 'Create feature', onConfirm: () => {
+            if (w.doc !== doc) throw new Error('The active drawing changed; reopen the operation');
+            const values = m.readOperation(); let result;
+            w.edit(id ? 'Edit 3D feature' : 'Create ' + tool.label, () => {
+                result = id ? editFeature(w.doc, id, values) : addFeature(w.doc, kind, values.parameters, values.inputs, { name: values.name, color: w.selected()[0]?.color });
+                w.selection = new Set([result.id]);
+            });
+            w.closeModal(); m.hit = null; m.sync();
+            // Preserve view while modifying an existing body; only new standalone bodies refit.
+            if (!id && !w.eval(values.parameters.operation ?? 0) && kind !== 'hole') { m.renderer.fit(); m.saveView(); }
+        } });
+    m.operation = { kind, id };
+    w.modal.querySelector('.modal').classList.add('model3d-operation-dialog');
+    const updateFields = () => {
+        const value = n => { try { return w.eval(w.modal?.querySelector(`[data-model-field="${n}"]`)?.value); } catch { return NaN; } };
+        const visible = (name, shown) => { const el = w.modal?.querySelector(`[data-model-row="${name}"]`); if (el) el.hidden = !shown; };
+        if (kind === 'extrude') {
+            visible('distance2', value('extent') === 2);
+            for (const axis of ['nx', 'ny', 'nz']) visible(axis, value('useNormal') === 0);
+            w.modal.querySelector('[data-model-target-row]').hidden = !value('operation');
+        }
+        if (kind === 'hole') {
+            visible('depth', !value('through'));
+            visible('counterDiameter', value('holeType') !== 0);
+            visible('counterDepth', value('holeType') === 1);
+            visible('sinkAngle', value('holeType') === 2);
+        }
+    };
+    const invalidate = () => {
+        updateFields();
+        const operation = m.operation;
+        if (m.previewDocument) { m.clearPreview(); m.operation = operation; }
+        const state = w.modal?.querySelector('.model3d-preview-state');
+        if (state) state.textContent = 'Changed · Preview or Apply to evaluate';
+    };
+    w.modal.addEventListener('input', invalidate); w.modal.addEventListener('change', invalidate);
+    updateFields();
+}
+
+function selectionToolbar3() {
+    return `<div class="model3d-selection-tools" role="toolbar" aria-label="3D selection and navigation">
+        ${['body', 'face', 'vertex'].map(mode => button('3d-pick:' + mode, mode[0].toUpperCase() + mode.slice(1), `aria-pressed="${mode === 'body'}"`)).join('')}
+        ${button('3d-nav-toggle', 'Orbit', 'aria-label="Toggle orbit or pan navigation"')}
+        ${button('3d-multi', 'Multi', 'aria-pressed="false"')}${button('3d-clear', 'Clear', 'aria-label="Clear 3D selection"')}
+        </div>`;
+}
+
+function syncAuthoring3(m) {
+    const w = m.w, items = w.selected(), one = items.length === 1 ? items[0] : null;
+    const face = one?.type === 'MESH' && m.hit?.id === one.id && m.hit?.face !== undefined && m.pickMode === 'face';
+    for (const mode of ['body', 'face', 'vertex']) m.stage.querySelector(`[data-action="3d-pick:${mode}"]`)?.setAttribute('aria-pressed', String(m.pickMode === mode));
+    const nav = m.stage.querySelector('[data-action="3d-nav-toggle"]');
+    if (nav) { nav.textContent = m.navigation === 'pan' ? 'Pan' : 'Orbit'; nav.setAttribute('aria-pressed', String(m.navigation === 'pan')); }
+    m.stage.querySelector('[data-action="3d-multi"]')?.setAttribute('aria-pressed', String(w.multi));
+    const hint = m.stage.querySelector('.model3d-hint');
+    const gesture = m.navigation === 'pan' ? 'pan' : 'orbit';
+    if (hint) hint.textContent = `Drag to ${gesture} · two fingers pan / pinch · tap to select ${m.pickMode}`;
+    m.host?.setAttribute('aria-label', `3D CAD model. Drag to ${gesture}, two fingers pan and zoom; tap to select ${m.pickMode}.`);
+    const context = m.stage.querySelector('.model3d-context');
+    const actions = face ? [['3d-face-profile', 'Sketch on face'], ['3d-op-hole', 'Hole'], ['3d-op-offset-face', 'Press / pull'], ['3d-look-face', 'Look at face']]
+        : one && isProfile(one) ? [['3d-op-extrude', 'Extrude'], ['3d-op-revolve', 'Revolve'], ['3d-vertex', 'Edit profile']]
+        : one?.type === 'MESH' ? [['3d-op-transform', 'Move'], ['3d-pick:face', 'Select face'], ['3d-visibility', one.hidden ? 'Show body' : 'Hide body']]
+        : items.filter(e => e.type === 'MESH').length === 2 ? [['3d-op-union', 'Join'], ['3d-op-subtract', 'Cut'], ['3d-op-intersect', 'Intersect']]
+        : [['3d-sketch', 'Create profile'], ['3d-op-box', 'Box'], ['3d-op-cylinder', 'Cylinder']];
+    const label = face ? 'Face ' + m.hit.face : one ? one.label || one.type : items.length ? items.length + ' selected' : 'Start modeling';
+    const html = `<span class="model3d-selection-label" title="${E(label)}">${E(label)}</span>${actions.map(([a, b]) => button(a, b)).join('')}`;
+    if (context && context.innerHTML !== html) context.innerHTML = html;
+    for (const action of ['3d-edit', '3d-op-transform', '3d-measure']) {
+        const b = m.stage.querySelector(`.model3d-dock [data-action="${action}"]`);
+        if (b) b.disabled = action === '3d-op-transform' ? one?.type !== 'MESH' : action === '3d-edit' ? !one : false;
+    }
+}
+
+function faceProfileDialog3(m) {
+    const w = m.w, target = w.selected()[0], hit = m.hit;
+    if (w.selection.size !== 1 || target?.type !== 'MESH' || hit?.id !== target.id || hit.face === undefined) throw new Error('Select one planar mesh face first');
+    const uv = faceCoordinates3(faceFrame3(target, hit.face), hit.point);
+    w.openModal('Sketch profile on selected face', `<p>Create a native face-aligned profile, then Extrude it. This profile is a snapshot, not an associative sketch-on-face constraint.</p>
+        <label class="field">Shape<select id="face-profile-shape"><option value="rectangle">Rectangle</option><option value="circle">Circle</option></select></label>
+        ${fields3([{ name: 'width', label: 'Width', value: 30 }, { name: 'height', label: 'Height', value: 20 }, { name: 'radius', label: 'Circle radius', value: 10 }, { name: 'u', label: 'Face U offset', value: uv.u }, { name: 'v', label: 'Face V offset', value: uv.v }, { name: 'offset', label: 'Normal offset', value: 0 }])}<div class="error-text" role="alert"></div>`,
+        { confirm: 'Create profile', onConfirm: () => {
+            const values = Object.fromEntries([...w.modal.querySelectorAll('[data-model-field]')].map(e => [e.dataset.modelField, w.eval(e.value)]));
+            const profile = profileOnFace3(target, hit.face, { ...values, shape: w.modal.querySelector('#face-profile-shape').value });
+            w.edit('Create face-aligned profile', () => { w.doc.entities.push(profile); w.selection = new Set([profile.id]); });
+            w.closeModal(); m.hit = null; m.sync();
+        } });
+    const update = () => {
+        const round = w.modal.querySelector('#face-profile-shape').value === 'circle';
+        for (const field of ['width', 'height', 'radius']) w.modal.querySelector(`[data-model-row="${field}"]`).hidden = field === 'radius' ? !round : round;
+    };
+    w.modal.querySelector('#face-profile-shape').addEventListener('change', update); update();
+    w.modal.querySelector('.modal').classList.add('model3d-operation-dialog');
+}
+
+function authoringAction3(m, action) {
+    const w = m.w;
+    if (action.startsWith('3d-pick:')) {
+        const mode = action.slice(8); if (!['body', 'face', 'vertex'].includes(mode)) throw new Error('Unknown selection mode');
+        m.pickMode = mode; m.hit = null; m.renderer.marker = null; m.selectionChanged(); m.renderInspector();
+    } else if (action === '3d-clear') {
+        w.selection.clear(); m.hit = null; m.renderer.marker = null; w.updateSelection();
+    } else if (action === '3d-nav-toggle') m.navigation = m.navigation === 'pan' ? 'orbit' : 'pan';
+    else if (action === '3d-face-profile') faceProfileDialog3(m);
+    else if (action === '3d-look-face') {
+        const e = w.selected()[0]; if (e?.type !== 'MESH' || m.hit?.id !== e.id || m.hit.face === undefined) throw new Error('Select a planar face');
+        const frame = faceFrame3(e, m.hit.face);
+        m.camera.target = { ...frame.origin }; m.camera.yaw = Math.atan2(frame.normal.y, frame.normal.x);
+        m.camera.pitch = Math.max(-Math.PI / 2 + 1e-6, Math.min(Math.PI / 2 - 1e-6, Math.asin(frame.normal.z)));
+        m.camera.perspective = false; m.changedView(); m.saveView();
+    } else if (action === '3d-visibility') {
+        const e = w.selected()[0]; if (!e || isLocked(e, w.doc)) throw new Error('Select an unlocked body');
+        w.edit(e.hidden ? 'Show 3D body' : 'Hide 3D body', () => { w.doc.entities.find(q => q.id === e.id).hidden = !e.hidden; });
+    } else return false;
+    syncAuthoring3(m); return true;
+}
+
+return {fields3,readOperation3,openOperation3,selectionToolbar3,syncAuthoring3,faceProfileDialog3,authoringAction3};
 })();
 // packages/renderer3d/src/camera.js
 __modules["packages/renderer3d/src/camera.js"]=(()=>{
@@ -3813,46 +4227,9 @@ function downloadFile(filename, contents, type = 'application/octet-stream') { c
 
 return {ProjectStore,downloadFile};
 })();
-// packages/workbench/src/icons.js
-__modules["packages/workbench/src/icons.js"]=(()=>{
-const paths = {
-    arc: 'M3 18A9 9 0 0 1 21 18 M2 16h3v4H2z M19 16h3v4h-3z',
-    ellipse: 'M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0 M12 4v16 M2 12h20',
-    spline: 'M3 18C5-3 18 28 21 6 M3 18 7 3 M17 21l4-15 M5 1h4v4H5z M15 19h4v4h-4z',
-    polygon: 'M12 2l9 5v10l-9 5-9-5V7z',
-    donut: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M17 12a5 5 0 1 0-10 0 5 5 0 0 0 10 0',
-    solid: 'M3 20 9 3l12 14-18 3 M5 16l5-11 M8 19l5-11 M12 18l4-6 M16 17l2-2',
-    hatch: 'M3 3h18v18H3z M3 11l8-8 M3 19 19 3 M9 21 21 9 M17 21l4-4',
-    wipeout: 'M3 5h18v14H3z M8 9l8 6 M16 9l-8 6',
-    point: 'M12 3v7 M12 14v7 M3 12h7 M14 12h7 M12 12h.01',
-    ray: 'M3 19 21 1 M2 17h4v4H2z M15 1h6v6',
-    xline: 'M2 22 22 2 M2 15v7h7 M15 2h7v7',
-    mtext: 'M3 4h18 M3 9h18 M3 14h14 M3 19h10',
-    leader: 'M3 20l9-12h10 M3 14v6h6',
-
-    logo: 'M5 5h6v6H5z M19 13h6v6h-6z M5 21h6v6H5z M11 8h5a6 6 0 0 1 6 5 M8 11v10 M11 24h5a6 6 0 0 0 6-5',
-    select: 'm5 3 14 11-7 1-4 7Z', pan: 'M8 12V6a2 2 0 0 1 4 0v5-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8c0 4-3 7-7 7h-1c-3 0-5-2-7-5l-3-5a2 2 0 0 1 3-2l3 3',
-    line: 'M5 19 19 5 M3 17h4v4H3z M17 3h4v4h-4z', polyline: 'M4 18 9 5l7 11 5-10 M2 16h4v4H2z M7 3h4v4H7z M14 14h4v4h-4z',
-    connect: 'M3 7h5v5h8v5h5 M1 5h4v4H1z M19 15h4v4h-4z', rect: 'M4 5h16v14H4z', circle: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M12 9v6 M9 12h6', text: 'M4 5h16 M12 5v15 M8 20h8 M4 5v3 M20 5v3',
-    undo: 'M9 5 4 10l5 5 M4 10h10a6 6 0 0 1 0 12', redo: 'm15 5 5 5-5 5 M20 10H10a6 6 0 0 0 0 12',
-    folder: 'M3 6h7l2 3h9v11H3z M3 6V4h7l2 2h8v3', export: 'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7', save: 'M4 3h13l4 4v14H3V3z M7 3v6h10V3 M7 21v-8h10v8',
-    plus: 'M12 5v14 M5 12h14', minus: 'M5 12h14', close: 'M5 5l14 14 M19 5 5 19', chevron: 'm8 4 8 8-8 8', down: 'm5 9 7 7 7-7', search: 'M16 10a6 6 0 1 1-12 0 6 6 0 0 1 12 0 M15 15l6 6',
-    layers: 'm12 3 10 5-10 5L2 8z M2 12l10 5 10-5 M2 17l10 5 10-5', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12 M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0', lock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0v4', unlock: 'M6 10h12v11H6z M8 10V6a4 4 0 0 1 8 0',
-    properties: 'M4 7h16 M4 17h16 M8 4v6 M16 14v6', grid: 'M4 4h16v16H4z M4 12h16 M12 4v16', snap: 'M5 4v10a7 7 0 0 0 14 0V4h-4v10a3 3 0 0 1-6 0V4z M5 8h4 M15 8h4', ortho: 'M5 4v16h15 M5 15h5v5',
-    fit: 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M8 21H3v-5 M8 8h8v8H8z', more: 'M5 12h.01 M12 12h.01 M19 12h.01', trash: 'M4 6h16 M9 6V3h6v3 M6 6l1 15h10l1-15 M10 10v7 M14 10v7', copy: 'M8 8h13v13H8z M4 16H2V2h14v2', rotate: 'M4 11a8 8 0 1 1 3 7 M4 4v7h7',
-    symbols: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M17.5 13l5 4.5-5 4.5-5-4.5z', dimension: 'M4 3v18 M20 3v18 M4 12h16 m-11-4-5 4 5 4 m6-8 5 4-5 4', ruler: 'm3 17 14-14 4 4L7 21z M7 13l3 3 M11 9l3 3 M15 5l3 3',
-    check: 'm4 12 5 5L20 6', warning: 'm12 3 10 18H2z M12 9v5 M12 17h.01', help: 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0 M9 8a3 3 0 0 1 6 0c0 3-3 2-3 5 M12 17h.01',
-    bolt: 'm13 2-9 12h7l-1 8 10-13h-7z', code: 'm8 6-6 6 6 6 M16 6l6 6-6 6 M14 3l-4 18', command: 'M8 8H5a3 3 0 1 1 3-3v14a3 3 0 1 1-3-3h14a3 3 0 1 1-3 3V5a3 3 0 1 1 3 3z',
-    param: 'M3 6h18 M5 12h14 M7 18h10 M8 3v6 M16 9v6 M12 15v6', offset: 'M3 18 9 6h12 M7 21l6-11h10', trim: 'M4 4 20 20 M4 20 20 4 M12 4v16', fillet: 'M4 20V10a6 6 0 0 1 6-6h10', extend: 'M3 20 21 2 M13 3h8v8 M3 13v7h7',
-    new: 'M14 2H4v20h16V8z M14 2v6h6 M8 15h8 M12 11v8', screen: 'M3 4h18v14H3z M8 22h8 M12 18v4', touch: 'M8 12V5a2 2 0 0 1 4 0v6l5-1 4 3-2 7H9l-6-7 2-2 3 3', graph: 'M5 5h5v5H5z M15 15h5v5h-5z M5 17h5v5H5z M10 8h7v7 M7 10v7', arrow: 'M4 12h16 M14 6l6 6-6 6',
-};
-function icon(name, cls = '') { return `<svg class="icon ${cls}" viewBox="0 0 ${name === 'logo' ? 32 : 24} ${name === 'logo' ? 32 : 24}" fill="none" stroke="currentColor" stroke-width="${name === 'more' ? 3 : 1.65}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.rect}"/></svg>`; }
-function escapeHTML(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-
-return {icon,escapeHTML};
-})();
 // packages/workbench/src/modeling-workbench.js
 __modules["packages/workbench/src/modeling-workbench.js"]=(()=>{
+const {fields3, openOperation3, readOperation3, selectionToolbar3, syncAuthoring3, authoringAction3} = __modules["packages/workbench/src/authoring-workbench.js"];
 const {V3, add3, sub3, mul3, dot3, unit3, distance3, bounds3, meshProperties, validateMesh, triangles3} = __modules["packages/geometry3d/src/index.js"];
 const {MODELING_TOOLS, EXAMPLES_3D, create3DExample, addFeature, editFeature, removeFeature, bakeFeature, regenerateFeatures, sectionEntities, writeOBJ, writeSTL, controlPoints3, setControlPoint3} = __modules["packages/modeling/src/index.js"];
 const {SpatialRenderer, OrbitCamera} = __modules["packages/renderer3d/src/index.js"];
@@ -3862,7 +4239,7 @@ const {downloadFile} = __modules["packages/storage/src/index.js"];
 const {escapeHTML:E, icon} = __modules["packages/workbench/src/icons.js"];
 const button = (action, label, cls = '') => `<button type="button" class="${cls}" data-action="${E(action)}">${E(label)}</button>`;
 const format = n => Number.isFinite(n) ? Number(n.toPrecision(7)).toString() : '—';
-function fields(values) { return values.map(f => `<label class="field">${E(f.label)}<input data-model-field="${E(f.name)}" value="${E(String(f.value ?? ''))}" autocomplete="off" spellcheck="false"></label>`).join(''); }
+const fields = fields3;
 function xyz(source, evaluate) { const parts = []; let depth = 0, from = 0; for (let i = 0; i < source.length; i++) {
     if (source[i] === '(')
         depth++;
@@ -3887,8 +4264,19 @@ class ModelingWorkbench {
         this.stage = document.createElement('div');
         this.stage.className = 'model3d-stage';
         this.stage.hidden = true;
-        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div><div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', '＋ Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', '＋ Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        const dock = this.stage.querySelector('.model3d-dock');
+        dock.insertBefore(this.stage.querySelector('.model3d-context'), dock.children[1]);
         workbench.$('.canvas-area').append(this.stage);
+        this.stage.querySelector('.model3d-timeline').addEventListener('dblclick', event => { if (event.target.closest('[data-action^="3d-select:"]')) this.action('3d-edit').catch(error => workbench.toast(error.message, true)); }, { signal: workbench.abort.signal });
+        this.stage.querySelector('.model3d-timeline').addEventListener('keydown', event => {
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const items = [...this.stage.querySelectorAll('.model3d-feature')], index = items.indexOf(document.activeElement);
+            if (index < 0) return;
+            event.preventDefault(); event.stopPropagation();
+            const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1 : Math.max(0, Math.min(items.length - 1, index + (event.key === 'ArrowRight' ? 1 : -1)));
+            items[next]?.focus({ preventScroll: true }); items[next]?.scrollIntoView({ block:'nearest', inline:'nearest' });
+        }, { signal: workbench.abort.signal });
         this.host = this.stage.querySelector('.viewport3d');
         this.input = new PointerController(this.host, { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), cancel: () => this.cancelDrag(), gesture: ({ scale, dx, dy }) => { this.camera.zoom(scale); this.camera.pan(dx, dy); this.changedView(); }, gestureEnd: () => this.saveView(), wheel: p => { this.camera.zoom(Math.exp(-p.deltaY * .0015)); this.changedView(); this.saveView(); } });
         this.host.addEventListener('dblclick', () => this.fitSelection(), { signal: workbench.abort.signal });
@@ -3957,12 +4345,28 @@ class ModelingWorkbench {
         if (docChanged && !w.model3dCamera)
             this.renderer.fit();
         this.stage.querySelector('.model3d-info').textContent = this.renderer.scene.diagnostics.length ? `${this.renderer.scene.diagnostics.length} spatial display notice(s) · Inspect for details` : this.previewDocument ? 'PREVIEW · not committed' : `${w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed && !e.hidden).length} visible mesh bodies`;
-        this.stage.querySelector('.model3d-timeline').innerHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`)).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
+        const timeline = this.stage.querySelector('.model3d-timeline');
+        const timelineHTML = w.doc.entities.filter(e => e.feature3d).map((e, i) => button('3d-select:' + e.id, `${i + 1} ${e.label || e.feature3d.kind}`, `model3d-feature ${w.selection.has(e.id) ? 'active' : ''} ${e.feature3d.suppressed ? 'suppressed' : ''}`)).join('') || '<span class="quiet">Create a primitive or extrude a 2D profile to begin feature history.</span>';
+        const timelineKey = JSON.stringify([w.doc.id, w.doc.entities.filter(e => e.feature3d).map(e => [e.id, e.label, e.feature3d.kind, !!e.feature3d.suppressed, w.selection.has(e.id)])]);
+        if (timeline.dataset.key !== timelineKey) {
+            timeline.dataset.key = timelineKey;
+            const left = timeline.scrollLeft, focus = document.activeElement?.closest('.model3d-feature')?.dataset.action;
+            timeline.innerHTML = timelineHTML; timeline.scrollLeft = left;
+            if (focus) [...timeline.children].find(el => el.dataset.action === focus)?.focus({ preventScroll: true });
+        }
+        for (const item of timeline.querySelectorAll('.model3d-feature')) item.setAttribute('aria-pressed', String(item.classList.contains('active')));
+        const selectedKey = [...w.selection].join('|');
+        if (selectedKey !== this.lastTimelineSelection) {
+            this.lastTimelineSelection = selectedKey;
+            const active = timeline.querySelector('.active');
+            if (active) { const a = active.getBoundingClientRect(), b = timeline.getBoundingClientRect(); if (a.left < b.left) timeline.scrollLeft += a.left - b.left; else if (a.right > b.right) timeline.scrollLeft += a.right - b.right; }
+        }
+        syncAuthoring3(this);
         this.stage.querySelector('[data-action="3d-undo"]').disabled = !w.history.canUndo;
         this.stage.querySelector('[data-action="3d-redo"]').disabled = !w.history.canRedo;
     }
     selectionChanged() { if (!this.active)
-        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); }
+        return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); syncAuthoring3(this); }
     clearPreview() { const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
@@ -3970,7 +4374,7 @@ class ModelingWorkbench {
         this.sync(); }
     selectionCenter() { const points = this.renderer?.scene.items.filter(i => this.w.selection.has(i.id)).flatMap(i => i.points) || []; if (!points.length)
         return null; const b = bounds3(points); return mul3(add3(b.min, b.max), .5); }
-    gizmo() { const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode === 'vertex')
+    gizmo() { const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
         return []; if (isLocked(this.w.selected()[0], this.w.doc))
         return []; const length = this.camera.height * .15; return [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)].map((axis, i) => ({ origin, axis, label: ['X', 'Y', 'Z'][i], color: ['#c46655', '#448f71', '#4d81b8'][i], a: this.camera.project(origin), b: this.camera.project(add3(origin, mul3(axis, length))) })); }
     drawGizmo(ctx) { for (const g of this.gizmo()) {
@@ -3991,7 +4395,7 @@ class ModelingWorkbench {
     } }
     axisParameter(p, axis, origin) { const r = this.camera.ray(p.x, p.y), o = sub3(r.origin, origin), ad = dot3(axis, r.direction), den = 1 - ad * ad; if (den < 1e-8)
         throw new Error('This axis is parallel to the camera; use exact coordinates or orbit first'); return (dot3(axis, o) - ad * dot3(r.direction, o)) / den; }
-    pointerDown(p) { this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
+    pointerDown(p) { this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
         const dx = g.b.x - g.a.x, dy = g.b.y - g.a.y, den = dx * dx + dy * dy, t = den ? ((p.x - g.a.x) * dx + (p.y - g.a.y) * dy) / den : 0;
         if (t > .2 && t < 1.25 && Math.hypot(g.a.x + dx * t - p.x, g.a.y + dy * t - p.y) < 12) {
             try {
@@ -4006,6 +4410,8 @@ class ModelingWorkbench {
     pointerMove(p) {
         if (!this.start)
             return;
+        if (!this.drag && !this.navigating && Math.hypot(p.x - this.start.x, p.y - this.start.y) < 7) return;
+        this.navigating = true;
         const dx = p.x - this.last.x, dy = p.y - this.last.y;
         this.last = p;
         if (this.drag) {
@@ -4050,7 +4456,7 @@ class ModelingWorkbench {
             this.saveView();
             return;
         }
-        if (start && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
+        if (start && !this.navigating && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
             this.hit = this.renderer.pick(p.x, p.y, { mode: this.pickMode, radius: p.pointerType === 'touch' ? 18 : 9 });
             if (!this.w.multi && !p.ctrl && !p.shift)
                 this.w.selection.clear();
@@ -4098,6 +4504,7 @@ class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
+        if (authoringAction3(this, action)) return;
         if (action.startsWith('3d-op-')) {
             this.operationDialog(action.slice(6));
             return;
@@ -4149,6 +4556,7 @@ class ModelingWorkbench {
             case '3d-multi':
                 w.multi = !w.multi;
                 this.renderInspector();
+                syncAuthoring3(this);
                 break;
             case '3d-bake': {
                 const e = w.selected()[0];
@@ -4214,34 +4622,11 @@ class ModelingWorkbench {
             default: throw new Error('Unknown 3D action ' + action);
         }
     }
-    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${['⌑', '◎', '♧', '▱', '〰', '▦', '▥', '▢', '╦', '◇'][i]}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
+    examplesDialog() { const w = this.w; w.openModal('New 3D example drawing', `<p>Each example opens in a new document tab. Native meshes, source sketches and editable feature parameters are included. These are faceted concept models, not certified designs.</p><div class="model3d-example-grid">${EXAMPLES_3D.map((e, i) => `<button class="model3d-example" data-action="3d-example:${e.id}"><span class="model3d-example-icon">${['⌑', '◎', '♧', '▱', '〰', '▦', '▥', '▢', '╦', '◇'][i % 10]}</span><span><small>${E(e.industry)}</small><strong>${E(e.name)}</strong><span>${E(e.description)}</span></span></button>`).join('')}</div>`, { wide: true }); }
     toolsDialog() { const w = this.w; w.openModal('3D modeling tools', `<p>Create mesh features or use selected profiles and bodies. Source order matters for cuts and sweeps. New results retain their dependency history.</p><label class="field">Find a tool<input id="model3d-search" type="search" placeholder="Extrude, revolve, pattern, vertex…"></label>${[...new Set(MODELING_TOOLS.map(t => t.group))].map(group => `<section><h3>${E(group)}</h3><div class="operation-grid">${MODELING_TOOLS.filter(t => t.group === group).map(t => button('3d-op-' + t.id, t.label, 'btn model3d-searchable')).join('')}</div></section>`).join('')}<h3>Sketch, inspect & exchange</h3><div class="operation-grid">${[['3d-sketch', 'Planar profile'], ['3d-path', '3D polyline'], ['3d-vertex', 'Exact XYZ vertices'], ['3d-section', 'Section analysis'], ['3d-measure', 'Measure & topology'], ['3d-obj', 'Export OBJ'], ['3d-stl', 'Export STL'], ['3d-examples', 'Example drawings'], ['3d-2d', 'Edit sketch in 2D']].map(([a, l]) => button(a, l, 'btn model3d-searchable')).join('')}</div>`, { wide: true }); w.modal.querySelector('#model3d-search').addEventListener('input', e => { const words = e.target.value.toLowerCase().split(/\s+/); for (const b of w.modal.querySelectorAll('.model3d-searchable'))
         b.hidden = !words.every(word => b.textContent.toLowerCase().includes(word)); }); }
-    operationDialog(kind, id = null) {
-        const w = this.w, tool = MODELING_TOOLS.find(t => t.id === kind);
-        if (!tool)
-            throw new Error('Unknown modeling tool');
-        const existing = id ? w.doc.entities.find(e => e.id === id) : null;
-        if (existing && isLocked(existing, w.doc))
-            throw new Error('The selected body is locked');
-        const selected = [...w.selection], count = tool.multiple ? Math.max(tool.inputs, selected.length, existing?.feature3d.inputs.length || 0) : tool.inputs || 0;
-        const candidates = w.doc.entities.filter(e => e.id !== id && !e.feature3d?.suppressed && (['extrude', 'revolve', 'loft'].includes(kind) ? ['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE'].includes(e.type) : kind === 'sweep' ? ['CIRCLE', 'LWPOLYLINE', 'POLYLINE', 'LINE', 'SPLINE'].includes(e.type) : e.type === 'MESH'));
-        const inputs = Array.from({ length: count }, (_, i) => { const chosen = existing?.feature3d.inputs[i] || selected[i] || candidates[i]?.id; return `<label class="field">${kind === 'subtract' ? (i ? 'Cutting body' : 'Target body') : kind === 'sweep' ? (i ? 'Path' : 'Profile') : 'Input ' + (i + 1)}<select data-model-input>${candidates.map(e => `<option value="${E(e.id)}" ${e.id === chosen ? 'selected' : ''}>${E(e.label || e.type + ' ' + e.id)}${e.model3dConsumed ? ' · history input' : ''}</option>`).join('')}</select></label>`; }).join('');
-        const inputFields = tool.fields.map(f => ({ ...f, value: existing?.feature3d.parameters?.[f.name] ?? f.value }));
-        if (!count)
-            for (const axis of ['x', 'y', 'z'])
-                inputFields.push({ name: axis, label: 'Position ' + axis.toUpperCase(), value: existing?.feature3d.parameters?.[axis] ?? 0 });
-        if (kind === 'offset-face' && this.hit?.face !== undefined && !id)
-            inputFields.find(f => f.name === 'face').value = this.hit.face;
-        w.openModal((id ? 'Edit ' : 'Create ') + tool.label, `<p>All numeric fields accept design parameter expressions. Geometry changes only after Apply. Mesh results are faceted, not ACIS solids.</p>${inputs}<div class="model3d-fields">${fields(inputFields)}</div><label class="field">Feature name<input data-model-name value="${E(existing?.label || tool.label)}"></label>${button('3d-preview', 'Preview without saving', 'btn')}<div class="model3d-preview-state" role="status"></div><div class="error-text"></div>`, { confirm: id ? 'Apply feature edit' : 'Create feature', onConfirm: () => { const values = this.readOperation(); let result; w.edit(id ? 'Edit 3D feature' : 'Create ' + tool.label, () => { result = id ? editFeature(w.doc, id, { parameters: values.parameters, inputs: values.inputs, name: values.name }) : addFeature(w.doc, kind, values.parameters, values.inputs, { name: values.name, color: w.selected()[0]?.color }); w.selection = new Set([result.id]); }); w.closeModal(); this.hit = null; this.sync(); if (!id) {
-                this.renderer.fit();
-                this.saveView();
-            } } });
-        this.operation = { kind, id };
-        w.modal.querySelector('.modal').classList.add('model3d-operation-dialog');
-    }
-    readOperation() { const modal = this.w.modal; if (!modal)
-        throw new Error('No modeling dialog'); return { parameters: Object.fromEntries([...modal.querySelectorAll('[data-model-field]')].map(e => [e.dataset.modelField, e.value])), inputs: [...modal.querySelectorAll('[data-model-input]')].map(e => e.value), name: modal.querySelector('[data-model-name]')?.value || 'Feature' }; }
+    operationDialog(kind, id = null) { return openOperation3(this, kind, id); }
+    readOperation() { return readOperation3(this); }
     previewOperation() { if (!this.operation)
         throw new Error('No active operation'); const v = this.readOperation(), doc = { ...this.w.doc, entities: clone(this.w.doc.entities) }; try {
         if (this.operation.id)
@@ -4256,6 +4641,8 @@ class ModelingWorkbench {
         this.w.modal.querySelector('.model3d-preview-state').textContent = 'Preview shown behind this dialog. The document is unchanged.';
     }
     catch (error) {
+        const operation = this.operation; this.clearPreview(); this.operation = operation;
+        this.w.modal.querySelector('.model3d-preview-state').textContent = 'Preview rejected · drawing unchanged';
         this.w.modal.querySelector('.error-text').textContent = error.message;
     } }
     renderInspector() {

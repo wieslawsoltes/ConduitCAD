@@ -1,0 +1,135 @@
+{
+  "checks": [
+    {
+      "name": "desktop startup displays 39 editable DXF entities",
+      "passed": true
+    },
+    {
+      "name": "default illustrative P&ID has no QA issues",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "parameter dialog opens and traps UI in dialog",
+      "passed": true
+    },
+    {
+      "name": "Escape closes modal",
+      "passed": true
+    },
+    {
+      "name": "mouse drags symbol CAD insertion point",
+      "passed": true,
+      "detail": {
+        "x": 530,
+        "y": 360
+      }
+    },
+    {
+      "name": "moving equipment maintains both connector references",
+      "passed": true
+    },
+    {
+      "name": "keyboard Undo restores pump and route transaction",
+      "passed": true
+    },
+    {
+      "name": "keyboard Redo restores moved geometry",
+      "passed": true
+    },
+    {
+      "name": "command palette creates actual circle entity",
+      "passed": true
+    },
+    {
+      "name": "numeric radius accepts named expression",
+      "passed": true
+    },
+    {
+      "name": "parameter change regenerates dependent geometry",
+      "passed": true
+    },
+    {
+      "name": "invalid parameter edit rolls back atomically",
+      "passed": true
+    },
+    {
+      "name": "drag gesture draws a native LINE",
+      "passed": true
+    },
+    {
+      "name": "drag gesture draws parametric rectangle polyline",
+      "passed": true
+    },
+    {
+      "name": "copy paste allocates independent entity identity",
+      "passed": true
+    },
+    {
+      "name": "Delete removes selected pasted entity",
+      "passed": true
+    },
+    {
+      "name": "Undo restores delete",
+      "passed": true
+    },
+    {
+      "name": "export dialog offers DXF, native project, SVG and graph",
+      "passed": true
+    },
+    {
+      "name": "camera-only pan retains GPU upload scene data",
+      "passed": true
+    },
+    {
+      "name": "390px portrait has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "mobile symbol library opens as a bottom sheet",
+      "passed": true
+    },
+    {
+      "name": "tap on symbol arms placement and closes sheet",
+      "passed": true
+    },
+    {
+      "name": "tap places native block reference on mobile",
+      "passed": true
+    },
+    {
+      "name": "mobile numeric properties sheet opens for selected block",
+      "passed": true
+    },
+    {
+      "name": "two-finger pinch zoom changes camera scale",
+      "passed": true,
+      "detail": {
+        "before": 0.2939929328621908,
+        "after": 0.6299848561332658
+      }
+    },
+    {
+      "name": "pinch cancels accidental edit instead of creating geometry",
+      "passed": true
+    },
+    {
+      "name": "844x390 landscape viewport remains usable",
+      "passed": true
+    },
+    {
+      "name": "mobile landscape has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser JavaScript errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "passed": 29,
+  "errors": [],
+  "backendTested": "Canvas 2D",
+  "persistence": "test-only in-memory adapter; opaque origin",
+  "hardwareGPUValidation": false
+}

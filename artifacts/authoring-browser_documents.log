@@ -1,0 +1,62 @@
+first drawing has one accessible selected document tab
+New creates another tab without removing the previous drawing
+new drawing has independent empty undo history
+first tab retains its geometry and selection
+view, library category and snapping restore independently
+undo only edits the active drawing
+other drawing and its independent undo history are intact
+accepted native command points resume on return to a tab
+second camera and active layer restore
+resumed command completes in its owning document
+single renderer retains only three canvas layers regardless of tab count
+arrow/home navigation focuses tabs without activating expensive scenes
+Enter activates a focused document tab
+block editor is isolated inside its document tab
+switching away suspends the block authoring bar and draft
+switching back restores block draft and its private history
+Test Block scratch state survives a document switch
+returning from Test Block recovers the original draft
+shared master save is confined to its owning drawing
+cross-document paste never overwrites colliding block definitions
+save all marks every captured document revision as saved
+reload restores every open drawing and active tab order
+reload restores an uncommitted block draft without changing its master
+recovered draft has restored camera and clean new undo history
+unsaved close presents explicit save, discard and cancel choices
+Cancel close leaves the same document active
+failed save-and-close retains the drawing and dirty status
+save failure keeps the close dialog available for retry
+successful save-and-close selects the surviving tab
+recently closed saved drawing can be reopened without losing its geometry
+document switcher filters without deleting hidden sessions
+Duplicate opens an independent drawing rather than shared mutable model data
+batch imports are ordered and invalid files do not discard successful tabs
+file-import tabs retain native DXF entity types
+reordering tabs preserves active drawing identity
+export downloads only the active document, not a workspace wrapper
+mobile tabs and document management have at least 44px targets
+mobile workspace has no horizontal document overflow
+mobile removes redundant workspace mode bar for canvas space
+portrait canvas retains useful height with document tabs visible
+mobile library opens with reachable sheet expansion handle
+sheet expansion increases usable symbol-library height
+hidden sheets cannot receive keyboard focus
+mobile document switcher lists all open drawings
+mobile document switcher fits its visual viewport
+touch activates another document tab
+landscape uses a compact scrollable tool rail with reachable symbol controls
+landscape tabs and canvas remain within horizontal viewport
+landscape properties use a side sheet without replacing the document tab bar
+narrow 320px mobile layout stays within viewport
+narrow mobile primary tools retain 44px targets
+delayed modal autofocus does not steal an already-focused text field
+visual keyboard resize constrains the mobile modal height
+keyboard mode hides canvas-only tool chrome
+no uncaught JavaScript errors
+CI storage path actually uses IndexedDB
+duplicated browser page forks a live recovery namespace
+forked page recovers the same open drawing set without clearing its source
+independent page saves do not overwrite the original recovery records
+duplicating an already-forked browser page still acquires a new namespace
+all real-origin document pages complete without JavaScript exceptions
+{"passed": 61, "errors": []}

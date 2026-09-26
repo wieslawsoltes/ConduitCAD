@@ -1,0 +1,514 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Extrusion direction study",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "3d-extrusion-study-001",
+      "type": "LWPOLYLINE",
+      "layer": "Annotations",
+      "points": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 30,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 30,
+          "z": 0
+        }
+      ],
+      "closed": true,
+      "label": "Source plane 1",
+      "model3dConsumed": true
+    },
+    {
+      "id": "3d-extrusion-study-002",
+      "type": "MESH",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 40,
+          "y": 30,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 30,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 40
+        },
+        {
+          "x": 40,
+          "y": 0,
+          "z": 40
+        },
+        {
+          "x": 40,
+          "y": 30,
+          "z": 40
+        },
+        {
+          "x": 0,
+          "y": 30,
+          "z": 40
+        }
+      ],
+      "faces": [
+        [
+          1,
+          0,
+          3
+        ],
+        [
+          3,
+          2,
+          1
+        ],
+        [
+          7,
+          4,
+          5
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "label": "One side",
+      "color": "#5496a4",
+      "feature3d": {
+        "version": 1,
+        "kind": "extrude",
+        "parameters": {
+          "height": "Distance",
+          "extent": 0,
+          "distance2": "SecondSide"
+        },
+        "inputs": [
+          "3d-extrusion-study-001"
+        ],
+        "suppressed": false
+      },
+      "edges": [],
+      "creases": [],
+      "subdivision": 0,
+      "model3dConsumed": false
+    },
+    {
+      "id": "3d-extrusion-study-003",
+      "type": "LWPOLYLINE",
+      "layer": "Annotations",
+      "points": [
+        {
+          "x": 70,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 110,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 110,
+          "y": 30,
+          "z": 0
+        },
+        {
+          "x": 70,
+          "y": 30,
+          "z": 0
+        }
+      ],
+      "closed": true,
+      "label": "Source plane 2",
+      "model3dConsumed": true
+    },
+    {
+      "id": "3d-extrusion-study-004",
+      "type": "MESH",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 70,
+          "y": 0,
+          "z": -20
+        },
+        {
+          "x": 110,
+          "y": 0,
+          "z": -20
+        },
+        {
+          "x": 110,
+          "y": 30,
+          "z": -20
+        },
+        {
+          "x": 70,
+          "y": 30,
+          "z": -20
+        },
+        {
+          "x": 70,
+          "y": 0,
+          "z": 20
+        },
+        {
+          "x": 110,
+          "y": 0,
+          "z": 20
+        },
+        {
+          "x": 110,
+          "y": 30,
+          "z": 20
+        },
+        {
+          "x": 70,
+          "y": 30,
+          "z": 20
+        }
+      ],
+      "faces": [
+        [
+          1,
+          0,
+          3
+        ],
+        [
+          3,
+          2,
+          1
+        ],
+        [
+          7,
+          4,
+          5
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "label": "Symmetric total",
+      "color": "#5496a4",
+      "feature3d": {
+        "version": 1,
+        "kind": "extrude",
+        "parameters": {
+          "height": "Distance",
+          "extent": 1,
+          "distance2": "SecondSide"
+        },
+        "inputs": [
+          "3d-extrusion-study-003"
+        ],
+        "suppressed": false
+      },
+      "edges": [],
+      "creases": [],
+      "subdivision": 0,
+      "model3dConsumed": false
+    },
+    {
+      "id": "3d-extrusion-study-005",
+      "type": "LWPOLYLINE",
+      "layer": "Annotations",
+      "points": [
+        {
+          "x": 140,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 180,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 180,
+          "y": 30,
+          "z": 0
+        },
+        {
+          "x": 140,
+          "y": 30,
+          "z": 0
+        }
+      ],
+      "closed": true,
+      "label": "Source plane 3",
+      "model3dConsumed": true
+    },
+    {
+      "id": "3d-extrusion-study-006",
+      "type": "MESH",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 140,
+          "y": 0,
+          "z": -15
+        },
+        {
+          "x": 180,
+          "y": 0,
+          "z": -15
+        },
+        {
+          "x": 180,
+          "y": 30,
+          "z": -15
+        },
+        {
+          "x": 140,
+          "y": 30,
+          "z": -15
+        },
+        {
+          "x": 140,
+          "y": 0,
+          "z": 40
+        },
+        {
+          "x": 180,
+          "y": 0,
+          "z": 40
+        },
+        {
+          "x": 180,
+          "y": 30,
+          "z": 40
+        },
+        {
+          "x": 140,
+          "y": 30,
+          "z": 40
+        }
+      ],
+      "faces": [
+        [
+          1,
+          0,
+          3
+        ],
+        [
+          3,
+          2,
+          1
+        ],
+        [
+          7,
+          4,
+          5
+        ],
+        [
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "label": "Two independent sides",
+      "color": "#5496a4",
+      "feature3d": {
+        "version": 1,
+        "kind": "extrude",
+        "parameters": {
+          "height": "Distance",
+          "extent": 2,
+          "distance2": "SecondSide"
+        },
+        "inputs": [
+          "3d-extrusion-study-005"
+        ],
+        "suppressed": false
+      },
+      "edges": [],
+      "creases": [],
+      "subdivision": 0,
+      "model3dConsumed": false
+    }
+  ],
+  "blocks": {},
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10",
+    "Distance": "40",
+    "SecondSide": "15"
+  },
+  "constraints": [],
+  "metadata": {
+    "description": "One-sided, symmetric-total and independent two-sided extrusions share named distance parameters.",
+    "modeling": {
+      "version": 1,
+      "preferredMode": "3d",
+      "example": "extrusion-study",
+      "notes": "Editable faceted concept model. Not certified or construction-approved."
+    }
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

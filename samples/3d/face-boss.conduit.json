@@ -1,0 +1,679 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Face profile and boss",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "3d-face-boss-001",
+      "type": "MESH",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 80,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 80,
+          "y": 60,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 60,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        {
+          "x": 80,
+          "y": 0,
+          "z": 15
+        },
+        {
+          "x": 80,
+          "y": 60,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 60,
+          "z": 15
+        }
+      ],
+      "faces": [
+        [
+          0,
+          3,
+          2,
+          1
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ],
+        [
+          0,
+          1,
+          5,
+          4
+        ],
+        [
+          1,
+          2,
+          6,
+          5
+        ],
+        [
+          2,
+          3,
+          7,
+          6
+        ],
+        [
+          3,
+          0,
+          4,
+          7
+        ]
+      ],
+      "label": "Fixture base",
+      "color": "#5496a4",
+      "feature3d": {
+        "version": 1,
+        "kind": "box",
+        "parameters": {
+          "width": 80,
+          "depth": 60,
+          "height": 15
+        },
+        "inputs": [],
+        "suppressed": false
+      },
+      "edges": [],
+      "creases": [],
+      "subdivision": 0,
+      "model3dConsumed": true
+    },
+    {
+      "id": "3d-face-boss-002",
+      "type": "LWPOLYLINE",
+      "layer": "Annotations",
+      "label": "Native top-face profile",
+      "extrusion": {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      "elevation": 15,
+      "points": [
+        {
+          "x": 25,
+          "y": 20
+        },
+        {
+          "x": 55,
+          "y": 20
+        },
+        {
+          "x": 55,
+          "y": 40
+        },
+        {
+          "x": 25,
+          "y": 40
+        }
+      ],
+      "closed": true,
+      "model3dConsumed": true
+    },
+    {
+      "id": "3d-face-boss-003",
+      "type": "MESH",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 80,
+          "y": 0,
+          "z": 15
+        },
+        {
+          "x": 80,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 80,
+          "y": 60,
+          "z": 0
+        },
+        {
+          "x": 80,
+          "y": 60,
+          "z": 15
+        },
+        {
+          "x": 55,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 55,
+          "y": 0,
+          "z": 4.6875
+        },
+        {
+          "x": 55,
+          "y": 0,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 55,
+          "y": 60,
+          "z": 0
+        },
+        {
+          "x": 55,
+          "y": 60,
+          "z": 10.3125
+        },
+        {
+          "x": 55,
+          "y": 60,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 60,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 60,
+          "z": 15
+        },
+        {
+          "x": 55,
+          "y": 18.75,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 20,
+          "z": 15
+        },
+        {
+          "x": 53.33333333333333,
+          "y": 20,
+          "z": 15
+        },
+        {
+          "x": 55,
+          "y": 20,
+          "z": 15
+        },
+        {
+          "x": 0,
+          "y": 40,
+          "z": 15
+        },
+        {
+          "x": 26.666666666666668,
+          "y": 40,
+          "z": 15
+        },
+        {
+          "x": 55,
+          "y": 40,
+          "z": 15
+        },
+        {
+          "x": 25,
+          "y": 20,
+          "z": 15
+        },
+        {
+          "x": 25,
+          "y": 40,
+          "z": 15
+        },
+        {
+          "x": 55,
+          "y": 40,
+          "z": 40
+        },
+        {
+          "x": 25,
+          "y": 40,
+          "z": 40
+        },
+        {
+          "x": 25,
+          "y": 20,
+          "z": 40
+        },
+        {
+          "x": 55,
+          "y": 20,
+          "z": 40
+        },
+        {
+          "x": 0,
+          "y": 20,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 20,
+          "z": 5
+        },
+        {
+          "x": 0,
+          "y": 40,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 40,
+          "z": 10
+        },
+        {
+          "x": 55,
+          "y": 18.75,
+          "z": 0
+        },
+        {
+          "x": 53.33333333333334,
+          "y": 20,
+          "z": 0
+        },
+        {
+          "x": 55,
+          "y": 20,
+          "z": 0
+        },
+        {
+          "x": 26.66666666666667,
+          "y": 40,
+          "z": 0
+        },
+        {
+          "x": 55,
+          "y": 40,
+          "z": 0
+        },
+        {
+          "x": 25,
+          "y": 40,
+          "z": 0
+        },
+        {
+          "x": 25.000000000000004,
+          "y": 20,
+          "z": 0
+        }
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          2,
+          3,
+          0
+        ],
+        [
+          4,
+          1,
+          5
+        ],
+        [
+          1,
+          0,
+          6,
+          5
+        ],
+        [
+          7,
+          8,
+          4,
+          5
+        ],
+        [
+          6,
+          7,
+          5
+        ],
+        [
+          3,
+          2,
+          9,
+          10
+        ],
+        [
+          11,
+          3,
+          10
+        ],
+        [
+          9,
+          12,
+          10
+        ],
+        [
+          12,
+          13,
+          11,
+          10
+        ],
+        [
+          6,
+          0,
+          14
+        ],
+        [
+          0,
+          3,
+          11,
+          20,
+          17,
+          14
+        ],
+        [
+          15,
+          7,
+          6,
+          14,
+          16,
+          21
+        ],
+        [
+          16,
+          14,
+          17
+        ],
+        [
+          13,
+          18,
+          22,
+          19
+        ],
+        [
+          11,
+          13,
+          19,
+          20
+        ],
+        [
+          18,
+          15,
+          21,
+          22
+        ],
+        [
+          23,
+          20,
+          19,
+          22
+        ],
+        [
+          22,
+          24,
+          23
+        ],
+        [
+          24,
+          25,
+          26
+        ],
+        [
+          26,
+          23,
+          24
+        ],
+        [
+          25,
+          21,
+          16,
+          17
+        ],
+        [
+          17,
+          26,
+          25
+        ],
+        [
+          24,
+          22,
+          21
+        ],
+        [
+          21,
+          25,
+          24
+        ],
+        [
+          26,
+          17,
+          20
+        ],
+        [
+          20,
+          23,
+          26
+        ],
+        [
+          27,
+          8,
+          28
+        ],
+        [
+          8,
+          7,
+          15,
+          28
+        ],
+        [
+          13,
+          12,
+          29,
+          30
+        ],
+        [
+          18,
+          13,
+          30
+        ],
+        [
+          29,
+          27,
+          28,
+          30
+        ],
+        [
+          15,
+          18,
+          30,
+          28
+        ],
+        [
+          1,
+          4,
+          31
+        ],
+        [
+          9,
+          2,
+          1,
+          31,
+          33,
+          35
+        ],
+        [
+          4,
+          8,
+          27,
+          37,
+          32,
+          31
+        ],
+        [
+          33,
+          31,
+          32
+        ],
+        [
+          29,
+          12,
+          34,
+          36
+        ],
+        [
+          12,
+          9,
+          35,
+          34
+        ],
+        [
+          27,
+          29,
+          36,
+          37
+        ],
+        [
+          36,
+          34,
+          32,
+          37
+        ],
+        [
+          35,
+          33,
+          32,
+          34
+        ]
+      ],
+      "label": "Joined mounting boss",
+      "color": "#5496a4",
+      "feature3d": {
+        "version": 1,
+        "kind": "extrude",
+        "parameters": {
+          "height": 25,
+          "operation": 1,
+          "useNormal": 1
+        },
+        "inputs": [
+          "3d-face-boss-002",
+          "3d-face-boss-001"
+        ],
+        "suppressed": false
+      },
+      "edges": [],
+      "creases": [],
+      "subdivision": 0,
+      "model3dConsumed": false
+    }
+  ],
+  "blocks": {},
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "grid": "10"
+  },
+  "constraints": [],
+  "metadata": {
+    "description": "Native face-aligned profile joined to a stock body with an editable extrusion operation.",
+    "modeling": {
+      "version": 1,
+      "preferredMode": "3d",
+      "example": "face-boss",
+      "notes": "Editable faceted concept model. Not certified or construction-approved."
+    }
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

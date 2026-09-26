@@ -400,3 +400,34 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
 @media(min-width:900px){.modal-backdrop:has(.model3d-operation-dialog){justify-content:flex-end;align-items:center;padding:20px;background:#26463422}.modal.model3d-operation-dialog{max-width:390px;margin:0;max-height:calc(100vh - 40px)}}
 .mobile-dialog .modal.model3d-operation-dialog{max-height:78%;}.model3d-example small{font-size:11px;line-height:1.5}
+
+/* Shared 3D authoring: explicit selection modes and contextual commands, not additional panels. */
+.model3d-selection-tools{position:absolute;top:62px;left:12px;display:flex;gap:3px;max-width:calc(100% - 24px);padding:3px;background:#fffffff2;border:1px solid #dce5e3;border-radius:9px;overflow-x:auto;overscroll-behavior:contain;scrollbar-width:none}
+.model3d-selection-tools button{white-space:nowrap;flex-shrink:0;min-height:34px;min-width:42px;font-size:11px;padding:6px 9px}
+.model3d-selection-tools button[aria-pressed=true]{background:#e0f1ec;color:#115c51;box-shadow:inset 0 0 0 1px #77b5a6}
+.model3d-info{top:110px}
+.model3d-dock>.model3d-context{display:flex;align-items:center;gap:4px;width:auto;max-width:none;overflow:visible;flex-shrink:0;pointer-events:auto;border:0;border-right:1px solid #dce5e3;border-radius:0;background:none;padding:0 5px 0 0;box-shadow:none}
+.model3d-context button{white-space:nowrap;min-height:34px;font-size:11px;flex-shrink:0}
+.model3d-selection-label{font-size:11px;color:#4b655f;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 8px;flex-shrink:0}
+.model3d-operation-dialog [data-model-row][hidden],.model3d-operation-dialog [data-model-target-row][hidden]{display:none!important}
+.model3d-reattach{display:flex;gap:8px;align-items:center;font-size:12px;padding:8px 0}
+.model3d-dock button:disabled{opacity:.45;cursor:not-allowed}
+.model3d-operation-help{font-size:12px;line-height:1.6;color:#526e64}
+.model3d-context button:focus-visible,.model3d-selection-tools button:focus-visible,.model3d-feature:focus-visible{outline:2px solid #167c70;outline-offset:-2px}
+@media(max-width:760px),(pointer:coarse) and (max-width:1100px){
+ .model3d-top{display:block}.model3d-mode{display:none}.model3d-views{width:max-content;max-width:100%;margin-left:auto}
+ .model3d-selection-tools{top:62px;left:6px;max-width:calc(100% - 12px)}
+ .model3d-selection-tools button,.model3d-dock .model3d-context button{min-height:44px;min-width:44px}
+ .model3d-selection-tools button{padding:6px 8px}.model3d-info{top:116px}
+ .model3d-dock .model3d-selection-label{display:none}
+ .model3d-operation-dialog .model3d-fields{grid-template-columns:1fr}
+ .model3d-operation-dialog .model3d-reattach{min-height:44px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .model3d-selection-tools{top:6px;right:auto;max-width:48%}.model3d-views{max-width:49%;margin-left:auto}
+ .model3d-info{top:61px;max-width:50%}.model3d-bottom{gap:2px}
+ .model3d-timeline{display:flex;max-height:54px;width:100%}.model3d-feature{min-height:44px}
+ .model3d-context button{min-height:44px}.model3d-selection-label{display:none}
+}
+/* 3D owns an in-canvas command strip; 2D regains its reserved fixed dock on mode return. */
+.app.mobile-workspace:has(.canvas-area[data-view="3d"]) .statusbar{margin-bottom:0;padding-bottom:var(--safe-bottom)}

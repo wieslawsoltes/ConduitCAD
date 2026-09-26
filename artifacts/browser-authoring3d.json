@@ -1,0 +1,341 @@
+{
+  "passed": 83,
+  "checks": [
+    {
+      "name": "canvas face pick selects a planar top face",
+      "passed": true
+    },
+    {
+      "name": "face mode has no body translation handles",
+      "passed": true
+    },
+    {
+      "name": "face actions are discoverable without opening a catalogue",
+      "passed": true
+    },
+    {
+      "name": "hole form inherits the picked face and local center",
+      "passed": true
+    },
+    {
+      "name": "simple through hole hides unused recess and blind fields",
+      "passed": true
+    },
+    {
+      "name": "counterbore and distance controls show only relevant fields",
+      "passed": true
+    },
+    {
+      "name": "hole preview is a noncommitting evaluated result",
+      "passed": true
+    },
+    {
+      "name": "changing a field invalidates old preview and restores camera",
+      "passed": true
+    },
+    {
+      "name": "invalid preview removes old geometry and reports failure",
+      "passed": true
+    },
+    {
+      "name": "hole Apply commits one attached native mesh feature",
+      "passed": true
+    },
+    {
+      "name": "hole creation preserves current camera",
+      "passed": true
+    },
+    {
+      "name": "undo removes hole and restores stock visibility",
+      "passed": true
+    },
+    {
+      "name": "redo restores executable hole history",
+      "passed": true
+    },
+    {
+      "name": "upstream form edit regenerates the attached hole",
+      "passed": true
+    },
+    {
+      "name": "countersink changes relevant form controls",
+      "passed": true
+    },
+    {
+      "name": "canvas face pick selects a planar top face",
+      "passed": true
+    },
+    {
+      "name": "look-at-face is orthographic and points along the selected normal",
+      "passed": true
+    },
+    {
+      "name": "face sketch creates a native elevated OCS polyline",
+      "passed": true
+    },
+    {
+      "name": "new extrusion defaults to profile normal",
+      "passed": true
+    },
+    {
+      "name": "Join shows the body selector",
+      "passed": true
+    },
+    {
+      "name": "Join produces one native feature retaining both inputs",
+      "passed": true
+    },
+    {
+      "name": "expression-valued choices retain the original expression",
+      "passed": true
+    },
+    {
+      "name": "Apply preserves expression-driven operation and its target",
+      "passed": true
+    },
+    {
+      "name": "unchanged timeline sync preserves button identity and keyboard focus",
+      "passed": true
+    },
+    {
+      "name": "timeline End moves focus without activating a different body",
+      "passed": true
+    },
+    {
+      "name": "2D drawing remains editable beside 3D features",
+      "passed": true
+    },
+    {
+      "name": "symmetric extent is editable through named controls",
+      "passed": true
+    },
+    {
+      "name": "two-side extrusion form produces independent opposite extents",
+      "passed": true
+    },
+    {
+      "name": "body visibility is an undoable edit",
+      "passed": true
+    },
+    {
+      "name": "undo restores body visibility",
+      "passed": true
+    },
+    {
+      "name": "320x568 reclaims space reserved for the hidden fixed 2D dock",
+      "passed": true
+    },
+    {
+      "name": "320x568 .model3d-selection-tools is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 .model3d-dock is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 .model3d-timeline is bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 context actions have touch-sized targets",
+      "passed": true
+    },
+    {
+      "name": "320x568 dialog and confirmation stay within visual viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 opening a form does not force the touch keyboard",
+      "passed": true
+    },
+    {
+      "name": "320x568 hole can be completed in a touch-sized form",
+      "passed": true
+    },
+    {
+      "name": "320x568 selection toggle exposes pressed state",
+      "passed": true
+    },
+    {
+      "name": "320x568 navigation toggles directly to Pan",
+      "passed": true
+    },
+    {
+      "name": "320x568 gesture hint follows navigation and selection mode",
+      "passed": true
+    },
+    {
+      "name": "320x568 two-finger gesture reaches canvas without edits",
+      "passed": true
+    },
+    {
+      "name": "320x568 2D dock and its reserved space return",
+      "passed": true
+    },
+    {
+      "name": "390x844 reclaims space reserved for the hidden fixed 2D dock",
+      "passed": true
+    },
+    {
+      "name": "390x844 .model3d-selection-tools is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 .model3d-dock is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 .model3d-timeline is bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 context actions have touch-sized targets",
+      "passed": true
+    },
+    {
+      "name": "390x844 dialog and confirmation stay within visual viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 opening a form does not force the touch keyboard",
+      "passed": true
+    },
+    {
+      "name": "390x844 hole can be completed in a touch-sized form",
+      "passed": true
+    },
+    {
+      "name": "390x844 selection toggle exposes pressed state",
+      "passed": true
+    },
+    {
+      "name": "390x844 navigation toggles directly to Pan",
+      "passed": true
+    },
+    {
+      "name": "390x844 gesture hint follows navigation and selection mode",
+      "passed": true
+    },
+    {
+      "name": "390x844 two-finger gesture reaches canvas without edits",
+      "passed": true
+    },
+    {
+      "name": "390x844 2D dock and its reserved space return",
+      "passed": true
+    },
+    {
+      "name": "844x390 reclaims space reserved for the hidden fixed 2D dock",
+      "passed": true
+    },
+    {
+      "name": "844x390 .model3d-selection-tools is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 .model3d-dock is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 .model3d-timeline is bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 context actions have touch-sized targets",
+      "passed": true
+    },
+    {
+      "name": "844x390 dialog and confirmation stay within visual viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 opening a form does not force the touch keyboard",
+      "passed": true
+    },
+    {
+      "name": "844x390 hole can be completed in a touch-sized form",
+      "passed": true
+    },
+    {
+      "name": "844x390 selection toggle exposes pressed state",
+      "passed": true
+    },
+    {
+      "name": "844x390 navigation toggles directly to Pan",
+      "passed": true
+    },
+    {
+      "name": "844x390 gesture hint follows navigation and selection mode",
+      "passed": true
+    },
+    {
+      "name": "844x390 two-finger gesture reaches canvas without edits",
+      "passed": true
+    },
+    {
+      "name": "844x390 2D dock and its reserved space return",
+      "passed": true
+    },
+    {
+      "name": "820x1180 reclaims space reserved for the hidden fixed 2D dock",
+      "passed": true
+    },
+    {
+      "name": "820x1180 .model3d-selection-tools is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 .model3d-dock is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 .model3d-timeline is bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 context actions have touch-sized targets",
+      "passed": true
+    },
+    {
+      "name": "820x1180 dialog and confirmation stay within visual viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 opening a form does not force the touch keyboard",
+      "passed": true
+    },
+    {
+      "name": "820x1180 hole can be completed in a touch-sized form",
+      "passed": true
+    },
+    {
+      "name": "820x1180 selection toggle exposes pressed state",
+      "passed": true
+    },
+    {
+      "name": "820x1180 navigation toggles directly to Pan",
+      "passed": true
+    },
+    {
+      "name": "820x1180 gesture hint follows navigation and selection mode",
+      "passed": true
+    },
+    {
+      "name": "820x1180 two-finger gesture reaches canvas without edits",
+      "passed": true
+    },
+    {
+      "name": "820x1180 2D dock and its reserved space return",
+      "passed": true
+    },
+    {
+      "name": "no uncaught authoring JavaScript errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "origin": "localhost",
+  "renderer": "canvas software depth",
+  "physicalDevice": false
+}
