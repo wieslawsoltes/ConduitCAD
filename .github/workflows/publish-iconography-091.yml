@@ -1,0 +1,167 @@
+name: Checkpoint and validate CAD iconography 0.9.1
+on:
+  push:
+    branches: [work/iconography-091]
+    paths: [.github/workflows/publish-iconography-091.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-iconography-publication
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/iconography-091
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore verified source and completed integration
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,hashlib,json,lzma,os,pathlib,re,subprocess,urllib.request
+          base='bcc790a08cce28f64d11e4c8d8832acb2a0718ff'
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          def download(shas):
+              parts=[]
+              for sha in shas:
+                  request=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+                  with urllib.request.urlopen(request,timeout=60) as response:record=json.load(response)
+                  data=base64.b64decode(record['content'])
+                  assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==sha
+                  parts.append(data)
+              return b''.join(parts)
+          def valid_name(name):
+              p=pathlib.PurePosixPath(name)
+              assert not p.is_absolute() and '..' not in p.parts and '\\' not in name
+              assert not any(x in p.parts for x in ('.git','.github','node_modules'))
+              assert p.parts[0] in ('README.md','RELEASE_NOTES.md','package.json','packages','tests','docs','scripts')
+          def verify(chunk):
+              name=re.search(rb'(?m)^\+\+\+ b/(.+)',chunk).group(1).decode();valid_name(name)
+              expected=re.search(rb'(?m)^index [0-9a-f]+\.\.([0-9a-f]+)',chunk).group(1).decode()
+              data=pathlib.Path(name).read_bytes()
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected,name
+              return name
+          raw=download(['8c8ed8a192754977c9efcc6c6cb893e0410bd93b','7585681afe7f9fc5bf67f2ab06ce8996f9128493','d59fac23a07329b839410607b09720f966d0f823','e473f5a9aee4c2986c4cbbf22aa558abae2fa2eb'])
+          assert len(raw)==24000 and hashlib.sha256(raw).hexdigest()=='917896377b854d117f766e16b0bd341c586668c29715df2402f61908c0958a72'
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          recovered=decoder.decompress(raw,max_length=2000000)
+          assert len(recovered)==85926 and hashlib.sha256(recovered).hexdigest()=='3e047b49bb07313fc0ccbd36f91466acdda21603b5c133c816071f30d0e6941d'
+          chunks=[c for c in re.split(rb'(?m)(?=^diff --git )',recovered) if c.startswith(b'diff --git ')]
+          assert len(chunks)==37 and chunks[-1].startswith(b'diff --git a/packages/workbench/src/icons.js ')
+          paths=[]
+          for chunk in chunks[:-1]:
+              name=re.search(rb'(?m)^\+\+\+ b/(.+)',chunk).group(1).decode();valid_name(name)
+              subprocess.run(['git','diff','--quiet',base,'HEAD','--',name],check=True)
+              subprocess.run(['git','apply','--unidiff-zero','--check','-'],input=chunk,check=True)
+              subprocess.run(['git','apply','--unidiff-zero','-'],input=chunk,check=True)
+              paths.append(verify(chunk))
+          raw=download(['1a39eca60951ff7fc2dc9404d7f02833b000cc27','8a9d14ba4d093cd5acd75741270705bc965b8758','fba9dc32401cbee03b94ca1ae3cc5d101285ab37','5120c38f50d765f756e8f46a738097b9672678e9'])
+          assert len(raw)==20424 and hashlib.sha256(raw).hexdigest()=='162404704228de0cc95f3a8b5528f7b3ec7cd9ce8e49d2401cd6be3a9596a735'
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=82768)
+          assert decoder.eof and not decoder.unused_data and len(patch)==82767
+          assert hashlib.sha256(patch).hexdigest()=='28a2d0611e57b4f2a49888c6ca4f6bc8c607bcfa527060ce36e134128a5586b5'
+          final_chunks=[c for c in re.split(rb'(?m)(?=^diff --git )',patch) if c.startswith(b'diff --git ')]
+          assert len(final_chunks)==17
+          for chunk in final_chunks:
+              name=re.search(rb'(?m)^\+\+\+ b/(.+)',chunk).group(1).decode();valid_name(name)
+              if name not in paths:subprocess.run(['git','diff','--quiet',base,'HEAD','--',name],check=True)
+          subprocess.run(['git','apply','--unidiff-zero','--check','-'],input=patch,check=True)
+          subprocess.run(['git','apply','--unidiff-zero','-'],input=patch,check=True)
+          paths+=list(map(verify,final_chunks))
+          assert len(set(paths))==47
+          subprocess.run(['git','add','--',*sorted(set(paths))],check=True)
+          print('Restored 36 verified original files and 17 verified integration patches; 47 unique source paths.')
+          PY
+      - name: Push complete source checkpoint before validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --stat
+          git commit -m 'feat: 180 coherent CAD icons with adaptive toolbars and accessible command labels' -m 'Complete recovered icon package and semantic mappings with render-boundary integration, mobile layouts, document indicators, stateful timeline controls, searchable guide, tooltips and regression tests.'
+          git push origin HEAD:work/iconography-091
+          echo "Source checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Unit tests, build, examples, icon atlas and package contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run samples:3d
+          npm run icons
+          npm run build
+          rm -f artifacts/npm/*-0.9.0.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install independent validators
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: Browser editing, responsive icons, native recovery and rendering
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=0
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_authoring3d browser_iconography; do
+            if python "tests/$suite.py" > "artifacts/iconography-$suite.log" 2>&1; then code=0; else code=$?; status=1; fi
+            tail -n 18 "artifacts/iconography-$suite.log"
+            echo "$suite: exit $code" >> "$GITHUB_STEP_SUMMARY"
+          done
+          if xvfb-run -a python tests/browser_modeling_backends.py > artifacts/iconography-browser_modeling_backends.log 2>&1; then code=0; else code=$?; status=1; fi
+          tail -n 35 artifacts/iconography-browser_modeling_backends.log
+          echo "browser_modeling_backends: exit $code" >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+      - name: Independent DXF and geometry audits
+        if: success() || failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d render_symbol_atlas; do
+            python "tests/$suite.py"
+          done
+      - name: Push validated deliverables and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A -- artifacts samples docs
+          git add -f dist artifacts/npm
+          git commit -m 'build: validated iconography 0.9.1 application, 19 packages and visual catalogue'
+          git push origin HEAD:work/iconography-091
+          echo "Validated checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve source checkpoint
+        if: always()
+        run: git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-0.9.1-source-checkpoint.zip"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-091-iconography-validation
+          path: |
+            ${{ runner.temp }}/ConduitCAD-0.9.1-source-checkpoint.zip
+            artifacts
+          retention-days: 30
