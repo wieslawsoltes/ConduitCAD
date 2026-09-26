@@ -52,15 +52,20 @@ def load(page, fresh=False):
         page.goto('about:blank')
         script = MEMORY.replace('SEED', json.dumps(seed))
         page.set_content(source.replace('<script>globalThis.__CONDUIT_STANDALONE__=true;', '<script>' + script + 'globalThis.__CONDUIT_STANDALONE__=true;').replace("mountWorkbench(document.getElementById('app'))", "mountWorkbench(document.getElementById('app'),{backend:'canvas'})"))
-    page.wait_for_function('document.documentElement.dataset.ready === "true"')
+    try:
+        page.wait_for_function('document.documentElement.dataset.ready === "true"')
+    except Exception:
+        print('STARTUP DIAGNOSTICS ' + json.dumps(page.evaluate("async()=>({ready:document.documentElement.dataset.ready,error:window.appError||null,mounted:!!window.conduit,key:window.conduit?.documents?.key,locks:await navigator.locks?.query?.(),text:document.body.innerText.slice(-2000)})")), flush=True)
+        raise
     page.evaluate('conduit.documents.debounce=100000;clearTimeout(conduit.documents.timer)')
 
 
 try:
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_EXECUTABLE') or shutil.which('chromium'), headless=True, args=['--no-sandbox'])
-        page = browser.new_page(viewport={'width': 1440, 'height': 960}, accept_downloads=True)
-        page.on('pageerror', lambda error: errors.append(str(error)))
+        desktop = browser.new_context(viewport={'width': 1440, 'height': 960}, accept_downloads=True)
+        page = desktop.new_page()
+        page.on('pageerror', lambda error: errors.append(getattr(error, 'stack', str(error))))
         page.on('dialog', lambda dialog: dialog.accept())
         load(page, fresh=True)
         ok('first drawing has one accessible selected document tab', page.locator('.document-tabs [role=tab][aria-selected=true]').count() == 1)
@@ -176,7 +181,7 @@ try:
         page.screenshot(path=str(OUT / 'workspace-desktop.png'))
         # Pointer-coarse mobile contexts are tested separately, not just CSS resize.
         mobile = browser.new_context(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True, device_scale_factor=2)
-        phone = mobile.new_page(); phone.on('pageerror', lambda e: errors.append(str(e))); phone.on('dialog', lambda d:d.accept())
+        phone = mobile.new_page(); phone.on('pageerror', lambda e: errors.append(getattr(e, 'stack', str(e)))); phone.on('dialog', lambda d:d.accept())
         load(phone, fresh=True)
         phone.evaluate("async()=>{await conduit.newDocument('blank');await conduit.newDocument('electrical');conduit.renderer.fit();conduit.toastTimer&&clearTimeout(conduit.toastTimer);document.querySelector('.toast').classList.remove('show');}")
         ok('mobile tabs and document management have at least 44px targets', phone.evaluate("[...document.querySelectorAll('.document-bar button')].every(b=>b.getBoundingClientRect().height>=44)"))
@@ -227,7 +232,7 @@ try:
             page.evaluate('conduit.saveAllDocuments()')
             original_key = page.evaluate('conduit.documents.key')
             other = page.context.new_page()
-            other.on('pageerror', lambda e: errors.append(str(e)))
+            other.on('pageerror', lambda e: errors.append(getattr(e, 'stack', str(e))))
             other.add_init_script('sessionStorage.setItem("conduit-workspace-id",' + json.dumps(original_key) + ')')
             load(other)
             other_key = other.evaluate('conduit.documents.key')
@@ -236,6 +241,7 @@ try:
             other.evaluate("async()=>{conduit.edit('Independent window rename',()=>conduit.doc.name='Other browser window');await conduit.saveAllDocuments();}")
             ok('independent page saves do not overwrite the original recovery records', page.evaluate("async()=>{const saved=await conduit.store.loadWorkspace(conduit.documents.key);return saved.records.find(r=>r.id===saved.manifest.activeId).document.name==='batch-two';}"))
             nested = page.context.new_page()
+            nested.on('pageerror', lambda e: errors.append(getattr(e, 'stack', str(e))))
             nested.add_init_script('sessionStorage.setItem("conduit-workspace-id",' + json.dumps(other_key) + ')')
             load(nested)
             ok('duplicating an already-forked browser page still acquires a new namespace', nested.evaluate('conduit.documents.key') not in [original_key, other_key])
