@@ -1,0 +1,145 @@
+name: Validate adaptive mobile UI 0.7.1
+on:
+  push:
+    branches: [work/mobile-071]
+    paths: [.github/workflows/apply-mobile-ui.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-mobile-071
+  cancel-in-progress: false
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/mobile-071
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore verified mobile source and checkpoint on the feature branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64, hashlib, json, lzma, os, pathlib, subprocess, urllib.request
+          base = 'eed9d5d4c3ef0116fb4d4cd2f3a7315707938db3'
+          shas = ['7ef09b8418afa02f22ae2b1f28ff20550adf09cb', 'bb3fc77c6040f6852b8241b45626188e982c84de', '15ff7d36bf78299405018e4ef3d6619feafdf619', '4d46c761a9b609e86da2910b700135fa1cdcc1dc']
+          parts = []
+          for index, sha in enumerate(shas):
+              request = urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}', headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request, timeout=60) as response: record = json.load(response)
+              data = base64.b64decode(record['content'])
+              assert len(data) == (6000 if index < 3 else 4032)
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest() == sha
+              parts.append(data)
+          compressed = b''.join(parts)
+          assert len(compressed) == 22032
+          assert hashlib.sha256(compressed).hexdigest() == '614d7658fe1474f0d5e3592c3eca59df0c1181a94f123dc663a77d0df116ab96'
+          decoder = lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch = decoder.decompress(compressed, max_length=91845)
+          assert decoder.eof and not decoder.unused_data and len(patch) == 91844
+          assert hashlib.sha256(patch).hexdigest() == 'af812c1484624c6c1780ac3d6cc08a47fb6d9856e62a27459ea82307640e7a61'
+          target = pathlib.Path(os.environ['RUNNER_TEMP'])/'mobile.patch'; target.write_bytes(patch)
+          stat = subprocess.check_output(['git','apply','--numstat',str(target)],text=True)
+          paths = [line.split('\t',2)[2] for line in stat.splitlines()]
+          assert len(paths) == 30 and len(set(paths)) == 30
+          for name in paths:
+              path = pathlib.PurePosixPath(name)
+              assert not path.is_absolute() and '..' not in path.parts and '\\' not in name
+              assert not any(p in ('.git','node_modules') for p in path.parts)
+              assert path.parts[0] in ('.github','README.md','RELEASE_NOTES.md','docs','package.json','packages','tests')
+              if path.parts[0] == '.github': assert name in ('.github/workflows/pages.yml','.github/workflows/apply-multidoc.yml')
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          subprocess.run(['git','diff','--quiet',base,'HEAD','--',*paths],check=True)
+          subprocess.run(['git','apply','--unidiff-zero','--check',str(target)],check=True)
+          subprocess.run(['git','apply','--unidiff-zero',str(target)],check=True)
+          # Workflow changes are finalized through the authorized connector after validation.
+          subprocess.run(['git','restore','--source=HEAD','--worktree','.github/workflows'],check=True)
+          subprocess.run(['git','add','--',*[p for p in paths if not p.startswith('.github/')]],check=True)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'feat: adapt all mobile dialogs, tabs, tools and editor sheets for touch'
+          git push origin HEAD:work/mobile-071
+          echo "Source checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Unit tests, catalogue, production build and all fifteen packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/ci-unit-tests.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run build
+          rm -f artifacts/npm/*-0.7.0.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install independent validation dependencies
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p: print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: Browser, real-origin recovery and adaptive mobile checks
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui; do
+            CONDUIT_TEST_ORIGIN=localhost python "tests/$suite.py" > "artifacts/mobile-071-$suite.log" 2>&1
+            code=$?
+            tail -n 20 "artifacts/mobile-071-$suite.log"
+            echo "$suite: exit $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          done
+          exit "$status"
+      - name: Independent native DXF and complete symbol audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tests/audit_dxf.py
+          python tests/audit_fidelity.py
+          python tests/audit_symbol_library.py
+          python tests/audit_interop.py
+          python tests/audit_cad_editing.py
+          python tests/audit_parametric.py
+          python tests/audit_drawing_tools.py
+          python tests/render_symbol_atlas.py
+      - name: Commit validated generated application and evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A -- artifacts samples docs
+          git add -f dist artifacts/npm
+          git diff --cached --stat
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: validated 0.7.1 mobile application, packages and regression evidence'
+            git push origin HEAD:work/mobile-071
+          fi
+          echo "Validated commit: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve source and test evidence even on failure
+        if: always()
+        run: git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-0.7.1-source.zip"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-071-mobile-validation
+          path: |
+            ${{ runner.temp }}/ConduitCAD-0.7.1-source.zip
+            artifacts
+          if-no-files-found: error
