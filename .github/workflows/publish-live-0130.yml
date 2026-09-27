@@ -1,0 +1,171 @@
+name: Qualify live parameters and spatial paths 0.13.0
+on:
+  push:
+    branches: [work/live-parameters-paths-0130]
+    paths: [.github/workflows/publish-live-0130.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-live-publication
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/live-parameters-paths-0130
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore checksum-verified source without overwriting concurrent work
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,hashlib,json,lzma,os,pathlib,re,subprocess,urllib.request
+          base='4b1050ab552d1a26ae961e4a158eca2c4c5625c8'
+          shas=['87920bab2340e9b9b3175e4b24646aa6427915a7','a97a47eb04bf49d9096b21de00aada2935f0b110','284911c14d6ecd3b1caa419bd4b5cdf1a774d67f','6a7a1c6a1a59a78f3e6ac2ef5e7c82e707a8458a','af5ca5873b41967ad474d5931f99f8bc94d0041b','3f378508da83d3e63b007b72c8da52afb2e1af51','0d5d07b04626fba97bfd9c30079c5bc91d9cfbda']
+          parts=[]
+          for i,sha in enumerate(shas):
+              request=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(request,timeout=60) as response:record=json.load(response)
+              data=base64.b64decode(record['content'])
+              assert len(data)==(6000 if i<6 else 4380)
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==sha
+              parts.append(data)
+          raw=b''.join(parts)
+          assert len(raw)==40380 and hashlib.sha256(raw).hexdigest()=='68297871f57435370a13d4f47062c69ed7a136fc9e22c26f47f35d28126ceab2'
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=180970)
+          assert decoder.eof and not decoder.unused_data and len(patch)==180969
+          assert hashlib.sha256(patch).hexdigest()=='783dfa403e33681b1010da225b384054a6f6f88f1cde6c0520a79206f6bf7f18'
+          chunks=[c for c in re.split(rb'(?m)(?=^diff --git )',patch) if c.startswith(b'diff --git ')]
+          paths=[]
+          for chunk in chunks:
+              name=re.search(rb'(?m)^\+\+\+ b/(.+)',chunk).group(1).decode()
+              p=pathlib.PurePosixPath(name)
+              assert not p.is_absolute() and '..' not in p.parts and '\\' not in name
+              assert not any(x in p.parts for x in ('.git','node_modules'))
+              assert name=='.github/workflows/pages.yml' or p.parts[0] in ('README.md','RELEASE_NOTES.md','docs','package.json','packages','scripts','tests')
+              paths.append(name)
+          assert len(paths)==59 and len(set(paths))==59
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          already=subprocess.run(['git','apply','--reverse','--unidiff-zero','--check','-'],input=patch,capture_output=True).returncode==0
+          if not already:
+              subprocess.run(['git','diff','--quiet',base,'HEAD','--',*paths],check=True)
+              subprocess.run(['git','apply','--unidiff-zero','--check','-'],input=patch,check=True)
+              subprocess.run(['git','apply','--unidiff-zero','-'],input=patch,check=True)
+          for chunk,name in zip(chunks,paths):
+              expected=re.search(rb'(?m)^index [0-9a-f]+\.\.([0-9a-f]+)',chunk).group(1).decode()
+              data=pathlib.Path(name).read_bytes()
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected,name
+          subprocess.run(['git','add','--',*paths],check=True)
+          print('All 59 source paths match the recorded target Git identities.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: live design parameters and WYSIWYG spatial polyline editing' -m 'Isolated whole-design previews, exact expressions, direct XYZ handles, drawing-plane placement, atomic dependent regeneration, mobile controls, native DXF examples and regression coverage.'
+            git push origin HEAD:work/live-parameters-paths-0130
+          fi
+          echo "Source checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Unit tests, examples, production build and reusable package contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/live-publication-unit.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run samples:3d
+          npm run samples:rendering
+          npm run samples:visual2d
+          npm run samples:live
+          npm run icons
+          npm run build
+          rm -f artifacts/npm/*-0.12.0.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install independent validators
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: Native-origin browser, mobile and required GPU execution
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+          run_suite() {
+            name="$1"; shift
+            "$@" > "artifacts/live-publication-$name.log" 2>&1
+            code=$?
+            tail -n 18 "artifacts/live-publication-$name.log"
+            echo "$name: exit $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          }
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_authoring3d browser_iconography browser_planar_visual browser_visual_editing browser_render_styles browser_live_workspace; do
+            run_suite "$suite" python "tests/$suite.py"
+          done
+          for backend in webgl2 webgpu; do
+            run_suite "planar-$backend" env PLANAR_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_planar_visual.py
+            run_suite "visual-$backend" env VISUAL_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_visual_editing.py
+            run_suite "live-$backend" env LIVE_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_live_workspace.py
+          done
+          run_suite render-backends env REQUIRE_WEBGPU=1 xvfb-run -a python tests/browser_render_backends.py
+          run_suite modeling-backends xvfb-run -a python tests/browser_modeling_backends.py
+          exit "$status"
+      - name: Independent native DXF and geometry audits
+        if: success() || failure()
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d audit_rendering audit_visual_editing audit_planar_visual audit_live_workspace render_symbol_atlas; do
+            python "tests/$suite.py" > "artifacts/live-publication-$suite.log" 2>&1
+            code=$?
+            tail -n 12 "artifacts/live-publication-$suite.log"
+            echo "$suite: exit $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          done
+          exit "$status"
+      - name: Commit validated distribution, examples, archives and evidence
+        run: |
+          git add -A -- artifacts samples docs
+          git add -f dist artifacts/npm
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: qualified 0.13.0 live workspace, 21 packages and native DXF examples'
+            git push origin HEAD:work/live-parameters-paths-0130
+          fi
+          echo "Validated checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve source and evidence
+        if: always()
+        run: |
+          git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-0.13.0-source-checkpoint.zip"
+          git bundle create "$RUNNER_TEMP/ConduitCAD-0.13.0-checkpoint.bundle" HEAD ^4b1050ab552d1a26ae961e4a158eca2c4c5625c8
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-0130-live-validation
+          path: |
+            ${{ runner.temp }}/ConduitCAD-0.13.0-source-checkpoint.zip
+            ${{ runner.temp }}/ConduitCAD-0.13.0-checkpoint.bundle
+            artifacts
+          retention-days: 30
