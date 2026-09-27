@@ -198,7 +198,7 @@ solving, hardware frame rate or universal pixel-equivalence guarantee is implied
 
 [DXF compatibility](docs/DXF_COMPATIBILITY.md) · [Drawing tools](docs/DRAWING_TOOLS.md) ·
 [Parametric authoring](docs/PARAMETRIC_AUTHORING.md) ·
-[Visual 2D editing](docs/VISUAL_EDITING_2D.md) · [Visual 3D editing](docs/VISUAL_EDITING_3D.md) ·
+[Visual 2D editing](docs/VISUAL_EDITING_2D_3D_0120.md) · [Visual 3D editing](docs/VISUAL_EDITING_3D.md) ·
 [Live parameters and paths](docs/LIVE_PARAMETERS_PATHS_0130.md) ·
 [3D modeling](docs/MODELING_3D.md) · [Face authoring](docs/AUTHORING_3D_090.md) ·
 [Symbols](docs/SYMBOLS.md) · [Multi-document workflows](docs/MULTI_DOCUMENT.md) ·
