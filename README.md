@@ -1,79 +1,46 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.13.0 live parameters and spatial path editing.**
+**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.13.0.**
 
 A local-first HTML/JavaScript application with native CAD entities, engineering
-symbol libraries, routed connectors, shared blocks, parametric sketches and a
-faceted 3D feature engine. Desktop and mobile share the same document/history
-model, with separate 2D and 3D cameras. Twenty-one reusable ES-module packages power
-the workbench; no third-party runtime packages or CDN assets are required.
+symbols, routed connectors, shared blocks, parametric sketches and a faceted 3D
+feature engine. Desktop and mobile use the same document/history model, independent
+2D/3D cameras, and 21 reusable ES-module packages. No third-party runtime packages,
+CDN assets, accounts or document uploads are required.
 
-## New: live parameters and spatial paths
+[Open the application](https://wieslawsoltes.github.io/ConduitCAD/) ·
+[Release notes](RELEASE_NOTES.md) · [Current validation](docs/VALIDATION_LIVE_0130.md)
 
-**Parameters** now previews the complete design in an interactive 2D/3D workspace:
-edit expressions, scrub values, inspect dependencies and Apply once. Native geometry,
-constraints, dimensions, routed connectors and 3D features regenerate in an isolated
-draft. The responsive panel collapses for model inspection without losing Apply/Cancel.
+## New: live design parameters and spatial paths
+
+**Parameters** now keeps the drawing interactive while expressions regenerate the
+complete 2D/3D design. Edit expressions, scrub calculated values, inspect dependencies,
+filter/add/remove rows and Apply once. Geometry, constraints, calculated annotations,
+dimensions, connectors and 3D feature history update in an isolated preview. The
+responsive panel can collapse for inspection without losing Apply/Cancel.
 
 **3D → Create → Spatial path** constructs native WCS POLYLINE geometry directly on
-XY/XZ/YZ, view or picked-face planes. Drag XYZ handles, edit coordinate expressions,
-insert midpoints, remove vertices and close paths. Parameter-driven paths regenerate
-Conduit sweeps. **Parametric path workshop** opens an editable route, sweep and plate
-with associated parameter expressions and a 2D footprint.
+XY/XZ/YZ, view or picked-face planes. Drag XYZ handles, enter coordinate expressions,
+insert midpoints, remove vertices, close paths and reverse direction. Draft undo/redo
+retains the selected physical vertex. Parameter-driven paths regenerate their Conduit
+sweeps; camera-only redraws reuse immutable evaluated coordinates instead of reparsing
+all path expressions.
+
+**Parametric path workshop** opens an independent editable route, swept body, plate,
+planar footprint, circle profile and calculated caption. Change Span, Rise, TubeRadius
+or PlateThickness through the live panel, or select the route and edit it on canvas.
+Native project, ASCII DXF and binary DXF copies are in `samples/live/`.
 
 ![Live design parameters](artifacts/live-canvas-parameters-desktop.png)
 
-[Workflows and reusable APIs](docs/LIVE_PARAMETERS_PATHS_0130.md) ·
+[Live workflows and reusable APIs](docs/LIVE_PARAMETERS_PATHS_0130.md) ·
 [Mobile path editing](artifacts/live-canvas-path-phone.png) ·
 [Earlier published visual editing](docs/PUBLICATION_VISUAL_0120.md)
 
-The previous 0.10–0.12 rendering and visual editing work is now committed and published
-at `4b1050ab552d1a26ae961e4a158eca2c4c5625c8`, with native-origin WebGPU execution
-on SwiftShader in CI. Historical checkpoint reports retain their original local scope.
-The current workflow requires full regression validation before deploying this update.
-Physical GPU performance, real touch devices, OS keyboards and screen readers are not
-qualified by emulated browser/software-adapter tests.
-
-## CAD rendering styles and material inspection
-
-Sixteen real-time 3D styles now use separate surface, depth, hidden-edge,
-transparency and presentation passes. Realistic adds GGX metal/roughness shading,
-procedural studio lighting, optional shadows and ambient occlusion. Section analysis
-caps valid closed contours without changing native geometry. Adaptive Display styles,
-a compact live phone preview, per-document settings, material presets, PNG capture and
-an editable material-study drawing preserve the existing 2D workflow.
-
-Native-origin Canvas, WebGL2 and WebGPU execution passed the published 0.12.0 CI
-on a software adapter. See [rendering behavior and limits](docs/RENDERING_3D.md),
-[published execution scope](docs/PUBLICATION_VISUAL_0120.md), and the historical
-[local rendering checkpoint](docs/VALIDATION_RENDERING_0100.md).
-
-![Material and rendering study](artifacts/render-material-study.png)
-
-## Coherent desktop and touch iconography
-
-180 original SVG UI glyphs now identify drawing tools, modeling operations,
-selection modes, camera views, properties, dimensions, blocks, feature history,
-document controls and export formats. **Adaptive**, **Icons and labels**, and
-**Compact icons** modes retain accessible command names. Document titles, numeric
-values, form labels and critical confirmations are not replaced by anonymous icons.
-
-Open **More / Shapes → Icon guide**, or find the same controls in **3D Create**,
-**3D View**, and **Help**. The guide is searchable; preferences are separate from
-drawing data. The engineering symbols themselves have not been changed.
-
-![Desktop iconography](artifacts/icons-1728-3d.png)
-
-[Icon behavior and accessibility](docs/ICONOGRAPHY.md) ·
-[Offline 180-glyph atlas](docs/icon-atlas.html) ·
-[Mobile tools](artifacts/icons-390-tools.png) ·
-[Validation and provenance](docs/VALIDATION_ICONOGRAPHY_091.md)
-
 ## Run
 
-Open `dist/ConduitCAD.html` for the single-file application, or serve the production
-`dist/` directory. Attachment previews may not execute JavaScript. For development,
-use Node.js 22 or newer:
+Open `dist/ConduitCAD.html` for the single-file application, or serve `dist/`.
+Attachment previews may not execute JavaScript. For development, use Node.js 22+:
 
 ```sh
 node scripts/bootstrap.mjs
@@ -82,147 +49,163 @@ npm run build
 npm run dev
 ```
 
-The development address is `http://localhost:4173`. Bootstrap links workspace
-packages without contacting npm. Serve over HTTPS for the mobile GPU-capable path;
-ordinary LAN HTTP must not be treated as secure-origin WebGPU validation. The
-application reports the active renderer and any fallback reason.
+The development address is `http://localhost:4173`. Bootstrap links local workspace
+packages without contacting npm. Use HTTPS for the mobile GPU-capable path; ordinary
+LAN HTTP is not secure-origin WebGPU validation. The UI reports the actual renderer
+and any fallback reason.
 
-`?renderer=canvas`, `?renderer=webgl2`, and `?renderer=webgpu` select a 2D backend.
-Use `renderer3d` for the corresponding 3D selection. `?fresh=1` skips workspace
-restoration without deleting saved data; `?no-sw=1` skips service-worker registration.
-The standalone file does not register a service worker.
+`?renderer=canvas|webgl2|webgpu` selects a 2D backend; use the `renderer3d` parameter
+for 3D. `?fresh=1` skips workspace restoration without deleting saved data, and
+`?no-sw=1` skips service-worker registration. The standalone does not register one.
 
-## Workflows
+## Editing workflows
 
-**Draw and connect.** On a phone, open Symbols, select a master, then tap to place.
-Use its dedicated grab handle for drag-and-drop without fighting library scrolling.
-Drag between ports or use Connect; routes update with connected equipment. More /
-Shapes exposes native arcs, ellipses, splines, polygons, fills, construction lines,
-text, leaders and dimension variants. Exact point entry supports Cartesian/polar
-coordinates and parameter expressions. Two fingers navigate without placing geometry.
+**Draw and connect.** Open Symbols, choose a master and tap to place. Dedicated grab
+handles support drag-and-drop without fighting library scrolling. Connect equipment
+ports with routed lines that follow connected geometry. More / Shapes provides native
+curves, splines, fills, construction lines, text, leaders and dimension variants.
+Exact point entry accepts Cartesian/polar coordinates and parameter expressions.
 
-**Edit parametrically.** Properties, grips and exact-control tables operate on
-native entities. Shared block geometry is edited in an isolated canvas; Save updates
-references in one undoable transaction. Parameters/actions, sketch constraints,
-driving dimensions and calculated text use validated expressions and atomic
-regeneration. Test Block previews independent instance values.
+**Edit on canvas.** Select supported geometry and choose Edit on canvas, or double-click.
+Native handles and inline dimensions edit planar curves, weighted splines, text,
+dimensions, block placement and dynamic instance values. Move/copy, rotate, scale,
+offset and two-line fillet have detached previews. Apply commits one history transaction;
+Cancel discards it. Shared-block editing uses an isolated draft and updates its inserts
+when saved. Specialist constraint/schema and file-management forms remain available.
 
-**Model in 3D.** Switch to 3D or open a 3D starter. Create/Edit uses the on-canvas
-manipulator and dimension ribbon by default; Options exposes additional fields
-without blocking the viewport, with an explicit Advanced form alternative. Create primitives, extrusions,
+**Model in 3D.** Create/Edit uses the manipulator and dimension ribbon by default.
+Options stays non-modal; Advanced form remains explicit. Create primitives, extrusions,
 revolves, lofts, sweeps, booleans and patterns. Face selection exposes Sketch on face,
-Hole, Press/Pull and Look at face. Holes support simple, counterbore and countersink
-forms. Extrusions support one-sided, symmetric and two-sided extents, start offsets
-and New Body/Join/Cut/Intersect. Preview is transient until Apply. The timeline
-supports feature editing and upstream regeneration; 2D Draw returns to planar drafting.
+Hole, Press/Pull and Look at face. Holes include simple, counterbore and countersink;
+extrusions include one-sided, symmetric/two-sided extents, start offset and
+New Body/Join/Cut/Intersect. Feature history supports upstream regeneration.
 
-**Keep multiple drawings open.** New/Open append documents instead of replacing
-the active drawing. Tabs preserve undo history, cameras, selection, settings,
-original DXF data and unfinished block drafts. The document switcher includes rename,
-reorder, duplicate, close/save and recently closed recovery. Export downloads the
-active drawing. Keep exported backups: browser recovery is not durable external storage.
+**Inspect without blocking the model.** Drag section-plane offsets, pick measurements,
+enter exact XYZ coordinates or preview material changes. Native guide/section lines
+are explicit snapshots, not fabricated associative dimensions or solid splits.
+Two-finger takeover rolls back an unfinished handle drag before navigating.
+Returning to 2D restores the established planar editor and its separate camera.
 
-Twenty schematic starters and thirteen 3D examples are editable native projects.
-The 3D examples also have ASCII and binary DXF copies under `samples/3d/`.
+**Keep drawings independent.** New/Open appends documents. Tabs preserve undo history,
+cameras, selection, display settings, original DXF records and unfinished block drafts.
+The document manager provides rename, reorder, duplicate, close/save and recently
+closed recovery. Export operates on the active document. Browser recovery is not a
+substitute for exported external backups.
+
+## Rendering and interface
+
+Sixteen 3D display styles use separate surface, depth, visible/hidden-edge, transparency
+and presentation passes. Realistic shading adds GGX metal/roughness materials,
+procedural studio lighting, optional shadows and ambient occlusion. Section caps fill
+supported closed contours without editing native geometry. Display settings are
+independent per document; PNG capture uses the active 3D renderer.
+
+The UI uses 180 original SVG glyphs with Adaptive, Icons and labels, and Compact icons
+modes. Accessible command names remain on the real controls. Document names, numeric
+values, property labels and critical confirmations stay readable. Find the searchable
+Icon guide through More / Shapes, 3D Create, 3D View or Help.
+
+[Rendering contracts](docs/RENDERING_3D.md) · [Iconography](docs/ICONOGRAPHY.md) ·
+[Offline icon atlas](docs/icon-atlas.html) · [Mobile UI](docs/MOBILE_UI.md)
 
 ## Engineering libraries and DXF
 
 The catalogue contains 223 editable masters in eleven categories, plus 21 connection
 styles: P&ID, electrical, flowcharts, instrumentation, hydraulics, pneumatics, HVAC,
-water/plumbing, automation, fire-alarm topology and networks. Each master records its
-reference family and review notes; this is **not blanket ISO/IEC/ISA certification**.
-Library updates explicitly validate terminals before replacing used definitions.
+water/plumbing, automation, fire-alarm topology and networks. Masters record reference
+families and review notes; this is **not blanket ISO/IEC/ISA certification**. Terminal
+compatibility is checked before replacing definitions already used in a drawing.
+Twenty schematic starters and thirteen 3D starters are available, alongside the
+material, visual drafting and live-path workshops.
 
 Native project export preserves Conduit editing metadata. Normalized DXF rebuilds
-supported entities/tables/layouts; record-preserving export retains original records
-and applies only guarded safe edits. Original-file download returns the imported
-bytes without edits. Supported exchanges include native DIMENSION graphics, MESH,
-HELIX, WIPEOUT, OCS/XYZ geometry, hatch boundaries and paper layouts. SVG/PNG and
-application-specific data exports remain available. Consult the compatibility matrix
-before importing production files.
+supported entities/tables/layouts. Record-preserving export retains original records
+and applies guarded safe edits. Original-file download returns unchanged imported
+bytes. Native DIMENSION graphics, MESH, HELIX, WIPEOUT, OCS/XYZ geometry, hatch
+boundaries and paper layouts have documented support. SVG/PNG and application-specific
+exports remain available. Consult the compatibility matrix for production exchanges.
 
 This is **not full AutoCAD/Fusion/Visio or universal DXF parity**. The 3D kernel is
 faceted, not curved ACIS/B-rep, and does not author native `3DSOLID`. Proprietary
-Autodesk action/association graphs are not evaluated. Face profiles are snapshots,
-not fully associative sketches; font/Bigfont fidelity, external reference resolution
-and complete paper plotting remain bounded. Unshifted two-color LINEAR hatch gradients
-have a gradient preview; other retained distributions have documented limitations.
+Autodesk action/association graphs are not evaluated. Face/view workplanes are
+snapshots, not fully associative supports. Font/Bigfont fidelity, external references
+and complete paper plotting remain bounded. Other readers receive evaluated native
+path vertices, not executable Autodesk parameter graphs.
 
 ## Reusable packages
 
 | Package | Responsibility |
 |---|---|
-| `@conduitcad/manipulation2d` | Native planar preview sessions, exact fields and geometric handles |
-| `@conduitcad/manipulation3d` | DOM-free visual edit sessions, world gestures, handle layouts |
-| `@conduitcad/icons` | Original decorative SVG registry and immutable discovery data |
+| `@conduitcad/manipulation2d` | Native planar sessions, live parameters, exact fields and handles |
+| `@conduitcad/manipulation3d` | Spatial feature/path sessions, world gestures and handle layouts |
+| `@conduitcad/icons` | Original SVG registry and immutable discovery data |
 | `@conduitcad/geometry` | Planar double-precision geometry and curve evaluation |
 | `@conduitcad/geometry3d` | Spatial vectors, transforms and curve geometry |
 | `@conduitcad/spatial` | Packed BVH and incremental indexing |
 | `@conduitcad/drawing` | Native construction factories and point sessions |
-| `@conduitcad/model` | Document, entities, blocks and portable geometry |
-| `@conduitcad/modeling` | Faceted 3D features, topology, booleans and regeneration |
+| `@conduitcad/model` | Documents, entities, blocks and portable geometry |
+| `@conduitcad/modeling` | Faceted features, topology, booleans and regeneration |
 | `@conduitcad/history` | Atomic transactions and bounded undo/redo |
 | `@conduitcad/constraints` | Expressions and component-partitioned planar solving |
 | `@conduitcad/routing` | Port-aware orthogonal routing and graphs |
 | `@conduitcad/symbols` | Engineering masters, connection styles and starters |
 | `@conduitcad/dxf` | Typed ASCII/binary readers, writers and preservation |
 | `@conduitcad/renderer` | Retained 2D scene, camera and rendering backends |
-| `@conduitcad/renderer3d` | Depth-aware spatial rendering, picking and navigation |
+| `@conduitcad/renderer3d` | Depth-aware rendering, picking and navigation |
 | `@conduitcad/input` | Mouse, pen, touch and wheel arbitration |
-| `@conduitcad/workspace` | Independent document sessions and recovery coordination |
+| `@conduitcad/workspace` | Independent sessions and recovery coordination |
 | `@conduitcad/storage` | Browser recovery and downloads |
 | `@conduitcad/exchange` | SVG, PNG and application exchanges |
-| `@conduitcad/workbench` | Responsive shell, tools, inspectors and dialogs |
+| `@conduitcad/workbench` | Responsive shell, visual tools, inspectors and dialogs |
 
 ```sh
 npm run pack:packages
 node scripts/verify-packages.mjs
+npm run samples:live
 npm run icons
 ```
 
-Archives are in `artifacts/npm/`. They are prepared and tested, **not published to
-npm**. `@conduitcad` is an implementation namespace, not an assertion of registry
-ownership. Rename it to a controlled scope before registry publication. Unpublished
-interdependent archives can be installed together with
-`npm install /path/to/artifacts/npm/*.tgz`. Public TypeScript declarations accompany
-the packages; DXF extension data remains permissively typed where documented.
+Archives in `artifacts/npm/` are prepared and tested, **not published to npm**.
+`@conduitcad` is an implementation namespace, not an assertion of registry ownership.
+Rename it to a controlled scope before registry publication. Unpublished interdependent
+archives can be installed together with `npm install /path/to/artifacts/npm/*.tgz`.
+Public TypeScript declarations accompany the packages; DXF extension data remains
+permissively typed where documented. Manipulation sessions are DOM-independent;
+the host supplies history, input arbitration and preview presentation.
 
-## Validation and implementation notes
+## Validation and performance scope
 
-The visual-editing checkpoint adds isolated transaction, geometric gesture, on-canvas
-interaction, mobile layout and independent DXF checks. Exact execution scope and counts
-are recorded in [the historical 0.12.0 local validation record](docs/VALIDATION_VISUAL_0120.md).
-[0.11.0 3D visual validation](docs/VALIDATION_VISUAL_0110.md) is retained as history.
-[0.10.0 rendering validation](docs/VALIDATION_RENDERING_0100.md) is retained as history.
-The previous [0.9.1 iconography validation](docs/VALIDATION_ICONOGRAPHY_091.md) remains
-a historical release record, not evidence that the new WebGPU graph has executed.
-The permanent Pages workflow validates the production build and compares hosted
-resource hashes after deployment.
+The 0.13.0 qualification has 893 passing Node tests, strict TypeScript contracts,
+clean offline integration of all 21 packages and a 113-assertion live workspace suite
+executed on Canvas, WebGL2 and WebGPU. Inherited editing, mobile, document recovery,
+rendering and independent DXF audits remain permanent gates. See the
+[current validation record](docs/VALIDATION_LIVE_0130.md) for exact runs and scope.
+The normal Pages pipeline validates before deployment and checks live resource hashes.
 
-Canvas software depth and WebGL2 execute the new graph with fixture-level regression
-coverage using SwiftShader. Native-origin WebGPU execution passed the 0.12.0 publication gate. This is not physical GPU performance or universal pixel
-equivalence. Emulated touch and keyboard tests are not physical iOS/Android, native
-screen-reader or OS keyboard acceptance. Native IndexedDB/Web Locks recovery has a
-separate suite; crash/eviction durability still requires independent qualification.
+GPU execution uses Google SwiftShader in CI, not physical graphics hardware. Emulated
+touch/keyboard tests do not certify physical iOS/Android, native screen readers or OS
+keyboard behavior. Native IndexedDB/Web Locks recovery has separate tests; historical
+memory-adapter runs are not reclassified as native-origin or durability evidence.
+Earlier validation documents preserve their original execution scope.
 
-No MutationObserver, per-frame DOM scan, icon font or remote asset load is used for
-iconography. The visual controller updates its projected handle nodes at frame boundaries
-and does not scan the unrelated document DOM. Existing 2D geometry/solver semantics are
-retained; pivoted transforms are an explicit extension to the 3D feature evaluator.
-CPU-only benchmarks are labeled as such; they are not GPU completion timestamps or
-mobile frame-rate guarantees. Large topology edits and snapshot history still incur
-whole-document costs.
+Camera changes reproject controls without reparsing unchanged spatial path expressions.
+There is no icon font, remote icon loading, MutationObserver or unrelated per-frame DOM
+scan. Geometry and topology changes still incur their required uploads. Preview
+regeneration clones and solves documents synchronously: no million-entity interactive
+solving, hardware frame rate or universal pixel-equivalence guarantee is implied.
 
 ## Documentation and license
 
 [DXF compatibility](docs/DXF_COMPATIBILITY.md) · [Drawing tools](docs/DRAWING_TOOLS.md) ·
-[Parametric authoring](docs/PARAMETRIC_AUTHORING.md) · [Visual 3D editing](docs/VISUAL_EDITING_3D.md) · [3D modeling](docs/MODELING_3D.md) ·
-[Face authoring](docs/AUTHORING_3D_090.md) · [Symbols](docs/SYMBOLS.md) ·
-[Multi-document workflows](docs/MULTI_DOCUMENT.md) · [Mobile UI](docs/MOBILE_UI.md) ·
-[API examples](docs/API.md) · [Release notes](RELEASE_NOTES.md)
+[Parametric authoring](docs/PARAMETRIC_AUTHORING.md) ·
+[Visual 2D editing](docs/VISUAL_EDITING_2D.md) · [Visual 3D editing](docs/VISUAL_EDITING_3D.md) ·
+[Live parameters and paths](docs/LIVE_PARAMETERS_PATHS_0130.md) ·
+[3D modeling](docs/MODELING_3D.md) · [Face authoring](docs/AUTHORING_3D_090.md) ·
+[Symbols](docs/SYMBOLS.md) · [Multi-document workflows](docs/MULTI_DOCUMENT.md) ·
+[API examples](docs/API.md)
 
-`apps/studio` is the entry point, `packages` contains reusable components, `scripts`
-contains build/sample tooling, `tests` contains validation, `samples` contains drawings,
-and `dist` contains the prebuilt application. MIT licensed; see `LICENSE` and
-`THIRD_PARTY_NOTICES.md`. Drawings are processed locally, without accounts, telemetry
-or document uploads. Always retain exported project backups.
+`apps/studio` is the entry point; `packages` contains reusable components; `scripts`
+contains build/sample tooling; `tests` contains validation; `samples` contains drawings;
+`dist` contains the prebuilt application. MIT licensed; see `LICENSE` and
+`THIRD_PARTY_NOTICES.md`. Drawings are processed locally without telemetry or document
+uploads. Always retain exported project backups.
