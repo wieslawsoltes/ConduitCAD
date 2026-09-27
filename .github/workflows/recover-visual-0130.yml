@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Validate preserved source fragments without changing application
+      - name: Inspect exact bytes and recover complete file patches only
         run: |
           python - <<'PY'
           import hashlib,json,lzma,pathlib,re,subprocess
@@ -23,18 +23,24 @@ jobs:
           raw=b''.join(p.read_bytes() for p in parts)
           (out/'uploaded.xz').write_bytes(raw)
           decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
-          patch=decoder.decompress(raw,max_length=16*1024*1024)
+          patch=b'';error=None
+          for offset in range(0,len(raw),256):
+              try: patch+=decoder.decompress(raw[offset:offset+256],max_length=16*1024*1024-len(patch))
+              except lzma.LZMAError as e:
+                  error={'offset':offset,'message':str(e)};break
+              if decoder.eof:break
           (out/'prefix.patch').write_bytes(patch)
-          report={'baseline':'f4823402d7ba6cb7b7186ee60bf32a5f7e8b1080','completeXZ':decoder.eof,'compressedBytes':len(raw),'patchBytes':len(patch),'compressedSHA256':hashlib.sha256(raw).hexdigest(),'patchSHA256':hashlib.sha256(patch).hexdigest(),'files':[]}
+          report={'baseline':'f4823402d7ba6cb7b7186ee60bf32a5f7e8b1080','completeXZ':decoder.eof,'decodeError':error,'compressedBytes':len(raw),'patchBytes':len(patch),'compressedSHA256':hashlib.sha256(raw).hexdigest(),'patchSHA256':hashlib.sha256(patch).hexdigest(),'parts':[{'name':p.name,'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in parts],'files':[]}
           for i,chunk in enumerate(re.split(rb'(?m)(?=^diff --git )',patch)):
               if not chunk.startswith(b'diff --git '):continue
               f=out/f'file-{i:03}.patch';f.write_bytes(chunk)
-              check=subprocess.run(['git','apply','--unidiff-zero','--check',str(f)],capture_output=True,text=True)
-              report['files'].append({'file':f.name,'header':chunk.splitlines()[0].decode(),'applicable':check.returncode==0,'error':check.stderr})
+              check=subprocess.run(['git','apply','--unidiff-zero','--check',str(f)],capture_output=True,text=True,errors='replace')
+              report['files'].append({'file':f.name,'header':chunk.splitlines()[0].decode(errors='replace'),'applicable':check.returncode==0,'error':check.stderr})
           (out/'report.json').write_text(json.dumps(report,indent=2))
           print(json.dumps(report,indent=2))
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: conduitcad-0130-recovered-upload
           path: recovered
