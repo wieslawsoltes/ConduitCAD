@@ -1,0 +1,1241 @@
+{
+  "reports": [
+    {
+      "backend": "Canvas 2D \u00b7 software depth buffer",
+      "reasons": [],
+      "adapter": null,
+      "secure": true,
+      "gpuAvailable": true,
+      "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/143.0.0.0 Safari/537.36",
+      "sampleCount": 1,
+      "glRenderer": null,
+      "requested": "canvas",
+      "executed": true,
+      "physicalDevice": false,
+      "modes": {
+        "shaded-edges": {
+          "sha256": "2f64bc9bdcce85f13ae4c1549b71615c666d5c8846f18d4abf689979eebc2afb",
+          "width": 564,
+          "height": 566
+        },
+        "shaded": {
+          "sha256": "101f26e1fb400988e7c67e42a4d990d17cac85baf5675f1e727e52b7b59c2b90",
+          "width": 564,
+          "height": 566
+        },
+        "shaded-hidden": {
+          "sha256": "2e6cdbe3b4b0fb111a4d1db883cb61688d6dd44a578763661fdc365be19a13b9",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe": {
+          "sha256": "7a40a69ab9caf548b42b695ef058b6dcb673864b708459999ce152df2ef5788b",
+          "width": 564,
+          "height": 566
+        },
+        "hidden": {
+          "sha256": "d296ed75e121da7b5617d1912eb37a9865ede9e4993357082c9f0a4505169502",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe-hidden": {
+          "sha256": "672bdba77f1910f9da7117c9fa0e027f186832afc2065271d85315aebaaf6f1a",
+          "width": 564,
+          "height": 566
+        },
+        "realistic": {
+          "sha256": "8b31ac0933f661e9e2b5b8eb88b54ffc06211eff948b012bd03af425f601d9cc",
+          "width": 564,
+          "height": 566
+        },
+        "realistic-edges": {
+          "sha256": "19061cefe8f3320c09968c09cccd785ab57ec6c1ebb060e8b050aae46a9cd6cf",
+          "width": 564,
+          "height": 566
+        },
+        "conceptual": {
+          "sha256": "d3c181db67abdff252c641daa6af83bc14c117b70bd33c02651ca1fc6d686989",
+          "width": 564,
+          "height": 566
+        },
+        "gray": {
+          "sha256": "cce466e2e5e43815b97ef3d39bb5dbad6642ca1a6738bc4646dc735fd92c3050",
+          "width": 564,
+          "height": 566
+        },
+        "sketchy": {
+          "sha256": "5cf462e8be72199ba974f0fb3bbb60c918d132f328426dfabd00c105132ab78b",
+          "width": 564,
+          "height": 566
+        },
+        "xray": {
+          "sha256": "67d57bd87302ec821453e379e7663d669041c903235ca9429a5fbaed17058d91",
+          "width": 564,
+          "height": 566
+        },
+        "flat": {
+          "sha256": "95cbd818efa2a93bad06c2bd39a9887be5e44478d78c4a53d4f53f1670e0aabd",
+          "width": 564,
+          "height": 566
+        },
+        "flat-edges": {
+          "sha256": "9d44090802afab84813f8e1023eca3b7206f35ae72a67b9f956d12770888c540",
+          "width": 564,
+          "height": 566
+        },
+        "clay": {
+          "sha256": "f89e2f006d7a8bf4183a2ae44d01f9abdfa11d3cf8f12a917db93b0ff3937196",
+          "width": 564,
+          "height": 566
+        },
+        "normals": {
+          "sha256": "f9d9f7e85b92dbe383f8a2542d136ae8147682655b74a36c32b85dd5d2cf4192",
+          "width": 564,
+          "height": 566
+        }
+      },
+      "stats": {
+        "backend": "Canvas 2D \u00b7 software depth buffer",
+        "style": "shaded",
+        "triangles": 2798,
+        "segments": 2793,
+        "frameMs": 25.599999999976717,
+        "uploads": 11,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
+      }
+    },
+    {
+      "backend": "WebGL2",
+      "reasons": [],
+      "adapter": null,
+      "secure": true,
+      "gpuAvailable": true,
+      "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/143.0.0.0 Safari/537.36",
+      "sampleCount": 4,
+      "glRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+      "requested": "webgl2",
+      "executed": true,
+      "physicalDevice": false,
+      "modes": {
+        "shaded-edges": {
+          "sha256": "109a8f488de2cbbfc3ec86936be8862b189a617591bdb7a20e44e8b31d12bc89",
+          "width": 564,
+          "height": 566
+        },
+        "shaded": {
+          "sha256": "2002c724372187f83b1c2f1b9cf3b3f1443a556796172d2f9c4ea6ea88c7e2e7",
+          "width": 564,
+          "height": 566
+        },
+        "shaded-hidden": {
+          "sha256": "7685cf74aa89771a2b781010cfcdd7fce949ac2e09a8bdd0d2090a469701d21d",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe": {
+          "sha256": "e6b766c64bd85bfa47d77b60d3274b8b8dc902eacb88d1d733c578ee3fe6fd90",
+          "width": 564,
+          "height": 566
+        },
+        "hidden": {
+          "sha256": "f1a2b548f00f999439df110929b4d7b3404f329659574b3d23f9fe19f26a313d",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe-hidden": {
+          "sha256": "41491fc829d5ddbe5094a5edba39126c6f64564d9b2fddf16ce476b8f9a9423b",
+          "width": 564,
+          "height": 566
+        },
+        "realistic": {
+          "sha256": "07fb8089efda0bd29d8e307d1ec14f9886b7d3cc177019a8cf1fcb8f06474d21",
+          "width": 564,
+          "height": 566
+        },
+        "realistic-edges": {
+          "sha256": "8815dd04ce4e4816ffdd7ae413648061e10d15a45a27018a89ff4e30b754cd87",
+          "width": 564,
+          "height": 566
+        },
+        "conceptual": {
+          "sha256": "91f2dab981426920c00ee4f10654c4414e18d0bf4054917a0bb7595f4ec28165",
+          "width": 564,
+          "height": 566
+        },
+        "gray": {
+          "sha256": "e722b2ddd3b5a4f4cf0d862c87a6d44aeda81be26ddb08d4967299bb5f29c842",
+          "width": 564,
+          "height": 566
+        },
+        "sketchy": {
+          "sha256": "6c5b5f6ba2e1084ecfcd51cf156d186f76a8c67b9bd2b3212ecd6007bd110211",
+          "width": 564,
+          "height": 566
+        },
+        "xray": {
+          "sha256": "1c699e719bc46e2f20ea91bd1c3b32f761de15df0596055c5427d873dfff253f",
+          "width": 564,
+          "height": 566
+        },
+        "flat": {
+          "sha256": "ed1cd9d62c8f273991bd460ee10fece5804e04463c50e5a6e13d359ee2a1b95d",
+          "width": 564,
+          "height": 566
+        },
+        "flat-edges": {
+          "sha256": "42d465f095153c9282f0e90ce478cd587f8310555a732e644b2a199d6647b6c1",
+          "width": 564,
+          "height": 566
+        },
+        "clay": {
+          "sha256": "752588dcbb725b2ad9e963ca588494743166309ccca95e02b25c97c189da0709",
+          "width": 564,
+          "height": 566
+        },
+        "normals": {
+          "sha256": "d4aa90772043cfe8c9bab57170e9f2f481a8632679c6907a8ad65d5e7dcf4e76",
+          "width": 564,
+          "height": 566
+        }
+      },
+      "stats": {
+        "backend": "WebGL2",
+        "style": "shaded",
+        "triangles": 2798,
+        "segments": 2793,
+        "frameMs": 0.09999999997671694,
+        "uploads": 12,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
+      },
+      "forcedResourceFailure": {
+        "simulated": true,
+        "fallback": "Canvas 2D \u00b7 software depth buffer"
+      },
+      "comparison": {
+        "shaded-edges": {
+          "meanAbsoluteChannelError": 0.15865035210385184,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "shaded": {
+          "meanAbsoluteChannelError": 0.2159267473623537,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "shaded-hidden": {
+          "meanAbsoluteChannelError": 0.13828743035193677,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "wireframe": {
+          "meanAbsoluteChannelError": 0.09931166411882147,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "hidden": {
+          "meanAbsoluteChannelError": 1.1569796339456515,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "wireframe-hidden": {
+          "meanAbsoluteChannelError": 0.8956145736744939,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "realistic": {
+          "meanAbsoluteChannelError": 0.18856456072642824,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "realistic-edges": {
+          "meanAbsoluteChannelError": 0.1826282902705728,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "conceptual": {
+          "meanAbsoluteChannelError": 0.19050572638648725,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "gray": {
+          "meanAbsoluteChannelError": 0.21267197955040976,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "sketchy": {
+          "meanAbsoluteChannelError": 0.7540775965048576,
+          "maskF1TwoPixelTolerance": 0.9986163400585643
+        },
+        "xray": {
+          "meanAbsoluteChannelError": 0.044851473155735996,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "flat": {
+          "meanAbsoluteChannelError": 0.23779018286010242,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "flat-edges": {
+          "meanAbsoluteChannelError": 0.30312361643652525,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "clay": {
+          "meanAbsoluteChannelError": 0.17148564435422567,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "normals": {
+          "meanAbsoluteChannelError": 0.24786774595059685,
+          "maskF1TwoPixelTolerance": 1.0
+        }
+      }
+    },
+    {
+      "backend": "WebGPU",
+      "reasons": [],
+      "adapter": {
+        "vendor": "google",
+        "architecture": "swiftshader",
+        "device": "",
+        "description": ""
+      },
+      "secure": true,
+      "gpuAvailable": true,
+      "browser": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/143.0.0.0 Safari/537.36",
+      "sampleCount": 4,
+      "glRenderer": null,
+      "requested": "webgpu",
+      "executed": true,
+      "physicalDevice": false,
+      "modes": {
+        "shaded-edges": {
+          "sha256": "5ecc4703b709661c1fe6d53c737921bb03ee599e5b9d1e41f42c3ef650ae0a63",
+          "width": 564,
+          "height": 566
+        },
+        "shaded": {
+          "sha256": "e485a8f10759ef4aa968170c087e1c123bcb5f2669e046e84f742fa7ea313d4b",
+          "width": 564,
+          "height": 566
+        },
+        "shaded-hidden": {
+          "sha256": "46bcd9f56383399d71413c44b3994fcc58e0327d5234475ffdd665b9f43f6ab1",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe": {
+          "sha256": "f0034fca802a326bdcea35bdb6badebd24e2092fd0d43baf09a8a00f2b42d117",
+          "width": 564,
+          "height": 566
+        },
+        "hidden": {
+          "sha256": "68339bcb076bd4b9ea3116e066e41a922c4e3d8a507723a0285c2fd6c7db934d",
+          "width": 564,
+          "height": 566
+        },
+        "wireframe-hidden": {
+          "sha256": "0a87dd1958a07b9c579a2b884175d1c7dba4b34d774d4b81fb7d386b4c176f9e",
+          "width": 564,
+          "height": 566
+        },
+        "realistic": {
+          "sha256": "2c1918a355da5c83347911906b57ebaf7aada490fef785fae6ab086585c13e67",
+          "width": 564,
+          "height": 566
+        },
+        "realistic-edges": {
+          "sha256": "c0516cb6c0ffd39d49a5e8a91a5bf1d37105d14206d88bcafc2b0519238444ea",
+          "width": 564,
+          "height": 566
+        },
+        "conceptual": {
+          "sha256": "b0c0402d66aa75505bbaa6651999421736e363b282c6dee6933098d441ad9414",
+          "width": 564,
+          "height": 566
+        },
+        "gray": {
+          "sha256": "213df6328d7f8cef9707f9f90c57b386de5611d2a9aee59f091bc95f79672160",
+          "width": 564,
+          "height": 566
+        },
+        "sketchy": {
+          "sha256": "ab1aca1e2c73f577fc1469363f6cbf51530effaca8690bc689ac1baf30b83590",
+          "width": 564,
+          "height": 566
+        },
+        "xray": {
+          "sha256": "5efaed56950fb8e38357a55154fb2dd277ff37a05842576a1938c57ec5e13b37",
+          "width": 564,
+          "height": 566
+        },
+        "flat": {
+          "sha256": "bf3cfa4fe725c6439106262b597a1a6997e5e61440fad36ba02348f0672d6913",
+          "width": 564,
+          "height": 566
+        },
+        "flat-edges": {
+          "sha256": "48837fae8d57a0c3b1673d38df1f584b4ad97a652d016c7c001358f78fabce5a",
+          "width": 564,
+          "height": 566
+        },
+        "clay": {
+          "sha256": "9bee5de9e9a9ceb3edd032dfe958068d06689ebc24c86bea2ba61f474387d389",
+          "width": 564,
+          "height": 566
+        },
+        "normals": {
+          "sha256": "182ee5e545bafc763f5d01643ddd9178246537e6f0c1dc87d92d141e267c639f",
+          "width": 564,
+          "height": 566
+        }
+      },
+      "stats": {
+        "backend": "WebGL2",
+        "style": "shaded",
+        "triangles": 2798,
+        "segments": 2793,
+        "frameMs": 0.2000000000698492,
+        "uploads": 10,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
+      },
+      "comparison": {
+        "shaded-edges": {
+          "meanAbsoluteChannelError": 0.15878400955650787,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "shaded": {
+          "meanAbsoluteChannelError": 0.2135616369696514,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "shaded-hidden": {
+          "meanAbsoluteChannelError": 0.14015759049027224,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "wireframe": {
+          "meanAbsoluteChannelError": 0.09965102874470591,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "hidden": {
+          "meanAbsoluteChannelError": 1.173465445371693,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "wireframe-hidden": {
+          "meanAbsoluteChannelError": 0.9004784519125546,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "realistic": {
+          "meanAbsoluteChannelError": 0.18575671002180288,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "realistic-edges": {
+          "meanAbsoluteChannelError": 0.18490986475536508,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "conceptual": {
+          "meanAbsoluteChannelError": 0.1942575328504958,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "gray": {
+          "meanAbsoluteChannelError": 0.2102494382210193,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "sketchy": {
+          "meanAbsoluteChannelError": 0.7522565137124193,
+          "maskF1TwoPixelTolerance": 0.9986492570914002
+        },
+        "xray": {
+          "meanAbsoluteChannelError": 0.0440349096559156,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "flat": {
+          "meanAbsoluteChannelError": 0.23554515533502077,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "flat-edges": {
+          "meanAbsoluteChannelError": 0.2999419425440025,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "clay": {
+          "meanAbsoluteChannelError": 0.17407003650519176,
+          "maskF1TwoPixelTolerance": 1.0
+        },
+        "normals": {
+          "meanAbsoluteChannelError": 0.24799931500555514,
+          "maskF1TwoPixelTolerance": 1.0
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "name": "canvas shaded-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas shaded-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas shaded shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas shaded renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas shaded-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas shaded-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas wireframe shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas wireframe renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas wireframe-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas wireframe-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas realistic shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas realistic renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas realistic-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas realistic-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas conceptual shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas conceptual renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas gray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas gray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas sketchy shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas sketchy renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas xray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas xray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas flat shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas flat renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas flat-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas flat-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas clay shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas clay renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas normals shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "canvas normals renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "canvas all style switches preserve geometry uploads",
+      "passed": true
+    },
+    {
+      "name": "canvas all sixteen styles produce distinct rendered images",
+      "passed": true
+    },
+    {
+      "name": "canvas shadow map changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "canvas screen-space occlusion changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "canvas section fill is emitted for closed contours",
+      "passed": true
+    },
+    {
+      "name": "canvas cap setting changes the cut image",
+      "passed": true
+    },
+    {
+      "name": "canvas weighted transparency is submission-order independent",
+      "passed": true
+    },
+    {
+      "name": "canvas perspective near-plane crossings remain bounded and error-free",
+      "passed": true
+    },
+    {
+      "name": "canvas camera-only redraws do not reupload or retessellate",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 conceptual shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 conceptual renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 gray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 gray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 sketchy shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 sketchy renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 xray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 xray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 clay shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 clay renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 normals shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgl2 normals renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgl2 all style switches preserve geometry uploads",
+      "passed": true
+    },
+    {
+      "name": "webgl2 all sixteen styles produce distinct rendered images",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shadow map changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "webgl2 screen-space occlusion changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "webgl2 section fill is emitted for closed contours",
+      "passed": true
+    },
+    {
+      "name": "webgl2 cap setting changes the cut image",
+      "passed": true
+    },
+    {
+      "name": "webgl2 weighted transparency is submission-order independent",
+      "passed": true
+    },
+    {
+      "name": "webgl2 perspective near-plane crossings remain bounded and error-free",
+      "passed": true
+    },
+    {
+      "name": "webgl2 camera-only redraws do not reupload or retessellate",
+      "passed": true
+    },
+    {
+      "name": "WebGL2 recreates all resources after context restoration",
+      "passed": true
+    },
+    {
+      "name": "simulated attachment allocation failure reports a working Canvas fallback",
+      "passed": true
+    },
+    {
+      "name": "resource fallback retains native document and visual style",
+      "passed": true
+    },
+    {
+      "name": "resource fallback draws actual geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe-hidden shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe-hidden renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu conceptual shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu conceptual renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu gray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu gray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu sketchy shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu sketchy renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu xray shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu xray renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat-edges shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat-edges renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu clay shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu clay renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu normals shader/passes complete without API errors",
+      "passed": true
+    },
+    {
+      "name": "webgpu normals renders nonempty geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu all style switches preserve geometry uploads",
+      "passed": true
+    },
+    {
+      "name": "webgpu all sixteen styles produce distinct rendered images",
+      "passed": true
+    },
+    {
+      "name": "webgpu shadow map changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "webgpu screen-space occlusion changes actual pixels",
+      "passed": true
+    },
+    {
+      "name": "webgpu section fill is emitted for closed contours",
+      "passed": true
+    },
+    {
+      "name": "webgpu cap setting changes the cut image",
+      "passed": true
+    },
+    {
+      "name": "webgpu weighted transparency is submission-order independent",
+      "passed": true
+    },
+    {
+      "name": "webgpu perspective near-plane crossings remain bounded and error-free",
+      "passed": true
+    },
+    {
+      "name": "webgpu camera-only redraws do not reupload or retessellate",
+      "passed": true
+    },
+    {
+      "name": "WebGPU device loss falls back to working WebGL2",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 shaded-hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe-hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 wireframe-hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 realistic-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 conceptual has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 conceptual matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 gray has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 gray matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 sketchy has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 sketchy matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 xray has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 xray matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 flat-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 clay has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 clay matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgl2 normals has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgl2 normals matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu shaded-hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe-hidden has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu wireframe-hidden matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu realistic-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu conceptual has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu conceptual matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu gray has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu gray matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu sketchy has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu sketchy matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu xray has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu xray matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat-edges has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu flat-edges matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu clay has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu clay matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "webgpu normals has identical output dimensions",
+      "passed": true
+    },
+    {
+      "name": "webgpu normals matches software reference within declared AA tolerance",
+      "passed": true
+    },
+    {
+      "name": "no uncaught rendering errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "origin": "localhost",
+  "reference": "Canvas depth renderer; per-style mean channel error <5 and 2px foreground-mask F1 >.94",
+  "physicalDevice": false
+}

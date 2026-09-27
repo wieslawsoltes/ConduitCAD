@@ -1,0 +1,638 @@
+{
+  "checks": [
+    {
+      "name": "requested webgpu backend executes without substitution",
+      "passed": true
+    },
+    {
+      "name": "visual authoring is default without test preference override",
+      "passed": true
+    },
+    {
+      "name": "Create opens a searchable nonmodal palette",
+      "passed": true
+    },
+    {
+      "name": "all 22 tools appear in palette",
+      "passed": true
+    },
+    {
+      "name": "search has explicit empty state",
+      "passed": true
+    },
+    {
+      "name": "box starts geometry preview without a dialog",
+      "passed": true
+    },
+    {
+      "name": "preview leaves source entities and history untouched",
+      "passed": true
+    },
+    {
+      "name": "inline dimension edits real preview geometry",
+      "passed": true
+    },
+    {
+      "name": "width dragging uses world-space distance",
+      "passed": true
+    },
+    {
+      "name": "drag retains preview identity and working camera",
+      "passed": true
+    },
+    {
+      "name": "pointer samples create no model history entries",
+      "passed": true
+    },
+    {
+      "name": "draft undo reverts just the last drag",
+      "passed": true
+    },
+    {
+      "name": "draft keyboard redo restores the drag",
+      "passed": true
+    },
+    {
+      "name": "keyboard slider changes the shared parameter",
+      "passed": true
+    },
+    {
+      "name": "handle exposes name and numeric slider value",
+      "passed": true
+    },
+    {
+      "name": "invalid geometry clears stale preview and disables Apply",
+      "passed": true
+    },
+    {
+      "name": "corrected geometry enables Apply",
+      "passed": true
+    },
+    {
+      "name": "invalid expression gives inline feedback",
+      "passed": true
+    },
+    {
+      "name": "invalid open field cannot commit an older valid value",
+      "passed": true
+    },
+    {
+      "name": "Apply makes one native feature and one history entry",
+      "passed": true
+    },
+    {
+      "name": "model undo removes entire operation",
+      "passed": true
+    },
+    {
+      "name": "redo restores entire operation",
+      "passed": true
+    },
+    {
+      "name": "unchanged existing edit does not add history",
+      "passed": true
+    },
+    {
+      "name": "drag retains named parameter expressions",
+      "passed": true
+    },
+    {
+      "name": "committed feature remains expression driven",
+      "passed": true
+    },
+    {
+      "name": "Cancel changes neither geometry nor history",
+      "passed": true
+    },
+    {
+      "name": "queued changes coalesce to one final geometry evaluation",
+      "passed": true
+    },
+    {
+      "name": "stale-source guard catches unversioned external mutations",
+      "passed": true
+    },
+    {
+      "name": "independent transaction cancels active draft",
+      "passed": true
+    },
+    {
+      "name": "canvas face selection finds native top face",
+      "passed": true
+    },
+    {
+      "name": "contextual hole opens visual placement without modal",
+      "passed": true
+    },
+    {
+      "name": "hole center has face-plane manipulator",
+      "passed": true
+    },
+    {
+      "name": "plane handle moves the hole center in local U/V coordinates",
+      "passed": true
+    },
+    {
+      "name": "blind depth has a draggable dimension",
+      "passed": true
+    },
+    {
+      "name": "counterbore controls drive same valid preview",
+      "passed": true
+    },
+    {
+      "name": "visual hole preserves native feature dependencies",
+      "passed": true
+    },
+    {
+      "name": "webgpu counterbore ascii is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "webgpu counterbore binary is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "vertex edit demands explicit feature detach",
+      "passed": true
+    },
+    {
+      "name": "vertex preview does not detach live feature",
+      "passed": true
+    },
+    {
+      "name": "missing selection opens canvas source picker",
+      "passed": true
+    },
+    {
+      "name": "canvas picker attaches original source identity",
+      "passed": true
+    },
+    {
+      "name": "transform pivot defaults to selected stock center",
+      "passed": true
+    },
+    {
+      "name": "translation axis edits displacement",
+      "passed": true
+    },
+    {
+      "name": "Rotate shows three oriented rings",
+      "passed": true
+    },
+    {
+      "name": "rotation ring changes the angle through real pointer motion",
+      "passed": true
+    },
+    {
+      "name": "scale axes follow object rotation",
+      "passed": true
+    },
+    {
+      "name": "transform commits dependency based geometry",
+      "passed": true
+    },
+    {
+      "name": "webgpu transform ascii is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "webgpu transform binary is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "on-canvas sketch creates native DXF profile",
+      "passed": true
+    },
+    {
+      "name": "symmetric extrusion handle represents total length",
+      "passed": true
+    },
+    {
+      "name": "two-sided extrusion exposes both handles",
+      "passed": true
+    },
+    {
+      "name": "extrusion retains native source profile",
+      "passed": true
+    },
+    {
+      "name": "webgpu extrusion ascii is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "webgpu extrusion binary is an actual browser DXF download",
+      "passed": true
+    },
+    {
+      "name": "optional Advanced handoff retains draft fields",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in shaded",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in shaded-edges",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in shaded-hidden",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in wireframe",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in hidden",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in wireframe-hidden",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in realistic",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in realistic-edges",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in conceptual",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in gray",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in sketchy",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in xray",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in flat",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in flat-edges",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in clay",
+      "passed": true
+    },
+    {
+      "name": "webgpu visual manipulation remains active in normals",
+      "passed": true
+    },
+    {
+      "name": "return to 2D cancels draft without creating geometry",
+      "passed": true
+    },
+    {
+      "name": "document switch releases isolated draft",
+      "passed": true
+    },
+    {
+      "name": "320x568 palette bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 no autofocus keyboard on open",
+      "passed": true
+    },
+    {
+      "name": "320x568 canvas keeps useful height",
+      "passed": true
+    },
+    {
+      "name": "320x568 controls and confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 handles keep 44px targets",
+      "passed": true
+    },
+    {
+      "name": "320x568 old dock does not cover editing controls",
+      "passed": true
+    },
+    {
+      "name": "320x568 options nonmodal and bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 readable numeric options",
+      "passed": true
+    },
+    {
+      "name": "320x568 inline edit does not scroll page",
+      "passed": true
+    },
+    {
+      "name": "320x568 exact field bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 Escape closes just exact field first",
+      "passed": true
+    },
+    {
+      "name": "320x568 dimension badges cannot intercept handle targets",
+      "passed": true
+    },
+    {
+      "name": "320x568 explicit label preference is honored",
+      "passed": true
+    },
+    {
+      "name": "320x568 labels never push Apply outside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 touch Apply makes one feature and transaction",
+      "passed": true
+    },
+    {
+      "name": "390x844 palette bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 no autofocus keyboard on open",
+      "passed": true
+    },
+    {
+      "name": "390x844 canvas keeps useful height",
+      "passed": true
+    },
+    {
+      "name": "390x844 controls and confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 handles keep 44px targets",
+      "passed": true
+    },
+    {
+      "name": "390x844 old dock does not cover editing controls",
+      "passed": true
+    },
+    {
+      "name": "390x844 options nonmodal and bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 readable numeric options",
+      "passed": true
+    },
+    {
+      "name": "390x844 inline edit does not scroll page",
+      "passed": true
+    },
+    {
+      "name": "390x844 exact field bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 Escape closes just exact field first",
+      "passed": true
+    },
+    {
+      "name": "390x844 dimension badges cannot intercept handle targets",
+      "passed": true
+    },
+    {
+      "name": "390x844 explicit label preference is honored",
+      "passed": true
+    },
+    {
+      "name": "390x844 labels never push Apply outside viewport",
+      "passed": true
+    },
+    {
+      "name": "keyboard viewport reduces chrome and keeps exact input reachable",
+      "passed": true
+    },
+    {
+      "name": "keyboard viewport retains visible Apply and Cancel",
+      "passed": true
+    },
+    {
+      "name": "closing inline input returns focus to canvas",
+      "passed": true
+    },
+    {
+      "name": "one finger begins a real handle gesture",
+      "passed": true
+    },
+    {
+      "name": "second finger rolls back incomplete handle gesture",
+      "passed": true
+    },
+    {
+      "name": "pinch and trailing touch do not commit geometry",
+      "passed": true
+    },
+    {
+      "name": "390x844 touch Apply makes one feature and transaction",
+      "passed": true
+    },
+    {
+      "name": "844x390 palette bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 no autofocus keyboard on open",
+      "passed": true
+    },
+    {
+      "name": "844x390 canvas keeps useful height",
+      "passed": true
+    },
+    {
+      "name": "844x390 controls and confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 handles keep 44px targets",
+      "passed": true
+    },
+    {
+      "name": "844x390 old dock does not cover editing controls",
+      "passed": true
+    },
+    {
+      "name": "844x390 options nonmodal and bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 readable numeric options",
+      "passed": true
+    },
+    {
+      "name": "844x390 inline edit does not scroll page",
+      "passed": true
+    },
+    {
+      "name": "844x390 exact field bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 Escape closes just exact field first",
+      "passed": true
+    },
+    {
+      "name": "844x390 dimension badges cannot intercept handle targets",
+      "passed": true
+    },
+    {
+      "name": "844x390 explicit label preference is honored",
+      "passed": true
+    },
+    {
+      "name": "844x390 labels never push Apply outside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 touch Apply makes one feature and transaction",
+      "passed": true
+    },
+    {
+      "name": "820x1180 palette bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 no autofocus keyboard on open",
+      "passed": true
+    },
+    {
+      "name": "820x1180 canvas keeps useful height",
+      "passed": true
+    },
+    {
+      "name": "820x1180 controls and confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 handles keep 44px targets",
+      "passed": true
+    },
+    {
+      "name": "820x1180 old dock does not cover editing controls",
+      "passed": true
+    },
+    {
+      "name": "820x1180 options nonmodal and bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 readable numeric options",
+      "passed": true
+    },
+    {
+      "name": "820x1180 inline edit does not scroll page",
+      "passed": true
+    },
+    {
+      "name": "820x1180 exact field bounded",
+      "passed": true
+    },
+    {
+      "name": "820x1180 Escape closes just exact field first",
+      "passed": true
+    },
+    {
+      "name": "820x1180 dimension badges cannot intercept handle targets",
+      "passed": true
+    },
+    {
+      "name": "820x1180 explicit label preference is honored",
+      "passed": true
+    },
+    {
+      "name": "820x1180 labels never push Apply outside viewport",
+      "passed": true
+    },
+    {
+      "name": "820x1180 touch Apply makes one feature and transaction",
+      "passed": true
+    },
+    {
+      "name": "1024x768 palette bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 no autofocus keyboard on open",
+      "passed": true
+    },
+    {
+      "name": "1024x768 canvas keeps useful height",
+      "passed": true
+    },
+    {
+      "name": "1024x768 controls and confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 handles keep 44px targets",
+      "passed": true
+    },
+    {
+      "name": "1024x768 old dock does not cover editing controls",
+      "passed": true
+    },
+    {
+      "name": "1024x768 options nonmodal and bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 readable numeric options",
+      "passed": true
+    },
+    {
+      "name": "1024x768 inline edit does not scroll page",
+      "passed": true
+    },
+    {
+      "name": "1024x768 exact field bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 Escape closes just exact field first",
+      "passed": true
+    },
+    {
+      "name": "1024x768 dimension badges cannot intercept handle targets",
+      "passed": true
+    },
+    {
+      "name": "1024x768 explicit label preference is honored",
+      "passed": true
+    },
+    {
+      "name": "1024x768 labels never push Apply outside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 touch Apply makes one feature and transaction",
+      "passed": true
+    },
+    {
+      "name": "no uncaught errors in visual authoring",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": 157,
+  "origin": "localhost",
+  "physicalDevice": false,
+  "requestedBackend": "webgpu",
+  "nativeStorage": true
+}

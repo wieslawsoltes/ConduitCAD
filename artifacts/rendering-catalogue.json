@@ -1,0 +1,239 @@
+{
+  "styles": [
+    {
+      "id": "shaded-edges",
+      "label": "Shaded with visible edges",
+      "group": "Design",
+      "faces": "shaded",
+      "visible": true,
+      "hidden": false,
+      "smooth": true,
+      "description": "Smooth surfaces with depth-tested feature and silhouette edges."
+    },
+    {
+      "id": "shaded",
+      "label": "Shaded",
+      "group": "Design",
+      "faces": "shaded",
+      "visible": false,
+      "hidden": false,
+      "smooth": true,
+      "description": "Smooth, lit surfaces without mesh edges."
+    },
+    {
+      "id": "shaded-hidden",
+      "label": "Shaded with hidden edges",
+      "group": "Design",
+      "faces": "shaded",
+      "visible": true,
+      "hidden": true,
+      "smooth": true,
+      "description": "Shaded surfaces, visible outlines and dashed obscured edges."
+    },
+    {
+      "id": "wireframe",
+      "label": "Wireframe",
+      "group": "Technical",
+      "faces": "none",
+      "visible": true,
+      "hidden": "solid",
+      "smooth": false,
+      "description": "All polygon edges, including edges behind other geometry."
+    },
+    {
+      "id": "hidden",
+      "label": "Wireframe · visible edges only",
+      "group": "Technical",
+      "faces": "none",
+      "visible": true,
+      "hidden": false,
+      "smooth": false,
+      "description": "Hidden-line removal using a surface depth prepass."
+    },
+    {
+      "id": "wireframe-hidden",
+      "label": "Wireframe with hidden edges",
+      "group": "Technical",
+      "faces": "none",
+      "visible": true,
+      "hidden": true,
+      "smooth": false,
+      "description": "Visible edges are solid; occluded edges are dashed."
+    },
+    {
+      "id": "realistic",
+      "label": "Realistic",
+      "group": "Presentation",
+      "faces": "pbr",
+      "visible": false,
+      "hidden": false,
+      "smooth": true,
+      "description": "Linear-light GGX metal/roughness materials and procedural environment lighting."
+    },
+    {
+      "id": "realistic-edges",
+      "label": "Realistic with edges",
+      "group": "Presentation",
+      "faces": "pbr",
+      "visible": true,
+      "hidden": false,
+      "smooth": true,
+      "description": "Material shading with readable feature and silhouette edges."
+    },
+    {
+      "id": "conceptual",
+      "label": "Conceptual",
+      "group": "Presentation",
+      "faces": "gooch",
+      "visible": true,
+      "hidden": false,
+      "smooth": true,
+      "description": "Cool-to-warm Gooch shading for shape comprehension."
+    },
+    {
+      "id": "gray",
+      "label": "Shades of gray",
+      "group": "Presentation",
+      "faces": "gray",
+      "visible": false,
+      "hidden": false,
+      "smooth": true,
+      "description": "Monochrome lit surfaces, without changing entity colors."
+    },
+    {
+      "id": "sketchy",
+      "label": "Sketchy",
+      "group": "Illustration",
+      "faces": "none",
+      "visible": true,
+      "hidden": false,
+      "smooth": false,
+      "description": "Depth-tested lines with deterministic screen-space jitter and overhang."
+    },
+    {
+      "id": "xray",
+      "label": "X-ray",
+      "group": "Inspection",
+      "faces": "shaded",
+      "visible": true,
+      "hidden": "solid",
+      "smooth": true,
+      "description": "Order-independent weighted transparency; internal edges remain visible."
+    },
+    {
+      "id": "flat",
+      "label": "Flat shaded",
+      "group": "Inspection",
+      "faces": "shaded",
+      "visible": false,
+      "hidden": false,
+      "smooth": false,
+      "description": "Original polygon normals expose faceting without altering the mesh."
+    },
+    {
+      "id": "flat-edges",
+      "label": "Flat shaded with edges",
+      "group": "Inspection",
+      "faces": "shaded",
+      "visible": true,
+      "hidden": false,
+      "smooth": false,
+      "description": "Faceted surfaces with every non-coplanar polygon edge."
+    },
+    {
+      "id": "clay",
+      "label": "Clay",
+      "group": "Illustration",
+      "faces": "clay",
+      "visible": true,
+      "hidden": false,
+      "smooth": true,
+      "description": "Neutral material with shape outlines."
+    },
+    {
+      "id": "normals",
+      "label": "Surface normals",
+      "group": "Inspection",
+      "faces": "normals",
+      "visible": false,
+      "hidden": false,
+      "smooth": false,
+      "description": "World-space normal components mapped to RGB for diagnosis."
+    }
+  ],
+  "materials": [
+    {
+      "id": "paint",
+      "label": "Paint",
+      "color": "#568e9b",
+      "metallic": 0,
+      "roughness": 0.36,
+      "opacity": 1
+    },
+    {
+      "id": "aluminum",
+      "label": "Aluminum",
+      "color": "#c7cdd1",
+      "metallic": 1,
+      "roughness": 0.24,
+      "opacity": 1
+    },
+    {
+      "id": "steel",
+      "label": "Steel",
+      "color": "#9da8b2",
+      "metallic": 1,
+      "roughness": 0.32,
+      "opacity": 1
+    },
+    {
+      "id": "copper",
+      "label": "Copper",
+      "color": "#c88455",
+      "metallic": 1,
+      "roughness": 0.28,
+      "opacity": 1
+    },
+    {
+      "id": "brass",
+      "label": "Brass",
+      "color": "#d0b06a",
+      "metallic": 1,
+      "roughness": 0.22,
+      "opacity": 1
+    },
+    {
+      "id": "plastic",
+      "label": "Polymer",
+      "color": "#365f7c",
+      "metallic": 0,
+      "roughness": 0.25,
+      "opacity": 1
+    },
+    {
+      "id": "rubber",
+      "label": "Rubber",
+      "color": "#34383b",
+      "metallic": 0,
+      "roughness": 0.9,
+      "opacity": 1
+    },
+    {
+      "id": "ceramic",
+      "label": "Ceramic",
+      "color": "#e2ddd0",
+      "metallic": 0,
+      "roughness": 0.18,
+      "opacity": 1
+    },
+    {
+      "id": "transparent",
+      "label": "Transparent polymer",
+      "color": "#98c3c5",
+      "metallic": 0,
+      "roughness": 0.12,
+      "opacity": 0.28
+    }
+  ],
+  "entities": 19
+}

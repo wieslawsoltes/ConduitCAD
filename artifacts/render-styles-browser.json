@@ -1,0 +1,380 @@
+{
+  "checks": [
+    {
+      "name": "1440x980 sixteen labeled style choices",
+      "passed": true
+    },
+    {
+      "name": "1440x980 preview panel and confirmation stay inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1440x980 live preview does not blur the model",
+      "passed": true
+    },
+    {
+      "name": "1440x980 search finds multiple hidden-line variants",
+      "passed": true
+    },
+    {
+      "name": "1440x980 empty search has feedback",
+      "passed": true
+    },
+    {
+      "name": "1440x980 style click previews without editing the drawing",
+      "passed": true
+    },
+    {
+      "name": "1440x980 Cancel restores original display and camera",
+      "passed": true
+    },
+    {
+      "name": "1440x980 Keep commits document-specific view state, not CAD geometry",
+      "passed": true
+    },
+    {
+      "name": "1440x980 camera navigation preserves uploaded geometry",
+      "passed": true
+    },
+    {
+      "name": "1440x980 line-width preference is live and uniform-only",
+      "passed": true
+    },
+    {
+      "name": "1440x980 secondary live preferences revert on Cancel",
+      "passed": true
+    },
+    {
+      "name": "1440x980 return to 2D retains drafting camera and controls",
+      "passed": true
+    },
+    {
+      "name": "1440x980 return to 3D retains chosen style",
+      "passed": true
+    },
+    {
+      "name": "320x568 sixteen labeled style choices",
+      "passed": true
+    },
+    {
+      "name": "320x568 preview panel and confirmation stay inside viewport",
+      "passed": true
+    },
+    {
+      "name": "320x568 live preview does not blur the model",
+      "passed": true
+    },
+    {
+      "name": "320x568 style targets are touch-sized",
+      "passed": true
+    },
+    {
+      "name": "320x568 search finds multiple hidden-line variants",
+      "passed": true
+    },
+    {
+      "name": "320x568 empty search has feedback",
+      "passed": true
+    },
+    {
+      "name": "320x568 style click previews without editing the drawing",
+      "passed": true
+    },
+    {
+      "name": "320x568 Cancel restores original display and camera",
+      "passed": true
+    },
+    {
+      "name": "320x568 Keep commits document-specific view state, not CAD geometry",
+      "passed": true
+    },
+    {
+      "name": "320x568 camera navigation preserves uploaded geometry",
+      "passed": true
+    },
+    {
+      "name": "320x568 line-width preference is live and uniform-only",
+      "passed": true
+    },
+    {
+      "name": "320x568 secondary live preferences revert on Cancel",
+      "passed": true
+    },
+    {
+      "name": "320x568 compact live preview hides options while retaining style control",
+      "passed": true
+    },
+    {
+      "name": "320x568 compact style selector changes actual shading",
+      "passed": true
+    },
+    {
+      "name": "320x568 leaving comparison restores exact working camera",
+      "passed": true
+    },
+    {
+      "name": "320x568 return to 2D retains drafting camera and controls",
+      "passed": true
+    },
+    {
+      "name": "320x568 return to 3D retains chosen style",
+      "passed": true
+    },
+    {
+      "name": "390x844 sixteen labeled style choices",
+      "passed": true
+    },
+    {
+      "name": "390x844 preview panel and confirmation stay inside viewport",
+      "passed": true
+    },
+    {
+      "name": "390x844 live preview does not blur the model",
+      "passed": true
+    },
+    {
+      "name": "390x844 style targets are touch-sized",
+      "passed": true
+    },
+    {
+      "name": "390x844 search finds multiple hidden-line variants",
+      "passed": true
+    },
+    {
+      "name": "390x844 empty search has feedback",
+      "passed": true
+    },
+    {
+      "name": "390x844 style click previews without editing the drawing",
+      "passed": true
+    },
+    {
+      "name": "390x844 Cancel restores original display and camera",
+      "passed": true
+    },
+    {
+      "name": "390x844 Keep commits document-specific view state, not CAD geometry",
+      "passed": true
+    },
+    {
+      "name": "390x844 camera navigation preserves uploaded geometry",
+      "passed": true
+    },
+    {
+      "name": "390x844 line-width preference is live and uniform-only",
+      "passed": true
+    },
+    {
+      "name": "390x844 secondary live preferences revert on Cancel",
+      "passed": true
+    },
+    {
+      "name": "390x844 compact live preview hides options while retaining style control",
+      "passed": true
+    },
+    {
+      "name": "390x844 compact style selector changes actual shading",
+      "passed": true
+    },
+    {
+      "name": "390x844 leaving comparison restores exact working camera",
+      "passed": true
+    },
+    {
+      "name": "390x844 return to 2D retains drafting camera and controls",
+      "passed": true
+    },
+    {
+      "name": "390x844 return to 3D retains chosen style",
+      "passed": true
+    },
+    {
+      "name": "844x390 sixteen labeled style choices",
+      "passed": true
+    },
+    {
+      "name": "844x390 preview panel and confirmation stay inside viewport",
+      "passed": true
+    },
+    {
+      "name": "844x390 live preview does not blur the model",
+      "passed": true
+    },
+    {
+      "name": "844x390 style targets are touch-sized",
+      "passed": true
+    },
+    {
+      "name": "844x390 search finds multiple hidden-line variants",
+      "passed": true
+    },
+    {
+      "name": "844x390 empty search has feedback",
+      "passed": true
+    },
+    {
+      "name": "844x390 style click previews without editing the drawing",
+      "passed": true
+    },
+    {
+      "name": "844x390 Cancel restores original display and camera",
+      "passed": true
+    },
+    {
+      "name": "844x390 Keep commits document-specific view state, not CAD geometry",
+      "passed": true
+    },
+    {
+      "name": "844x390 camera navigation preserves uploaded geometry",
+      "passed": true
+    },
+    {
+      "name": "844x390 line-width preference is live and uniform-only",
+      "passed": true
+    },
+    {
+      "name": "844x390 secondary live preferences revert on Cancel",
+      "passed": true
+    },
+    {
+      "name": "844x390 compact live preview hides options while retaining style control",
+      "passed": true
+    },
+    {
+      "name": "844x390 compact style selector changes actual shading",
+      "passed": true
+    },
+    {
+      "name": "844x390 leaving comparison restores exact working camera",
+      "passed": true
+    },
+    {
+      "name": "844x390 return to 2D retains drafting camera and controls",
+      "passed": true
+    },
+    {
+      "name": "844x390 return to 3D retains chosen style",
+      "passed": true
+    },
+    {
+      "name": "1024x768 sixteen labeled style choices",
+      "passed": true
+    },
+    {
+      "name": "1024x768 preview panel and confirmation stay inside viewport",
+      "passed": true
+    },
+    {
+      "name": "1024x768 live preview does not blur the model",
+      "passed": true
+    },
+    {
+      "name": "1024x768 style targets are touch-sized",
+      "passed": true
+    },
+    {
+      "name": "1024x768 search finds multiple hidden-line variants",
+      "passed": true
+    },
+    {
+      "name": "1024x768 empty search has feedback",
+      "passed": true
+    },
+    {
+      "name": "1024x768 style click previews without editing the drawing",
+      "passed": true
+    },
+    {
+      "name": "1024x768 Cancel restores original display and camera",
+      "passed": true
+    },
+    {
+      "name": "1024x768 Keep commits document-specific view state, not CAD geometry",
+      "passed": true
+    },
+    {
+      "name": "1024x768 camera navigation preserves uploaded geometry",
+      "passed": true
+    },
+    {
+      "name": "1024x768 line-width preference is live and uniform-only",
+      "passed": true
+    },
+    {
+      "name": "1024x768 secondary live preferences revert on Cancel",
+      "passed": true
+    },
+    {
+      "name": "1024x768 return to 2D retains drafting camera and controls",
+      "passed": true
+    },
+    {
+      "name": "1024x768 return to 3D retains chosen style",
+      "passed": true
+    },
+    {
+      "name": "named preset and drawing default are portable metadata",
+      "passed": true
+    },
+    {
+      "name": "new document does not inherit another document display style",
+      "passed": true
+    },
+    {
+      "name": "tab return restores style and section plane independently",
+      "passed": true
+    },
+    {
+      "name": "material form updates native color and coefficients atomically",
+      "passed": true
+    },
+    {
+      "name": "material assignment exposes realistic shading",
+      "passed": true
+    },
+    {
+      "name": "undo restores original appearance",
+      "passed": true
+    },
+    {
+      "name": "redo restores material coefficients",
+      "passed": true
+    },
+    {
+      "name": "invalid material values leave the document unmodified",
+      "passed": true
+    },
+    {
+      "name": "CAD display command uses the actual mode registry",
+      "passed": true
+    },
+    {
+      "name": "custom preset reloads validated saved fields",
+      "passed": true
+    },
+    {
+      "name": "material study opens an independent editable drawing",
+      "passed": true
+    },
+    {
+      "name": "portable default restores ground, shadows and AO",
+      "passed": true
+    },
+    {
+      "name": "actual viewport PNG download has renderer dimensions",
+      "passed": true
+    },
+    {
+      "name": "workspace snapshot contains per-document display and sections",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser errors",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "origin": "localhost",
+  "renderer": "Canvas software depth",
+  "physicalDevice": false
+}

@@ -1,0 +1,271 @@
+{
+  "checks": [
+    {
+      "name": "ascii: native document has no audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "ascii: seven native dimension subtypes",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 0 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 0 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 0 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 0 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 1 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 1 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 1 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 1 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 2 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 2 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 2 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 2 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 3 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 3 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 3 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 3 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 4 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 4 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 4 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 4 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 5 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 5 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 5 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 5 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 6 type flag",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 6 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 6 native style override",
+      "passed": true
+    },
+    {
+      "name": "ascii: subtype 6 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "ascii: separate native evaluated variants",
+      "passed": true
+    },
+    {
+      "name": "ascii: native variant has expected width 125",
+      "passed": true
+    },
+    {
+      "name": "ascii: native variant has expected width 250",
+      "passed": true
+    },
+    {
+      "name": "binary: native document has no audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "binary: seven native dimension subtypes",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 0 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 0 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 0 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 0 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 1 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 1 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 1 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 1 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 2 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 2 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 2 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 2 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 3 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 3 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 3 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 3 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 4 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 4 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 4 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 4 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 5 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 5 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 5 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 5 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 6 type flag",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 6 independent geometric measurement",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 6 native style override",
+      "passed": true
+    },
+    {
+      "name": "binary: subtype 6 editable native picture",
+      "passed": true
+    },
+    {
+      "name": "binary: separate native evaluated variants",
+      "passed": true
+    },
+    {
+      "name": "binary: native variant has expected width 125",
+      "passed": true
+    },
+    {
+      "name": "binary: native variant has expected width 250",
+      "passed": true
+    }
+  ],
+  "passed": 66,
+  "validator": "ezdxf 1.4.4",
+  "nativeAutodeskDynamicEvaluator": false
+}

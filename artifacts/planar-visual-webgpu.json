@@ -1,0 +1,713 @@
+{
+  "backend": "webgpu",
+  "nativeOrigin": true,
+  "memoryStorageAdapter": false,
+  "physicalDevice": false,
+  "checks": [
+    {
+      "name": "default planar and spatial inspection need no compatibility flags",
+      "passed": true
+    },
+    {
+      "name": "2D native edit is non-modal",
+      "passed": true
+    },
+    {
+      "name": "preview and real document are different objects",
+      "passed": true
+    },
+    {
+      "name": "actual endpoint pointer drag changes native preview",
+      "passed": true
+    },
+    {
+      "name": "drag is isolated from real document/history",
+      "passed": true
+    },
+    {
+      "name": "Undo draft restores preview endpoint",
+      "passed": true
+    },
+    {
+      "name": "Redo draft replays endpoint",
+      "passed": true
+    },
+    {
+      "name": "length expression evaluated live",
+      "passed": true
+    },
+    {
+      "name": "Apply is one real history transaction",
+      "passed": true
+    },
+    {
+      "name": "length formula persists on native LINE",
+      "passed": true
+    },
+    {
+      "name": "drawing undo restores original native geometry",
+      "passed": true
+    },
+    {
+      "name": "line actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "line actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "unchanged geometry apply produces no undo record",
+      "passed": true
+    },
+    {
+      "name": "numeric typing creates actual native circle preview",
+      "passed": true
+    },
+    {
+      "name": "invalid radius clears preview and disables Apply",
+      "passed": true
+    },
+    {
+      "name": "invalid exact input is marked and source unchanged",
+      "passed": true
+    },
+    {
+      "name": "oversized input cannot apply a stale valid value",
+      "passed": true
+    },
+    {
+      "name": "Keep value rejects oversized input",
+      "passed": true
+    },
+    {
+      "name": "Revert value restores last exact state",
+      "passed": true
+    },
+    {
+      "name": "radius drag retains named expression",
+      "passed": true
+    },
+    {
+      "name": "circle actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "circle actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "ARC has valid native preview",
+      "passed": true
+    },
+    {
+      "name": "ARC retains native type",
+      "passed": true
+    },
+    {
+      "name": "ELLIPSE has valid native preview",
+      "passed": true
+    },
+    {
+      "name": "ELLIPSE retains native type",
+      "passed": true
+    },
+    {
+      "name": "angle handle at its center invalidates the complete draft",
+      "passed": true
+    },
+    {
+      "name": "keyboard Apply cannot resurrect a pre-error geometry preview",
+      "passed": true
+    },
+    {
+      "name": "SPLINE exact native controls preview",
+      "passed": true
+    },
+    {
+      "name": "SPLINE is not flattened",
+      "passed": true
+    },
+    {
+      "name": "rational spline weights retained",
+      "passed": true
+    },
+    {
+      "name": "spline actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "spline actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "LWPOLYLINE exact native controls preview",
+      "passed": true
+    },
+    {
+      "name": "LWPOLYLINE is not flattened",
+      "passed": true
+    },
+    {
+      "name": "lwpolyline actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "lwpolyline actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "HATCH exact native controls preview",
+      "passed": true
+    },
+    {
+      "name": "HATCH is not flattened",
+      "passed": true
+    },
+    {
+      "name": "hatch actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "hatch actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "TEXT typing updates preview not document",
+      "passed": true
+    },
+    {
+      "name": "TEXT keeps native text and height",
+      "passed": true
+    },
+    {
+      "name": "text actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "text actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "MTEXT typing updates preview not document",
+      "passed": true
+    },
+    {
+      "name": "MTEXT keeps native text and height",
+      "passed": true
+    },
+    {
+      "name": "mtext actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "mtext actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "managed dimension picture regenerates without flattening",
+      "passed": true
+    },
+    {
+      "name": "dimension actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "dimension actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "driving constraint updated only in preview",
+      "passed": true
+    },
+    {
+      "name": "solver-produced line length is 200",
+      "passed": true
+    },
+    {
+      "name": "visual edit works inside isolated block geometry",
+      "passed": true
+    },
+    {
+      "name": "shared definition updates after parent Save",
+      "passed": true
+    },
+    {
+      "name": "visual workshop opens an independent native drawing",
+      "passed": true
+    },
+    {
+      "name": "native dynamic grip edits through rotated block coordinates",
+      "passed": true
+    },
+    {
+      "name": "move native copy preview isolated",
+      "passed": true
+    },
+    {
+      "name": "move Apply creates unique stable native IDs",
+      "passed": true
+    },
+    {
+      "name": "rotate native copy preview isolated",
+      "passed": true
+    },
+    {
+      "name": "rotate Apply creates unique stable native IDs",
+      "passed": true
+    },
+    {
+      "name": "scale native copy preview isolated",
+      "passed": true
+    },
+    {
+      "name": "scale Apply creates unique stable native IDs",
+      "passed": true
+    },
+    {
+      "name": "offset native copy preview isolated",
+      "passed": true
+    },
+    {
+      "name": "offset Apply creates unique stable native IDs",
+      "passed": true
+    },
+    {
+      "name": "fillet produces native ARC and trimmed lines",
+      "passed": true
+    },
+    {
+      "name": "fillet actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "fillet actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "More is a non-modal drawing palette",
+      "passed": true
+    },
+    {
+      "name": "search filters actual tools",
+      "passed": true
+    },
+    {
+      "name": "polygon options remain non-modal",
+      "passed": true
+    },
+    {
+      "name": "invalid tool options block placement",
+      "passed": true
+    },
+    {
+      "name": "non-modal exact point input creates native polygon",
+      "passed": true
+    },
+    {
+      "name": "Cancel restores source bytes",
+      "passed": true
+    },
+    {
+      "name": "Export closes draft and serializes accepted geometry only",
+      "passed": true
+    },
+    {
+      "name": "concurrent unversioned change prevents commit",
+      "passed": true
+    },
+    {
+      "name": "document switch discards planar draft",
+      "passed": true
+    },
+    {
+      "name": "requested spatial backend executes",
+      "passed": true
+    },
+    {
+      "name": "section is non-modal with real clipping",
+      "passed": true
+    },
+    {
+      "name": "exact section offset changes renderer only",
+      "passed": true
+    },
+    {
+      "name": "invalid plane clears draft clipping and disables Apply",
+      "passed": true
+    },
+    {
+      "name": "actual section handle moves plane",
+      "passed": true
+    },
+    {
+      "name": "section Cancel restores original unclipped view",
+      "passed": true
+    },
+    {
+      "name": "section output is native WCS LINE geometry",
+      "passed": true
+    },
+    {
+      "name": "section actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "section actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "measurement interface leaves canvas interactive",
+      "passed": true
+    },
+    {
+      "name": "Point 2 cannot invent a first point",
+      "passed": true
+    },
+    {
+      "name": "actual surface picking captures WCS point",
+      "passed": true
+    },
+    {
+      "name": "exact measurement is 3-4-12 distance 13",
+      "passed": true
+    },
+    {
+      "name": "measured guide Apply creates native spatial line",
+      "passed": true
+    },
+    {
+      "name": "measurement actual ascii DXF download",
+      "passed": true
+    },
+    {
+      "name": "measurement actual binary DXF download",
+      "passed": true
+    },
+    {
+      "name": "appearance panel non-modal",
+      "passed": true
+    },
+    {
+      "name": "material preset previews isolated document",
+      "passed": true
+    },
+    {
+      "name": "material expression evaluates live",
+      "passed": true
+    },
+    {
+      "name": "invalid material clears preview and disables Apply",
+      "passed": true
+    },
+    {
+      "name": "material commits exact values and one undo record",
+      "passed": true
+    },
+    {
+      "name": "material undo restores native source",
+      "passed": true
+    },
+    {
+      "name": "material refresh preserves exact input node",
+      "passed": true
+    },
+    {
+      "name": "2D mode remains independent after spatial inspection",
+      "passed": true
+    },
+    {
+      "name": "no uncaught desktop page errors",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 planar ribbon in viewport",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 [data-planar-command=apply] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 [data-planar-command=cancel] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 inline input readable and bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 actual touch radius drag",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 keyboard handle nudge",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 cancel touch preview restores source",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 nonmodal tool palette bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 section panel bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 section confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 section collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 measure panel bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 measure confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 measure collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 appearance panel bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 appearance confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "320\u00d7568 appearance collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 planar ribbon in viewport",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 [data-planar-command=apply] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 [data-planar-command=cancel] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 inline input readable and bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 actual touch radius drag",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 keyboard handle nudge",
+      "passed": true
+    },
+    {
+      "name": "two-finger takeover reverts only the unfinished 2D handle gesture",
+      "passed": true
+    },
+    {
+      "name": "pinch and remaining-finger release cannot commit 2D geometry",
+      "passed": true
+    },
+    {
+      "name": "keyboard-sized viewport retains visible exact input and Apply",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 cancel touch preview restores source",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 nonmodal tool palette bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 section panel bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 section confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 section collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 measure panel bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 measure confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 measure collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 appearance panel bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 appearance confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "390\u00d7844 appearance collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 planar ribbon in viewport",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 [data-planar-command=apply] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 [data-planar-command=cancel] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 inline input readable and bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 actual touch radius drag",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 keyboard handle nudge",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 cancel touch preview restores source",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 nonmodal tool palette bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 section panel bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 section confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 section collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 measure panel bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 measure confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 measure collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 appearance panel bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 appearance confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "844\u00d7390 appearance collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 planar ribbon in viewport",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 [data-planar-command=apply] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 [data-planar-command=cancel] 44px and visible",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 inline input readable and bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 actual touch radius drag",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 keyboard handle nudge",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 cancel touch preview restores source",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 nonmodal tool palette bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 section panel bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 section confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 section collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 measure panel bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 measure confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 measure collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 appearance panel bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 appearance confirmation bounded",
+      "passed": true
+    },
+    {
+      "name": "1024\u00d7768 appearance collapsed view keeps confirmation",
+      "passed": true
+    },
+    {
+      "name": "no uncaught page errors across all viewports",
+      "passed": true
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,0 +1,2049 @@
+{
+  "validator": "ezdxf 1.4.4",
+  "files": [
+    {
+      "file": "artifacts/planar-canvas-line-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-line-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-circle-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-circle-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-spline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-spline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-lwpolyline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-lwpolyline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-hatch-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-hatch-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-text-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-text-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-mtext-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-mtext-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-dimension-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-dimension-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-fillet-ascii.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-fillet-binary.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-section-ascii.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-section-binary.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-measurement-ascii.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-canvas-measurement-binary.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-line-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-line-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-circle-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-circle-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-spline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-spline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-lwpolyline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-lwpolyline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-hatch-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-hatch-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-text-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-text-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-mtext-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-mtext-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-dimension-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-dimension-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-fillet-ascii.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-fillet-binary.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-section-ascii.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-section-binary.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-measurement-ascii.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgl2-measurement-binary.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-line-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-line-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-circle-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-circle-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-spline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-spline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-lwpolyline-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-lwpolyline-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-hatch-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-hatch-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-text-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-text-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-mtext-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-mtext-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-dimension-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-dimension-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-fillet-ascii.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-fillet-binary.dxf",
+      "entities": 3,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-section-ascii.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-section-binary.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-measurement-ascii.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "artifacts/planar-webgpu-measurement-binary.dxf",
+      "entities": 16,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "samples/visual/drafting-workshop-binary.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    },
+    {
+      "file": "samples/visual/drafting-workshop.dxf",
+      "entities": 15,
+      "auditErrors": 0,
+      "auditRepairs": 0
+    }
+  ],
+  "checks": [
+    {
+      "name": "planar-canvas-line-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-ascii.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-ascii.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-line-binary.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-ascii.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-ascii.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-binary.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-circle-binary.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-ascii.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-spline-binary.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-ascii.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-lwpolyline-binary.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-ascii.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-ascii.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-binary.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-hatch-binary.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-text-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-ascii.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-mtext-binary.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-ascii.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-dimension-binary.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-ascii.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-fillet-binary.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-ascii.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-section-binary.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-ascii.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-canvas-measurement-binary.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-ascii.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-line-binary.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-ascii.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-ascii.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-binary.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-circle-binary.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-ascii.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-spline-binary.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-ascii.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-lwpolyline-binary.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-ascii.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-ascii.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-binary.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-hatch-binary.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-text-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-ascii.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-mtext-binary.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-ascii.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-dimension-binary.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-ascii.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-fillet-binary.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-ascii.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-section-binary.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-ascii.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-webgl2-measurement-binary.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-ascii.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf exact length 150",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-line-binary.dxf exact angle 30",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-ascii.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-ascii.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-binary.dxf retains CIRCLE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-circle-binary.dxf parameter-driven radius 60",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-ascii.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf retains SPLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf degree/knots retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf native rational weights retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-spline-binary.dxf edited control Y=70",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-ascii.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf retains LWPOLYLINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf bulge retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-lwpolyline-binary.dxf closed topology retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-ascii.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-ascii.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-binary.dxf retains HATCH",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-hatch-binary.dxf edited polygon boundary retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf retains TEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-text-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-ascii.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf retains MTEXT",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf actual user text retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf text height 16",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-mtext-binary.dxf native paragraph break retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-ascii.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf retains DIMENSION",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf native linear dimension subtype",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf anonymous picture block resolves",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-dimension-binary.dxf native custom text",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-ascii.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf retains ARC",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf radius 15",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-fillet-binary.dxf two native tangent lines",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-ascii.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf WCS Z=10 cutting lines retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-section-binary.dxf original body meshes retained",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-ascii.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf zero DXF audit errors",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf zero implicit repairs",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf native database not empty",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf retains LINE",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf exact native 3-4-12 world-space line",
+      "passed": true
+    },
+    {
+      "name": "planar-webgpu-measurement-binary.dxf Euclidean length 13",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop-binary.dxf example independently audits",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop-binary.dxf 15 native example entities",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop-binary.dxf dynamic block picture resolves",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop.dxf example independently audits",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop.dxf 15 native example entities",
+      "passed": true
+    },
+    {
+      "name": "drafting-workshop.dxf dynamic block picture resolves",
+      "passed": true
+    }
+  ],
+  "passed": 408,
+  "nativeAutoCADAcceptance": false
+}

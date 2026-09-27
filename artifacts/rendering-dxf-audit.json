@@ -1,0 +1,1413 @@
+{
+  "passed": 348,
+  "files": [
+    {
+      "file": "material-study.dxf",
+      "entities": 19,
+      "errors": 0,
+      "repairs": 0
+    },
+    {
+      "file": "material-study-binary.dxf",
+      "entities": 19,
+      "errors": 0,
+      "repairs": 0
+    }
+  ],
+  "checks": [
+    {
+      "name": "material-study.dxf no audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf DXF R2018",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf all 19 authored meshes retained",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 0 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 1 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 2 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 3 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 4 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 5 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 6 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 7 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 8 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 9 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 10 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 11 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 12 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 13 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 14 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 15 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 16 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 17 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study.dxf entity 18 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf no audit errors or repairs",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf DXF R2018",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf all 19 authored meshes retained",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 0 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 1 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 2 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 3 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 4 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 5 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 6 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 7 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 8 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 9 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 10 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 11 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 12 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 13 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 14 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 15 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 16 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 17 positive finite independent volume",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 native MESH, never a mislabeled ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 XYZ coordinates unchanged",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 complete native polygon topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 no false subdivision levels",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 native true color",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 native transparency within 8-bit quantization",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 authoring metadata retained as application data",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 closed oriented topology",
+      "passed": true
+    },
+    {
+      "name": "material-study-binary.dxf entity 18 positive finite independent volume",
+      "passed": true
+    }
+  ],
+  "reader": "ezdxf 1.4.4",
+  "nativeAutodeskValidation": false
+}

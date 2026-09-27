@@ -6,10 +6,14 @@
       "triangles": 2798,
       "stats": {
         "backend": "Canvas 2D \u00b7 software depth buffer",
+        "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 9.900000000023283,
-        "uploads": 7
+        "frameMs": 34.09999999997672,
+        "uploads": 5,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
       },
       "secure": true,
       "requested": "canvas",
@@ -46,10 +50,14 @@
       "triangles": 2798,
       "stats": {
         "backend": "WebGL2",
+        "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0.20000000001164153,
-        "uploads": 7
+        "frameMs": 0.09999999997671694,
+        "uploads": 5,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
       },
       "secure": true,
       "requested": "webgl2",
@@ -77,7 +85,7 @@
         "--use-vulkan=swiftshader"
       ],
       "contextRestore": true,
-      "filledMaskIoU": 0.9656711519527404,
+      "filledMaskIoU": 0.9904488378306171,
       "flatInteriorAgreement": 1.0,
       "stableGeometryUploads": true
     },
@@ -87,10 +95,14 @@
       "triangles": 2798,
       "stats": {
         "backend": "WebGPU",
+        "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0.09999999997671694,
-        "uploads": 4
+        "frameMs": 0.19999999995343387,
+        "uploads": 3,
+        "passes": 2,
+        "estimatedAttachmentBytes": 17876544,
+        "capTriangles": 0
       },
       "secure": true,
       "requested": "webgpu",
@@ -118,7 +130,7 @@
         "--use-vulkan=swiftshader"
       ],
       "deviceLossFallback": "WebGL2",
-      "filledMaskIoU": 0.9651855245075585,
+      "filledMaskIoU": 0.9900818166638838,
       "flatInteriorAgreement": 1.0,
       "stableGeometryUploads": true
     }

@@ -1,0 +1,136 @@
+{
+  "ezdxfVersion": "1.4.4",
+  "mastersVerified": 223,
+  "templatesVerified": 20,
+  "errors": 0,
+  "repairs": 0,
+  "normativeCertification": false,
+  "files": [
+    {
+      "file": "artifacts/symbol-catalog.dxf",
+      "entities": 223,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/pid.dxf",
+      "entities": 39,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/electrical.dxf",
+      "entities": 23,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/flow.dxf",
+      "entities": 20,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/water-treatment.dxf",
+      "entities": 16,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/chemical-batch.dxf",
+      "entities": 17,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/oil-gas.dxf",
+      "entities": 16,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/food-beverage.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/pharmaceutical.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/power-single-line.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/solar.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/hvac-air.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/hvac-hydronic.dxf",
+      "entities": 15,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/hydraulic-actuator.dxf",
+      "entities": 17,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/pneumatic-clamp.dxf",
+      "entities": 16,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/instrument-loop.dxf",
+      "entities": 12,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/automation-io.dxf",
+      "entities": 16,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/fire-alarm.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/network.dxf",
+      "entities": 16,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/plumbing.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    },
+    {
+      "file": "samples/industry/quality-workflow.dxf",
+      "entities": 14,
+      "errors": [],
+      "repairs": []
+    }
+  ]
+}

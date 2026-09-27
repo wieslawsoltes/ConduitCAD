@@ -1,0 +1,451 @@
+{
+  "schema": "conduitcad/1",
+  "name": "Visual drafting workshop",
+  "units": "mm",
+  "version": 0,
+  "entities": [
+    {
+      "id": "plate",
+      "type": "LWPOLYLINE",
+      "layer": "Equipment",
+      "points": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 120,
+          "y": 0
+        },
+        {
+          "x": 120,
+          "y": 60
+        },
+        {
+          "x": 0,
+          "y": 60
+        }
+      ],
+      "closed": true,
+      "parametric": {
+        "kind": "rectangle",
+        "width": "Width",
+        "height": "Height"
+      }
+    },
+    {
+      "id": "hole-profile",
+      "type": "CIRCLE",
+      "layer": "Process",
+      "c": {
+        "x": 60,
+        "y": 30
+      },
+      "r": 22,
+      "parametric": {
+        "radius": "Radius"
+      }
+    },
+    {
+      "id": "driven-edge",
+      "type": "LINE",
+      "layer": "Process",
+      "a": {
+        "x": 0,
+        "y": 105
+      },
+      "b": {
+        "x": 120,
+        "y": 105
+      }
+    },
+    {
+      "id": "associated-length",
+      "type": "DIMENSION",
+      "layer": "Annotations",
+      "dimtype": 33,
+      "a": {
+        "x": 0,
+        "y": 105
+      },
+      "b": {
+        "x": 120,
+        "y": 105
+      },
+      "offset": 20,
+      "dimension": {
+        "version": 1,
+        "manualText": false,
+        "references": {
+          "a": {
+            "entityId": "driven-edge",
+            "point": "a"
+          },
+          "b": {
+            "entityId": "driven-edge",
+            "point": "b"
+          }
+        },
+        "style": {
+          "dimtxt": 5,
+          "dimasz": 3,
+          "dimgap": 2
+        },
+        "resolvedScale": 1
+      },
+      "definitionPoint": {
+        "x": 120,
+        "y": 125
+      },
+      "textMidpoint": {
+        "x": 60,
+        "y": 129.5
+      },
+      "measurement": 120,
+      "dirty": true
+    },
+    {
+      "id": "adjustable-bar",
+      "type": "INSERT",
+      "layer": "Equipment",
+      "block": "AdjustableBar",
+      "x": 175,
+      "y": 105,
+      "rotation": 15,
+      "sx": 1,
+      "sy": 1
+    },
+    {
+      "id": "arc",
+      "type": "ARC",
+      "layer": "Process",
+      "c": {
+        "x": 200,
+        "y": 30
+      },
+      "r": 28,
+      "start": 0,
+      "end": 4.71238898038469
+    },
+    {
+      "id": "ellipse",
+      "type": "ELLIPSE",
+      "layer": "Process",
+      "c": {
+        "x": 285,
+        "y": 30
+      },
+      "major": {
+        "x": 36,
+        "y": 12
+      },
+      "ratio": 0.5,
+      "start": 0,
+      "end": 6.283185307179586
+    },
+    {
+      "id": "spline",
+      "type": "SPLINE",
+      "layer": "Equipment",
+      "degree": 3,
+      "controlPoints": [
+        {
+          "x": 170,
+          "y": -60
+        },
+        {
+          "x": 190,
+          "y": -15
+        },
+        {
+          "x": 240,
+          "y": -100
+        },
+        {
+          "x": 290,
+          "y": -45
+        }
+      ],
+      "knots": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1
+      ],
+      "weights": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "multiline",
+      "type": "MTEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 0,
+        "y": -32
+      },
+      "text": "Tap text to edit\\PNative MTEXT · no modal",
+      "height": 6,
+      "mtextWidth": 130,
+      "attachment": 1
+    },
+    {
+      "id": "title",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 0,
+        "y": 165
+      },
+      "text": "EDIT ON CANVAS · choose an entity, drag, type, Apply",
+      "height": 6,
+      "rotation": 0
+    },
+    {
+      "id": "plate-label",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 0,
+        "y": 76
+      },
+      "text": "Rectangle + circle / persistent dimensions",
+      "height": 6,
+      "rotation": 0
+    },
+    {
+      "id": "driver-label",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 0,
+        "y": 143
+      },
+      "text": "Driven length + associated dimension",
+      "height": 6,
+      "rotation": 0
+    },
+    {
+      "id": "bar-label",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 175,
+        "y": 143
+      },
+      "text": "Dynamic block / native parameter grip",
+      "height": 6,
+      "rotation": 0
+    },
+    {
+      "id": "curves-label",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 172,
+        "y": 76
+      },
+      "text": "Native arc / ellipse",
+      "height": 6,
+      "rotation": 0
+    },
+    {
+      "id": "spline-label",
+      "type": "TEXT",
+      "layer": "Annotations",
+      "p": {
+        "x": 170,
+        "y": -90
+      },
+      "text": "Weighted spline controls",
+      "height": 6,
+      "rotation": 0
+    }
+  ],
+  "blocks": {
+    "AdjustableBar": {
+      "name": "AdjustableBar",
+      "base": {
+        "x": 0,
+        "y": 0
+      },
+      "ports": [],
+      "entities": [
+        {
+          "id": "bar-edge",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": 0
+          },
+          "b": {
+            "x": 80,
+            "y": 0
+          }
+        },
+        {
+          "id": "bar-start",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 0,
+            "y": -6
+          },
+          "b": {
+            "x": 0,
+            "y": 6
+          }
+        },
+        {
+          "id": "bar-end",
+          "type": "LINE",
+          "layer": "0",
+          "a": {
+            "x": 80,
+            "y": -6
+          },
+          "b": {
+            "x": 80,
+            "y": 6
+          }
+        }
+      ],
+      "dynamic": {
+        "version": 1,
+        "parameters": [
+          {
+            "name": "Length",
+            "type": "distance",
+            "default": 80,
+            "min": 10,
+            "max": 300,
+            "grip": {
+              "base": {
+                "x": 0,
+                "y": 0
+              },
+              "direction": {
+                "x": 1,
+                "y": 0
+              }
+            }
+          }
+        ],
+        "actions": [
+          {
+            "type": "stretch",
+            "parameter": "Length",
+            "entities": [
+              "bar-edge",
+              "bar-end"
+            ],
+            "direction": {
+              "x": 1,
+              "y": 0
+            },
+            "box": {
+              "minX": 79,
+              "minY": -10,
+              "maxX": 81,
+              "maxY": 10
+            }
+          }
+        ]
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "0",
+      "color": "#344755",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Equipment",
+      "color": "#355463",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Process",
+      "color": "#147c77",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Instruments",
+      "color": "#9b7246",
+      "visible": true,
+      "locked": false,
+      "dash": [
+        5,
+        4
+      ]
+    },
+    {
+      "name": "Electrical",
+      "color": "#6477ba",
+      "visible": true,
+      "locked": false
+    },
+    {
+      "name": "Annotations",
+      "color": "#71808a",
+      "visible": true,
+      "locked": false
+    }
+  ],
+  "linetypes": {
+    "CONTINUOUS": [],
+    "DASHED": [
+      8,
+      4
+    ],
+    "CENTER": [
+      12,
+      3,
+      2,
+      3
+    ],
+    "HIDDEN": [
+      4,
+      3
+    ]
+  },
+  "parameters": {
+    "Width": "120",
+    "Height": "60",
+    "Radius": "22",
+    "BarLength": "80"
+  },
+  "constraints": [
+    {
+      "id": "edge-length",
+      "type": "length",
+      "entityId": "driven-edge",
+      "value": "Width"
+    }
+  ],
+  "metadata": {
+    "author": "",
+    "description": "",
+    "visualEditing": {
+      "version": 1,
+      "description": "A native 2D editing workshop; select an object then Edit on canvas. Includes shared blocks and managed dimensions."
+    }
+  },
+  "activeLayout": "Model",
+  "layouts": [
+    "Model"
+  ],
+  "importDiagnostics": []
+}

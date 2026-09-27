@@ -15,7 +15,7 @@ new category search exposes actual native block thumbnails True
 browsing missing masters does not mutate an imported document True
 placement lazily installs exactly the selected master True
 hydraulic insertion uses the hydraulic layer True
-new drawing dialog exposes twenty 2D and ten 3D starters and Blank True
+new drawing dialog exposes twenty 2D starters, Blank and every generated 3D starter True
 industry search filters the actual starter buttons True
 starter selection creates routed editable hydraulic entities True
 starter selects appropriate symbol category and line style True
@@ -102,7 +102,7 @@ no uncaught errors in catalogue, starters, migration or touch True
       "passed": true
     },
     {
-      "name": "new drawing dialog exposes twenty 2D and ten 3D starters and Blank",
+      "name": "new drawing dialog exposes twenty 2D starters, Blank and every generated 3D starter",
       "passed": true
     },
     {

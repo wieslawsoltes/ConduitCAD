@@ -1,0 +1,158 @@
+requested webgl2 backend executes without substitution
+visual authoring is default without test preference override
+Create opens a searchable nonmodal palette
+all 22 tools appear in palette
+search has explicit empty state
+box starts geometry preview without a dialog
+preview leaves source entities and history untouched
+inline dimension edits real preview geometry
+width dragging uses world-space distance
+drag retains preview identity and working camera
+pointer samples create no model history entries
+draft undo reverts just the last drag
+draft keyboard redo restores the drag
+keyboard slider changes the shared parameter
+handle exposes name and numeric slider value
+invalid geometry clears stale preview and disables Apply
+corrected geometry enables Apply
+invalid expression gives inline feedback
+invalid open field cannot commit an older valid value
+Apply makes one native feature and one history entry
+model undo removes entire operation
+redo restores entire operation
+unchanged existing edit does not add history
+drag retains named parameter expressions
+committed feature remains expression driven
+Cancel changes neither geometry nor history
+queued changes coalesce to one final geometry evaluation
+stale-source guard catches unversioned external mutations
+independent transaction cancels active draft
+canvas face selection finds native top face
+contextual hole opens visual placement without modal
+hole center has face-plane manipulator
+plane handle moves the hole center in local U/V coordinates
+blind depth has a draggable dimension
+counterbore controls drive same valid preview
+visual hole preserves native feature dependencies
+webgl2 counterbore ascii is an actual browser DXF download
+webgl2 counterbore binary is an actual browser DXF download
+vertex edit demands explicit feature detach
+vertex preview does not detach live feature
+missing selection opens canvas source picker
+canvas picker attaches original source identity
+transform pivot defaults to selected stock center
+translation axis edits displacement
+Rotate shows three oriented rings
+rotation ring changes the angle through real pointer motion
+scale axes follow object rotation
+transform commits dependency based geometry
+webgl2 transform ascii is an actual browser DXF download
+webgl2 transform binary is an actual browser DXF download
+on-canvas sketch creates native DXF profile
+symmetric extrusion handle represents total length
+two-sided extrusion exposes both handles
+extrusion retains native source profile
+webgl2 extrusion ascii is an actual browser DXF download
+webgl2 extrusion binary is an actual browser DXF download
+optional Advanced handoff retains draft fields
+webgl2 visual manipulation remains active in shaded
+webgl2 visual manipulation remains active in shaded-edges
+webgl2 visual manipulation remains active in shaded-hidden
+webgl2 visual manipulation remains active in wireframe
+webgl2 visual manipulation remains active in hidden
+webgl2 visual manipulation remains active in wireframe-hidden
+webgl2 visual manipulation remains active in realistic
+webgl2 visual manipulation remains active in realistic-edges
+webgl2 visual manipulation remains active in conceptual
+webgl2 visual manipulation remains active in gray
+webgl2 visual manipulation remains active in sketchy
+webgl2 visual manipulation remains active in xray
+webgl2 visual manipulation remains active in flat
+webgl2 visual manipulation remains active in flat-edges
+webgl2 visual manipulation remains active in clay
+webgl2 visual manipulation remains active in normals
+return to 2D cancels draft without creating geometry
+document switch releases isolated draft
+320x568 palette bounded
+320x568 no autofocus keyboard on open
+320x568 canvas keeps useful height
+320x568 controls and confirmation bounded
+320x568 handles keep 44px targets
+320x568 old dock does not cover editing controls
+320x568 options nonmodal and bounded
+320x568 readable numeric options
+320x568 inline edit does not scroll page
+320x568 exact field bounded
+320x568 Escape closes just exact field first
+320x568 dimension badges cannot intercept handle targets
+320x568 explicit label preference is honored
+320x568 labels never push Apply outside viewport
+320x568 touch Apply makes one feature and transaction
+390x844 palette bounded
+390x844 no autofocus keyboard on open
+390x844 canvas keeps useful height
+390x844 controls and confirmation bounded
+390x844 handles keep 44px targets
+390x844 old dock does not cover editing controls
+390x844 options nonmodal and bounded
+390x844 readable numeric options
+390x844 inline edit does not scroll page
+390x844 exact field bounded
+390x844 Escape closes just exact field first
+390x844 dimension badges cannot intercept handle targets
+390x844 explicit label preference is honored
+390x844 labels never push Apply outside viewport
+keyboard viewport reduces chrome and keeps exact input reachable
+keyboard viewport retains visible Apply and Cancel
+closing inline input returns focus to canvas
+one finger begins a real handle gesture
+second finger rolls back incomplete handle gesture
+pinch and trailing touch do not commit geometry
+390x844 touch Apply makes one feature and transaction
+844x390 palette bounded
+844x390 no autofocus keyboard on open
+844x390 canvas keeps useful height
+844x390 controls and confirmation bounded
+844x390 handles keep 44px targets
+844x390 old dock does not cover editing controls
+844x390 options nonmodal and bounded
+844x390 readable numeric options
+844x390 inline edit does not scroll page
+844x390 exact field bounded
+844x390 Escape closes just exact field first
+844x390 dimension badges cannot intercept handle targets
+844x390 explicit label preference is honored
+844x390 labels never push Apply outside viewport
+844x390 touch Apply makes one feature and transaction
+820x1180 palette bounded
+820x1180 no autofocus keyboard on open
+820x1180 canvas keeps useful height
+820x1180 controls and confirmation bounded
+820x1180 handles keep 44px targets
+820x1180 old dock does not cover editing controls
+820x1180 options nonmodal and bounded
+820x1180 readable numeric options
+820x1180 inline edit does not scroll page
+820x1180 exact field bounded
+820x1180 Escape closes just exact field first
+820x1180 dimension badges cannot intercept handle targets
+820x1180 explicit label preference is honored
+820x1180 labels never push Apply outside viewport
+820x1180 touch Apply makes one feature and transaction
+1024x768 palette bounded
+1024x768 no autofocus keyboard on open
+1024x768 canvas keeps useful height
+1024x768 controls and confirmation bounded
+1024x768 handles keep 44px targets
+1024x768 old dock does not cover editing controls
+1024x768 options nonmodal and bounded
+1024x768 readable numeric options
+1024x768 inline edit does not scroll page
+1024x768 exact field bounded
+1024x768 Escape closes just exact field first
+1024x768 dimension badges cannot intercept handle targets
+1024x768 explicit label preference is honored
+1024x768 labels never push Apply outside viewport
+1024x768 touch Apply makes one feature and transaction
+no uncaught errors in visual authoring
+Visual 3D browser assertions: 157

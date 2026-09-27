@@ -1,0 +1,194 @@
+canvas shaded-edges shader/passes complete without API errors
+canvas shaded-edges renders nonempty geometry
+canvas shaded shader/passes complete without API errors
+canvas shaded renders nonempty geometry
+canvas shaded-hidden shader/passes complete without API errors
+canvas shaded-hidden renders nonempty geometry
+canvas wireframe shader/passes complete without API errors
+canvas wireframe renders nonempty geometry
+canvas hidden shader/passes complete without API errors
+canvas hidden renders nonempty geometry
+canvas wireframe-hidden shader/passes complete without API errors
+canvas wireframe-hidden renders nonempty geometry
+canvas realistic shader/passes complete without API errors
+canvas realistic renders nonempty geometry
+canvas realistic-edges shader/passes complete without API errors
+canvas realistic-edges renders nonempty geometry
+canvas conceptual shader/passes complete without API errors
+canvas conceptual renders nonempty geometry
+canvas gray shader/passes complete without API errors
+canvas gray renders nonempty geometry
+canvas sketchy shader/passes complete without API errors
+canvas sketchy renders nonempty geometry
+canvas xray shader/passes complete without API errors
+canvas xray renders nonempty geometry
+canvas flat shader/passes complete without API errors
+canvas flat renders nonempty geometry
+canvas flat-edges shader/passes complete without API errors
+canvas flat-edges renders nonempty geometry
+canvas clay shader/passes complete without API errors
+canvas clay renders nonempty geometry
+canvas normals shader/passes complete without API errors
+canvas normals renders nonempty geometry
+canvas all style switches preserve geometry uploads
+canvas all sixteen styles produce distinct rendered images
+canvas shadow map changes actual pixels
+canvas screen-space occlusion changes actual pixels
+canvas section fill is emitted for closed contours
+canvas cap setting changes the cut image
+canvas weighted transparency is submission-order independent
+canvas perspective near-plane crossings remain bounded and error-free
+canvas camera-only redraws do not reupload or retessellate
+webgl2 shaded-edges shader/passes complete without API errors
+webgl2 shaded-edges renders nonempty geometry
+webgl2 shaded shader/passes complete without API errors
+webgl2 shaded renders nonempty geometry
+webgl2 shaded-hidden shader/passes complete without API errors
+webgl2 shaded-hidden renders nonempty geometry
+webgl2 wireframe shader/passes complete without API errors
+webgl2 wireframe renders nonempty geometry
+webgl2 hidden shader/passes complete without API errors
+webgl2 hidden renders nonempty geometry
+webgl2 wireframe-hidden shader/passes complete without API errors
+webgl2 wireframe-hidden renders nonempty geometry
+webgl2 realistic shader/passes complete without API errors
+webgl2 realistic renders nonempty geometry
+webgl2 realistic-edges shader/passes complete without API errors
+webgl2 realistic-edges renders nonempty geometry
+webgl2 conceptual shader/passes complete without API errors
+webgl2 conceptual renders nonempty geometry
+webgl2 gray shader/passes complete without API errors
+webgl2 gray renders nonempty geometry
+webgl2 sketchy shader/passes complete without API errors
+webgl2 sketchy renders nonempty geometry
+webgl2 xray shader/passes complete without API errors
+webgl2 xray renders nonempty geometry
+webgl2 flat shader/passes complete without API errors
+webgl2 flat renders nonempty geometry
+webgl2 flat-edges shader/passes complete without API errors
+webgl2 flat-edges renders nonempty geometry
+webgl2 clay shader/passes complete without API errors
+webgl2 clay renders nonempty geometry
+webgl2 normals shader/passes complete without API errors
+webgl2 normals renders nonempty geometry
+webgl2 all style switches preserve geometry uploads
+webgl2 all sixteen styles produce distinct rendered images
+webgl2 shadow map changes actual pixels
+webgl2 screen-space occlusion changes actual pixels
+webgl2 section fill is emitted for closed contours
+webgl2 cap setting changes the cut image
+webgl2 weighted transparency is submission-order independent
+webgl2 perspective near-plane crossings remain bounded and error-free
+webgl2 camera-only redraws do not reupload or retessellate
+WebGL2 recreates all resources after context restoration
+simulated attachment allocation failure reports a working Canvas fallback
+resource fallback retains native document and visual style
+resource fallback draws actual geometry
+webgpu shaded-edges shader/passes complete without API errors
+webgpu shaded-edges renders nonempty geometry
+webgpu shaded shader/passes complete without API errors
+webgpu shaded renders nonempty geometry
+webgpu shaded-hidden shader/passes complete without API errors
+webgpu shaded-hidden renders nonempty geometry
+webgpu wireframe shader/passes complete without API errors
+webgpu wireframe renders nonempty geometry
+webgpu hidden shader/passes complete without API errors
+webgpu hidden renders nonempty geometry
+webgpu wireframe-hidden shader/passes complete without API errors
+webgpu wireframe-hidden renders nonempty geometry
+webgpu realistic shader/passes complete without API errors
+webgpu realistic renders nonempty geometry
+webgpu realistic-edges shader/passes complete without API errors
+webgpu realistic-edges renders nonempty geometry
+webgpu conceptual shader/passes complete without API errors
+webgpu conceptual renders nonempty geometry
+webgpu gray shader/passes complete without API errors
+webgpu gray renders nonempty geometry
+webgpu sketchy shader/passes complete without API errors
+webgpu sketchy renders nonempty geometry
+webgpu xray shader/passes complete without API errors
+webgpu xray renders nonempty geometry
+webgpu flat shader/passes complete without API errors
+webgpu flat renders nonempty geometry
+webgpu flat-edges shader/passes complete without API errors
+webgpu flat-edges renders nonempty geometry
+webgpu clay shader/passes complete without API errors
+webgpu clay renders nonempty geometry
+webgpu normals shader/passes complete without API errors
+webgpu normals renders nonempty geometry
+webgpu all style switches preserve geometry uploads
+webgpu all sixteen styles produce distinct rendered images
+webgpu shadow map changes actual pixels
+webgpu screen-space occlusion changes actual pixels
+webgpu section fill is emitted for closed contours
+webgpu cap setting changes the cut image
+webgpu weighted transparency is submission-order independent
+webgpu perspective near-plane crossings remain bounded and error-free
+webgpu camera-only redraws do not reupload or retessellate
+WebGPU device loss falls back to working WebGL2
+webgl2 shaded-edges has identical output dimensions
+webgl2 shaded-edges matches software reference within declared AA tolerance
+webgl2 shaded has identical output dimensions
+webgl2 shaded matches software reference within declared AA tolerance
+webgl2 shaded-hidden has identical output dimensions
+webgl2 shaded-hidden matches software reference within declared AA tolerance
+webgl2 wireframe has identical output dimensions
+webgl2 wireframe matches software reference within declared AA tolerance
+webgl2 hidden has identical output dimensions
+webgl2 hidden matches software reference within declared AA tolerance
+webgl2 wireframe-hidden has identical output dimensions
+webgl2 wireframe-hidden matches software reference within declared AA tolerance
+webgl2 realistic has identical output dimensions
+webgl2 realistic matches software reference within declared AA tolerance
+webgl2 realistic-edges has identical output dimensions
+webgl2 realistic-edges matches software reference within declared AA tolerance
+webgl2 conceptual has identical output dimensions
+webgl2 conceptual matches software reference within declared AA tolerance
+webgl2 gray has identical output dimensions
+webgl2 gray matches software reference within declared AA tolerance
+webgl2 sketchy has identical output dimensions
+webgl2 sketchy matches software reference within declared AA tolerance
+webgl2 xray has identical output dimensions
+webgl2 xray matches software reference within declared AA tolerance
+webgl2 flat has identical output dimensions
+webgl2 flat matches software reference within declared AA tolerance
+webgl2 flat-edges has identical output dimensions
+webgl2 flat-edges matches software reference within declared AA tolerance
+webgl2 clay has identical output dimensions
+webgl2 clay matches software reference within declared AA tolerance
+webgl2 normals has identical output dimensions
+webgl2 normals matches software reference within declared AA tolerance
+webgpu shaded-edges has identical output dimensions
+webgpu shaded-edges matches software reference within declared AA tolerance
+webgpu shaded has identical output dimensions
+webgpu shaded matches software reference within declared AA tolerance
+webgpu shaded-hidden has identical output dimensions
+webgpu shaded-hidden matches software reference within declared AA tolerance
+webgpu wireframe has identical output dimensions
+webgpu wireframe matches software reference within declared AA tolerance
+webgpu hidden has identical output dimensions
+webgpu hidden matches software reference within declared AA tolerance
+webgpu wireframe-hidden has identical output dimensions
+webgpu wireframe-hidden matches software reference within declared AA tolerance
+webgpu realistic has identical output dimensions
+webgpu realistic matches software reference within declared AA tolerance
+webgpu realistic-edges has identical output dimensions
+webgpu realistic-edges matches software reference within declared AA tolerance
+webgpu conceptual has identical output dimensions
+webgpu conceptual matches software reference within declared AA tolerance
+webgpu gray has identical output dimensions
+webgpu gray matches software reference within declared AA tolerance
+webgpu sketchy has identical output dimensions
+webgpu sketchy matches software reference within declared AA tolerance
+webgpu xray has identical output dimensions
+webgpu xray matches software reference within declared AA tolerance
+webgpu flat has identical output dimensions
+webgpu flat matches software reference within declared AA tolerance
+webgpu flat-edges has identical output dimensions
+webgpu flat-edges matches software reference within declared AA tolerance
+webgpu clay has identical output dimensions
+webgpu clay matches software reference within declared AA tolerance
+webgpu normals has identical output dimensions
+webgpu normals matches software reference within declared AA tolerance
+no uncaught rendering errors
+193 rendering backend assertions passed.

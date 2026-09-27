@@ -1,0 +1,673 @@
+{
+  "passed": 139,
+  "checks": [
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-counterbore-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-ascii.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-transform-binary.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-ascii.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-canvas-extrusion-binary.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-counterbore-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-ascii.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-transform-binary.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-ascii.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgl2-extrusion-binary.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-counterbore-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-ascii.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf transformed minimum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-transform-binary.dxf transformed maximum",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-ascii.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf errors",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf repairs",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf native meshes",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf no fabricated ACIS solid",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf finite coordinates",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf measured volume",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf lower extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf upper extent",
+      "passed": true
+    },
+    {
+      "name": "visual3d-webgpu-extrusion-binary.dxf native source profile",
+      "passed": true
+    },
+    {
+      "name": "Canvas download inventory complete",
+      "passed": true
+    }
+  ],
+  "files": [
+    {
+      "file": "visual3d-canvas-counterbore-ascii.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-canvas-counterbore-binary.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-canvas-transform-ascii.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-canvas-transform-binary.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-canvas-extrusion-ascii.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    },
+    {
+      "file": "visual3d-canvas-extrusion-binary.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    },
+    {
+      "file": "visual3d-webgl2-counterbore-ascii.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-webgl2-counterbore-binary.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-webgl2-transform-ascii.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-webgl2-transform-binary.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-webgl2-extrusion-ascii.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    },
+    {
+      "file": "visual3d-webgl2-extrusion-binary.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    },
+    {
+      "file": "visual3d-webgpu-counterbore-ascii.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-webgpu-counterbore-binary.dxf",
+      "volume": 318372.54584439535,
+      "vertices": 396,
+      "faces": 447
+    },
+    {
+      "file": "visual3d-webgpu-transform-ascii.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-webgpu-transform-binary.dxf",
+      "volume": 384000.0,
+      "vertices": 8,
+      "faces": 6
+    },
+    {
+      "file": "visual3d-webgpu-extrusion-ascii.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    },
+    {
+      "file": "visual3d-webgpu-extrusion-binary.dxf",
+      "volume": 227500.0,
+      "vertices": 8,
+      "faces": 8
+    }
+  ],
+  "reader": "ezdxf 1.4.4",
+  "scope": "Actual native browser downloads; no native Autodesk acceptance"
+}
