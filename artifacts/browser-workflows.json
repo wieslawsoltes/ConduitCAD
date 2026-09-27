@@ -10,11 +10,11 @@
       "detail": []
     },
     {
-      "name": "parameter dialog opens and traps UI in dialog",
+      "name": "parameter editing previews the drawing without a modal",
       "passed": true
     },
     {
-      "name": "Escape closes modal",
+      "name": "Escape closes live parameter editing",
       "passed": true
     },
     {

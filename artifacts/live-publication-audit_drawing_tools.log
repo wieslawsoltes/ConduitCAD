@@ -1,0 +1,9 @@
+Built native drawing tool samples and ASCII/binary audit inputs.
+{
+  "passed": 148,
+  "files": 2,
+  "validator": "ezdxf 1.4.4",
+  "errors": 0,
+  "repairs": 0,
+  "scope": "Independent native field and geometry readback; not a vendor conformance certification"
+}

@@ -1,0 +1,94 @@
+1440x980 sixteen labeled style choices
+1440x980 preview panel and confirmation stay inside viewport
+1440x980 live preview does not blur the model
+1440x980 search finds multiple hidden-line variants
+1440x980 empty search has feedback
+1440x980 style click previews without editing the drawing
+1440x980 Cancel restores original display and camera
+1440x980 Keep commits document-specific view state, not CAD geometry
+1440x980 camera navigation preserves uploaded geometry
+1440x980 line-width preference is live and uniform-only
+1440x980 secondary live preferences revert on Cancel
+1440x980 return to 2D retains drafting camera and controls
+1440x980 return to 3D retains chosen style
+320x568 sixteen labeled style choices
+320x568 preview panel and confirmation stay inside viewport
+320x568 live preview does not blur the model
+320x568 style targets are touch-sized
+320x568 search finds multiple hidden-line variants
+320x568 empty search has feedback
+320x568 style click previews without editing the drawing
+320x568 Cancel restores original display and camera
+320x568 Keep commits document-specific view state, not CAD geometry
+320x568 camera navigation preserves uploaded geometry
+320x568 line-width preference is live and uniform-only
+320x568 secondary live preferences revert on Cancel
+320x568 compact live preview hides options while retaining style control
+320x568 compact style selector changes actual shading
+320x568 leaving comparison restores exact working camera
+320x568 return to 2D retains drafting camera and controls
+320x568 return to 3D retains chosen style
+390x844 sixteen labeled style choices
+390x844 preview panel and confirmation stay inside viewport
+390x844 live preview does not blur the model
+390x844 style targets are touch-sized
+390x844 search finds multiple hidden-line variants
+390x844 empty search has feedback
+390x844 style click previews without editing the drawing
+390x844 Cancel restores original display and camera
+390x844 Keep commits document-specific view state, not CAD geometry
+390x844 camera navigation preserves uploaded geometry
+390x844 line-width preference is live and uniform-only
+390x844 secondary live preferences revert on Cancel
+390x844 compact live preview hides options while retaining style control
+390x844 compact style selector changes actual shading
+390x844 leaving comparison restores exact working camera
+390x844 return to 2D retains drafting camera and controls
+390x844 return to 3D retains chosen style
+844x390 sixteen labeled style choices
+844x390 preview panel and confirmation stay inside viewport
+844x390 live preview does not blur the model
+844x390 style targets are touch-sized
+844x390 search finds multiple hidden-line variants
+844x390 empty search has feedback
+844x390 style click previews without editing the drawing
+844x390 Cancel restores original display and camera
+844x390 Keep commits document-specific view state, not CAD geometry
+844x390 camera navigation preserves uploaded geometry
+844x390 line-width preference is live and uniform-only
+844x390 secondary live preferences revert on Cancel
+844x390 compact live preview hides options while retaining style control
+844x390 compact style selector changes actual shading
+844x390 leaving comparison restores exact working camera
+844x390 return to 2D retains drafting camera and controls
+844x390 return to 3D retains chosen style
+1024x768 sixteen labeled style choices
+1024x768 preview panel and confirmation stay inside viewport
+1024x768 live preview does not blur the model
+1024x768 style targets are touch-sized
+1024x768 search finds multiple hidden-line variants
+1024x768 empty search has feedback
+1024x768 style click previews without editing the drawing
+1024x768 Cancel restores original display and camera
+1024x768 Keep commits document-specific view state, not CAD geometry
+1024x768 camera navigation preserves uploaded geometry
+1024x768 line-width preference is live and uniform-only
+1024x768 secondary live preferences revert on Cancel
+1024x768 return to 2D retains drafting camera and controls
+1024x768 return to 3D retains chosen style
+named preset and drawing default are portable metadata
+new document does not inherit another document display style
+tab return restores style and section plane independently
+material form updates native color and coefficients atomically
+material assignment exposes realistic shading
+undo restores original appearance
+redo restores material coefficients
+invalid material values leave the document unmodified
+CAD display command uses the actual mode registry
+custom preset reloads validated saved fields
+material study opens an independent editable drawing
+portable default restores ground, shadows and AO
+actual viewport PNG download has renderer dimensions
+workspace snapshot contains per-document display and sections
+no uncaught browser errors
+93 render-style browser assertions passed.

@@ -6657,7 +6657,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6dv-1","label":"Paint","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
+{"id":"e-mukancnm-1","label":"Paint","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
 1000
 se},"model3dConsumed":false,"appearance3d":{"id":"paint","label":"Paint","color":"#568e9b","metallic":0,"roughness":0.36,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -7427,7 +7427,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6e0-2","label":"Paint pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"0*Spacing"},"inputs":[],"suppressed":fa
+{"id":"e-mukancnp-2","label":"Paint pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"0*Spacing"},"inputs":[],"suppressed":fa
 1000
 lse},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -13471,7 +13471,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6e2-3","label":"Aluminum","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":
+{"id":"e-mukancnq-3","label":"Aluminum","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":
 1000
 false},"model3dConsumed":false,"appearance3d":{"id":"aluminum","label":"Aluminum","color":"#c7cdd1","metallic":1,"roughness":0.24,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -14241,7 +14241,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6e6-4","label":"Aluminum pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"0*Spacing"},"inputs":[],"suppressed"
+{"id":"e-mukancnt-4","label":"Aluminum pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"0*Spacing"},"inputs":[],"suppressed"
 1000
 :false},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -20285,7 +20285,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6e9-5","label":"Steel","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
+{"id":"e-mukancnv-5","label":"Steel","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"0*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
 1000
 se},"model3dConsumed":false,"appearance3d":{"id":"steel","label":"Steel","color":"#9da8b2","metallic":1,"roughness":0.32,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -21055,7 +21055,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6ed-6","label":"Steel pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"0*Spacing"},"inputs":[],"suppressed":fa
+{"id":"e-mukancnx-6","label":"Steel pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"0*Spacing"},"inputs":[],"suppressed":fa
 1000
 lse},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -27099,7 +27099,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6eh-7","label":"Copper","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fa
+{"id":"e-mukanco0-7","label":"Copper","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fa
 1000
 lse},"model3dConsumed":false,"appearance3d":{"id":"copper","label":"Copper","color":"#c88455","metallic":1,"roughness":0.28,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -27869,7 +27869,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6em-8","label":"Copper pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":f
+{"id":"e-mukanco3-8","label":"Copper pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":f
 1000
 alse},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -33913,7 +33913,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6er-9","label":"Brass","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
+{"id":"e-mukanco6-9","label":"Brass","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fal
 1000
 se},"model3dConsumed":false,"appearance3d":{"id":"brass","label":"Brass","color":"#d0b06a","metallic":1,"roughness":0.22,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -34683,7 +34683,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6ex-a","label":"Brass pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":fa
+{"id":"e-mukancoa-a","label":"Brass pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":fa
 1000
 lse},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -40727,7 +40727,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6f3-b","label":"Polymer","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":f
+{"id":"e-mukancod-b","label":"Polymer","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"1*Spacing","z":"Radius+5"},"inputs":[],"suppressed":f
 1000
 alse},"model3dConsumed":false,"appearance3d":{"id":"plastic","label":"Polymer","color":"#365f7c","metallic":0,"roughness":0.25,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -41497,7 +41497,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6f9-c","label":"Polymer pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":
+{"id":"e-mukancoi-c","label":"Polymer pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"1*Spacing"},"inputs":[],"suppressed":
 1000
 false},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -47541,7 +47541,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6fh-d","label":"Rubber","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fa
+{"id":"e-mukancom-d","label":"Rubber","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"0*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"suppressed":fa
 1000
 lse},"model3dConsumed":false,"appearance3d":{"id":"rubber","label":"Rubber","color":"#34383b","metallic":0,"roughness":0.9,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -48311,7 +48311,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6fo-e","label":"Rubber pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"2*Spacing"},"inputs":[],"suppressed":f
+{"id":"e-mukancor-e","label":"Rubber pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"0*Spacing","y":"2*Spacing"},"inputs":[],"suppressed":f
 1000
 alse},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -54355,7 +54355,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6fw-f","label":"Ceramic","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"suppressed":f
+{"id":"e-mukancow-f","label":"Ceramic","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"1*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"suppressed":f
 1000
 alse},"model3dConsumed":false,"appearance3d":{"id":"ceramic","label":"Ceramic","color":"#e2ddd0","metallic":0,"roughness":0.18,"opacity":1,"emission":0},"model3dUserHidden":false}
 0
@@ -55125,7 +55125,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6g7-g","label":"Ceramic pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"2*Spacing"},"inputs":[],"suppressed":
+{"id":"e-mukancp2-g","label":"Ceramic pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"1*Spacing","y":"2*Spacing"},"inputs":[],"suppressed":
 1000
 false},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -61169,7 +61169,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6gg-h","label":"Transparent polymer","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"s
+{"id":"e-mukancp7-h","label":"Transparent polymer","feature3d":{"version":1,"kind":"sphere","parameters":{"radius":"Radius","segments":28,"x":"2*Spacing","y":"2*Spacing","z":"Radius+5"},"inputs":[],"s
 1000
 uppressed":false},"model3dConsumed":false,"appearance3d":{"id":"transparent","label":"Transparent polymer","color":"#98c3c5","metallic":0,"roughness":0.12,"opacity":0.28,"emission":0},"model3dUserHidd
 1000
@@ -61941,7 +61941,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6gr-i","label":"Transparent polymer pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"2*Spacing"},"inputs":[],"
+{"id":"e-mukancpf-i","label":"Transparent polymer pedestal","feature3d":{"version":1,"kind":"cylinder","parameters":{"radius":14,"height":4,"segments":28,"x":"2*Spacing","y":"2*Spacing"},"inputs":[],"
 1000
 suppressed":false},"model3dConsumed":false,"appearance3d":{"metallic":0.3,"roughness":0.55,"emission":0,"opacity":1},"model3dUserHidden":false}
 0
@@ -72219,7 +72219,7 @@ AcDbSubDMesh
 1001
 CONDUITCAD
 1000
-{"id":"e-mujqx6h1-j","label":"Section contour and silhouette ring","feature3d":{"version":1,"kind":"torus","parameters":{"major":18,"minor":4,"segments":40,"x":-40,"y":36,"z":20},"inputs":[],"suppress
+{"id":"e-mukancpl-j","label":"Section contour and silhouette ring","feature3d":{"version":1,"kind":"torus","parameters":{"major":18,"minor":4,"segments":40,"x":-40,"y":36,"z":20},"inputs":[],"suppress
 1000
 ed":false},"model3dConsumed":false,"appearance3d":{"metallic":1,"roughness":0.23,"opacity":1,"emission":0},"model3dUserHidden":false}
 0

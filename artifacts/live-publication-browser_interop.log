@@ -1,0 +1,147 @@
+{
+  "checks": [
+    {
+      "name": "independent file imported through File/Blob worker",
+      "passed": true
+    },
+    {
+      "name": "import does not silently install 223 symbol masters",
+      "passed": true
+    },
+    {
+      "name": "all four native layouts available in UI",
+      "passed": true
+    },
+    {
+      "name": "binary export control exists",
+      "passed": true
+    },
+    {
+      "name": "preserving mode disables version conversion",
+      "passed": true
+    },
+    {
+      "name": "real browser download uses binary DXF signature",
+      "passed": true
+    },
+    {
+      "name": "download opens independently without audit repairs",
+      "passed": true
+    },
+    {
+      "name": "download retains foreign XRECORD payload",
+      "passed": true
+    },
+    {
+      "name": "binary download reimports through the worker without duplicate paper entities",
+      "passed": true
+    },
+    {
+      "name": "paper layout is actively rendered",
+      "passed": true
+    },
+    {
+      "name": "paper layout label follows the selected sheet",
+      "passed": true
+    },
+    {
+      "name": "native dimension blocks do not expose stale raw grips",
+      "passed": true
+    },
+    {
+      "name": "viewport model stroke visible inside polygon",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    {
+      "name": "nonrectangular clip removes stroke inside rectangle but outside polygon",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "viewport rectangle removes out-of-frame model geometry",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "frozen layer does not draw into viewport",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "clipped-away geometry cannot be picked",
+      "passed": true
+    },
+    {
+      "name": "visible viewport geometry can be picked",
+      "passed": true
+    },
+    {
+      "name": "SVG download contains real clip paths",
+      "passed": true
+    },
+    {
+      "name": "WIPEOUT covers earlier line with background mask",
+      "passed": true,
+      "detail": [
+        251,
+        252,
+        251,
+        255
+      ]
+    },
+    {
+      "name": "WIPEOUT leaves outside geometry visible",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    {
+      "name": "mobile binary export remains reachable",
+      "passed": true
+    },
+    {
+      "name": "mobile export avoids horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "touch-initiated binary download independently audits without repairs",
+      "passed": true
+    },
+    {
+      "name": "no uncaught browser errors",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "passed": 25,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "physicalDevice": false,
+  "origin": "localhost",
+  "downloads": "real browser downloads, independently parsed"
+}

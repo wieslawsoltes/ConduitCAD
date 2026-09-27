@@ -1,0 +1,469 @@
+{
+  "validator": "ezdxf 1.4.4",
+  "checks": [
+    {
+      "name": "normalized: zero audit errors/repairs",
+      "passed": true
+    },
+    {
+      "name": "normalized: all layout names",
+      "passed": true
+    },
+    {
+      "name": "normalized: entity sequence Model",
+      "passed": true
+    },
+    {
+      "name": "normalized: entity sequence Layout1",
+      "passed": true
+    },
+    {
+      "name": "normalized: entity sequence Sheet A",
+      "passed": true
+    },
+    {
+      "name": "normalized: entity sequence Sheet B",
+      "passed": true
+    },
+    {
+      "name": "normalized: seven native subtypes",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 0",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 1",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 2",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 3",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 4",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 5",
+      "passed": true
+    },
+    {
+      "name": "normalized: DIMENSION 6",
+      "passed": true
+    },
+    {
+      "name": "normalized: native mesh topology",
+      "passed": true
+    },
+    {
+      "name": "normalized: native mesh Z",
+      "passed": true
+    },
+    {
+      "name": "normalized: helix analytic properties",
+      "passed": true
+    },
+    {
+      "name": "normalized: helix spline controls",
+      "passed": true
+    },
+    {
+      "name": "normalized: wipeout WCS polygon",
+      "passed": true
+    },
+    {
+      "name": "normalized: Unicode text",
+      "passed": true
+    },
+    {
+      "name": "normalized: Unicode MTEXT",
+      "passed": true
+    },
+    {
+      "name": "normalized: frozen layer Sheet A",
+      "passed": true
+    },
+    {
+      "name": "normalized: view transform Sheet A",
+      "passed": true
+    },
+    {
+      "name": "normalized: frozen layer Sheet B",
+      "passed": true
+    },
+    {
+      "name": "normalized: view transform Sheet B",
+      "passed": true
+    },
+    {
+      "name": "normalized: resolved polygon clip",
+      "passed": true
+    },
+    {
+      "name": "binary: zero audit errors/repairs",
+      "passed": true
+    },
+    {
+      "name": "binary: all layout names",
+      "passed": true
+    },
+    {
+      "name": "binary: entity sequence Model",
+      "passed": true
+    },
+    {
+      "name": "binary: entity sequence Layout1",
+      "passed": true
+    },
+    {
+      "name": "binary: entity sequence Sheet A",
+      "passed": true
+    },
+    {
+      "name": "binary: entity sequence Sheet B",
+      "passed": true
+    },
+    {
+      "name": "binary: seven native subtypes",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 0",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 1",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 2",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 3",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 4",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 5",
+      "passed": true
+    },
+    {
+      "name": "binary: DIMENSION 6",
+      "passed": true
+    },
+    {
+      "name": "binary: native mesh topology",
+      "passed": true
+    },
+    {
+      "name": "binary: native mesh Z",
+      "passed": true
+    },
+    {
+      "name": "binary: helix analytic properties",
+      "passed": true
+    },
+    {
+      "name": "binary: helix spline controls",
+      "passed": true
+    },
+    {
+      "name": "binary: wipeout WCS polygon",
+      "passed": true
+    },
+    {
+      "name": "binary: Unicode text",
+      "passed": true
+    },
+    {
+      "name": "binary: Unicode MTEXT",
+      "passed": true
+    },
+    {
+      "name": "binary: frozen layer Sheet A",
+      "passed": true
+    },
+    {
+      "name": "binary: view transform Sheet A",
+      "passed": true
+    },
+    {
+      "name": "binary: frozen layer Sheet B",
+      "passed": true
+    },
+    {
+      "name": "binary: view transform Sheet B",
+      "passed": true
+    },
+    {
+      "name": "binary: resolved polygon clip",
+      "passed": true
+    },
+    {
+      "name": "preserved: zero audit errors/repairs",
+      "passed": true
+    },
+    {
+      "name": "preserved: all layout names",
+      "passed": true
+    },
+    {
+      "name": "preserved: entity sequence Model",
+      "passed": true
+    },
+    {
+      "name": "preserved: entity sequence Layout1",
+      "passed": true
+    },
+    {
+      "name": "preserved: entity sequence Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved: entity sequence Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved: seven native subtypes",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 0",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 1",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 2",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 3",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 4",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 5",
+      "passed": true
+    },
+    {
+      "name": "preserved: DIMENSION 6",
+      "passed": true
+    },
+    {
+      "name": "preserved: native mesh topology",
+      "passed": true
+    },
+    {
+      "name": "preserved: native mesh Z",
+      "passed": true
+    },
+    {
+      "name": "preserved: helix analytic properties",
+      "passed": true
+    },
+    {
+      "name": "preserved: helix spline controls",
+      "passed": true
+    },
+    {
+      "name": "preserved: wipeout WCS polygon",
+      "passed": true
+    },
+    {
+      "name": "preserved: Unicode text",
+      "passed": true
+    },
+    {
+      "name": "preserved: Unicode MTEXT",
+      "passed": true
+    },
+    {
+      "name": "preserved: frozen layer Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved: view transform Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved: frozen layer Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved: view transform Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved: resolved polygon clip",
+      "passed": true
+    },
+    {
+      "name": "preserved: arbitrary XRECORD int64/binary payload",
+      "passed": true
+    },
+    {
+      "name": "preserved: extension dictionary identity",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: zero audit errors/repairs",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: all layout names",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: entity sequence Model",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: entity sequence Layout1",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: entity sequence Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: entity sequence Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: seven native subtypes",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 0",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 1",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 2",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 3",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 4",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 5",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: DIMENSION 6",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: native mesh topology",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: native mesh Z",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: helix analytic properties",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: helix spline controls",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: wipeout WCS polygon",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: Unicode text",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: Unicode MTEXT",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: frozen layer Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: view transform Sheet A",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: frozen layer Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: view transform Sheet B",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: resolved polygon clip",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: arbitrary XRECORD int64/binary payload",
+      "passed": true
+    },
+    {
+      "name": "preserved-binary: extension dictionary identity",
+      "passed": true
+    },
+    {
+      "name": "authored aligned dimension has zero errors/repairs",
+      "passed": true
+    },
+    {
+      "name": "authored DIMENSION picture and measurement",
+      "passed": true
+    }
+  ],
+  "passed": 110,
+  "files": [
+    {
+      "name": "normalized",
+      "errors": 0,
+      "repairs": 0
+    },
+    {
+      "name": "binary",
+      "errors": 0,
+      "repairs": 0
+    },
+    {
+      "name": "preserved",
+      "errors": 0,
+      "repairs": 0
+    },
+    {
+      "name": "preserved-binary",
+      "errors": 0,
+      "repairs": 0
+    }
+  ],
+  "scope": "Independent native field, topology, graph and ownership checks; not AutoCAD/physical-GPU certification."
+}

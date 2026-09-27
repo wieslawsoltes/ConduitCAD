@@ -20,7 +20,7 @@
           "index": 2,
           "vertices": 23,
           "faces": 26,
-          "volume": 97599.99999999999
+          "volume": 97600.0
         },
         {
           "index": 3,
@@ -64,7 +64,7 @@
           "index": 2,
           "vertices": 23,
           "faces": 26,
-          "volume": 97599.99999999999
+          "volume": 97600.0
         },
         {
           "index": 3,
@@ -96,7 +96,7 @@
           "index": 2,
           "vertices": 192,
           "faces": 380,
-          "volume": 31843.237519152288
+          "volume": 31843.237519152277
         }
       ],
       "auditErrors": 0,
@@ -110,7 +110,7 @@
           "index": 2,
           "vertices": 192,
           "faces": 380,
-          "volume": 31843.237519152288
+          "volume": 31843.237519152277
         }
       ],
       "auditErrors": 0,
@@ -154,7 +154,7 @@
           "index": 5,
           "vertices": 470,
           "faces": 433,
-          "volume": 121695.99999999999
+          "volume": 121695.99999999997
         }
       ],
       "auditErrors": 0,
@@ -198,7 +198,7 @@
           "index": 5,
           "vertices": 470,
           "faces": 433,
-          "volume": 121695.99999999999
+          "volume": 121695.99999999997
         }
       ],
       "auditErrors": 0,
@@ -316,13 +316,13 @@
           "index": 2,
           "vertices": 160,
           "faces": 88,
-          "volume": 15141.832724372407
+          "volume": 15141.832724372405
         },
         {
           "index": 3,
           "vertices": 480,
           "faces": 264,
-          "volume": 45425.498173117405
+          "volume": 45425.4981731174
         }
       ],
       "auditErrors": 0,
@@ -348,13 +348,13 @@
           "index": 2,
           "vertices": 160,
           "faces": 88,
-          "volume": 15141.832724372407
+          "volume": 15141.832724372405
         },
         {
           "index": 3,
           "vertices": 480,
           "faces": 264,
-          "volume": 45425.498173117405
+          "volume": 45425.4981731174
         }
       ],
       "auditErrors": 0,
@@ -386,7 +386,7 @@
           "index": 4,
           "vertices": 1574,
           "faces": 1636,
-          "volume": 99587.74779036421
+          "volume": 99587.74779036423
         }
       ],
       "auditErrors": 0,
@@ -418,7 +418,7 @@
           "index": 4,
           "vertices": 1574,
           "faces": 1636,
-          "volume": 99587.74779036421
+          "volume": 99587.74779036423
         }
       ],
       "auditErrors": 0,
@@ -538,7 +538,7 @@
           "index": 3,
           "vertices": 538,
           "faces": 517,
-          "volume": 51940.84733357413
+          "volume": 51940.847333574144
         },
         {
           "index": 4,
@@ -556,13 +556,13 @@
           "index": 6,
           "vertices": 366,
           "faces": 353,
-          "volume": 11087.807892191959
+          "volume": 11087.807892191962
         },
         {
           "index": 7,
           "vertices": 1098,
           "faces": 1059,
-          "volume": 33263.423676576065
+          "volume": 33263.42367657609
         }
       ],
       "auditErrors": 0,
@@ -594,7 +594,7 @@
           "index": 3,
           "vertices": 538,
           "faces": 517,
-          "volume": 51940.84733357413
+          "volume": 51940.847333574144
         },
         {
           "index": 4,
@@ -612,13 +612,13 @@
           "index": 6,
           "vertices": 366,
           "faces": 353,
-          "volume": 11087.807892191959
+          "volume": 11087.807892191962
         },
         {
           "index": 7,
           "vertices": 1098,
           "faces": 1059,
-          "volume": 33263.423676576065
+          "volume": 33263.42367657609
         }
       ],
       "auditErrors": 0,
@@ -638,7 +638,7 @@
           "index": 1,
           "vertices": 96,
           "faces": 50,
-          "volume": 117473.57299804637
+          "volume": 117473.57299804638
         },
         {
           "index": 2,
@@ -650,7 +650,7 @@
           "index": 3,
           "vertices": 482,
           "faces": 512,
-          "volume": 90484.86509373126
+          "volume": 90484.86509373125
         },
         {
           "index": 4,
@@ -682,7 +682,7 @@
           "index": 1,
           "vertices": 96,
           "faces": 50,
-          "volume": 117473.57299804637
+          "volume": 117473.57299804638
         },
         {
           "index": 2,
@@ -694,7 +694,7 @@
           "index": 3,
           "vertices": 482,
           "faces": 512,
-          "volume": 90484.86509373126
+          "volume": 90484.86509373125
         },
         {
           "index": 4,
@@ -748,7 +748,7 @@
           "index": 2,
           "vertices": 96,
           "faces": 188,
-          "volume": 374689.9855992349
+          "volume": 374689.9855992348
         }
       ],
       "auditErrors": 0,
@@ -762,7 +762,7 @@
           "index": 2,
           "vertices": 96,
           "faces": 188,
-          "volume": 374689.9855992349
+          "volume": 374689.9855992348
         }
       ],
       "auditErrors": 0,
@@ -776,7 +776,7 @@
           "index": 1,
           "vertices": 290,
           "faces": 336,
-          "volume": 759766.8596744781
+          "volume": 759766.859674478
         },
         {
           "index": 2,
@@ -794,19 +794,19 @@
           "index": 4,
           "vertices": 128,
           "faces": 72,
-          "volume": 12245.869835682872
+          "volume": 12245.869835682868
         },
         {
           "index": 5,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.88447358601
+          "volume": 10062.884473586011
         },
         {
           "index": 6,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586004
+          "volume": 10062.884473586006
         }
       ],
       "auditErrors": 0,
@@ -820,7 +820,7 @@
           "index": 1,
           "vertices": 290,
           "faces": 336,
-          "volume": 759766.8596744781
+          "volume": 759766.859674478
         },
         {
           "index": 2,
@@ -838,19 +838,19 @@
           "index": 4,
           "vertices": 128,
           "faces": 72,
-          "volume": 12245.869835682872
+          "volume": 12245.869835682868
         },
         {
           "index": 5,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.88447358601
+          "volume": 10062.884473586011
         },
         {
           "index": 6,
           "vertices": 48,
           "faces": 26,
-          "volume": 10062.884473586004
+          "volume": 10062.884473586006
         }
       ],
       "auditErrors": 0,

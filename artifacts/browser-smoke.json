@@ -6,8 +6,8 @@
       "app": true,
       "stats": {
         "backend": "Canvas 2D",
-        "frameMs": 4.899999999994179,
-        "buildMs": 3.7999999999883585,
+        "frameMs": 2.1000000000058208,
+        "buildMs": 2.1000000000058208,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -34,8 +34,8 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 4.2000000000116415,
-        "buildMs": 3.3999999999941792,
+        "frameMs": 1.8999999999941792,
+        "buildMs": 2.3000000000029104,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -62,8 +62,8 @@
       "app": true,
       "stats": {
         "backend": "WebGL2",
-        "frameMs": 4.199999999982538,
-        "buildMs": 3.2000000000116415,
+        "frameMs": 1.9000000000087311,
+        "buildMs": 2.1999999999970896,
         "segments": 266,
         "entities": 39,
         "draws": 2,
@@ -89,8 +89,8 @@
     "overflow": false,
     "stats": {
       "backend": "Canvas 2D",
-      "frameMs": 2.599999999976717,
-      "buildMs": 3,
+      "frameMs": 2,
+      "buildMs": 1.9000000000087311,
       "segments": 252,
       "entities": 39,
       "draws": 2,

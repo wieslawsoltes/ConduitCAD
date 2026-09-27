@@ -1,0 +1,90 @@
+{
+  "validator": "ezdxf 1.4.4",
+  "files": 14,
+  "records": [
+    {
+      "file": "samples/live/parametric-path-workshop-binary.dxf",
+      "entities": 6,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "samples/live/parametric-path-workshop.dxf",
+      "entities": 6,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-canvas-parameters-ascii.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-canvas-path-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgl2-parameters-ascii.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgl2-path-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgpu-parameters-ascii.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgpu-path-ascii.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-canvas-parameters-binary.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-canvas-path-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgl2-parameters-binary.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgl2-path-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgpu-parameters-binary.dxf",
+      "entities": 2,
+      "auditErrors": 0,
+      "auditFixes": 0
+    },
+    {
+      "file": "artifacts/live-webgpu-path-binary.dxf",
+      "entities": 1,
+      "auditErrors": 0,
+      "auditFixes": 0
+    }
+  ]
+}

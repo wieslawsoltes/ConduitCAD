@@ -673,3 +673,113 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:760px),(pointer:coarse) and (max-width:1100px){.inspect3d-panel{top:54px;right:6px;width:290px;max-height:calc(100% - 147px)}.inspect3d-panel>header button span{display:none}.inspect3d-controls{left:6px;right:6px;transform:none;width:auto;max-width:calc(100% - 12px);bottom:max(5px,env(safe-area-inset-bottom))}.inspect3d-tools button span{display:none}.inspect3d-confirm button{padding:6px 7px}.inspect3d-confirm [data-inspect-command=options] span{display:none}}
 @media(max-height:500px) and (orientation:landscape){.inspect3d-panel{top:5px;max-height:calc(100% - 72px);width:290px}.inspect3d-body{padding:7px 10px}.inspect3d-panel>header{padding:2px 7px}.inspect3d-panel>header button span{display:none}.inspect3d-controls{bottom:5px}.inspect3d-controls button span{display:none}.inspect3d-controls [data-inspect-command=apply] span,.inspect3d-controls [data-inspect-command=cancel] span{display:inline}}
 .workspace-keyboard .inspect3d-panel{top:5px;max-height:calc(100% - 67px)}.workspace-keyboard .inspect3d-markers{display:none!important}
+
+/* Live parameters and native WCS paths share the visual editors' bounded chrome.
+   No viewport-wide pointer interception: only controls own input; the canvas keeps navigation. */
+.live-parameters, .path3d-controls, .path3d-panel {
+    box-sizing: border-box; background: var(--paper, #fff); color: var(--ink, #24332f);
+    border: 1px solid var(--border, #d7dfdb); border-radius: 14px;
+    box-shadow: 0 9px 30px #143f2921; overflow: hidden;
+}
+.live-parameters {
+    position: absolute; z-index: 24; right: 12px; top: 64px; bottom: 12px;
+    width: min(380px, calc(100% - 24px)); display: flex; flex-direction: column;
+}
+.live-parameters[hidden], .path3d[hidden], .path3d-panel[hidden], .live-parameter-row[hidden] { display: none !important; }
+.live-parameters header, .path3d-panel header, .path3d-controls header {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 8px 10px; flex-shrink: 0; border-bottom: 1px solid var(--border, #d7dfdb);
+}
+.live-parameters strong, .path3d strong { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; }
+.live-parameters button, .path3d button {
+    box-sizing: border-box; min-height: 44px; min-width: 44px; display: inline-flex;
+    align-items: center; justify-content: center; gap: 6px; flex-shrink: 0;
+    border: 1px solid var(--border, #d7dfdb); border-radius: 8px;
+    background: var(--paper, #fff); color: inherit; padding: 7px 9px; font: inherit;
+    cursor: pointer; touch-action: manipulation;
+}
+.live-parameters button:disabled, .path3d button:disabled { opacity: .45; cursor: default; }
+.live-parameters button:focus-visible, .path3d button:focus-visible,
+.live-parameters input:focus-visible, .path3d input:focus-visible, .path3d select:focus-visible {
+    outline: 2px solid var(--teal, #167c70); outline-offset: 2px;
+}
+.live-parameters input, .path3d input, .path3d select {
+    box-sizing: border-box; min-width: 0; width: 100%; min-height: 44px; border: 1px solid var(--border, #d7dfdb);
+    border-radius: 7px; background: var(--paper, #fff); color: inherit;
+    font: 16px system-ui, sans-serif; padding: 7px;
+}
+.live-parameters label, .path3d label { display: flex; flex-direction: column; min-width: 0; gap: 4px; font-size: 11px; }
+.live-parameter-body, .path3d-panel-body { flex: 1; min-height: 0; padding: 10px; overflow: auto; overscroll-behavior: contain; }
+.live-parameter-body > p, .path3d-panel-body > p { font-size: 12px; line-height: 1.5; margin: 0 0 12px; }
+.live-parameter-search { margin-bottom: 8px; }
+.live-parameter-row { display: grid; grid-template-columns: minmax(60px, 1fr) minmax(78px, 100px) 44px; gap: 7px; padding: 10px 0; border-bottom: 1px solid var(--border, #d7dfdb); }
+.live-parameter-expression { grid-column: 1 / -1; }
+.live-parameter-row small { grid-column: 1 / -1; overflow-wrap: anywhere; font-size: 11px; opacity: .75; }
+.live-parameter-row [data-parameter-scrub] { align-self: end; cursor: ew-resize; touch-action: none; user-select: none; min-width: 0; padding: 6px; }
+.live-parameter-row [data-parameter-scrub] output { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.live-parameter-row [data-parameter-scrub] .cad-icon { width: 14px; flex-shrink: 0; }
+.live-parameter-row [data-parameter-remove] { align-self: end; padding: 0; }
+.live-parameter-body > [data-parameter-command=add] { margin-top: 10px; }
+.live-parameter-hint { padding-top: 10px; }
+.live-parameter-error, .path3d-error { color: #9f3b2c; background: #fff2ee; padding: 7px 10px; font-size: 12px; margin: 0; overflow-wrap: anywhere; flex-shrink: 0; max-height: 70px; overflow-y: auto; }
+.live-parameter-status { margin: 0; padding: 8px 10px; font-size: 11px; flex-shrink: 0; }
+.live-parameters footer { display: flex; flex-shrink: 0; justify-content: space-between; gap: 8px; border-top: 1px solid var(--border, #d7dfdb); padding: 8px; }
+.live-parameters footer > div { display: flex; gap: 5px; }
+.live-parameters footer [data-parameter-command=undo] span, .live-parameters footer [data-parameter-command=redo] span { display: none; }
+.live-parameters [data-parameter-command=apply], .path3d [data-path-command=apply] { background: var(--teal, #167c70); color: #fff; border-color: var(--teal, #167c70); }
+.live-parameters.collapsed { top: auto; }
+.live-parameters.collapsed .live-parameter-body { display: none; }
+.parameters-active .tool-dock, .parameters-active .tool-hint, .parameters-active .planar-context,
+.parameters-active .model3d-bottom, .parameters-active .model3d-selection-tools, .parameters-active .model3d-info,
+.path3d-active .model3d-bottom, .path3d-active .model3d-selection-tools, .path3d-active .model3d-info { display: none !important; }
+.path3d { position: absolute; z-index: 15; inset: 0; pointer-events: none; }
+.path3d-controls { position: absolute; bottom: max(8px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(850px, calc(100% - 16px)); pointer-events: auto; }
+.path3d-controls header { padding: 6px 10px; min-height: 25px; }
+.path3d-status { min-width: 0; font-size: 11px; text-align: right; }
+.path3d-commandbar { display: flex; min-width: 0; gap: 8px; padding: 7px; }
+.path3d-utilities { display: flex; align-items: center; min-width: 0; gap: 5px; overflow-x: auto; scrollbar-width: thin; overscroll-behavior: contain; }
+.path3d-utilities button[aria-pressed=true] { border-color: var(--teal, #167c70); background: #e8f5f0; color: #186856; }
+.path3d-confirm { display: flex; gap: 5px; flex-shrink: 0; padding-left: 6px; border-left: 1px solid var(--border, #d7dfdb); }
+.path3d-coordinates { display: grid; grid-template-columns: minmax(68px, .8fr) repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 10px 9px; }
+.path3d-panel { position: absolute; top: 60px; bottom: 174px; right: 12px; width: min(340px, calc(100% - 24px)); display: flex; flex-direction: column; pointer-events: auto; }
+.path3d-panel-body > label { margin-bottom: 10px; }
+.path3d-panel-body > button { margin-bottom: 10px; }
+.path3d-next { margin-bottom: 12px; }
+.path3d-next fieldset { margin: 0 0 10px; padding: 8px; border: 1px solid var(--border, #d7dfdb); border-radius: 8px; }
+.path3d-next fieldset > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.path3d-next legend { font-size: 12px; padding: 0 4px; }
+.path3d-handle { position: absolute; width: 44px; height: 44px; padding: 0 !important; pointer-events: none; border: 0 !important; background: transparent !important; user-select: none; }
+.path3d-handle span { display: grid; place-items: center; width: 27px; height: 27px; background: var(--paper, #fff); color: #235a4d; border: 1px solid #397e6a; border-radius: 50%; box-shadow: 0 2px 6px #1234; font: 600 12px system-ui; }
+.path3d-handle.selected span { background: #e3f5e9; border-width: 2px; }
+.path3d-handle[data-axis=x] span { border-color: #bd655a; color: #98473c; }
+.path3d-handle[data-axis=y] span { border-color: #418c65; color: #2b6748; }
+.path3d-handle[data-axis=z] span { border-color: #517da8; color: #385f88; }
+@media (max-width: 600px) {
+    .live-parameters { top: auto; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100% - 16px); max-height: calc(100% - 58px); }
+    .live-parameters:not(.collapsed) { height: min(560px, calc(100% - 58px)); }
+    .live-parameters header, .path3d-panel header { padding: 6px 8px; }
+    .live-parameters header button, .path3d-panel header button { font-size: 12px; }
+    .path3d-controls .path3d-utilities button span { display: none; }
+    .path3d-utilities button { padding: 7px; }
+    .path3d-confirm button { font-size: 12px; padding: 7px; }
+    .path3d-status { max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .path3d-coordinates { gap: 5px; padding-inline: 7px; }
+    .path3d-panel { top: 58px; bottom: 180px; right: 8px; width: calc(100% - 16px); }
+}
+@media (max-height: 500px) {
+    .live-parameters { top: 54px; bottom: 6px; }
+    .live-parameters.collapsed { top: auto; }
+    .live-parameter-status, .live-parameter-hint { display: none; }
+    .path3d-panel { top: 54px; bottom: 155px; }
+    .path3d-controls header { padding-block: 3px; }
+    .path3d-controls .path3d-error { max-height: 36px; }
+    .path3d-coordinates { padding-bottom: 5px; }
+}
+[data-icon-labels=labels] .path3d-utilities button span { display: inline !important; }
+[data-icon-labels=compact] .path3d-utilities button span { display: none !important; }
+@media (max-height: 500px) {
+    .path3d-controls header { display: none; }
+    .path3d.options-open .path3d-coordinates, .path3d.options-open .path3d-utilities { display: none; }
+    .path3d.options-open .path3d-commandbar { justify-content: flex-end; }
+    .path3d.options-open .path3d-panel { top: 8px; }
+}

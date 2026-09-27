@@ -2485,6 +2485,135 @@ class PlanarEditSession {
 
 return {PLANAR_OPERATIONS,expressionDelta2,PlanarEditSession};
 })();
+// packages/manipulation2d/src/parameters.js
+__modules["packages/manipulation2d/src/parameters.js"]=(()=>{
+const {clone, uid, isLocked} = __modules["packages/model/src/index.js"];
+const {resolveParameters, reservedParameterNames, parameterDependencies} = __modules["packages/constraints/src/index.js"];
+const {expressionDelta2} = __modules["packages/manipulation2d/src/session.js"];
+const MAX_PARAMETERS = 1024;
+const MAX_EXPRESSION = 4096;
+const expressionOf = value => value && typeof value === 'object' ? value.expression ?? value.value : value;
+function checkRows(rows) {
+    if (!Array.isArray(rows) || rows.length > MAX_PARAMETERS) throw new Error('Use at most 1024 parameters');
+    const ids = new Set();
+    for (const row of rows) {
+        if (!row || typeof row.id !== 'string' || !row.id || ids.has(row.id) || typeof row.name !== 'string' || row.name.length > 128 || typeof row.expression !== 'string' || row.expression.length > MAX_EXPRESSION)
+            throw new Error('Invalid parameter edit snapshot');
+        ids.add(row.id);
+    }
+}
+/** Document-independent parameter authoring state. The host owns regeneration and history. */
+class ParameterEditSession {
+    constructor(document, { process = null } = {}) {
+        this.source = document;
+        this.version = document.version;
+        this.signature = JSON.stringify(document);
+        this.base = clone(document);
+        this.process = process;
+        this.records = new Map();
+        this.rows = Object.entries(document.parameters || {}).map(([name, value]) => {
+            const id = uid('parameter-draft');
+            this.records.set(id, clone(value));
+            return { id, name, expression: String(expressionOf(value) ?? '') };
+        });
+        checkRows(this.rows);
+        this.initial = this.snapshot();
+        this.undoStack = [];
+        this.redoStack = [];
+        this.closed = false;
+        this.revision = 0;
+        this.validatedRevision = -1;
+        this.preview = null;
+        this.values = null;
+        this.error = null;
+        this.evaluations = 0;
+    }
+    assertOpen() { if (this.closed) throw new Error('This parameter edit has ended'); }
+    row(id) { this.assertOpen(); const row = this.rows.find(r => r.id === id); if (!row) throw new Error('Unknown parameter row'); return row; }
+    snapshot() { return clone(this.rows); }
+    get changed() { return JSON.stringify(this.rows) !== JSON.stringify(this.initial); }
+    invalidate() { this.preview = null; this.values = null; this.error = null; this.validatedRevision = -1; this.revision++; }
+    set(id, changes) {
+        const row = this.row(id);
+        if (!changes || Object.keys(changes).some(k => !['name', 'expression'].includes(k))) throw new Error('Unknown parameter field');
+        const next = { ...row, ...changes };
+        checkRows([next]);
+        if (JSON.stringify(next) !== JSON.stringify(row)) { Object.assign(row, next); this.invalidate(); }
+    }
+    add(name = '', expression = '100') {
+        this.assertOpen();
+        if (!name) { let i = 1; do { name = 'Size' + i++; } while (this.rows.some(r => r.name === name)); }
+        const row = { id: uid('parameter-draft'), name, expression: String(expression) };
+        checkRows([...this.rows, row]);
+        this.rows.push(row); this.invalidate(); return row.id;
+    }
+    remove(id) { this.row(id); this.rows = this.rows.filter(r => r.id !== id); this.invalidate(); }
+    restore(rows) { this.assertOpen(); checkRows(rows); this.rows = clone(rows); this.invalidate(); }
+    checkpoint(before) {
+        checkRows(before);
+        if (JSON.stringify(before) === JSON.stringify(this.rows)) return;
+        this.undoStack.push(clone(before));
+        if (this.undoStack.length > 60) this.undoStack.shift();
+        this.redoStack = [];
+    }
+    undo() { this.assertOpen(); if (!this.undoStack.length) return false; this.redoStack.push(this.snapshot()); this.restore(this.undoStack.pop()); return true; }
+    redo() { this.assertOpen(); if (!this.redoStack.length) return false; this.undoStack.push(this.snapshot()); this.restore(this.redoStack.pop()); return true; }
+    parameterMap() {
+        this.assertOpen(); checkRows(this.rows);
+        const map = {}, reserved = new Set([...reservedParameterNames(), ...(this.base.constraints || []).map(c => c.name).filter(Boolean)]);
+        for (const row of this.rows) {
+            const name = row.name.trim();
+            if (!/^[A-Za-z_]\w*$/.test(name) || reserved.has(name) || Object.hasOwn(map, name)) throw new Error('Invalid, reserved or duplicate parameter: ' + name);
+            const record = this.records.get(row.id);
+            // A numeric/string record remains byte-identical unless its expression is edited.
+            if (record !== undefined && row.expression === String(expressionOf(record))) map[name] = clone(record);
+            else if (record && typeof record === 'object') map[name] = { ...clone(record), [Object.hasOwn(record, 'expression') ? 'expression' : 'value']: row.expression };
+            else map[name] = row.expression;
+        }
+        return map;
+    }
+    scrub(id, delta, originalValue, before) {
+        this.row(id); checkRows(before);
+        const row = before.find(r => r.id === id);
+        if (!row) throw new Error('The scrubbed parameter no longer exists');
+        this.set(id, { expression: String(expressionDelta2(row.expression, delta, originalValue)) });
+    }
+    dependencies(id) { return parameterDependencies(this.row(id).expression); }
+    evaluate() {
+        this.assertOpen();
+        if (this.preview && this.validatedRevision === this.revision) return this.preview;
+        this.preview = null; this.values = null; this.error = null; this.validatedRevision = -1;
+        try {
+            const parameters = this.parameterMap(), values = resolveParameters(parameters), draft = clone(this.base);
+            draft.parameters = parameters;
+            this.process?.(draft);
+            // A global parameter edit must not bypass entity/layer locking.
+            const updated = new Map(draft.entities.map(e => [e.id, e]));
+            for (const e of this.base.entities) if (isLocked(e, this.base) && JSON.stringify({ ...e, dirty: undefined, model3dConsumed: undefined }) !== JSON.stringify({ ...updated.get(e.id), dirty: undefined, model3dConsumed: undefined }))
+                throw new Error('Parameter change affects locked geometry: ' + (e.label || e.id));
+            const originals = new Map(this.base.entities.map(e => [e.id, e]));
+            for (const e of draft.entities) if (JSON.stringify({ ...e, dirty: undefined, model3dConsumed: undefined }) !== JSON.stringify({ ...originals.get(e.id), dirty: undefined, model3dConsumed: undefined })) e.dirty = true;
+            this.values = values; this.preview = draft; this.validatedRevision = this.revision; this.evaluations++;
+            return draft;
+        } catch (error) { this.error = error.message; throw error; }
+    }
+    assertSource(document) {
+        this.assertOpen();
+        if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed. Restart parameter editing.');
+    }
+    commit(document) {
+        this.assertSource(document);
+        const draft = this.evaluate();
+        document.parameters = clone(draft.parameters);
+        document.entities = clone(draft.entities);
+        document.constraints = clone(draft.constraints);
+        if (draft.blockEditing) document.blockEditing = clone(draft.blockEditing);
+    }
+    cancel() { this.closed = true; this.source = null; this.base = null; this.preview = null; this.values = null; this.process = null; this.records.clear(); this.undoStack = []; this.redoStack = []; }
+}
+
+return {ParameterEditSession};
+})();
 // packages/manipulation2d/src/handles.js
 __modules["packages/manipulation2d/src/handles.js"]=(()=>{
 const {dimensionGrips, dynamicParameterGrips, dynamicGripValue} = __modules["packages/model/src/index.js"];
@@ -2552,6 +2681,7 @@ return {handles2,dragHandle2};
 })();
 // packages/manipulation2d/src/index.js
 __modules["packages/manipulation2d/src/index.js"]=(()=>{
+const {ParameterEditSession:ParameterSession} = __modules["packages/manipulation2d/src/parameters.js"];
 const {PLANAR_TYPES:types, planarEditable:editable, fields2:fields, anchor2:anchor, editFields2:edit, number2:number, sourceField2:source} = __modules["packages/manipulation2d/src/fields.js"];
 const {PLANAR_OPERATIONS:operations, PlanarEditSession:Session, expressionDelta2:expression} = __modules["packages/manipulation2d/src/session.js"];
 const {handles2:handles, dragHandle2:drag} = __modules["packages/manipulation2d/src/handles.js"];
@@ -2568,7 +2698,9 @@ const expressionDelta2=expression;
 const handles2=handles;
 const dragHandle2=drag;
 
-return {PLANAR_TYPES,PLANAR_OPERATIONS,planarEditable,fields2,anchor2,editFields2,number2,sourceField2,PlanarEditSession,expressionDelta2,handles2,dragHandle2};
+const ParameterEditSession = ParameterSession;
+
+return {PLANAR_TYPES,PLANAR_OPERATIONS,planarEditable,fields2,anchor2,editFields2,number2,sourceField2,PlanarEditSession,expressionDelta2,handles2,dragHandle2,ParameterEditSession};
 })();
 // packages/geometry3d/src/csg.js
 __modules["packages/geometry3d/src/csg.js"]=(()=>{
@@ -3034,113 +3166,47 @@ function booleanMesh(left, right, operation = 'union') {
 
 return {V3,add3,sub3,mul3,dot3,cross3,length3,distance3,unit3,lerp3,finite3,identity4,multiply4,transform3,translation3,scaling3,rotation3,ocs3,bounds3,faceNormal,validateMesh,triangulateFace,triangles3,transformMesh,mergeMeshes,meshProperties,segments3,boxMesh,cylinderMesh,sphereMesh,revolveMesh,torusMesh,extrudeMesh,loftMesh,sweepMesh,rayTriangle,sliceMesh,spline3,booleanMesh};
 })();
-// packages/manipulation3d/src/gestures.js
-__modules["packages/manipulation3d/src/gestures.js"]=(()=>{
-const {V3, add3, sub3, mul3, dot3, cross3, unit3, finite3} = __modules["packages/geometry3d/src/index.js"];
-const finite = n => { if (!Number.isFinite(n)) throw new TypeError('A finite gesture coordinate is required'); return n; };
-const point2 = p => ({ x: finite(p.x), y: finite(p.y) });
-function snapValue3(value, step = 0) {
-    finite(value); finite(step);
-    if (step < 0) throw new RangeError('Snap increment cannot be negative');
-    if (!step) return value;
-    const out = Math.round(value / step) * step;
-    if (!Number.isFinite(out)) throw new RangeError('Snap range exceeded');
-    return Number(out.toPrecision(14));
+// packages/modeling/src/spatial-path.js
+__modules["packages/modeling/src/spatial-path.js"]=(()=>{
+const {evaluateExpression} = __modules["packages/constraints/src/index.js"];
+const {distance3} = __modules["packages/geometry3d/src/index.js"];
+const MAX_SPATIAL_PATH_POINTS = 2048;
+/** Evaluates native WCS POLYLINE coordinates; does not modify its argument. */
+function spatialPathPoints(coordinates, parameters = {}, closed = false) {
+    if (!Array.isArray(coordinates) || coordinates.length < (closed ? 3 : 2) || coordinates.length > MAX_SPATIAL_PATH_POINTS)
+        throw new Error(`A ${closed ? 'closed' : 'spatial'} path needs ${closed ? '3' : '2'}–2048 vertices`);
+    const points = coordinates.map((p, i) => {
+        if (!p || typeof p !== 'object') throw new Error('Invalid path point ' + (i + 1));
+        const result = {};
+        for (const axis of ['x', 'y', 'z']) {
+            const source = p[axis];
+            if (!['string', 'number'].includes(typeof source)) throw new Error('Every path point needs X, Y and Z');
+            const value = evaluateExpression(source, parameters);
+            if (Math.abs(value) > 1e12) throw new Error('Spatial coordinates must stay within ±1e12 drawing units');
+            result[axis] = value;
+        }
+        return result;
+    });
+    for (let i = 1; i < points.length; i++) if (distance3(points[i], points[i - 1]) < 1e-8) throw new Error('Consecutive path vertices must be distinct');
+    if (closed && distance3(points[0], points.at(-1)) < 1e-8) throw new Error('A closed path connects its last point automatically; do not repeat the first point');
+    return points;
 }
-/** Ray / plane intersection in WCS; parallel and behind-eye rays are not invented. */
-function rayPlane3(ray, origin, normal) {
-    finite3(origin); normal = unit3(finite3(normal));
-    const direction=finite3(ray.direction),rayOrigin=finite3(ray.origin);
-    const denominator = dot3(direction, normal);
-    if (Math.abs(denominator) < 1e-7) return null;
-    const t = dot3(sub3(origin, rayOrigin), normal) / denominator;
-    if (!Number.isFinite(t) || t < 0) return null;
-    return add3(rayOrigin, mul3(direction, t));
-}
-function unitsPerPixel3(camera, origin) {
-    const depth = camera.project(origin).depth;
-    return camera.perspective ? Math.max(camera.near(), depth) * 2 * Math.tan(Math.PI / 8) / camera.pixelHeight : camera.height / camera.pixelHeight;
-}
-/** Snapshot projection state so a gesture never mixes two different cameras. */
-function frozenCamera(camera) {
-    const b = camera.basis(), width = camera.width, height = camera.pixelHeight, worldHeight = camera.height;
-    const perspective = camera.perspective, near = camera.near();
-    const ray = (x, y) => {
-        const k = perspective ? 2 * Math.tan(Math.PI / 8) / height : worldHeight / height;
-        const offset = add3(mul3(b.right, (x - width / 2) * k), mul3(b.up, (height / 2 - y) * k));
-        return perspective ? { origin: b.eye, direction: unit3(add3(b.forward, offset)) } : { origin: add3(b.eye, offset), direction: b.forward };
-    };
-    return { ray, b, near, perspective, height, worldHeight };
-}
-function axisParameter(ray, origin, axis) {
-    const o = sub3(ray.origin, origin), ad = dot3(axis, ray.direction), den = 1 - ad * ad;
-    if (den < .0004) return null;
-    return (dot3(axis, o) - ad * dot3(ray.direction, o)) / den;
-}
-/** Signed axis drag. End-on axes deliberately use vertical screen distance rather than exploding. */
-function beginAxisDrag3(camera, origin, axis, pointer) {
-    origin = finite3(origin); axis = unit3(finite3(axis)); pointer = point2(pointer);
-    const view = frozenCamera(camera), start = axisParameter(view.ray(pointer.x, pointer.y), origin, axis);
-    const scale = unitsPerPixel3(camera, origin);
-    return { kind: 'axis', origin, axis, pointer, start, view, scale, fallback: start === null };
-}
-function updateAxisDrag3(drag, pointer) {
-    pointer = point2(pointer);
-    if (drag.fallback) return finite((drag.pointer.y - pointer.y) * drag.scale);
-    const value = axisParameter(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.axis);
-    if (value === null) throw new Error('Axis projection became ambiguous; release and orbit');
-    return finite(value - drag.start);
-}
-function beginPlaneDrag3(camera, origin, u, v, pointer) {
-    origin = finite3(origin); u = unit3(finite3(u)); v = unit3(finite3(v));
-    if (Math.abs(dot3(u, v)) > 1e-6) throw new Error('Plane axes must be orthogonal');
-    const view = frozenCamera(camera), normal = unit3(cross3(u, v));
-    const start = rayPlane3(view.ray(pointer.x, pointer.y), origin, normal);
-    if (!start) throw new Error('This plane is edge-on; orbit or use an axis handle');
-    return { kind: 'plane', view, origin, u, v, normal, start };
-}
-function updatePlaneDrag3(drag, pointer) {
-    point2(pointer);
-    const p = rayPlane3(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.normal);
-    if (!p) throw new Error('Pointer ray no longer intersects this plane');
-    const delta = sub3(p, drag.start);
-    return { u: finite(dot3(delta, drag.u)), v: finite(dot3(delta, drag.v)) };
-}
-/** Angles are unwrapped across +/-pi, supporting repeated complete revolutions. */
-function beginAngleDrag3(camera, origin, u, v, pointer) {
-    const plane = beginPlaneDrag3(camera, origin, u, v, pointer), d = sub3(plane.start, origin);
-    if (Math.hypot(dot3(d, u), dot3(d, v)) < 1e-10) throw new Error('Start rotation away from the axis center');
-    return { ...plane, kind: 'angle', last: Math.atan2(dot3(d, v), dot3(d, u)), accumulated: 0 };
-}
-function updateAngleDrag3(drag, pointer) {
-    point2(pointer);
-    const p = rayPlane3(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.normal);
-    if (!p) throw new Error('Rotation plane is edge-on; orbit first');
-    const d = sub3(p, drag.origin), u = dot3(d, drag.u), v = dot3(d, drag.v);
-    if (Math.hypot(u, v) < 1e-10) return drag.accumulated;
-    const angle = Math.atan2(v, u);
-    let delta = angle - drag.last;
-    if (delta > Math.PI) delta -= 2 * Math.PI;
-    if (delta < -Math.PI) delta += 2 * Math.PI;
-    drag.accumulated += delta * 180 / Math.PI; drag.last = angle;
-    return finite(drag.accumulated);
-}
-/** Keep an expression's dependency during a drag; the original expression is reused for every sample. */
-function expressionDelta3(original, delta, originalValue) {
-    finite(delta); finite(originalValue);
-    if (Math.abs(delta) <= 1e-12) return original;
-    const n = Number((originalValue + delta).toPrecision(12)); finite(n);
-    if (typeof original === 'number' || /^\s*[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?\s*$/i.test(String(original))) return n;
-    const d = Number(Math.abs(delta).toPrecision(12));
-    return `(${String(original)}) ${delta < 0 ? '-' : '+'} ${d}`;
-}
-function perpendicularAxes3(axis) {
-    axis = unit3(axis);
-    const u = unit3(cross3(Math.abs(axis.z) < .9 ? V3(0, 0, 1) : V3(0, 1, 0), axis));
-    return { u, v: unit3(cross3(axis, u)) };
+/** Prepare all path updates before feature evaluation; publish them only with the complete result. */
+function spatialPathUpdates(document) {
+    const updates = new Map();
+    for (const e of document.entities) {
+        if (e.parametric?.kind !== 'spatial-path') continue;
+        if (e.type !== 'POLYLINE' || !(e.flags & 8) || (e.flags & (2 | 4 | 16 | 64)) || e.feature3d || e.points?.some(p => p.bulge) || e.parametric.version !== 1)
+            throw new Error('Parametric spatial paths require an ordinary native 3D POLYLINE');
+        const points = spatialPathPoints(e.parametric.coordinates, document.parameters, !!e.closed);
+        if (points.length !== e.points.length) throw new Error('Spatial path expression count does not match its vertices');
+        const next = points.map((p, i) => ({ ...e.points[i], ...p }));
+        if (JSON.stringify(next) !== JSON.stringify(e.points)) updates.set(e.id, { ...e, points: next, dirty: true });
+    }
+    return updates;
 }
 
-return {snapValue3,rayPlane3,unitsPerPixel3,beginAxisDrag3,updateAxisDrag3,beginPlaneDrag3,updatePlaneDrag3,beginAngleDrag3,updateAngleDrag3,expressionDelta3,perpendicularAxes3};
+return {MAX_SPATIAL_PATH_POINTS,spatialPathPoints,spatialPathUpdates};
 })();
 // packages/modeling/src/authoring.js
 __modules["packages/modeling/src/authoring.js"]=(()=>{
@@ -3276,6 +3342,7 @@ return {faceFrame3,faceCoordinates3,facePoint3,profileOnFace3,extrudeExtent3,com
 })();
 // packages/modeling/src/features.js
 __modules["packages/modeling/src/features.js"]=(()=>{
+const {spatialPathUpdates} = __modules["packages/modeling/src/spatial-path.js"];
 const {faceFrame3, extrudeExtent3, combineExtrusion3, drillHole3} = __modules["packages/modeling/src/authoring.js"];
 const {V3, add3, sub3, mul3, dot3, cross3, unit3, distance3, lerp3, translation3, scaling3, rotation3, multiply4, transform3, ocs3, validateMesh, meshProperties, boxMesh, cylinderMesh, sphereMesh, torusMesh, extrudeMesh, revolveMesh, loftMesh, sweepMesh, booleanMesh, transformMesh, mergeMeshes, spline3, triangles3, faceNormal, sliceMesh} = __modules["packages/geometry3d/src/index.js"];
 const {entity, clone} = __modules["packages/model/src/index.js"];
@@ -3485,15 +3552,18 @@ function evaluateFeature(f, inputs, variables) {
 }
 /** Two-phase regeneration: evaluate every dependent result before mutating the document. */
 function regenerateFeatures(doc) {
+    const pathUpdates = spatialPathUpdates(doc);
     const features = doc.entities.filter(e => e.feature3d);
     if (!features.length) {
-        for (const e of doc.entities)
+        for (const e of doc.entities) {
+            if (pathUpdates.has(e.id)) Object.assign(e, pathUpdates.get(e.id));
             delete e.model3dConsumed;
-        return { features: 0, updated: [] };
+        }
+        return { features: 0, updated: [...pathUpdates.keys()] };
     }
     if (features.length > 256)
         throw new Error('Feature history exceeds 256 feature budget');
-    const map = new Map(doc.entities.map(e => [e.id, e]));
+    const map = new Map(doc.entities.map(e => [e.id, pathUpdates.get(e.id) || e]));
     if (map.size !== doc.entities.length)
         throw new Error('Duplicate entity identities');
     const visiting = new Set(), done = new Map(), consumed = new Set(), variables = resolveParameters(doc.parameters || {}), order = [];
@@ -3534,7 +3604,7 @@ function regenerateFeatures(doc) {
         visit(e);
     const updated = [];
     for (const e of doc.entities) {
-        const result = done.get(e.id);
+        const result = done.get(e.id) || pathUpdates.get(e.id);
         if (result && result !== e) {
             Object.assign(e, result);
             updated.push(e.id);
@@ -3767,6 +3837,10 @@ function setControlPoint3(entity, index, point) {
         delete draft.feature3d;
     }
     Object.assign(points[index], point);
+    if (draft.parametric?.kind === 'spatial-path') {
+        if (!Array.isArray(draft.parametric.coordinates) || draft.parametric.coordinates.length !== points.length) throw new Error('Invalid spatial path expressions');
+        draft.parametric.coordinates[index] = { x: point.x, y: point.y, z: point.z };
+    }
     if (triangle && (index === 2 || index === 3)) {
         Object.assign(points[2], point);
         Object.assign(points[3], point);
@@ -3788,6 +3862,7 @@ return {controlPoints3,setControlPoint3};
 })();
 // packages/modeling/src/index.js
 __modules["packages/modeling/src/index.js"]=(()=>{
+const {spatialPathPoints:pathPoints, spatialPathUpdates:pathUpdates, MAX_SPATIAL_PATH_POINTS:pathLimit} = __modules["packages/modeling/src/spatial-path.js"];
 const {EXAMPLES_3D:examples, create3DExample:createExample} = __modules["packages/modeling/src/examples.js"];
 const {MODELING_TOOLS:tools, curvePoints3:curve, regenerateFeatures:regenerate, addFeature:add, editFeature:edit, removeFeature:remove, bakeFeature:bake, offsetPlanarFace:offset, sectionEntities:section, writeOBJ:obj, writeSTL:stl} = __modules["packages/modeling/src/features.js"];
 const MODELING_TOOLS = tools;
@@ -3817,472 +3892,11 @@ const drillHole3 = drill;
 const extrudeExtent3 = extent;
 const combineExtrusion3 = combine;
 
-return {MODELING_TOOLS,curvePoints3,regenerateFeatures,addFeature,editFeature,removeFeature,bakeFeature,offsetPlanarFace,sectionEntities,writeOBJ,writeSTL,EXAMPLES_3D,create3DExample,controlPoints3,setControlPoint3,faceFrame3,facePoint3,faceCoordinates3,profileOnFace3,holeTool3,drillHole3,extrudeExtent3,combineExtrusion3};
-})();
-// packages/manipulation3d/src/session.js
-__modules["packages/manipulation3d/src/session.js"]=(()=>{
-const {V3, add3, sub3, mul3, bounds3, faceNormal, unit3} = __modules["packages/geometry3d/src/index.js"];
-const {clone, isLocked} = __modules["packages/model/src/index.js"];
-const {MODELING_TOOLS, addFeature, editFeature, bakeFeature, curvePoints3, regenerateFeatures, faceFrame3, faceCoordinates3, profileOnFace3, controlPoints3, setControlPoint3} = __modules["packages/modeling/src/index.js"];
-const {evaluateExpression, resolveParameters} = __modules["packages/constraints/src/index.js"];
-const {expressionDelta3, snapValue3} = __modules["packages/manipulation3d/src/gestures.js"];
-const PROFILE_TYPES = Object.freeze(['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE']);
-const synthetic = [
-    { id: 'sketch-profile', label: 'Planar sketch profile', group: 'Sketch', fields: [
-        { name: 'shape', label: 'Shape', value: 0, options: ['Rectangle', 'Circle'] },
-        { name: 'width', label: 'Width', value: 60 }, { name: 'height', label: 'Height', value: 40 }, { name: 'radius', label: 'Radius', value: 20 },
-        { name: 'plane', label: 'Plane', value: 0, options: ['XY', 'XZ', 'YZ'] }
-    ] },
-    { id: 'face-profile', label: 'Sketch on face', inputs: 1, group: 'Sketch', fields: [
-        { name: 'shape', label: 'Shape', value: 0, options: ['Rectangle', 'Circle'] },
-        { name: 'width', label: 'Width', value: 30 }, { name: 'height', label: 'Height', value: 20 }, { name: 'radius', label: 'Radius', value: 10 },
-        { name: 'u', label: 'Face U', value: 0 }, { name: 'v', label: 'Face V', value: 0 }, { name: 'offset', label: 'Normal offset', value: 0 }, { name: 'face', label: 'Face index', value: 1 }
-    ] },
-    { id: 'vertex', label: 'Edit native vertex', inputs: 1, group: 'Modify', fields: [
-        { name: 'x', label: 'X', value: 0 }, { name: 'y', label: 'Y', value: 0 }, { name: 'z', label: 'Z', value: 0 },
-        { name: 'index', label: 'Vertex index', value: 0 }, { name: 'detach', label: 'Detach feature history', value: 0, options: ['Keep feature link', 'Detach and edit vertex'] }
-    ] }
-];
-const VISUAL_TOOLS = Object.freeze([...MODELING_TOOLS, ...synthetic].map(t => Object.freeze({ ...t, fields: Object.freeze(t.fields.map(f => Object.freeze({ ...f, ...(f.options ? {options:Object.freeze([...f.options])} : {}) }))) })));
-function visualTool3(kind) {
-    const tool = VISUAL_TOOLS.find(t => t.id === kind);
-    if (!tool) throw new Error('Unsupported visual operation: ' + kind);
-    return tool;
-}
-function inputAccepts3(kind, index, e) {
-    if (!e || e.feature3d?.suppressed) return false;
-    if (kind === 'vertex') { try { return controlPoints3(e).length > 0; } catch { return false; } }
-    if (['extrude', 'revolve', 'loft'].includes(kind) && !(kind === 'extrude' && index === 1)) return PROFILE_TYPES.includes(e.type);
-    if (kind === 'sweep') return PROFILE_TYPES.includes(e.type) || (index === 1 && ['LINE', 'HELIX'].includes(e.type));
-    return e.type === 'MESH';
-}
-/** Source document never mutates until the host's explicit history transaction calls commit(). */
-class VisualEditSession {
-    constructor(document, kind, { id = null, inputs = [], parameters = {}, name, hit = null } = {}) {
-        this.tool = visualTool3(kind); this.kind = kind; this.source = document; this.sourceVersion = document.version;
-        this.signature = JSON.stringify(document); this.base = clone(document); this.id = id;
-        this.closed = false; this.revision = 0; this.validatedRevision = -1; this.preview = null; this.resultId = null;
-        this.error = null; this.undoStack = []; this.redoStack = []; this.evaluations = 0;
-        const e = id ? document.entities.find(e => e.id === id) : null;
-        if (id && (!e?.feature3d || e.feature3d.kind !== kind)) throw new Error('Select a matching editable feature');
-        if (e && (isLocked(e, document) || e.feature3d.suppressed)) throw new Error('The feature is locked or suppressed');
-        this.parameters = Object.fromEntries(this.tool.fields.map(f => [f.name, f.value]));
-        if (!this.tool.inputs) Object.assign(this.parameters, { x: 0, y: 0, z: 0 });
-        if (kind === 'extrude' && !id) this.parameters.useNormal = 1;
-        Object.assign(this.parameters, e?.feature3d?.parameters || {}, parameters);
-        this.inputs = (e?.feature3d?.inputs || inputs).slice();
-        this.name = name || e?.label || this.tool.label;
-        if (!id && hit && hit.id === this.inputs[0] && hit.face !== undefined && ['hole', 'offset-face', 'face-profile'].includes(kind)) {
-            const target = this.base.entities.find(e => e.id === hit.id), frame = faceFrame3(target, hit.face);
-            this.parameters.face = hit.face;
-            if (kind !== 'offset-face') { const uv = faceCoordinates3(frame, hit.point || frame.origin); this.parameters.u = uv.u; this.parameters.v = uv.v; }
-        }
-        if (kind === 'vertex' && this.inputs[0]) this.loadVertex(hit?.vertex ?? this.parameters.index);
-        if (!id && kind === 'transform' && this.inputs[0]) {
-            const target = document.entities.find(e => e.id === this.inputs[0]);
-            const b = bounds3(target.points), c = mul3(add3(b.min, b.max), .5);
-            Object.assign(this.parameters, { px: c.x, py: c.y, pz: c.z });
-        }
-        this.initial = this.snapshot();
-    }
-    assertOpen() { if (this.closed) throw new Error('Visual edit session is closed'); }
-    snapshot() { return clone({ parameters: this.parameters, inputs: this.inputs, name: this.name }); }
-    restore(snapshot) { this.assertOpen(); Object.assign(this, clone(snapshot)); this.invalidate(); }
-    checkpoint(snapshot = this.snapshot()) {
-        if (JSON.stringify(snapshot) !== JSON.stringify(this.undoStack.at(-1))) this.undoStack.push(clone(snapshot));
-        if (this.undoStack.length > 64) this.undoStack.shift(); this.redoStack.length = 0;
-    }
-    undo() { if (!this.undoStack.length) return false; this.redoStack.push(this.snapshot()); this.restore(this.undoStack.pop()); return true; }
-    redo() { if (!this.redoStack.length) return false; this.undoStack.push(this.snapshot()); this.restore(this.redoStack.pop()); return true; }
-    invalidate() { this.revision++; this.preview = null; this.validatedRevision = -1; this.error = null; }
-    set(name, value) {
-        this.assertOpen();
-        if (typeof name !== 'string' || !Object.hasOwn(this.parameters, name)) throw new Error('Unknown parameter: ' + name);
-        if (!['number', 'string'].includes(typeof value) || String(value).length > 1024) throw new Error('Invalid parameter value');
-        if (this.parameters[name] === value) return;
-        this.parameters[name] = value; this.invalidate();
-        // Switching to New body must not leave a stale target attached.
-        if (this.kind === 'extrude' && name === 'operation') {
-            try { if (this.value('operation') === 0) this.inputs = this.inputs.slice(0, 1); } catch { /* retain invalid draft for correction */ }
-        }
-    }
-    values() {
-        const variables = resolveParameters(this.base.parameters || {});
-        return Object.fromEntries(Object.entries(this.parameters).map(([key, value]) => [key, evaluateExpression(String(value), variables)]));
-    }
-    value(name) { return evaluateExpression(String(this.parameters[name]), resolveParameters(this.base.parameters || {})); }
-    inputCount() { return this.kind === 'extrude' && this.value('operation') ? 2 : this.tool.multiple ? Math.max(this.tool.inputs, this.inputs.length) : this.tool.inputs || 0; }
-    setInput(index, id, hit = null) {
-        this.assertOpen();
-        if (!Number.isInteger(index) || index < 0 || index >= (this.tool.multiple ? 32 : this.inputCount())) throw new RangeError('Input index is out of range');
-        const e = this.base.entities.find(e => e.id === id);
-        if (!inputAccepts3(this.kind, index, e) || id === this.id) throw new Error('Pick a compatible source entity');
-        if (isLocked(e, this.base)) throw new Error('The picked input is locked');
-        if (this.inputs.some((v, i) => i !== index && v === id)) throw new Error('Inputs must be distinct');
-        const patch = {};
-        if (hit?.face !== undefined && ['hole', 'offset-face', 'face-profile'].includes(this.kind)) {
-            const frame = faceFrame3(e, hit.face); patch.face = hit.face;
-            if (this.kind !== 'offset-face') { const uv = faceCoordinates3(frame, hit.point || frame.origin); patch.u = uv.u; patch.v = uv.v; }
-        }
-        if (this.kind === 'vertex') {
-            const index = hit?.vertex ?? 0, p = controlPoints3(e)[index];
-            if (!p) throw new Error('Select a native control vertex');
-            Object.assign(patch, {x:p.x,y:p.y,z:p.z,index});
-        }
-        if (this.kind === 'transform' && !this.id && index === 0 && !this.inputs[0]) {
-            const bounds = bounds3(e.points), center = mul3(add3(bounds.min,bounds.max),.5);
-            Object.assign(patch,{px:center.x,py:center.y,pz:center.z});
-        }
-        this.inputs[index] = id; Object.assign(this.parameters,patch);
-        this.invalidate();
-    }
-    loadVertex(index) {
-        const e = this.base.entities.find(e => e.id === this.inputs[0]), p = controlPoints3(e)[index];
-        if (!p) throw new Error('Select a native control vertex');
-        Object.assign(this.parameters, { x: p.x, y: p.y, z: p.z, index });
-    }
-    dragValue(name, delta, original, originalValue, step = 0) {
-        const value = snapValue3(originalValue + delta, step);
-        this.set(name, expressionDelta3(original, value - originalValue, originalValue));
-    }
-    assertSource(document) {
-        this.assertOpen();
-        if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed during preview; restart this operation');
-    }
-    evaluate() {
-        this.assertOpen();
-        if (this.preview && this.validatedRevision === this.revision) return this.preview;
-        this.preview = null; this.error = null;
-        try {
-            const count = this.inputCount();
-            if (this.inputs.length !== count || this.inputs.some((id, i) => !id || !inputAccepts3(this.kind, i, this.base.entities.find(e => e.id === id)))) throw new Error('Pick all required source geometry on the canvas');
-            if (new Set(this.inputs).size !== this.inputs.length || this.inputs.includes(this.id)) throw new Error('Feature inputs must be distinct');
-            if (this.inputs.some(id => isLocked(this.base.entities.find(e => e.id === id), this.base))) throw new Error('An input is locked');
-            const draft = clone(this.base); let result;
-            if (this.kind === 'sketch-profile') {
-                const p = this.values();
-                if (![0,1,2].includes(p.plane) || ![0,1].includes(p.shape)) throw new Error('Select a valid sketch plane and shape');
-                const c = V3(p.x,p.y,p.z), u = p.plane === 2 ? V3(0,1,0) : V3(1,0,0), v = p.plane === 0 ? V3(0,1,0) : V3(0,0,1);
-                const support = {points:[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>add3(c,add3(mul3(u,a),mul3(v,b)))),faces:[[0,1,2,3]]};
-                result = profileOnFace3(support,0,{...p,shape:p.shape?'circle':'rectangle'});result.label=this.name;draft.entities.push(result);
-            } else if (this.kind === 'face-profile') {
-                const p = this.values();
-                if (![0, 1].includes(p.shape)) throw new Error('Unknown profile shape');
-                result = profileOnFace3(draft.entities.find(e => e.id === this.inputs[0]), p.face, { ...p, shape: p.shape ? 'circle' : 'rectangle' });
-                result.label=this.name;draft.entities.push(result);
-            } else if (this.kind === 'vertex') {
-                const p = this.values(); result = draft.entities.find(e => e.id === this.inputs[0]);
-                if (result.feature3d && p.detach !== 1) throw new Error('Direct vertex editing requires explicitly detaching this feature');
-                if (result.feature3d) result = bakeFeature(draft, result.id);
-                setControlPoint3(result, p.index, V3(p.x, p.y, p.z)); regenerateFeatures(draft);
-                this.resultId = result.id;
-            } else {
-                result = this.id ? editFeature(draft, this.id, { parameters: this.parameters, inputs: this.inputs, name: this.name })
-                    : addFeature(draft, this.kind, this.parameters, this.inputs, { name: this.name, color: this.base.entities.find(e => e.id === this.inputs[0])?.color });
-            }
-            this.resultId ||= result.id;
-            if (result.id !== this.resultId) result.id = this.resultId;
-            this.preview = draft; this.validatedRevision = this.revision; this.evaluations++;
-            return draft;
-        } catch (error) { this.error = error.message; throw error; }
-    }
-    /** Call inside the host history transaction. Only validated geometry is copied, never stale metadata. */
-    commit(document) {
-        this.assertSource(document);
-        const preview = this.evaluate();
-        document.entities = clone(preview.entities);
-        return document.entities.find(e => e.id === this.resultId);
-    }
-    cancel() { this.closed = true; this.preview = null; this.base = null; this.source = null; this.undoStack.length = this.redoStack.length = 0; }
-}
-function visibleFields3(session) {
-    const p = (() => { try { return session.values(); } catch { return {}; } })();
-    const fields = session.tool.fields.slice();
-    if (!session.tool.inputs) fields.push(...['x', 'y', 'z'].map(name => ({ name, label: 'Position ' + name.toUpperCase(), value: 0 })));
-    return fields.filter(f => {
-        if (session.kind === 'extrude') return f.name === 'distance2' ? p.extent === 2 : ['nx', 'ny', 'nz'].includes(f.name) ? p.useNormal === 0 : true;
-        if (session.kind === 'hole') return f.name === 'depth' ? p.through === 0 : f.name === 'counterDiameter' ? !!p.holeType : f.name === 'counterDepth' ? p.holeType === 1 : f.name === 'sinkAngle' ? p.holeType === 2 : true;
-        if (['face-profile','sketch-profile'].includes(session.kind)) return f.name === 'radius' ? p.shape === 1 : ['width', 'height'].includes(f.name) ? p.shape === 0 : true;
-        if (session.kind === 'vertex' && f.name === 'detach') return !!session.base.entities.find(e => e.id === session.inputs[0])?.feature3d;
-        return true;
-    });
-}
+const spatialPathPoints = pathPoints;
+const spatialPathUpdates = pathUpdates;
+const MAX_SPATIAL_PATH_POINTS = pathLimit;
 
-return {PROFILE_TYPES,VISUAL_TOOLS,visualTool3,inputAccepts3,VisualEditSession,visibleFields3};
-})();
-// packages/manipulation3d/src/handles.js
-__modules["packages/manipulation3d/src/handles.js"]=(()=>{
-const {V3, add3, sub3, mul3, unit3, bounds3, faceNormal, rotation3, multiply4, transform3} = __modules["packages/geometry3d/src/index.js"];
-const {curvePoints3, faceFrame3, facePoint3} = __modules["packages/modeling/src/index.js"];
-const {perpendicularAxes3, unitsPerPixel3} = __modules["packages/manipulation3d/src/gestures.js"];
-const AXES = [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)];
-const COLORS = ['#b84336', '#26835d', '#377bc2'];
-const center = points => { const b = bounds3(points); return mul3(add3(b.min, b.max), .5); };
-/** Geometry-anchored dimensions and manipulators; the host handles hit targets, focus, and rendering. */
-function visualHandles3(session, camera, mode = 'dimensions') {
-    if (session.closed) return [];
-    let p; try { p = session.values(); } catch { return []; }
-    const src = session.base.entities.find(e => e.id === session.inputs[0]), k = session.kind, out = [];
-    const origin = V3(p.x || 0, p.y || 0, p.z || 0);
-    const field = name => session.tool.fields.find(f => f.name === name)?.label || name.toUpperCase();
-    const axis = (name, start, direction, length, { factor = 1, color = '#087f72', unit = 'length', label = field(name) } = {}) => {
-        if (!Object.hasOwn(p, name)) return;
-        direction = unit3(direction);
-        out.push({ id: name, kind: 'axis', field: name, label, origin: start, axis: direction, point: add3(start, mul3(direction, length)), factor, color, unit, value: p[name] });
-    };
-    const plane = (id, start, u, v, names, label) => out.push({ id, kind: 'plane', fields: names, label, origin: start, point: start, u, v, color: '#087f72', unit: 'length' });
-    const angle = (name, start, normal, radius) => {
-        const { u, v } = perpendicularAxes3(normal), a = p[name] * Math.PI / 180;
-        out.push({ id: name, kind: 'angle', field: name, label: field(name), origin: start, axis: normal, u, v, radius, point: add3(start, add3(mul3(u, radius * Math.cos(a)), mul3(v, radius * Math.sin(a)))), color: COLORS[['rx', 'ry', 'rz'].indexOf(name)] || '#8e59a2', unit: 'angle', value: p[name] });
-    };
-    const move = (start, fields) => {
-        const length = Math.max(1e-6, unitsPerPixel3(camera, start) * 76);
-        AXES.forEach((a, i) => axis(fields[i], start, a, length, { color: COLORS[i] }));
-        plane('position', start, AXES[0], AXES[1], fields.slice(0, 2), 'Move on XY plane');
-    };
-    if (k === 'vertex') { move(origin, ['x', 'y', 'z']); return out; }
-    if (!session.tool.inputs) {
-        if (mode === 'move') { move(origin, ['x', 'y', 'z']); return out; }
-        if (k === 'sketch-profile') {
-            const u=p.plane===2?AXES[1]:AXES[0],v=p.plane===0?AXES[1]:AXES[2];
-            if(p.shape)axis('radius',origin,u,p.radius);
-            else {axis('width',origin,u,p.width/2,{factor:2});axis('height',origin,v,p.height/2,{factor:2,color:COLORS[2]});}
-        } else if (k === 'box' || k === 'wedge') {
-            axis('width', add3(origin, V3(0, p.depth / 2, p.height / 2)), AXES[0], p.width, { color: COLORS[0] });
-            axis('depth', add3(origin, V3(p.width / 2, 0, p.height / 2)), AXES[1], p.depth, { color: COLORS[1] });
-            axis('height', add3(origin, V3(p.width / 2, p.depth / 2, 0)), AXES[2], p.height, { color: COLORS[2] });
-        } else if (['cylinder', 'cone', 'sphere'].includes(k)) {
-            axis('radius', origin, AXES[0], p.radius, { color: COLORS[0] });
-            if (k !== 'sphere') axis('height', origin, AXES[2], p.height, { color: COLORS[2] });
-            if (k === 'cone') axis('topRadius', add3(origin, V3(0, 0, p.height)), AXES[0], p.topRadius);
-        } else if (k === 'torus') {
-            axis('major', origin, AXES[0], p.major);
-            axis('minor', add3(origin, V3(p.major, 0, 0)), AXES[2], p.minor, { color: COLORS[2] });
-        }
-        return out;
-    }
-    if (!src) return [];
-    if (k === 'extrude') {
-        const points = curvePoints3(src, { closed: true }).points, c = center(points);
-        const normal = p.useNormal ? unit3(src.extrusion || faceNormal(points, points.map((_, i) => i))) : unit3(V3(p.nx, p.ny, p.nz));
-        const start = add3(c, mul3(normal, p.startOffset));
-        axis('height', start, normal, p.extent === 1 ? p.height / 2 : p.height, { factor: p.extent === 1 ? 2 : 1 });
-        if (p.extent === 2) axis('distance2', start, mul3(normal, -1), p.distance2, { color: '#377bc2' });
-        axis('startOffset', c, normal, p.startOffset, { color: '#8e59a2' });
-    } else if (['hole', 'face-profile', 'offset-face'].includes(k)) {
-        const f = faceFrame3(src, p.face), c = facePoint3(f, p.u || 0, p.v || 0, p.offset || 0);
-        if (k === 'offset-face') axis('distance', f.origin, f.normal, p.distance);
-        else {
-            plane('face-position', c, f.u, f.v, ['u', 'v'], 'Position on face');
-            if (k === 'hole') {
-                axis('diameter', c, f.u, p.diameter / 2, { factor: 2 });
-                if (!p.through) axis('depth', c, mul3(f.normal, -1), p.depth, { color: COLORS[2] });
-                if (p.holeType) axis('counterDiameter', c, f.v, p.counterDiameter / 2, { factor: 2, color: '#8e59a2' });
-                if (p.holeType === 1) axis('counterDepth', add3(c, mul3(f.v, p.counterDiameter / 2)), mul3(f.normal, -1), p.counterDepth, { color: COLORS[2] });
-            } else {
-                if (p.shape) axis('radius', c, f.u, p.radius);
-                else { axis('width', c, f.u, p.width / 2, { factor: 2 }); axis('height', c, f.v, p.height / 2, { factor: 2, color: COLORS[1] }); }
-                axis('offset', f.origin, f.normal, p.offset, { color: COLORS[2] });
-            }
-        }
-    } else if (k === 'transform') {
-        const pivot = V3(p.px || 0, p.py || 0, p.pz || 0), c = add3(pivot, V3(p.dx, p.dy, p.dz));
-        const length = Math.max(1e-6, unitsPerPixel3(camera, c) * 76);
-        if (mode === 'rotate') {
-            const z = rotation3(AXES[2], p.rz * Math.PI / 180), yz = multiply4(z, rotation3(AXES[1], p.ry * Math.PI / 180));
-            [transform3(AXES[0], yz), transform3(AXES[1], z), AXES[2]].forEach((a, i) => angle(['rx', 'ry', 'rz'][i], c, a, length * (1 + i * .12)));
-        } else if (mode === 'scale') {
-            const b = bounds3(src.points), lengths = [b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z].map(v => Math.max(v / 2, length / 3));
-            const rotation=multiply4(multiply4(rotation3(AXES[2],p.rz*Math.PI/180),rotation3(AXES[1],p.ry*Math.PI/180)),rotation3(AXES[0],p.rx*Math.PI/180));
-            AXES.forEach((a, i) => axis(['sx', 'sy', 'sz'][i], c, transform3(a,rotation), lengths[i] * p[['sx', 'sy', 'sz'][i]], { factor: 1 / lengths[i], color: COLORS[i], unit: 'scale' }));
-        } else move(c, ['dx', 'dy', 'dz']);
-    } else if (k === 'linear-pattern') {
-        const c = center(src.points); AXES.forEach((a, i) => axis(['dx', 'dy', 'dz'][i], c, a, p[['dx', 'dy', 'dz'][i]], { color: COLORS[i] }));
-    } else if (k === 'revolve' || k === 'circular-pattern') {
-        const c = V3(p.cx || 0, p.cy || 0, 0); angle('angle', c, AXES[2], Math.max(unitsPerPixel3(camera, c) * 88, 1e-6));
-    } else if (k === 'mirror') axis('offset', V3(), AXES[p.axis] || AXES[0], p.offset);
-    return out;
-}
-
-return {visualHandles3};
-})();
-// packages/manipulation3d/src/layout.js
-__modules["packages/manipulation3d/src/layout.js"]=(()=>{
-/** Deterministic screen-space packing: dimension badges never intercept another handle.
- * The host keeps all values in an accessible ribbon when a badge cannot fit.
- * Coordinates and sizes are CSS pixels, independent of render-target resolution.
- */
-function layoutHandles3(handles, {width, height, top=60, bottom=height-120, active=null, labels=true}={}) {
-    if (![width,height,top,bottom].every(Number.isFinite)) throw new TypeError('Finite viewport bounds are required');
-    const size=44,margin=6,minX=margin+size/2,maxX=width-margin-size/2,minY=top+size/2,maxY=bottom-size/2;
-    if(maxX<minX || maxY<minY)return handles.map(h=>({id:h.id,visible:false,label:null}));
-    const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
-    const overlap=(a,b,gap=3)=>a.x<b.x+b.w+gap&&a.x+a.w+gap>b.x&&a.y<b.y+b.h+gap&&a.y+a.h+gap>b.y;
-    const occupied=[],results=[];
-    for(const h of handles){
-        if(!Number.isFinite(h.x)||!Number.isFinite(h.y)){results.push({id:h.id,visible:false,label:null});continue;}
-        const x=clamp(h.x,minX,maxX),y=clamp(h.y,minY,maxY),candidates=[];
-        for(let dy=-3;dy<=3;dy++)for(let dx=-6;dx<=6;dx++){
-            const px=clamp(x+dx*50,minX,maxX),py=clamp(y+dy*50,minY,maxY);
-            candidates.push({x:px,y:py,d:(px-x)**2+(py-y)**2});
-        }
-        candidates.sort((a,b)=>a.d-b.d);
-        const chosen=candidates.find(c=>!occupied.some(r=>overlap({x:c.x-22,y:c.y-22,w:size,h:size},r)));
-        if(!chosen){results.push({id:h.id,visible:false,label:null});continue;}
-        occupied.push({x:chosen.x-22,y:chosen.y-22,w:size,h:size});
-        results.push({id:h.id,x:chosen.x,y:chosen.y,visible:true,label:null});
-    }
-    if(!labels)return results;
-    const badges=[];
-    const order=handles.map((_,i)=>i).sort((a,b)=>(handles[a].id===active?-1:0)-(handles[b].id===active?-1:0));
-    for(const i of order){
-        const h=handles[i],r=results[i];if(!r.visible||!h.hasLabel||h.hideLabel)continue;
-        const w=Math.min(Math.max(94,h.labelWidth||110),154,width-2*margin),hh=Math.max(40,h.labelHeight||44),candidates=[];
-        for(let n=0;n<7;n++)for(const sign of n?[-1,1]:[1]){
-            const dy=n*sign*(hh+6);
-            candidates.push({x:r.x+27,y:r.y-hh/2+dy},{x:r.x-w-27,y:r.y-hh/2+dy});
-        }
-        candidates.push({x:r.x-w/2,y:r.y-hh-27},{x:r.x-w/2,y:r.y+27});
-        const rects=candidates.map(p=>({x:clamp(p.x,margin,width-margin-w),y:clamp(p.y,top,bottom-hh),w,h:hh}));
-        const rect=rects.find(p=>p.y>=top&&p.y+p.h<=bottom&&!occupied.some(q=>overlap(p,q))&&!badges.some(q=>overlap(p,q)));
-        if(rect){r.label=rect;badges.push(rect);}
-    }
-    return results;
-}
-
-return {layoutHandles3};
-})();
-// packages/manipulation3d/src/inspection.js
-__modules["packages/manipulation3d/src/inspection.js"]=(()=>{
-const {V3, add3, sub3, mul3, dot3, length3, finite3} = __modules["packages/geometry3d/src/index.js"];
-const {perpendicularAxes3} = __modules["packages/manipulation3d/src/gestures.js"];
-/** Exact world-space measurement, never a screen-projected distance. */
-function measurePoints3(first, second) {
-    const a=finite3(first),b=finite3(second),delta=sub3(b,a),distance=length3(delta),horizontal=Math.hypot(delta.x,delta.y);
-    if(!Number.isFinite(distance)||distance>1e15)throw new RangeError('Measurement exceeds the supported range');
-    return {a,b,delta,distance,horizontal,inclination:distance?Math.atan2(delta.z,horizontal)*180/Math.PI:0,midpoint:add3(a,mul3(delta,.5))};
-}
-/** A finite plane guide around the visible scene. offset follows n·p = offset. */
-function sectionFrame3(normal, offset, center=V3(), span=100) {
-    normal=finite3(normal);center=finite3(center);const length=length3(normal);
-    if(length<1e-12||!Number.isFinite(offset)||!Number.isFinite(span)||span<=0||span>1e15)throw new RangeError('Invalid section plane or guide span');
-    normal=mul3(normal,1/length);offset/=length;
-    const origin=add3(center,mul3(normal,offset-dot3(center,normal))),{u,v}=perpendicularAxes3(normal);
-    const corners=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,y])=>add3(origin,add3(mul3(u,x*span/2),mul3(v,y*span/2))));
-    return {normal,offset,origin,u,v,corners};
-}
-
-return {measurePoints3,sectionFrame3};
-})();
-// packages/manipulation3d/src/index.js
-__modules["packages/manipulation3d/src/index.js"]=(()=>{
-const {snapValue3:snap, rayPlane3:ray, unitsPerPixel3:units, beginAxisDrag3:ba, updateAxisDrag3:ua, beginPlaneDrag3:bp, updatePlaneDrag3:up, beginAngleDrag3:br, updateAngleDrag3:ur, expressionDelta3:expression, perpendicularAxes3:axes} = __modules["packages/manipulation3d/src/gestures.js"];
-const {PROFILE_TYPES:profiles, VISUAL_TOOLS:tools, visualTool3:tool, inputAccepts3:accepts, VisualEditSession:Session, visibleFields3:fields} = __modules["packages/manipulation3d/src/session.js"];
-const {visualHandles3:handles} = __modules["packages/manipulation3d/src/handles.js"];
-const snapValue3 = snap;
-const rayPlane3 = ray;
-const unitsPerPixel3 = units;
-const beginAxisDrag3 = ba;
-const updateAxisDrag3 = ua;
-const beginPlaneDrag3 = bp;
-const updatePlaneDrag3 = up;
-const beginAngleDrag3 = br;
-const updateAngleDrag3 = ur;
-const expressionDelta3 = expression;
-const perpendicularAxes3 = axes;
-const PROFILE_TYPES = profiles;
-const VISUAL_TOOLS = tools;
-const visualTool3 = tool;
-const inputAccepts3 = accepts;
-const VisualEditSession = Session;
-const visibleFields3 = fields;
-const visualHandles3 = handles;
-
-const {layoutHandles3:layout} = __modules["packages/manipulation3d/src/layout.js"];
-const layoutHandles3 = layout;
-const {measurePoints3:measurement, sectionFrame3:sectionFrame} = __modules["packages/manipulation3d/src/inspection.js"];
-const measurePoints3 = measurement;
-const sectionFrame3 = sectionFrame;
-
-return {snapValue3,rayPlane3,unitsPerPixel3,beginAxisDrag3,updateAxisDrag3,beginPlaneDrag3,updatePlaneDrag3,beginAngleDrag3,updateAngleDrag3,expressionDelta3,perpendicularAxes3,PROFILE_TYPES,VISUAL_TOOLS,visualTool3,inputAccepts3,VisualEditSession,visibleFields3,visualHandles3,layoutHandles3,measurePoints3,sectionFrame3};
-})();
-// packages/history/src/index.js
-__modules["packages/history/src/index.js"]=(()=>{
-/** Atomic serializable transactions with bounded undo memory and redo invalidation. */
-class History {
-    constructor({ capture, restore, onChange = () => { }, limit = 80, maxBytes = 32 * 1024 * 1024 }) { this.capture = capture; this.restore = restore; this.onChange = onChange; this.limit = limit; this.maxBytes = maxBytes; this.undoStack = []; this.redoStack = []; this.pending = null; }
-    begin(label = 'Edit') {
-        if (this.pending)
-            return;
-        this.pending = { label, before: JSON.stringify(this.capture()) };
-    }
-    commit() {
-        if (!this.pending)
-            return false;
-        const item = this.pending;
-        this.pending = null;
-        const after = JSON.stringify(this.capture());
-        if (after === item.before)
-            return false;
-        item.after = after;
-        this.undoStack.push(item);
-        this.redoStack = [];
-        let bytes = this.undoStack.reduce((n, x) => n + x.before.length + x.after.length, 0);
-        while (this.undoStack.length > 1 && (this.undoStack.length > this.limit || bytes > this.maxBytes)) {
-            const old = this.undoStack.shift();
-            bytes -= old.before.length + old.after.length;
-        }
-        this.onChange();
-        return true;
-    }
-    cancel() {
-        if (!this.pending)
-            return;
-        const p = this.pending;
-        this.pending = null;
-        this.restore(JSON.parse(p.before));
-        this.onChange();
-    }
-    run(label, action) {
-        this.begin(label);
-        try {
-            const result = action();
-            this.commit();
-            return result;
-        }
-        catch (error) {
-            this.cancel();
-            throw error;
-        }
-    }
-    undo() {
-        if (this.pending)
-            this.cancel();
-        const item = this.undoStack.pop();
-        if (!item)
-            return false;
-        this.restore(JSON.parse(item.before));
-        this.redoStack.push(item);
-        this.onChange();
-        return true;
-    }
-    redo() {
-        if (this.pending)
-            this.cancel();
-        const item = this.redoStack.pop();
-        if (!item)
-            return false;
-        this.restore(JSON.parse(item.after));
-        this.undoStack.push(item);
-        this.onChange();
-        return true;
-    }
-    clear() { this.pending = null; this.undoStack = []; this.redoStack = []; this.onChange(); }
-    get canUndo() { return this.undoStack.length > 0; }
-    get canRedo() { return this.redoStack.length > 0; }
-}
-
-return {History};
+return {MODELING_TOOLS,curvePoints3,regenerateFeatures,addFeature,editFeature,removeFeature,bakeFeature,offsetPlanarFace,sectionEntities,writeOBJ,writeSTL,EXAMPLES_3D,create3DExample,controlPoints3,setControlPoint3,faceFrame3,facePoint3,faceCoordinates3,profileOnFace3,holeTool3,drillHole3,extrudeExtent3,combineExtrusion3,spatialPathPoints,spatialPathUpdates,MAX_SPATIAL_PATH_POINTS};
 })();
 // packages/icons/src/index.js
 __modules["packages/icons/src/index.js"]=(()=>{
@@ -4794,6 +4408,870 @@ function setCommandLabel(button, label, glyph = '') {
 
 return {icon,escapeHTML,toolIcon,entityIcon,commandContent,commandButton,setCommandLabel};
 })();
+// packages/workbench/src/visual-parameters.js
+__modules["packages/workbench/src/visual-parameters.js"]=(()=>{
+const {ParameterEditSession} = __modules["packages/manipulation2d/src/index.js"];
+const {ConstraintSolver, evaluateExpression, evaluateCalculations} = __modules["packages/constraints/src/index.js"];
+const {regenerateFeatures} = __modules["packages/modeling/src/index.js"];
+const {regenerateDimensions} = __modules["packages/model/src/index.js"];
+const {icon} = __modules["packages/workbench/src/icons.js"];
+const format = n => Number.isFinite(n) ? Number(n.toPrecision(9)).toString() : '—';
+const stepFor = n => Math.max(1e-6, 10 ** (Math.floor(Math.log10(Math.abs(n) || 1)) - 2));
+const button = (id, label, glyph) => `<button type="button" data-parameter-command="${id}" aria-label="${label}">${icon(glyph)}<span>${label}</span></button>`;
+/** Live, isolated whole-design parameter preview; canvas navigation stays available. */
+class VisualParameters {
+    constructor(w) {
+        this.w = w; this.session = null; this.frame = 0; this.nodes = new Map(); this.scrubbing = null;
+        this.root = document.createElement('section'); this.root.className = 'live-parameters'; this.root.hidden = true;
+        this.root.setAttribute('role', 'region'); this.root.setAttribute('aria-label', 'Parameters on canvas');
+        this.root.innerHTML = `<header><strong>${icon('formula')}Live parameters</strong>${button('collapse', 'Preview model', 'eye')}</header>
+          <div class="live-parameter-body"><p>Type an expression, or drag a calculated value left / right. Preview updates the whole design; Apply keeps one undoable change.</p>
+          <input class="live-parameter-search" type="search" aria-label="Find parameters" placeholder="Find parameters…"><div class="live-parameter-rows"></div>
+          ${button('add', 'Add parameter', 'plus')}<p class="live-parameter-hint">Canvas drag navigates during this preview. Angles in trig functions use radians.</p></div>
+          <p class="live-parameter-error" role="alert" hidden></p><p class="live-parameter-status" role="status"></p>
+          <footer><div>${button('undo', 'Undo draft', 'undo')}${button('redo', 'Redo draft', 'redo')}</div><div>${button('cancel', 'Cancel', 'close')}${button('apply', 'Apply', 'check')}</div></footer>`;
+        w.$('.canvas-area').append(this.root);
+        const opt = { signal: w.abort.signal };
+        this.root.addEventListener('click', e => this.click(e), opt);
+        this.root.addEventListener('input', e => this.input(e), opt);
+        this.root.addEventListener('focusin', e => { if (e.target.matches('[data-parameter-field]')) this.focusBefore = this.session?.snapshot(); }, opt);
+        this.root.addEventListener('focusout', e => { if (e.target.matches('[data-parameter-field]')) this.checkpointInput(); }, opt);
+        this.root.addEventListener('pointerdown', e => this.scrubDown(e), opt);
+        this.root.addEventListener('pointermove', e => this.scrubMove(e), opt);
+        this.root.addEventListener('pointerup', e => this.scrubUp(e), opt);
+        for (const type of ['pointercancel', 'lostpointercapture']) this.root.addEventListener(type, e => { if (this.scrubbing?.pointer === e.pointerId) this.cancelDrag(); }, opt);
+        w.root.addEventListener('pointerdown', e => { if (this.scrubbing && this.scrubbing.pointer !== e.pointerId) this.cancelDrag(); }, { ...opt, capture: true });
+        w.root.addEventListener('conduit:documentchange', () => this.cancel(), opt);
+    }
+    get active() { return !!this.session; }
+    start() {
+        this.cancel(); this.w.model3d.path?.cancel(); this.w.model3d.inspection.cancel(); this.w.model3d.visual.cancel(); this.w.visual2d.cancel(); this.w.visual2d.panel.close();
+        this.w.closeModal(); this.w.closePanels(); if (!this.w.model3d.active) this.w.setTool('select'); this.w.cancelGesture(); this.w.input.reset(); this.w.model3d.input.reset();
+        const facade = Object.create(this.w); facade.solver = new ConstraintSolver();
+        this.session = new ParameterEditSession(this.w.doc, { process: draft => {
+            facade.doc = draft;
+            for (const e of draft.entities) facade.evaluateParametric(e);
+            for (const p of draft.blockEditing?.dynamic?.parameters || []) {
+                if (!Object.hasOwn(draft.parameters, p.name)) throw new Error('Keep block parameters; edit their schema through Parameters & actions');
+                const record = draft.parameters[p.name], expression = record && typeof record === 'object' ? record.expression ?? record.value : record;
+                if (p.expression !== undefined) p.expression = expression;
+                else if (typeof p.default === 'number') p.default = evaluateExpression(expression, draft.parameters);
+            }
+            facade.solveConstraints();
+            evaluateCalculations(draft.entities, draft.constraints || [], draft.parameters);
+            regenerateFeatures(draft); regenerateDimensions(draft); facade.reroute();
+            this.solveStatus = facade.lastSolve;
+        }});
+        this.view = this.w.viewMode; this.nodes.clear(); this.root.querySelector('.live-parameter-rows').replaceChildren(); this.root.querySelector('.live-parameter-search').value = '';
+        this.root.hidden = false; this.root.classList.remove('collapsed'); this.w.$('.canvas-area').classList.add('parameters-active'); this.w.visual2d.sync();
+        this.rejectedFields = new Map(); this.rejected = false; this.root.querySelector('[data-parameter-command=collapse] span').textContent = 'Preview model'; this.report(); this.renderRows(); this.requestPreview(true); this.root.querySelector('.live-parameter-search').focus({ preventScroll: true });
+        return this.session;
+    }
+    report(message = '') { const e = this.root.querySelector('.live-parameter-error'); e.textContent = message; e.hidden = !message; }
+    checkpointInput() { if (this.session && this.focusBefore) this.session.checkpoint(this.focusBefore); this.focusBefore = null; this.refresh(); }
+    renderRows() {
+        if (!this.session) return;
+        const host = this.root.querySelector('.live-parameter-rows'), alive = new Set(this.session.rows.map(r => r.id));
+        for (const [id, node] of this.nodes) if (!alive.has(id)) { node.remove(); this.nodes.delete(id); }
+        for (const row of this.session.rows) {
+            let node = this.nodes.get(row.id);
+            if (!node) {
+                node = document.createElement('div'); node.className = 'live-parameter-row'; node.dataset.parameterRow = row.id;
+                node.innerHTML = `<label>Name<input data-parameter-field="name" maxlength="128" spellcheck="false" autocomplete="off"></label>
+                  <button type="button" data-parameter-scrub role="spinbutton" title="Drag left / right; arrow keys adjust; Enter edits expression">${icon('move')}<output></output></button>
+                  <button type="button" data-parameter-remove title="Remove parameter">${icon('trash')}</button>
+                  <label class="live-parameter-expression">Expression<input data-parameter-field="expression" maxlength="4096" autocomplete="off" spellcheck="false"></label><small></small>`;
+                this.nodes.set(row.id, node); host.append(node);
+            }
+            for (const field of ['name', 'expression']) {
+                const input = node.querySelector(`[data-parameter-field=${field}]`);
+                if (document.activeElement !== input || this.scrubbing) input.value = this.rejectedFields.get(row.id + ":" + field) ?? row[field];
+                input.setAttribute('aria-invalid', String(this.rejectedFields.has(row.id + ":" + field)));
+                input.setAttribute('aria-label', field === 'name' ? 'Parameter name' : 'Expression for ' + row.name);
+            }
+            node.querySelector('[data-parameter-remove]').setAttribute('aria-label', 'Remove ' + row.name);
+        }
+        this.filter(); this.refresh();
+    }
+    filter() {
+        if (!this.session) return;
+        const query = this.root.querySelector('.live-parameter-search').value.trim().toLowerCase();
+        for (const row of this.session.rows) this.nodes.get(row.id).hidden = !(row.name + ' ' + row.expression).toLowerCase().includes(query);
+    }
+    refresh() {
+        const s = this.session; if (!s) return;
+        for (const row of s.rows) {
+            const node = this.nodes.get(row.id); if (!node) continue;
+            const value = s.values?.[row.name.trim()], control = node.querySelector('[data-parameter-scrub]');
+            control.querySelector('output').textContent = format(value); control.setAttribute('aria-label', 'Adjust ' + row.name);
+            control.setAttribute('aria-invalid', String(!Number.isFinite(value))); control.disabled = !Number.isFinite(value) && !this.scrubbing;
+            if (Number.isFinite(value)) control.setAttribute('aria-valuenow', String(value)); else control.removeAttribute('aria-valuenow');
+            let deps = []; try { deps = s.dependencies(row.id); } catch {} node.querySelector('small').textContent = deps.length ? 'Depends on ' + deps.join(', ') : 'Independent value';
+        }
+        this.root.querySelector('[data-parameter-command=apply]').disabled = this.rejected || !s.preview || s.validatedRevision !== s.revision;
+        for (const id of ['undo', 'redo']) this.root.querySelector(`[data-parameter-command=${id}]`).disabled = !s[id + 'Stack'].length;
+        this.root.querySelector('.live-parameter-status').textContent = s.preview ? `${s.rows.length} parameters · live ${this.view === '3d' ? '3D' : '2D'} preview · drawing unchanged` : 'No valid preview · correct the highlighted expression';
+    }
+    input(e) {
+        if (e.target.matches('.live-parameter-search')) { this.filter(); return; }
+        const field = e.target.dataset.parameterField, row = e.target.closest('[data-parameter-row]'); if (!field || !row || !this.session) return;
+        const key = row.dataset.parameterRow + ":" + field;
+        try { this.session.set(row.dataset.parameterRow, { [field]: e.target.value }); this.rejectedFields.delete(key); e.target.setAttribute('aria-invalid', 'false'); this.rejected = this.rejectedFields.size > 0; this.requestPreview(); }
+        catch (error) { this.rejectedFields.set(key, e.target.value); e.target.setAttribute('aria-invalid', 'true'); this.reject(error); }
+    }
+    reject(error) { if (!this.session) return; this.rejected = true; this.session.invalidate(); this.session.error = error.message; cancelAnimationFrame(this.frame); this.frame = 0; this.showDocument(this.w.doc); this.report(error.message); this.refresh(); }
+    showDocument(document) {
+        if (this.w.model3d.active) { this.w.model3d.previewDocument = document === this.w.doc ? null : document; this.w.model3d.renderer.setDocument(document, { showInputs: this.w.model3d.showInputs }); this.w.model3d.renderer.invalidate(); }
+        else { this.w.renderer.setDocument(document); this.w.renderer.invalidate(); }
+    }
+    requestPreview(immediate = false) {
+        if (!this.session || this.rejected) return; cancelAnimationFrame(this.frame); this.frame = 0; this.refresh();
+        const run = () => {
+            this.frame = 0; if (!this.session) return;
+            if (this.session.source !== this.w.doc || this.session.version !== this.w.doc.version) { this.cancel(); return; }
+            try { this.showDocument(this.session.evaluate()); this.report(); } catch (error) { this.showDocument(this.w.doc); this.report(error.message); }
+            this.renderRows();
+        };
+        if (immediate) run(); else this.frame = requestAnimationFrame(run);
+    }
+    scrubDown(e) {
+        const control = e.target.closest('[data-parameter-scrub]'); if (!control || !this.session || this.rejectedFields.size || e.button !== 0 || this.scrubbing) return;
+        const id = control.closest('[data-parameter-row]').dataset.parameterRow, value = this.session.values?.[this.session.row(id).name.trim()]; if (!Number.isFinite(value)) return;
+        e.preventDefault(); this.checkpointInput(); control.focus({ preventScroll: true });
+        this.scrubbing = { id, pointer: e.pointerId, x: e.clientX, value, step: stepFor(value), before: this.session.snapshot(), control, moved: false };
+        try { control.setPointerCapture(e.pointerId); } catch { this.scrubbing = null; }
+    }
+    scrubMove(e) {
+        const d = this.scrubbing; if (!d || d.pointer !== e.pointerId || !this.session) return;
+        const dx = e.clientX - d.x; if (!d.moved && Math.abs(dx) < 5) return; d.moved = true;
+        try { this.rejected = false; this.session.scrub(d.id, Math.round(dx) * d.step * (e.shiftKey ? .1 : 1), d.value, d.before); this.requestPreview(); } catch (error) { this.reject(error); }
+    }
+    releaseScrub() { const d = this.scrubbing; this.scrubbing = null; if (d) { try { d.control.releasePointerCapture(d.pointer); } catch {} } return d; }
+    scrubUp(e) {
+        if (this.scrubbing?.pointer !== e.pointerId) return; this.scrubMove(e); const d = this.releaseScrub();
+        if (!this.session) return;
+        if (d.moved) { this.session.checkpoint(d.before); this.requestPreview(true); }
+        else this.nodes.get(d.id)?.querySelector('[data-parameter-field=expression]').focus({ preventScroll: true });
+    }
+    cancelDrag() { this.nav = null; const d = this.releaseScrub(); if (d && this.session) { this.rejectedFields.clear(); this.rejected = false; this.session.restore(d.before); this.requestPreview(true); } }
+    pointerDown(p) { if (!this.active) return false; this.nav = p; return true; }
+    pointerMove(p) { if (!this.active) return false; if (this.nav) { this.w.camera.pan(p.x - this.nav.x, p.y - this.nav.y); this.nav = p; this.w.renderer.invalidate(); } return true; }
+    pointerUp() { if (!this.active) return false; this.nav = null; return true; }
+    click(event) {
+        const command = event.target.closest('[data-parameter-command]'), remove = event.target.closest('[data-parameter-remove]'); if (!command && !remove) return;
+        event.preventDefault(); event.stopPropagation(); if (!this.session) return;
+        try {
+            this.checkpointInput(); const id = command?.dataset.parameterCommand;
+            if (id === 'cancel') { this.cancel(); return; } if (id === 'apply') { this.apply(); return; }
+            if (id === 'collapse') { const collapsed = this.root.classList.toggle('collapsed'); command.querySelector('span').textContent = collapsed ? 'Show parameters' : 'Preview model'; command.setAttribute('aria-expanded', String(!collapsed)); return; }
+            if (this.rejectedFields.size && !['undo','redo'].includes(id)) { this.report('Repair the rejected field or undo the draft first'); return; }
+            this.cancelDrag(); const before = this.session.snapshot();
+            if (remove) this.session.remove(remove.closest('[data-parameter-row]').dataset.parameterRow);
+            if (id === 'add') { this.root.querySelector('.live-parameter-search').value = ''; this.root.classList.remove('collapsed'); this.session.add(); }
+            if (id === 'undo' || id === 'redo') this.session[id](); else this.session.checkpoint(before);
+            this.rejectedFields.clear(); this.rejected = false; this.renderRows(); this.requestPreview(true);
+            if (id === 'add') this.nodes.get(this.session.rows.at(-1).id).querySelector('input').focus();
+        } catch (error) { this.reject(error); }
+    }
+    apply() {
+        const s = this.session; if (!s || this.applying || this.rejected) return; this.checkpointInput(); this.cancelDrag(); this.requestPreview(true);
+        if (!s.preview || s.error || s.validatedRevision !== s.revision) return;
+        try {
+            s.assertSource(this.w.doc);
+            if (s.changed) { this.applying = true; this.w.edit('Edit live design parameters', () => s.commit(this.w.doc)); }
+            this.finish();
+        } catch (error) { this.report(error.message); if (s.source !== this.w.doc) this.finish(); } finally { this.applying = false; }
+    }
+    finish() {
+        if (!this.session) return; cancelAnimationFrame(this.frame); this.frame = 0; this.releaseScrub(); this.focusBefore = null; this.nav = null;
+        this.session.cancel(); this.session = null; this.root.hidden = true; this.w.$('.canvas-area').classList.remove('parameters-active'); this.w.model3d.previewDocument = null;
+        this.showDocument(this.w.doc); this.w.visual2d.sync(); this.w.updateUI();
+        (this.w.model3d.active ? this.w.model3d.host : this.w.$('.viewport')).focus({ preventScroll: true });
+    }
+    cancel() { if (!this.applying) this.finish(); }
+    beforeEdit() { this.cancel(); }
+    externalChange() { if (this.session && !this.applying && (this.session.source !== this.w.doc || this.session.version !== this.w.doc.version || this.view !== this.w.viewMode)) this.cancel(); }
+    keyDown(e) {
+        if (!this.active) return false;
+        if (e.key === 'Escape') { e.preventDefault(); if (this.scrubbing) this.cancelDrag(); else if (this.focusBefore) { const row = e.target.closest('[data-parameter-row]'); this.rejectedFields.delete(row?.dataset.parameterRow + ':' + e.target.dataset.parameterField); this.rejected = this.rejectedFields.size > 0; this.session.restore(this.focusBefore); this.focusBefore = null; e.target.blur(); this.requestPreview(true); } else this.cancel(); return true; }
+        const control = e.target.closest('[data-parameter-scrub]');
+        if (control && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter'].includes(e.key)) {
+            e.preventDefault(); const id = control.closest('[data-parameter-row]').dataset.parameterRow;
+            if (e.key === 'Enter') { this.nodes.get(id).querySelector('[data-parameter-field=expression]').focus(); return true; }
+            const value = this.session.values?.[this.session.row(id).name.trim()]; if (!Number.isFinite(value)) return true;
+            const before = this.session.snapshot(); this.session.scrub(id, (['ArrowLeft', 'ArrowDown'].includes(e.key) ? -1 : 1) * stepFor(value) * (e.shiftKey ? .1 : 1), value, before); this.session.checkpoint(before); this.requestPreview(true); return true;
+        }
+        if (e.target.closest('input,textarea,select')) return false;
+        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.session[e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'](); this.requestPreview(true); return true; }
+        if (!e.ctrlKey && !e.metaKey && (e.key.length === 1 || ['Delete', 'Backspace', 'Enter'].includes(e.key))) return true;
+        return false;
+    }
+    dispose() { this.cancel(); this.root.remove(); }
+}
+
+return {VisualParameters};
+})();
+// packages/manipulation3d/src/gestures.js
+__modules["packages/manipulation3d/src/gestures.js"]=(()=>{
+const {V3, add3, sub3, mul3, dot3, cross3, unit3, finite3} = __modules["packages/geometry3d/src/index.js"];
+const finite = n => { if (!Number.isFinite(n)) throw new TypeError('A finite gesture coordinate is required'); return n; };
+const point2 = p => ({ x: finite(p.x), y: finite(p.y) });
+function snapValue3(value, step = 0) {
+    finite(value); finite(step);
+    if (step < 0) throw new RangeError('Snap increment cannot be negative');
+    if (!step) return value;
+    const out = Math.round(value / step) * step;
+    if (!Number.isFinite(out)) throw new RangeError('Snap range exceeded');
+    return Number(out.toPrecision(14));
+}
+/** Ray / plane intersection in WCS; parallel and behind-eye rays are not invented. */
+function rayPlane3(ray, origin, normal) {
+    finite3(origin); normal = unit3(finite3(normal));
+    const direction=finite3(ray.direction),rayOrigin=finite3(ray.origin);
+    const denominator = dot3(direction, normal);
+    if (Math.abs(denominator) < 1e-7) return null;
+    const t = dot3(sub3(origin, rayOrigin), normal) / denominator;
+    if (!Number.isFinite(t) || t < 0) return null;
+    return add3(rayOrigin, mul3(direction, t));
+}
+function unitsPerPixel3(camera, origin) {
+    const depth = camera.project(origin).depth;
+    return camera.perspective ? Math.max(camera.near(), depth) * 2 * Math.tan(Math.PI / 8) / camera.pixelHeight : camera.height / camera.pixelHeight;
+}
+/** Snapshot projection state so a gesture never mixes two different cameras. */
+function frozenCamera(camera) {
+    const b = camera.basis(), width = camera.width, height = camera.pixelHeight, worldHeight = camera.height;
+    const perspective = camera.perspective, near = camera.near();
+    const ray = (x, y) => {
+        const k = perspective ? 2 * Math.tan(Math.PI / 8) / height : worldHeight / height;
+        const offset = add3(mul3(b.right, (x - width / 2) * k), mul3(b.up, (height / 2 - y) * k));
+        return perspective ? { origin: b.eye, direction: unit3(add3(b.forward, offset)) } : { origin: add3(b.eye, offset), direction: b.forward };
+    };
+    return { ray, b, near, perspective, height, worldHeight };
+}
+function axisParameter(ray, origin, axis) {
+    const o = sub3(ray.origin, origin), ad = dot3(axis, ray.direction), den = 1 - ad * ad;
+    if (den < .0004) return null;
+    return (dot3(axis, o) - ad * dot3(ray.direction, o)) / den;
+}
+/** Signed axis drag. End-on axes deliberately use vertical screen distance rather than exploding. */
+function beginAxisDrag3(camera, origin, axis, pointer) {
+    origin = finite3(origin); axis = unit3(finite3(axis)); pointer = point2(pointer);
+    const view = frozenCamera(camera), start = axisParameter(view.ray(pointer.x, pointer.y), origin, axis);
+    const scale = unitsPerPixel3(camera, origin);
+    return { kind: 'axis', origin, axis, pointer, start, view, scale, fallback: start === null };
+}
+function updateAxisDrag3(drag, pointer) {
+    pointer = point2(pointer);
+    if (drag.fallback) return finite((drag.pointer.y - pointer.y) * drag.scale);
+    const value = axisParameter(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.axis);
+    if (value === null) throw new Error('Axis projection became ambiguous; release and orbit');
+    return finite(value - drag.start);
+}
+function beginPlaneDrag3(camera, origin, u, v, pointer) {
+    origin = finite3(origin); u = unit3(finite3(u)); v = unit3(finite3(v));
+    if (Math.abs(dot3(u, v)) > 1e-6) throw new Error('Plane axes must be orthogonal');
+    const view = frozenCamera(camera), normal = unit3(cross3(u, v));
+    const start = rayPlane3(view.ray(pointer.x, pointer.y), origin, normal);
+    if (!start) throw new Error('This plane is edge-on; orbit or use an axis handle');
+    return { kind: 'plane', view, origin, u, v, normal, start };
+}
+function updatePlaneDrag3(drag, pointer) {
+    point2(pointer);
+    const p = rayPlane3(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.normal);
+    if (!p) throw new Error('Pointer ray no longer intersects this plane');
+    const delta = sub3(p, drag.start);
+    return { u: finite(dot3(delta, drag.u)), v: finite(dot3(delta, drag.v)) };
+}
+/** Angles are unwrapped across +/-pi, supporting repeated complete revolutions. */
+function beginAngleDrag3(camera, origin, u, v, pointer) {
+    const plane = beginPlaneDrag3(camera, origin, u, v, pointer), d = sub3(plane.start, origin);
+    if (Math.hypot(dot3(d, u), dot3(d, v)) < 1e-10) throw new Error('Start rotation away from the axis center');
+    return { ...plane, kind: 'angle', last: Math.atan2(dot3(d, v), dot3(d, u)), accumulated: 0 };
+}
+function updateAngleDrag3(drag, pointer) {
+    point2(pointer);
+    const p = rayPlane3(drag.view.ray(pointer.x, pointer.y), drag.origin, drag.normal);
+    if (!p) throw new Error('Rotation plane is edge-on; orbit first');
+    const d = sub3(p, drag.origin), u = dot3(d, drag.u), v = dot3(d, drag.v);
+    if (Math.hypot(u, v) < 1e-10) return drag.accumulated;
+    const angle = Math.atan2(v, u);
+    let delta = angle - drag.last;
+    if (delta > Math.PI) delta -= 2 * Math.PI;
+    if (delta < -Math.PI) delta += 2 * Math.PI;
+    drag.accumulated += delta * 180 / Math.PI; drag.last = angle;
+    return finite(drag.accumulated);
+}
+/** Keep an expression's dependency during a drag; the original expression is reused for every sample. */
+function expressionDelta3(original, delta, originalValue) {
+    finite(delta); finite(originalValue);
+    if (Math.abs(delta) <= 1e-12) return original;
+    const n = Number((originalValue + delta).toPrecision(12)); finite(n);
+    if (typeof original === 'number' || /^\s*[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?\s*$/i.test(String(original))) return n;
+    const d = Number(Math.abs(delta).toPrecision(12));
+    return `(${String(original)}) ${delta < 0 ? '-' : '+'} ${d}`;
+}
+function perpendicularAxes3(axis) {
+    axis = unit3(axis);
+    const u = unit3(cross3(Math.abs(axis.z) < .9 ? V3(0, 0, 1) : V3(0, 1, 0), axis));
+    return { u, v: unit3(cross3(axis, u)) };
+}
+
+return {snapValue3,rayPlane3,unitsPerPixel3,beginAxisDrag3,updateAxisDrag3,beginPlaneDrag3,updatePlaneDrag3,beginAngleDrag3,updateAngleDrag3,expressionDelta3,perpendicularAxes3};
+})();
+// packages/manipulation3d/src/path-session.js
+__modules["packages/manipulation3d/src/path-session.js"]=(()=>{
+const {evaluateExpression} = __modules["packages/constraints/src/index.js"];
+const {clone, entity, isLocked} = __modules["packages/model/src/index.js"];
+const {spatialPathPoints, regenerateFeatures} = __modules["packages/modeling/src/index.js"];
+const {expressionDelta3} = __modules["packages/manipulation3d/src/gestures.js"];
+/** Isolated WCS polyline authoring, including point insertion/removal and dependent feature previews. */
+class SpatialPathSession {
+    constructor(document, { id = null, layer = '0' } = {}) {
+        this.source = document; this.version = document.version; this.signature = JSON.stringify(document); this.base = clone(document);
+        const existing = id ? document.entities.find(e => e.id === id) : null;
+        if (id && (!existing || existing.type !== 'POLYLINE' || !(existing.flags & 8) || (existing.flags & (2 | 4 | 16 | 64)) || existing.feature3d || existing.connector || existing.parametric && existing.parametric.kind !== 'spatial-path' || existing.points?.some(p => p.bulge)))
+            throw new Error('Choose an ordinary native 3D polyline');
+        if (existing && isLocked(existing, document)) throw new Error('The spatial path is locked');
+        const outputLayer = document.layers.find(l => l.name === (existing?.layer || layer));
+        if (!outputLayer || outputLayer.locked || outputLayer.visible === false) throw new Error('Choose an unlocked visible output layer');
+        this.entity = existing ? clone(existing) : entity('POLYLINE', { points: [], closed: false, flags: 8, layer, layout: 'Model', label: 'Spatial path' });
+        if ((this.entity.layout || 'Model') !== 'Model') throw new Error('Spatial paths require Model space');
+        this.id = this.entity.id; this.creation = !existing;
+        const coordinates = existing?.parametric?.kind === 'spatial-path' ? existing.parametric.coordinates : this.entity.points.map(p => ({ x: String(p.x), y: String(p.y), z: String(p.z ?? 0) }));
+        this.state = { coordinates: clone(coordinates), origins: this.entity.points.map((_, i) => i), closed: !!this.entity.closed };
+        this.validateState(this.state);
+        this.initial = this.snapshot(); this.preview = null; this.error = null; this.revision = 0; this.validatedRevision = -1; this.closed = false; this.evaluations = 0;
+        this.undoStack = []; this.redoStack = [];
+    }
+    assertOpen() { if (this.closed) throw new Error('This spatial path edit has ended'); }
+    snapshot() { return clone(this.state); }
+    get changed() { return this.creation || JSON.stringify(this.initial) !== JSON.stringify(this.state); }
+    invalidate() { this.preview = null; this.validatedRevision = -1; this.error = null; this.revision++; }
+    validateState(state) {
+        if (!state || typeof state.closed !== 'boolean' || !Array.isArray(state.coordinates) || state.coordinates.length > 2048) throw new Error('Invalid spatial path snapshot');
+        if (!Array.isArray(state.origins) || state.origins.length !== state.coordinates.length || state.origins.some(i => i !== null && (!Number.isInteger(i) || i < 0 || i >= this.entity.points.length)) || new Set(state.origins.filter(i => i !== null)).size !== state.origins.filter(i => i !== null).length) throw new Error('Invalid path vertex provenance');
+        for (const p of state.coordinates) for (const axis of ['x', 'y', 'z']) if (!p || !['number', 'string'].includes(typeof p[axis]) || String(p[axis]).length > 4096) throw new Error('Invalid path coordinate');
+    }
+    restore(state) { this.assertOpen(); this.validateState(state); this.state = clone(state); this.invalidate(); }
+    set(index, axis, expression) {
+        this.assertOpen();
+        if (!Number.isInteger(index) || index < 0 || index >= this.state.coordinates.length || !['x', 'y', 'z'].includes(axis)) throw new Error('Unknown path coordinate');
+        const state = this.snapshot(); state.coordinates[index][axis] = expression; this.validateState(state);
+        if (JSON.stringify(state) !== JSON.stringify(this.state)) this.restore(state);
+    }
+    insert(index, point) {
+        this.assertOpen();
+        if (!Number.isInteger(index) || index < 0 || index > this.state.coordinates.length) throw new Error('Invalid insertion index');
+        const state = this.snapshot(); state.coordinates.splice(index, 0, clone(point)); state.origins.splice(index, 0, null); this.restore(state);
+    }
+    remove(index) {
+        this.assertOpen();
+        if (!Number.isInteger(index) || index < 0 || index >= this.state.coordinates.length) throw new Error('Unknown path vertex');
+        const state = this.snapshot(); state.coordinates.splice(index, 1); state.origins.splice(index, 1); this.restore(state);
+    }
+    setClosed(value) { if (typeof value !== 'boolean') throw new Error('Expected a closed-path flag'); const state = this.snapshot(); state.closed = value; this.restore(state); }
+    checkpoint(before) { this.validateState(before); if (JSON.stringify(before) === JSON.stringify(this.state)) return; this.undoStack.push(clone(before)); if (this.undoStack.length > 60) this.undoStack.shift(); this.redoStack = []; }
+    undo() { this.assertOpen(); if (!this.undoStack.length) return false; this.redoStack.push(this.snapshot()); this.restore(this.undoStack.pop()); return true; }
+    redo() { this.assertOpen(); if (!this.redoStack.length) return false; this.undoStack.push(this.snapshot()); this.restore(this.redoStack.pop()); return true; }
+    drag(index, delta, before) {
+        this.assertOpen(); this.validateState(before);
+        const point = before.coordinates[index], next = this.snapshot();
+        if (!point || !next.coordinates[index]) throw new Error('Unknown dragged vertex');
+        for (const axis of ['x', 'y', 'z']) next.coordinates[index][axis] = expressionDelta3(point[axis], delta[axis] ?? 0, evaluateExpression(point[axis], this.base.parameters));
+        this.restore(next);
+    }
+    evaluate() {
+        this.assertOpen();
+        if (this.preview && this.validatedRevision === this.revision) return this.preview;
+        this.preview = null; this.error = null; this.validatedRevision = -1;
+        try {
+            const points = spatialPathPoints(this.state.coordinates, this.base.parameters, this.state.closed), draft = clone(this.base), e = clone(this.entity);
+            e.points = points.map((p, i) => ({ ...(this.state.origins[i] === null ? {} : this.entity.points[this.state.origins[i]]), ...p }));
+            e.closed = this.state.closed; e.flags = (e.flags | 8) & ~1 | (e.closed ? 1 : 0); e.dirty = true;
+            e.parametric = { kind: 'spatial-path', version: 1, coordinates: clone(this.state.coordinates) };
+            if (this.creation) draft.entities.push(e); else draft.entities[draft.entities.findIndex(q => q.id === this.id)] = e;
+            regenerateFeatures(draft);
+            const updated = new Map(draft.entities.map(e => [e.id, e]));
+            for (const original of this.base.entities) if (isLocked(original, this.base) && JSON.stringify({ ...original, dirty: undefined, model3dConsumed: undefined }) !== JSON.stringify({ ...updated.get(original.id), dirty: undefined, model3dConsumed: undefined })) throw new Error('Path edit affects locked geometry: ' + (original.label || original.id));
+            this.preview = draft; this.validatedRevision = this.revision; this.evaluations++; return draft;
+        } catch (error) { this.error = error.message; throw error; }
+    }
+    assertSource(document) { this.assertOpen(); if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed. Restart spatial path editing.'); }
+    commit(document) { this.assertSource(document); const draft = this.evaluate(); document.entities = clone(draft.entities); return this.id; }
+    cancel() { this.closed = true; this.source = null; this.base = null; this.preview = null; this.undoStack = []; this.redoStack = []; }
+}
+
+return {SpatialPathSession};
+})();
+// packages/manipulation3d/src/session.js
+__modules["packages/manipulation3d/src/session.js"]=(()=>{
+const {V3, add3, sub3, mul3, bounds3, faceNormal, unit3} = __modules["packages/geometry3d/src/index.js"];
+const {clone, isLocked} = __modules["packages/model/src/index.js"];
+const {MODELING_TOOLS, addFeature, editFeature, bakeFeature, curvePoints3, regenerateFeatures, faceFrame3, faceCoordinates3, profileOnFace3, controlPoints3, setControlPoint3} = __modules["packages/modeling/src/index.js"];
+const {evaluateExpression, resolveParameters} = __modules["packages/constraints/src/index.js"];
+const {expressionDelta3, snapValue3} = __modules["packages/manipulation3d/src/gestures.js"];
+const PROFILE_TYPES = Object.freeze(['CIRCLE', 'ELLIPSE', 'LWPOLYLINE', 'POLYLINE', 'SPLINE']);
+const synthetic = [
+    { id: 'sketch-profile', label: 'Planar sketch profile', group: 'Sketch', fields: [
+        { name: 'shape', label: 'Shape', value: 0, options: ['Rectangle', 'Circle'] },
+        { name: 'width', label: 'Width', value: 60 }, { name: 'height', label: 'Height', value: 40 }, { name: 'radius', label: 'Radius', value: 20 },
+        { name: 'plane', label: 'Plane', value: 0, options: ['XY', 'XZ', 'YZ'] }
+    ] },
+    { id: 'face-profile', label: 'Sketch on face', inputs: 1, group: 'Sketch', fields: [
+        { name: 'shape', label: 'Shape', value: 0, options: ['Rectangle', 'Circle'] },
+        { name: 'width', label: 'Width', value: 30 }, { name: 'height', label: 'Height', value: 20 }, { name: 'radius', label: 'Radius', value: 10 },
+        { name: 'u', label: 'Face U', value: 0 }, { name: 'v', label: 'Face V', value: 0 }, { name: 'offset', label: 'Normal offset', value: 0 }, { name: 'face', label: 'Face index', value: 1 }
+    ] },
+    { id: 'vertex', label: 'Edit native vertex', inputs: 1, group: 'Modify', fields: [
+        { name: 'x', label: 'X', value: 0 }, { name: 'y', label: 'Y', value: 0 }, { name: 'z', label: 'Z', value: 0 },
+        { name: 'index', label: 'Vertex index', value: 0 }, { name: 'detach', label: 'Detach feature history', value: 0, options: ['Keep feature link', 'Detach and edit vertex'] }
+    ] }
+];
+const VISUAL_TOOLS = Object.freeze([...MODELING_TOOLS, ...synthetic].map(t => Object.freeze({ ...t, fields: Object.freeze(t.fields.map(f => Object.freeze({ ...f, ...(f.options ? {options:Object.freeze([...f.options])} : {}) }))) })));
+function visualTool3(kind) {
+    const tool = VISUAL_TOOLS.find(t => t.id === kind);
+    if (!tool) throw new Error('Unsupported visual operation: ' + kind);
+    return tool;
+}
+function inputAccepts3(kind, index, e) {
+    if (!e || e.feature3d?.suppressed) return false;
+    if (kind === 'vertex') { try { return controlPoints3(e).length > 0; } catch { return false; } }
+    if (['extrude', 'revolve', 'loft'].includes(kind) && !(kind === 'extrude' && index === 1)) return PROFILE_TYPES.includes(e.type);
+    if (kind === 'sweep') return PROFILE_TYPES.includes(e.type) || (index === 1 && ['LINE', 'HELIX'].includes(e.type));
+    return e.type === 'MESH';
+}
+/** Source document never mutates until the host's explicit history transaction calls commit(). */
+class VisualEditSession {
+    constructor(document, kind, { id = null, inputs = [], parameters = {}, name, hit = null } = {}) {
+        this.tool = visualTool3(kind); this.kind = kind; this.source = document; this.sourceVersion = document.version;
+        this.signature = JSON.stringify(document); this.base = clone(document); this.id = id;
+        this.closed = false; this.revision = 0; this.validatedRevision = -1; this.preview = null; this.resultId = null;
+        this.error = null; this.undoStack = []; this.redoStack = []; this.evaluations = 0;
+        const e = id ? document.entities.find(e => e.id === id) : null;
+        if (id && (!e?.feature3d || e.feature3d.kind !== kind)) throw new Error('Select a matching editable feature');
+        if (e && (isLocked(e, document) || e.feature3d.suppressed)) throw new Error('The feature is locked or suppressed');
+        this.parameters = Object.fromEntries(this.tool.fields.map(f => [f.name, f.value]));
+        if (!this.tool.inputs) Object.assign(this.parameters, { x: 0, y: 0, z: 0 });
+        if (kind === 'extrude' && !id) this.parameters.useNormal = 1;
+        Object.assign(this.parameters, e?.feature3d?.parameters || {}, parameters);
+        this.inputs = (e?.feature3d?.inputs || inputs).slice();
+        this.name = name || e?.label || this.tool.label;
+        if (!id && hit && hit.id === this.inputs[0] && hit.face !== undefined && ['hole', 'offset-face', 'face-profile'].includes(kind)) {
+            const target = this.base.entities.find(e => e.id === hit.id), frame = faceFrame3(target, hit.face);
+            this.parameters.face = hit.face;
+            if (kind !== 'offset-face') { const uv = faceCoordinates3(frame, hit.point || frame.origin); this.parameters.u = uv.u; this.parameters.v = uv.v; }
+        }
+        if (kind === 'vertex' && this.inputs[0]) this.loadVertex(hit?.vertex ?? this.parameters.index);
+        if (!id && kind === 'transform' && this.inputs[0]) {
+            const target = document.entities.find(e => e.id === this.inputs[0]);
+            const b = bounds3(target.points), c = mul3(add3(b.min, b.max), .5);
+            Object.assign(this.parameters, { px: c.x, py: c.y, pz: c.z });
+        }
+        this.initial = this.snapshot();
+    }
+    assertOpen() { if (this.closed) throw new Error('Visual edit session is closed'); }
+    snapshot() { return clone({ parameters: this.parameters, inputs: this.inputs, name: this.name }); }
+    restore(snapshot) { this.assertOpen(); Object.assign(this, clone(snapshot)); this.invalidate(); }
+    checkpoint(snapshot = this.snapshot()) {
+        if (JSON.stringify(snapshot) !== JSON.stringify(this.undoStack.at(-1))) this.undoStack.push(clone(snapshot));
+        if (this.undoStack.length > 64) this.undoStack.shift(); this.redoStack.length = 0;
+    }
+    undo() { if (!this.undoStack.length) return false; this.redoStack.push(this.snapshot()); this.restore(this.undoStack.pop()); return true; }
+    redo() { if (!this.redoStack.length) return false; this.undoStack.push(this.snapshot()); this.restore(this.redoStack.pop()); return true; }
+    invalidate() { this.revision++; this.preview = null; this.validatedRevision = -1; this.error = null; }
+    set(name, value) {
+        this.assertOpen();
+        if (typeof name !== 'string' || !Object.hasOwn(this.parameters, name)) throw new Error('Unknown parameter: ' + name);
+        if (!['number', 'string'].includes(typeof value) || String(value).length > 1024) throw new Error('Invalid parameter value');
+        if (this.parameters[name] === value) return;
+        this.parameters[name] = value; this.invalidate();
+        // Switching to New body must not leave a stale target attached.
+        if (this.kind === 'extrude' && name === 'operation') {
+            try { if (this.value('operation') === 0) this.inputs = this.inputs.slice(0, 1); } catch { /* retain invalid draft for correction */ }
+        }
+    }
+    values() {
+        const variables = resolveParameters(this.base.parameters || {});
+        return Object.fromEntries(Object.entries(this.parameters).map(([key, value]) => [key, evaluateExpression(String(value), variables)]));
+    }
+    value(name) { return evaluateExpression(String(this.parameters[name]), resolveParameters(this.base.parameters || {})); }
+    inputCount() { return this.kind === 'extrude' && this.value('operation') ? 2 : this.tool.multiple ? Math.max(this.tool.inputs, this.inputs.length) : this.tool.inputs || 0; }
+    setInput(index, id, hit = null) {
+        this.assertOpen();
+        if (!Number.isInteger(index) || index < 0 || index >= (this.tool.multiple ? 32 : this.inputCount())) throw new RangeError('Input index is out of range');
+        const e = this.base.entities.find(e => e.id === id);
+        if (!inputAccepts3(this.kind, index, e) || id === this.id) throw new Error('Pick a compatible source entity');
+        if (isLocked(e, this.base)) throw new Error('The picked input is locked');
+        if (this.inputs.some((v, i) => i !== index && v === id)) throw new Error('Inputs must be distinct');
+        const patch = {};
+        if (hit?.face !== undefined && ['hole', 'offset-face', 'face-profile'].includes(this.kind)) {
+            const frame = faceFrame3(e, hit.face); patch.face = hit.face;
+            if (this.kind !== 'offset-face') { const uv = faceCoordinates3(frame, hit.point || frame.origin); patch.u = uv.u; patch.v = uv.v; }
+        }
+        if (this.kind === 'vertex') {
+            const index = hit?.vertex ?? 0, p = controlPoints3(e)[index];
+            if (!p) throw new Error('Select a native control vertex');
+            Object.assign(patch, {x:p.x,y:p.y,z:p.z,index});
+        }
+        if (this.kind === 'transform' && !this.id && index === 0 && !this.inputs[0]) {
+            const bounds = bounds3(e.points), center = mul3(add3(bounds.min,bounds.max),.5);
+            Object.assign(patch,{px:center.x,py:center.y,pz:center.z});
+        }
+        this.inputs[index] = id; Object.assign(this.parameters,patch);
+        this.invalidate();
+    }
+    loadVertex(index) {
+        const e = this.base.entities.find(e => e.id === this.inputs[0]), p = controlPoints3(e)[index];
+        if (!p) throw new Error('Select a native control vertex');
+        Object.assign(this.parameters, { x: p.x, y: p.y, z: p.z, index });
+    }
+    dragValue(name, delta, original, originalValue, step = 0) {
+        const value = snapValue3(originalValue + delta, step);
+        this.set(name, expressionDelta3(original, value - originalValue, originalValue));
+    }
+    assertSource(document) {
+        this.assertOpen();
+        if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed during preview; restart this operation');
+    }
+    evaluate() {
+        this.assertOpen();
+        if (this.preview && this.validatedRevision === this.revision) return this.preview;
+        this.preview = null; this.error = null;
+        try {
+            const count = this.inputCount();
+            if (this.inputs.length !== count || this.inputs.some((id, i) => !id || !inputAccepts3(this.kind, i, this.base.entities.find(e => e.id === id)))) throw new Error('Pick all required source geometry on the canvas');
+            if (new Set(this.inputs).size !== this.inputs.length || this.inputs.includes(this.id)) throw new Error('Feature inputs must be distinct');
+            if (this.inputs.some(id => isLocked(this.base.entities.find(e => e.id === id), this.base))) throw new Error('An input is locked');
+            const draft = clone(this.base); let result;
+            if (this.kind === 'sketch-profile') {
+                const p = this.values();
+                if (![0,1,2].includes(p.plane) || ![0,1].includes(p.shape)) throw new Error('Select a valid sketch plane and shape');
+                const c = V3(p.x,p.y,p.z), u = p.plane === 2 ? V3(0,1,0) : V3(1,0,0), v = p.plane === 0 ? V3(0,1,0) : V3(0,0,1);
+                const support = {points:[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>add3(c,add3(mul3(u,a),mul3(v,b)))),faces:[[0,1,2,3]]};
+                result = profileOnFace3(support,0,{...p,shape:p.shape?'circle':'rectangle'});result.label=this.name;draft.entities.push(result);
+            } else if (this.kind === 'face-profile') {
+                const p = this.values();
+                if (![0, 1].includes(p.shape)) throw new Error('Unknown profile shape');
+                result = profileOnFace3(draft.entities.find(e => e.id === this.inputs[0]), p.face, { ...p, shape: p.shape ? 'circle' : 'rectangle' });
+                result.label=this.name;draft.entities.push(result);
+            } else if (this.kind === 'vertex') {
+                const p = this.values(); result = draft.entities.find(e => e.id === this.inputs[0]);
+                if (result.feature3d && p.detach !== 1) throw new Error('Direct vertex editing requires explicitly detaching this feature');
+                if (result.feature3d) result = bakeFeature(draft, result.id);
+                setControlPoint3(result, p.index, V3(p.x, p.y, p.z)); regenerateFeatures(draft);
+                this.resultId = result.id;
+            } else {
+                result = this.id ? editFeature(draft, this.id, { parameters: this.parameters, inputs: this.inputs, name: this.name })
+                    : addFeature(draft, this.kind, this.parameters, this.inputs, { name: this.name, color: this.base.entities.find(e => e.id === this.inputs[0])?.color });
+            }
+            this.resultId ||= result.id;
+            if (result.id !== this.resultId) result.id = this.resultId;
+            this.preview = draft; this.validatedRevision = this.revision; this.evaluations++;
+            return draft;
+        } catch (error) { this.error = error.message; throw error; }
+    }
+    /** Call inside the host history transaction. Only validated geometry is copied, never stale metadata. */
+    commit(document) {
+        this.assertSource(document);
+        const preview = this.evaluate();
+        document.entities = clone(preview.entities);
+        return document.entities.find(e => e.id === this.resultId);
+    }
+    cancel() { this.closed = true; this.preview = null; this.base = null; this.source = null; this.undoStack.length = this.redoStack.length = 0; }
+}
+function visibleFields3(session) {
+    const p = (() => { try { return session.values(); } catch { return {}; } })();
+    const fields = session.tool.fields.slice();
+    if (!session.tool.inputs) fields.push(...['x', 'y', 'z'].map(name => ({ name, label: 'Position ' + name.toUpperCase(), value: 0 })));
+    return fields.filter(f => {
+        if (session.kind === 'extrude') return f.name === 'distance2' ? p.extent === 2 : ['nx', 'ny', 'nz'].includes(f.name) ? p.useNormal === 0 : true;
+        if (session.kind === 'hole') return f.name === 'depth' ? p.through === 0 : f.name === 'counterDiameter' ? !!p.holeType : f.name === 'counterDepth' ? p.holeType === 1 : f.name === 'sinkAngle' ? p.holeType === 2 : true;
+        if (['face-profile','sketch-profile'].includes(session.kind)) return f.name === 'radius' ? p.shape === 1 : ['width', 'height'].includes(f.name) ? p.shape === 0 : true;
+        if (session.kind === 'vertex' && f.name === 'detach') return !!session.base.entities.find(e => e.id === session.inputs[0])?.feature3d;
+        return true;
+    });
+}
+
+return {PROFILE_TYPES,VISUAL_TOOLS,visualTool3,inputAccepts3,VisualEditSession,visibleFields3};
+})();
+// packages/manipulation3d/src/handles.js
+__modules["packages/manipulation3d/src/handles.js"]=(()=>{
+const {V3, add3, sub3, mul3, unit3, bounds3, faceNormal, rotation3, multiply4, transform3} = __modules["packages/geometry3d/src/index.js"];
+const {curvePoints3, faceFrame3, facePoint3} = __modules["packages/modeling/src/index.js"];
+const {perpendicularAxes3, unitsPerPixel3} = __modules["packages/manipulation3d/src/gestures.js"];
+const AXES = [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)];
+const COLORS = ['#b84336', '#26835d', '#377bc2'];
+const center = points => { const b = bounds3(points); return mul3(add3(b.min, b.max), .5); };
+/** Geometry-anchored dimensions and manipulators; the host handles hit targets, focus, and rendering. */
+function visualHandles3(session, camera, mode = 'dimensions') {
+    if (session.closed) return [];
+    let p; try { p = session.values(); } catch { return []; }
+    const src = session.base.entities.find(e => e.id === session.inputs[0]), k = session.kind, out = [];
+    const origin = V3(p.x || 0, p.y || 0, p.z || 0);
+    const field = name => session.tool.fields.find(f => f.name === name)?.label || name.toUpperCase();
+    const axis = (name, start, direction, length, { factor = 1, color = '#087f72', unit = 'length', label = field(name) } = {}) => {
+        if (!Object.hasOwn(p, name)) return;
+        direction = unit3(direction);
+        out.push({ id: name, kind: 'axis', field: name, label, origin: start, axis: direction, point: add3(start, mul3(direction, length)), factor, color, unit, value: p[name] });
+    };
+    const plane = (id, start, u, v, names, label) => out.push({ id, kind: 'plane', fields: names, label, origin: start, point: start, u, v, color: '#087f72', unit: 'length' });
+    const angle = (name, start, normal, radius) => {
+        const { u, v } = perpendicularAxes3(normal), a = p[name] * Math.PI / 180;
+        out.push({ id: name, kind: 'angle', field: name, label: field(name), origin: start, axis: normal, u, v, radius, point: add3(start, add3(mul3(u, radius * Math.cos(a)), mul3(v, radius * Math.sin(a)))), color: COLORS[['rx', 'ry', 'rz'].indexOf(name)] || '#8e59a2', unit: 'angle', value: p[name] });
+    };
+    const move = (start, fields) => {
+        const length = Math.max(1e-6, unitsPerPixel3(camera, start) * 76);
+        AXES.forEach((a, i) => axis(fields[i], start, a, length, { color: COLORS[i] }));
+        plane('position', start, AXES[0], AXES[1], fields.slice(0, 2), 'Move on XY plane');
+    };
+    if (k === 'vertex') { move(origin, ['x', 'y', 'z']); return out; }
+    if (!session.tool.inputs) {
+        if (mode === 'move') { move(origin, ['x', 'y', 'z']); return out; }
+        if (k === 'sketch-profile') {
+            const u=p.plane===2?AXES[1]:AXES[0],v=p.plane===0?AXES[1]:AXES[2];
+            if(p.shape)axis('radius',origin,u,p.radius);
+            else {axis('width',origin,u,p.width/2,{factor:2});axis('height',origin,v,p.height/2,{factor:2,color:COLORS[2]});}
+        } else if (k === 'box' || k === 'wedge') {
+            axis('width', add3(origin, V3(0, p.depth / 2, p.height / 2)), AXES[0], p.width, { color: COLORS[0] });
+            axis('depth', add3(origin, V3(p.width / 2, 0, p.height / 2)), AXES[1], p.depth, { color: COLORS[1] });
+            axis('height', add3(origin, V3(p.width / 2, p.depth / 2, 0)), AXES[2], p.height, { color: COLORS[2] });
+        } else if (['cylinder', 'cone', 'sphere'].includes(k)) {
+            axis('radius', origin, AXES[0], p.radius, { color: COLORS[0] });
+            if (k !== 'sphere') axis('height', origin, AXES[2], p.height, { color: COLORS[2] });
+            if (k === 'cone') axis('topRadius', add3(origin, V3(0, 0, p.height)), AXES[0], p.topRadius);
+        } else if (k === 'torus') {
+            axis('major', origin, AXES[0], p.major);
+            axis('minor', add3(origin, V3(p.major, 0, 0)), AXES[2], p.minor, { color: COLORS[2] });
+        }
+        return out;
+    }
+    if (!src) return [];
+    if (k === 'extrude') {
+        const points = curvePoints3(src, { closed: true }).points, c = center(points);
+        const normal = p.useNormal ? unit3(src.extrusion || faceNormal(points, points.map((_, i) => i))) : unit3(V3(p.nx, p.ny, p.nz));
+        const start = add3(c, mul3(normal, p.startOffset));
+        axis('height', start, normal, p.extent === 1 ? p.height / 2 : p.height, { factor: p.extent === 1 ? 2 : 1 });
+        if (p.extent === 2) axis('distance2', start, mul3(normal, -1), p.distance2, { color: '#377bc2' });
+        axis('startOffset', c, normal, p.startOffset, { color: '#8e59a2' });
+    } else if (['hole', 'face-profile', 'offset-face'].includes(k)) {
+        const f = faceFrame3(src, p.face), c = facePoint3(f, p.u || 0, p.v || 0, p.offset || 0);
+        if (k === 'offset-face') axis('distance', f.origin, f.normal, p.distance);
+        else {
+            plane('face-position', c, f.u, f.v, ['u', 'v'], 'Position on face');
+            if (k === 'hole') {
+                axis('diameter', c, f.u, p.diameter / 2, { factor: 2 });
+                if (!p.through) axis('depth', c, mul3(f.normal, -1), p.depth, { color: COLORS[2] });
+                if (p.holeType) axis('counterDiameter', c, f.v, p.counterDiameter / 2, { factor: 2, color: '#8e59a2' });
+                if (p.holeType === 1) axis('counterDepth', add3(c, mul3(f.v, p.counterDiameter / 2)), mul3(f.normal, -1), p.counterDepth, { color: COLORS[2] });
+            } else {
+                if (p.shape) axis('radius', c, f.u, p.radius);
+                else { axis('width', c, f.u, p.width / 2, { factor: 2 }); axis('height', c, f.v, p.height / 2, { factor: 2, color: COLORS[1] }); }
+                axis('offset', f.origin, f.normal, p.offset, { color: COLORS[2] });
+            }
+        }
+    } else if (k === 'transform') {
+        const pivot = V3(p.px || 0, p.py || 0, p.pz || 0), c = add3(pivot, V3(p.dx, p.dy, p.dz));
+        const length = Math.max(1e-6, unitsPerPixel3(camera, c) * 76);
+        if (mode === 'rotate') {
+            const z = rotation3(AXES[2], p.rz * Math.PI / 180), yz = multiply4(z, rotation3(AXES[1], p.ry * Math.PI / 180));
+            [transform3(AXES[0], yz), transform3(AXES[1], z), AXES[2]].forEach((a, i) => angle(['rx', 'ry', 'rz'][i], c, a, length * (1 + i * .12)));
+        } else if (mode === 'scale') {
+            const b = bounds3(src.points), lengths = [b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z].map(v => Math.max(v / 2, length / 3));
+            const rotation=multiply4(multiply4(rotation3(AXES[2],p.rz*Math.PI/180),rotation3(AXES[1],p.ry*Math.PI/180)),rotation3(AXES[0],p.rx*Math.PI/180));
+            AXES.forEach((a, i) => axis(['sx', 'sy', 'sz'][i], c, transform3(a,rotation), lengths[i] * p[['sx', 'sy', 'sz'][i]], { factor: 1 / lengths[i], color: COLORS[i], unit: 'scale' }));
+        } else move(c, ['dx', 'dy', 'dz']);
+    } else if (k === 'linear-pattern') {
+        const c = center(src.points); AXES.forEach((a, i) => axis(['dx', 'dy', 'dz'][i], c, a, p[['dx', 'dy', 'dz'][i]], { color: COLORS[i] }));
+    } else if (k === 'revolve' || k === 'circular-pattern') {
+        const c = V3(p.cx || 0, p.cy || 0, 0); angle('angle', c, AXES[2], Math.max(unitsPerPixel3(camera, c) * 88, 1e-6));
+    } else if (k === 'mirror') axis('offset', V3(), AXES[p.axis] || AXES[0], p.offset);
+    return out;
+}
+
+return {visualHandles3};
+})();
+// packages/manipulation3d/src/layout.js
+__modules["packages/manipulation3d/src/layout.js"]=(()=>{
+/** Deterministic screen-space packing: dimension badges never intercept another handle.
+ * The host keeps all values in an accessible ribbon when a badge cannot fit.
+ * Coordinates and sizes are CSS pixels, independent of render-target resolution.
+ */
+function layoutHandles3(handles, {width, height, top=60, bottom=height-120, active=null, labels=true}={}) {
+    if (![width,height,top,bottom].every(Number.isFinite)) throw new TypeError('Finite viewport bounds are required');
+    const size=44,margin=6,minX=margin+size/2,maxX=width-margin-size/2,minY=top+size/2,maxY=bottom-size/2;
+    if(maxX<minX || maxY<minY)return handles.map(h=>({id:h.id,visible:false,label:null}));
+    const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+    const overlap=(a,b,gap=3)=>a.x<b.x+b.w+gap&&a.x+a.w+gap>b.x&&a.y<b.y+b.h+gap&&a.y+a.h+gap>b.y;
+    const occupied=[],results=[];
+    for(const h of handles){
+        if(!Number.isFinite(h.x)||!Number.isFinite(h.y)){results.push({id:h.id,visible:false,label:null});continue;}
+        const x=clamp(h.x,minX,maxX),y=clamp(h.y,minY,maxY),candidates=[];
+        for(let dy=-3;dy<=3;dy++)for(let dx=-6;dx<=6;dx++){
+            const px=clamp(x+dx*50,minX,maxX),py=clamp(y+dy*50,minY,maxY);
+            candidates.push({x:px,y:py,d:(px-x)**2+(py-y)**2});
+        }
+        candidates.sort((a,b)=>a.d-b.d);
+        const chosen=candidates.find(c=>!occupied.some(r=>overlap({x:c.x-22,y:c.y-22,w:size,h:size},r)));
+        if(!chosen){results.push({id:h.id,visible:false,label:null});continue;}
+        occupied.push({x:chosen.x-22,y:chosen.y-22,w:size,h:size});
+        results.push({id:h.id,x:chosen.x,y:chosen.y,visible:true,label:null});
+    }
+    if(!labels)return results;
+    const badges=[];
+    const order=handles.map((_,i)=>i).sort((a,b)=>(handles[a].id===active?-1:0)-(handles[b].id===active?-1:0));
+    for(const i of order){
+        const h=handles[i],r=results[i];if(!r.visible||!h.hasLabel||h.hideLabel)continue;
+        const w=Math.min(Math.max(94,h.labelWidth||110),154,width-2*margin),hh=Math.max(40,h.labelHeight||44),candidates=[];
+        for(let n=0;n<7;n++)for(const sign of n?[-1,1]:[1]){
+            const dy=n*sign*(hh+6);
+            candidates.push({x:r.x+27,y:r.y-hh/2+dy},{x:r.x-w-27,y:r.y-hh/2+dy});
+        }
+        candidates.push({x:r.x-w/2,y:r.y-hh-27},{x:r.x-w/2,y:r.y+27});
+        const rects=candidates.map(p=>({x:clamp(p.x,margin,width-margin-w),y:clamp(p.y,top,bottom-hh),w,h:hh}));
+        const rect=rects.find(p=>p.y>=top&&p.y+p.h<=bottom&&!occupied.some(q=>overlap(p,q))&&!badges.some(q=>overlap(p,q)));
+        if(rect){r.label=rect;badges.push(rect);}
+    }
+    return results;
+}
+
+return {layoutHandles3};
+})();
+// packages/manipulation3d/src/inspection.js
+__modules["packages/manipulation3d/src/inspection.js"]=(()=>{
+const {V3, add3, sub3, mul3, dot3, length3, finite3} = __modules["packages/geometry3d/src/index.js"];
+const {perpendicularAxes3} = __modules["packages/manipulation3d/src/gestures.js"];
+/** Exact world-space measurement, never a screen-projected distance. */
+function measurePoints3(first, second) {
+    const a=finite3(first),b=finite3(second),delta=sub3(b,a),distance=length3(delta),horizontal=Math.hypot(delta.x,delta.y);
+    if(!Number.isFinite(distance)||distance>1e15)throw new RangeError('Measurement exceeds the supported range');
+    return {a,b,delta,distance,horizontal,inclination:distance?Math.atan2(delta.z,horizontal)*180/Math.PI:0,midpoint:add3(a,mul3(delta,.5))};
+}
+/** A finite plane guide around the visible scene. offset follows n·p = offset. */
+function sectionFrame3(normal, offset, center=V3(), span=100) {
+    normal=finite3(normal);center=finite3(center);const length=length3(normal);
+    if(length<1e-12||!Number.isFinite(offset)||!Number.isFinite(span)||span<=0||span>1e15)throw new RangeError('Invalid section plane or guide span');
+    normal=mul3(normal,1/length);offset/=length;
+    const origin=add3(center,mul3(normal,offset-dot3(center,normal))),{u,v}=perpendicularAxes3(normal);
+    const corners=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,y])=>add3(origin,add3(mul3(u,x*span/2),mul3(v,y*span/2))));
+    return {normal,offset,origin,u,v,corners};
+}
+
+return {measurePoints3,sectionFrame3};
+})();
+// packages/manipulation3d/src/index.js
+__modules["packages/manipulation3d/src/index.js"]=(()=>{
+const {SpatialPathSession:PathSession} = __modules["packages/manipulation3d/src/path-session.js"];
+const {snapValue3:snap, rayPlane3:ray, unitsPerPixel3:units, beginAxisDrag3:ba, updateAxisDrag3:ua, beginPlaneDrag3:bp, updatePlaneDrag3:up, beginAngleDrag3:br, updateAngleDrag3:ur, expressionDelta3:expression, perpendicularAxes3:axes} = __modules["packages/manipulation3d/src/gestures.js"];
+const {PROFILE_TYPES:profiles, VISUAL_TOOLS:tools, visualTool3:tool, inputAccepts3:accepts, VisualEditSession:Session, visibleFields3:fields} = __modules["packages/manipulation3d/src/session.js"];
+const {visualHandles3:handles} = __modules["packages/manipulation3d/src/handles.js"];
+const snapValue3 = snap;
+const rayPlane3 = ray;
+const unitsPerPixel3 = units;
+const beginAxisDrag3 = ba;
+const updateAxisDrag3 = ua;
+const beginPlaneDrag3 = bp;
+const updatePlaneDrag3 = up;
+const beginAngleDrag3 = br;
+const updateAngleDrag3 = ur;
+const expressionDelta3 = expression;
+const perpendicularAxes3 = axes;
+const PROFILE_TYPES = profiles;
+const VISUAL_TOOLS = tools;
+const visualTool3 = tool;
+const inputAccepts3 = accepts;
+const VisualEditSession = Session;
+const visibleFields3 = fields;
+const visualHandles3 = handles;
+
+const {layoutHandles3:layout} = __modules["packages/manipulation3d/src/layout.js"];
+const layoutHandles3 = layout;
+const {measurePoints3:measurement, sectionFrame3:sectionFrame} = __modules["packages/manipulation3d/src/inspection.js"];
+const measurePoints3 = measurement;
+const sectionFrame3 = sectionFrame;
+
+const SpatialPathSession = PathSession;
+
+return {snapValue3,rayPlane3,unitsPerPixel3,beginAxisDrag3,updateAxisDrag3,beginPlaneDrag3,updatePlaneDrag3,beginAngleDrag3,updateAngleDrag3,expressionDelta3,perpendicularAxes3,PROFILE_TYPES,VISUAL_TOOLS,visualTool3,inputAccepts3,VisualEditSession,visibleFields3,visualHandles3,layoutHandles3,measurePoints3,sectionFrame3,SpatialPathSession};
+})();
+// packages/history/src/index.js
+__modules["packages/history/src/index.js"]=(()=>{
+/** Atomic serializable transactions with bounded undo memory and redo invalidation. */
+class History {
+    constructor({ capture, restore, onChange = () => { }, limit = 80, maxBytes = 32 * 1024 * 1024 }) { this.capture = capture; this.restore = restore; this.onChange = onChange; this.limit = limit; this.maxBytes = maxBytes; this.undoStack = []; this.redoStack = []; this.pending = null; }
+    begin(label = 'Edit') {
+        if (this.pending)
+            return;
+        this.pending = { label, before: JSON.stringify(this.capture()) };
+    }
+    commit() {
+        if (!this.pending)
+            return false;
+        const item = this.pending;
+        this.pending = null;
+        const after = JSON.stringify(this.capture());
+        if (after === item.before)
+            return false;
+        item.after = after;
+        this.undoStack.push(item);
+        this.redoStack = [];
+        let bytes = this.undoStack.reduce((n, x) => n + x.before.length + x.after.length, 0);
+        while (this.undoStack.length > 1 && (this.undoStack.length > this.limit || bytes > this.maxBytes)) {
+            const old = this.undoStack.shift();
+            bytes -= old.before.length + old.after.length;
+        }
+        this.onChange();
+        return true;
+    }
+    cancel() {
+        if (!this.pending)
+            return;
+        const p = this.pending;
+        this.pending = null;
+        this.restore(JSON.parse(p.before));
+        this.onChange();
+    }
+    run(label, action) {
+        this.begin(label);
+        try {
+            const result = action();
+            this.commit();
+            return result;
+        }
+        catch (error) {
+            this.cancel();
+            throw error;
+        }
+    }
+    undo() {
+        if (this.pending)
+            this.cancel();
+        const item = this.undoStack.pop();
+        if (!item)
+            return false;
+        this.restore(JSON.parse(item.before));
+        this.redoStack.push(item);
+        this.onChange();
+        return true;
+    }
+    redo() {
+        if (this.pending)
+            this.cancel();
+        const item = this.redoStack.pop();
+        if (!item)
+            return false;
+        this.restore(JSON.parse(item.after));
+        this.undoStack.push(item);
+        this.onChange();
+        return true;
+    }
+    clear() { this.pending = null; this.undoStack = []; this.redoStack = []; this.onChange(); }
+    get canUndo() { return this.undoStack.length > 0; }
+    get canRedo() { return this.redoStack.length > 0; }
+}
+
+return {History};
+})();
 // packages/workbench/src/parametric-workbench.js
 __modules["packages/workbench/src/parametric-workbench.js"]=(()=>{
 const {beginBlockEdit, editedBlockDefinition, updateBlockDefinition, inspectBlockReferences, duplicateBlockDefinition, renameBlockDefinition, evaluateDynamicBlock, clone, entity, uid, entityBounds, isLocked, regenerateDimensions, createBlockDefinition, deleteBlockDefinition, syncInsertAttributes} = __modules["packages/model/src/index.js"];
@@ -4939,6 +5417,7 @@ function constraintAuthor(w){
     const a=w.modal.querySelector('#constraint-point-a');if([...a.options].some(o=>o.value==='b'))a.value='b';
 }
 function parameterManager(w){
+    if(w.options.drawingInteraction!=='dialog'&&w.parameters)return w.parameters.start();
     const descriptors=describeParameters(w.doc.parameters);
     const row=(name,expression,value)=>`<div class="param-row"><input class="param-name" aria-label="Parameter name" value="${E(name)}"><input class="param-expression" aria-label="Expression for ${E(name)}" value="${E(typeof expression==='object'?expression.expression:expression)}"><output class="param-result">${number(value)}</output><button class="remove-param" aria-label="Remove parameter">×</button></div>`;
     w.openModal('Parameters & solved calculations',`<p>Dependency-aware expressions. Functions include sqrt, hypot, sin, cos, atan2, min/max, clamp, rad and deg. Trigonometry uses radians; dimensional angle constraints use degrees.</p><div class="param-head"><span>Name</span><span>Expression</span><span>Calculated</span></div><div id="parameter-rows">${descriptors.map(p=>row(p.name,p.expression,p.value)).join('')}</div><button class="btn" id="add-parameter">Add parameter</button><div class="error-text" role="status"></div><h3>Constraint measurements</h3><div class="calculation-table">${constraintAnnotations(w.doc.entities,w.doc.constraints,w.doc.parameters).map(a=>`<div><b>${E(a.text)}</b><small>${a.reference?'Reference only':`Expression: ${E(a.expression??'geometric')}`}</small></div>`).join('')||'No constrained measurements.'}</div>`,{wide:true,confirm:'Apply parameters',onConfirm:()=>{
@@ -5668,7 +6147,7 @@ class VisualEditing2D {
     beforeEdit(){if(!this.applying)this.cancel();}
     sync(){
         if(this.active&&!this.applying&&(this.session.source!==this.w.doc||this.session.version!==this.w.doc.version||this.w.model3d.active))this.cancel('Drawing or workspace changed');
-        const selected=this.w.selected();this.context.hidden=!this.enabled||this.active||this.w.model3d.active||this.w.tool!=='select'||!selected.length||selected.some(e=>planarEditable(e,this.w.doc));
+        const selected=this.w.selected();this.context.hidden=!!this.w.parameters?.active||!this.enabled||this.active||this.w.model3d.active||this.w.tool!=='select'||!selected.length||selected.some(e=>planarEditable(e,this.w.doc));
         this.context.querySelector('[data-planar-command=geometry]').disabled=selected.length!==1;
     }
     keyDown(e){
@@ -5690,6 +6169,304 @@ class VisualEditing2D {
 }
 
 return {VisualEditing2D};
+})();
+// packages/workbench/src/live-workspace-example.js
+__modules["packages/workbench/src/live-workspace-example.js"]=(()=>{
+const {createDocument, entity, circle, text} = __modules["packages/model/src/index.js"];
+const {addFeature, spatialPathPoints} = __modules["packages/modeling/src/index.js"];
+/** Original editable example. Native vertices and Conduit expressions coexist in the DXF. */
+function createLiveWorkspaceExample() {
+    const doc = createDocument('Parametric path workshop');
+    doc.parameters = {
+        Span: { expression: '100', unit: 'mm', description: 'Distance between the two risers' },
+        Rise: { expression: '70', unit: 'mm', description: 'Height of the route' },
+        TubeRadius: { expression: '6', unit: 'mm', description: 'Circular sweep profile radius' },
+        PlateThickness: { expression: '10', unit: 'mm', description: 'Base plate height' }
+    };
+    doc.metadata.description = 'Edit Span / Rise in live Parameters. Edit the native WCS route with XYZ handles; the dependent sweep regenerates. 2D Draw retains the footprint and native profile.';
+    const coordinates = [
+        { x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 'Rise' },
+        { x: 'Span', y: 0, z: 'Rise' }, { x: 'Span', y: 0, z: 0 }
+    ];
+    const path = entity('POLYLINE', { id: 'live-route', layer: 'Process', label: 'Editable WCS route', points: spatialPathPoints(coordinates, doc.parameters), closed: false, flags: 8, parametric: { kind: 'spatial-path', version: 1, coordinates } });
+    const profile = circle({ x: 0, y: 0 }, 6, { id: 'live-profile', layer: 'Process', label: 'Tube radius profile', parametric: { radius: 'TubeRadius' } });
+    doc.entities.push(path, profile);
+    const tube = addFeature(doc, 'sweep', { segments: 24 }, [profile.id, path.id], { name: 'Parametric conduit', layer: 'Equipment', color: '#378c85' });
+    tube.id = 'live-sweep';
+    const plate = addFeature(doc, 'box', { x: -18, y: -20, z: '-PlateThickness', width: 'Span + 36', depth: 40, height: 'PlateThickness' }, [], { name: 'Parametric mounting plate', layer: 'Equipment', color: '#b4b9b3' });
+    plate.id = 'live-plate';
+    doc.entities.push(entity('LWPOLYLINE', { id: 'live-footprint', label: 'Editable 2D footprint', layer: 'Annotations', closed: true, points: [{ x: 0, y: 65 }, { x: 100, y: 65 }, { x: 100, y: 95 }, { x: 0, y: 95 }], parametric: { kind: 'rectangle', width: 'Span', height: '30' } }));
+    doc.entities.push(text({ x: 0, y: 115 }, 'Span / Rise: live parameters · route: Edit on canvas', 5, { id: 'live-caption', layer: 'Annotations' }));
+    return doc;
+}
+
+return {createLiveWorkspaceExample};
+})();
+// packages/workbench/src/visual-path3d.js
+__modules["packages/workbench/src/visual-path3d.js"]=(()=>{
+const {SpatialPathSession, rayPlane3, beginAxisDrag3, updateAxisDrag3, beginPlaneDrag3, updatePlaneDrag3, layoutHandles3} = __modules["packages/manipulation3d/src/index.js"];
+const {evaluateExpression} = __modules["packages/constraints/src/index.js"];
+const {faceFrame3} = __modules["packages/modeling/src/index.js"];
+const {V3, add3, mul3, dot3, cross3, unit3, distance3} = __modules["packages/geometry3d/src/index.js"];
+const {icon} = __modules["packages/workbench/src/icons.js"];
+const axes = { x: V3(1, 0, 0), y: V3(0, 1, 0), z: V3(0, 0, 1) };
+const planes = { XY: { u: axes.x, v: axes.y, normal: axes.z }, XZ: { u: axes.x, v: axes.z, normal: V3(0, -1, 0) }, YZ: { u: axes.y, v: axes.z, normal: axes.x } };
+const fmt = n => Number(n.toPrecision(10)).toString();
+const b = (id, label, glyph = 'point') => `<button type="button" data-path-command="${id}" aria-label="${label}" title="${label}">${icon(glyph)}<span>${label}</span></button>`;
+/** Non-modal native POLYLINE construction/editing on explicit WCS workplanes. */
+class VisualPath3D {
+    constructor(m) {
+        this.m = m; this.w = m.w; this.session = null; this.frame = 0; this.drag = null; this.nodes = new Map();
+        this.root = document.createElement('div'); this.root.className = 'path3d'; this.root.hidden = true;
+        this.root.innerHTML = `<div class="path3d-markers"></div><section class="path3d-panel" role="region" aria-label="Spatial path options" hidden>
+          <header><strong>Spatial path</strong>${b('options-close', 'Preview model', 'eye')}</header><div class="path3d-panel-body">
+          <label>Workplane<select data-path-plane><option>XY</option><option>XZ</option><option>YZ</option><option>View</option><option value="Face" disabled>Picked face</option></select></label>
+          <label>Plane offset along normal<input data-path-offset value="0" autocomplete="off" spellcheck="false"></label>${b('face', 'Pick face plane', 'face')}
+          <p>Tap to add points. Drag a vertex in the workplane, or use its X/Y/Z handles. Empty-space drag orbits; two fingers navigate.</p>
+          <form class="path3d-next"><fieldset><legend>Add an exact WCS point</legend><div>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-next="${k}" value="0" autocomplete="off" spellcheck="false"></label>`).join('')}</div></fieldset><button type="submit">${icon('plus')}Add exact point</button></form>
+          <p>Coordinates retain parameter expressions in Conduit metadata. Other DXF readers receive evaluated native vertices. Picked planes are snapshots, not associative face sketches.</p></div></section>
+          <section class="path3d-controls" role="region" aria-label="Spatial path editing"><header><strong>${icon('polyline')}Spatial path</strong><span class="path3d-status" role="status"></span></header>
+          <div class="path3d-commandbar"><div class="path3d-utilities">${b('add', 'Add points', 'plus')}${b('options', 'Plane / exact point', 'properties')}${b('midpoint', 'Insert midpoint', 'point')}${b('remove', 'Remove vertex', 'trash')}${b('closed', 'Close path', 'polyline')}${b('snap', 'Snap 1', 'snap')}${b('undo', 'Undo draft', 'undo')}${b('redo', 'Redo draft', 'redo')}${b('fit', 'Fit preview', 'fit')}</div><div class="path3d-confirm">${b('cancel', 'Cancel', 'close')}${b('apply', 'Apply', 'check')}</div></div>
+          <div class="path3d-coordinates"><label>Vertex<select data-path-vertex aria-label="Active path vertex"></select></label>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-axis="${k}" aria-label="Path vertex ${k.toUpperCase()} expression" autocomplete="off" spellcheck="false"></label>`).join('')}</div><p class="path3d-error" role="alert" hidden></p></section>`;
+        m.stage.append(this.root); const opt = { signal: this.w.abort.signal };
+        this.root.addEventListener('click', e => this.click(e), opt);
+        this.root.addEventListener('input', e => this.input(e), opt);
+        this.root.addEventListener('change', e => this.change(e), opt);
+        this.root.addEventListener('focusin', e => { if (e.target.matches('[data-path-axis]')) this.focusBefore = this.session?.snapshot(); }, opt);
+        this.root.addEventListener('focusout', e => { if (e.target.matches('[data-path-axis]')) this.checkpointInput(); }, opt);
+        this.root.querySelector('.path3d-next').addEventListener('submit', e => { e.preventDefault(); e.stopPropagation(); this.addExact(); }, opt);
+        this.w.root.addEventListener('conduit:documentchange', () => this.cancel(), opt);
+        let size = '';
+        this.observer = new ResizeObserver(entries => { const r = entries[0].contentRect, key = r.width + ':' + r.height; if (size && key !== size) this.cancelDrag(); size = key; this.updatePositions(); });
+        this.observer.observe(m.host);
+    }
+    get active() { return !!this.session; }
+    start(id = null) {
+        this.cancel(); this.w.parameters?.cancel(); this.m.inspection.cancel(); this.m.visual.cancel(); this.m.visual.closePalette(); this.w.visual2d.cancel(); this.w.visual2d.panel.close(); this.w.closeModal(); this.w.closePanels(); this.m.input.reset();
+        const session = new SpatialPathSession(this.w.doc, { id, layer: this.w.currentLayer });
+        this.rejectedFields = new Map(); this.rejected = false; this.session = session; this.initialSelection = new Set(this.w.selection); this.selected = session.state.coordinates.length - 1; this.placing = !id; this.snap = true; this.pickingFace = false; this.plane = planes.XY; this.offset = '0'; this.nodes.clear(); this.handles = [];
+        this.root.querySelector('.path3d-markers').replaceChildren(); this.root.querySelector('[data-path-plane]').value = 'XY'; this.root.querySelector('[data-path-offset]').value = '0'; this.root.querySelector('.path3d-panel').hidden = true;
+        this.root.hidden = false; this.root.classList.remove('options-open'); this.m.stage.classList.add('path3d-active'); this.lastCount = -1; this.report(); this.preview(true);
+        this.root.querySelector('[data-path-command=add]').focus({ preventScroll: true }); return session;
+    }
+    value(source) { const n = evaluateExpression(source, this.session.base.parameters); if (Math.abs(n) > 1e12) throw new Error('Coordinates must stay within ±1e12'); return n; }
+    points() { return this.session.state.coordinates.map(p => ({ x: this.value(p.x), y: this.value(p.y), z: this.value(p.z) })); }
+    showOptions(open) { this.root.classList.toggle('options-open', open); this.root.querySelector('.path3d-panel').hidden = !open; this.root.querySelector('[data-path-command=options]').setAttribute('aria-expanded', String(open)); this.updatePositions(); }
+    report(message = '') { const e = this.root.querySelector('.path3d-error'); e.textContent = message; e.hidden = !message; }
+    reject(error) { if (!this.session) return; this.rejected = true; cancelAnimationFrame(this.frame); this.frame = 0; this.session.invalidate(); this.session.error = error.message; this.m.previewDocument = null; this.m.renderer.setDocument(this.w.doc, { showInputs: this.m.showInputs }); this.m.renderer.invalidate(); this.report(error.message); this.render(); }
+    checkpointInput() { if (this.focusBefore && this.session) this.session.checkpoint(this.focusBefore); this.focusBefore = null; }
+    preview(immediate = false) {
+        if (!this.session || this.rejected) return; cancelAnimationFrame(this.frame); this.frame = 0;
+        this.root.querySelector('[data-path-command=apply]').disabled = true;
+        const run = () => {
+            this.frame = 0; if (!this.session) return;
+            if (this.session.source !== this.w.doc || this.session.version !== this.w.doc.version) { this.cancel(); return; }
+            try {
+                this.value(this.offset);
+                const draft = this.session.evaluate(); this.m.previewDocument = draft; this.m.renderer.setDocument(draft, { showInputs: true }); this.report();
+            } catch (error) { this.m.previewDocument = null; this.m.renderer.setDocument(this.w.doc, { showInputs: this.m.showInputs }); this.report(this.session.state.coordinates.length < 2 ? 'Tap two points to begin; or add exact WCS coordinates.' : error.message); }
+            this.render(); this.m.renderer.invalidate();
+        };
+        if (immediate) run(); else this.frame = requestAnimationFrame(run);
+    }
+    render() {
+        const s = this.session; if (!s) return; const count = s.state.coordinates.length;
+        this.selected = Math.max(-1, Math.min(count - 1, this.selected));
+        const selector = this.root.querySelector('[data-path-vertex]');
+        if (this.lastCount !== count) { selector.innerHTML = count ? Array.from({ length: count }, (_, i) => `<option value="${i}">${i + 1} / ${count}</option>`).join('') : '<option value="-1">No points</option>'; this.lastCount = count; }
+        selector.value = String(this.selected);
+        for (const input of this.root.querySelectorAll('[data-path-axis]')) {
+            const key = this.selected + ':' + input.dataset.pathAxis; input.disabled = this.selected < 0;
+            input.setAttribute('aria-invalid', String(this.rejectedFields.has(key)));
+            if (document.activeElement !== input || this.drag) input.value = this.rejectedFields.get(key) ?? (this.selected >= 0 ? String(s.state.coordinates[this.selected][input.dataset.pathAxis]) : '');
+        }
+        const apply = this.root.querySelector('[data-path-command=apply]'); apply.disabled = this.rejected || !s.preview || s.validatedRevision !== s.revision || !!s.error;
+        try { this.value(this.offset); } catch { apply.disabled = true; }
+        for (const id of ['undo', 'redo']) this.root.querySelector(`[data-path-command=${id}]`).disabled = !s[id + 'Stack'].length;
+        this.root.querySelector('[data-path-command=remove]').disabled = this.selected < 0;
+        this.root.querySelector('[data-path-command=midpoint]').disabled = count < 2 || (!s.state.closed && this.selected === count - 1);
+        for (const [id, pressed] of [['add', this.placing], ['closed', s.state.closed], ['snap', this.snap]]) this.root.querySelector(`[data-path-command=${id}]`).setAttribute('aria-pressed', String(pressed));
+        let length = 0; try { const points = this.points(); points.forEach((p, i) => { if (i) length += distance3(p, points[i - 1]); }); if (s.state.closed && count > 2) length += distance3(points.at(-1), points[0]); } catch {}
+        this.root.querySelector('.path3d-status').textContent = this.pickingFace ? 'Tap a planar face' : `${count} points · ${fmt(length)} ${this.w.doc.units} · ${this.placing ? 'tap to add' : 'drag to edit'}`;
+        this.updatePositions();
+    }
+    updatePositions() {
+        if (!this.session || !this.m.renderer) return;
+        const camera = this.m.camera, stage = this.m.host.getBoundingClientRect(), controls = this.root.querySelector('.path3d-controls').getBoundingClientRect();
+        const panel = this.root.querySelector('.path3d-panel'); if (!panel.hidden) panel.style.bottom = Math.ceil(stage.bottom - controls.top + 8) + 'px';
+        let points; try { points = this.points(); } catch { points = []; }
+        const candidates = [], count = points.length, active = points[this.selected];
+        // Bounded handle window; every vertex remains selectable by its native index.
+        const indices = Array.from({ length: Math.min(count, 24) }, (_, n) => Math.max(0, Math.min(count - 24, this.selected - 12)) + n);
+        for (const i of indices) { const raw = camera.project(points[i]); if (raw.visible) candidates.push({ id: 'p' + i, index: i, point: points[i], raw, ...raw, kind: 'point', label: String(i + 1) }); }
+        if (active) {
+            const d = camera.height * .13;
+            for (const [axis, direction] of Object.entries(axes)) { const point = add3(active, mul3(direction, d)), raw = camera.project(point); if (raw.visible) candidates.unshift({ id: axis, index: this.selected, axis, direction, point, raw, ...raw, kind: 'axis', label: axis.toUpperCase() }); }
+        }
+        const bottom = Math.min(camera.pixelHeight - 8, controls.top - stage.top - 8), top = Math.min(60, bottom - 44), packed = layoutHandles3(candidates, { width: camera.width, height: camera.pixelHeight, top, bottom, labels: false });
+        this.handles = candidates.map((h, i) => ({ ...h, ...packed[i], label: h.label })).filter(h => h.visible);
+        const host = this.root.querySelector('.path3d-markers'), alive = new Set(this.handles.map(h => h.id));
+        for (const [id, node] of this.nodes) if (!alive.has(id)) { node.remove(); this.nodes.delete(id); }
+        for (const h of this.handles) {
+            let node = this.nodes.get(h.id);
+            if (!node) { node = document.createElement('button'); node.type = 'button'; node.className = 'path3d-handle'; node.dataset.pathHandle = h.id; node.innerHTML = '<span></span>'; this.nodes.set(h.id, node); host.append(node); }
+            node.querySelector('span').textContent = h.label; node.classList.toggle('selected', h.index === this.selected); node.dataset.axis = h.axis || '';
+            node.style.left = h.x - 22 + 'px'; node.style.top = h.y - 22 + 'px'; node.setAttribute('aria-label', h.axis ? `Move vertex ${h.index + 1} along ${h.label}` : `Path vertex ${h.index + 1}`);
+        }
+    }
+    draw(ctx) {
+        if (!this.session) return;
+        let points; try { points = this.points(); } catch { return; }
+        ctx.save();
+        if (this.placing) {
+            // A transient plane grid explains where a tap will land; it is not DXF geometry.
+            try {
+                const camera = this.m.camera, offset = this.value(this.offset), {u,v,normal} = this.plane;
+                const step = 10 ** Math.floor(Math.log10(Math.max(camera.height / 10, 1e-8)));
+                const center = add3(mul3(normal, offset), add3(mul3(u, Math.round(dot3(camera.target,u)/step)*step), mul3(v, Math.round(dot3(camera.target,v)/step)*step)));
+                ctx.lineWidth = 1; ctx.strokeStyle = '#248b7760'; ctx.setLineDash([3,5]);
+                for (let i=-6;i<=6;i++) for (const [a,b] of [[u,v],[v,u]]) {
+                    const origin = add3(center,mul3(a,i*step)), p=camera.project(add3(origin,mul3(b,-6*step))), q=camera.project(add3(origin,mul3(b,6*step)));
+                    if(p.visible&&q.visible){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}
+                }
+                ctx.setLineDash([]);
+            } catch { /* Invalid offsets keep the accepted scene, not an invented plane. */ }
+        }
+        ctx.lineWidth = 2; ctx.strokeStyle = '#198777'; ctx.fillStyle = '#198777';
+        const projected = points.map(p => this.m.camera.project(p));
+        for (let i = 1; i < projected.length + (this.session.state.closed && projected.length > 2 ? 1 : 0); i++) { const a = projected[i - 1], b = projected[i % projected.length]; if (a.visible && b.visible) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); } }
+        for (const h of this.handles || []) { if (Math.hypot(h.x - h.raw.x, h.y - h.raw.y) > 4) { ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(h.raw.x, h.raw.y); ctx.lineTo(h.x, h.y); ctx.stroke(); } }
+        const p = points[this.selected];
+        if (p) { const raw = this.m.camera.project(p); for (const h of this.handles.filter(h => h.axis)) if (raw.visible) { ctx.setLineDash([]); ctx.strokeStyle = { x: '#bd655a', y: '#418c65', z: '#517da8' }[h.axis]; ctx.beginPath(); ctx.moveTo(raw.x, raw.y); ctx.lineTo(h.x, h.y); ctx.stroke(); } }
+        ctx.restore();
+    }
+    planeAtPoint(point) { this.offset = fmt(dot3(point, this.plane.normal)); this.root.querySelector('[data-path-offset]').value = this.offset; }
+    pointerDown(p) {
+        if (!this.session || this.pickingFace || this.rejectedFields.size || p.button !== 0) return false;
+        const h = this.handles?.find(h => Math.hypot(h.x - p.x, h.y - p.y) <= 22); if (!h) return false;
+        this.checkpointInput(); this.selected = h.index; this.placing = false;
+        try {
+            const origin = this.points()[h.index]; this.planeAtPoint(origin);
+            const motion = h.axis ? beginAxisDrag3(this.m.camera, h.point, h.direction, h.raw) : beginPlaneDrag3(this.m.camera, origin, this.plane.u, this.plane.v, h.raw);
+            this.drag = { h, start: p, motion, before: this.session.snapshot(), moved: false, offset: { x: h.raw.x - p.x, y: h.raw.y - p.y } }; this.render();
+        } catch (error) { this.report(error.message); this.render(); }
+        return true;
+    }
+    pointerMove(p) {
+        const d = this.drag; if (!d || !this.session) return false;
+        if (!d.moved && Math.hypot(p.x - d.start.x, p.y - d.start.y) < 5) return true; d.moved = true;
+        try {
+            const pointer = { x: p.x + d.offset.x, y: p.y + d.offset.y }, snap = n => this.snap && !p.alt ? Math.round(n / (p.shift ? .1 : 1)) * (p.shift ? .1 : 1) : n;
+            let delta;
+            if (d.h.axis) delta = mul3(d.h.direction, snap(updateAxisDrag3(d.motion, pointer)));
+            else { const uv = updatePlaneDrag3(d.motion, pointer); delta = add3(mul3(this.plane.u, snap(uv.u)), mul3(this.plane.v, snap(uv.v))); }
+            this.session.drag(d.h.index, delta, d.before); this.rejected = false; this.preview();
+        } catch (error) { this.reject(error); }
+        return true;
+    }
+    pointerUp(p) {
+        if (!this.drag) return false; this.pointerMove(p); const d = this.drag; this.drag = null;
+        if (d.moved) { this.session.checkpoint(d.before); if (!this.session.error) this.preview(true); }
+        else { this.render(); if (d.h.axis) this.root.querySelector(`[data-path-axis=${d.h.axis}]`).focus({ preventScroll: true }); }
+        return true;
+    }
+    cancelDrag() { if (this.drag && this.session) { const before = this.drag.before; this.drag = null; this.rejectedFields.clear(); this.rejected = false; this.session.restore(before); this.preview(true); } }
+    pickAt(p) {
+        if (!this.session) return false;
+        try {
+            if (this.pickingFace) {
+                const hit = this.m.renderer.pick(p.x, p.y, { mode: 'face', radius: 12 }), item = hit && this.m.renderer.scene.items.find(i => i.id === hit.id && i.sourceId === hit.sourceId && i.faces[hit.face]);
+                if (!item) throw new Error('Tap a visible planar polygon face');
+                const { normal } = faceFrame3(item, hit.face), u = unit3(cross3(Math.abs(normal.z) < .9 ? axes.z : axes.y, normal));
+                this.plane = { normal, u, v: unit3(cross3(normal, u)) }; this.planeAtPoint(hit.point); this.root.querySelector('[data-path-plane]').value = 'Face'; this.pickingFace = false; this.report(); this.render(); return true;
+            }
+            if (!this.placing || this.rejectedFields.size) return true;
+            const offset = this.value(this.offset), origin = mul3(this.plane.normal, offset), point = rayPlane3(this.m.camera.ray(p.x, p.y), origin, this.plane.normal);
+            if (!point) throw new Error('Workplane is edge-on or behind the camera. Orbit or choose another plane.');
+            const snap = n => this.snap && !p.alt ? Math.round(n) : n, u = snap(dot3(point, this.plane.u)), v = snap(dot3(point, this.plane.v));
+            this.append(add3(origin, add3(mul3(this.plane.u, u), mul3(this.plane.v, v))));
+        } catch (error) { this.report(error.message); }
+        return true;
+    }
+    append(point) { if (this.rejectedFields.size) throw new Error('Repair the rejected coordinate or undo the draft before adding points'); const before = this.session.snapshot(); this.session.insert(this.session.state.coordinates.length, point); this.session.checkpoint(before); this.selected = this.session.state.coordinates.length - 1; this.rejected = false; this.preview(true); }
+    addExact() {
+        if (!this.session) return;
+        try { const point = Object.fromEntries([...this.root.querySelectorAll('[data-path-next]')].map(e => [e.dataset.pathNext, e.value])); for (const value of Object.values(point)) this.value(value); this.append(point); this.placing = false; this.render(); } catch (error) { this.report(error.message); }
+    }
+    input(e) {
+        if (!this.session) return;
+        try {
+            if (e.target.dataset.pathAxis) { this.session.set(this.selected, e.target.dataset.pathAxis, e.target.value); this.rejectedFields.delete(this.selected + ':' + e.target.dataset.pathAxis); this.rejected = this.rejectedFields.size > 0; this.preview(); }
+            if (e.target.matches('[data-path-offset]')) { this.offset = e.target.value; this.value(this.offset); this.rejectedFields.delete('offset'); this.rejected = this.rejectedFields.size > 0; e.target.setAttribute('aria-invalid', 'false'); this.preview(); }
+        } catch (error) { this.rejectedFields.set(e.target.dataset.pathAxis ? this.selected + ':' + e.target.dataset.pathAxis : 'offset', e.target.value); e.target.setAttribute('aria-invalid', 'true'); this.reject(error); }
+    }
+    change(e) {
+        if (!this.session) return;
+        try {
+            if (e.target.matches('[data-path-vertex]')) { this.checkpointInput(); this.selected = Number(e.target.value); this.placing = false; this.render(); }
+            if (e.target.matches('[data-path-plane]')) {
+                this.cancelDrag(); const value = e.target.value, basis = this.m.camera.basis();
+                this.plane = value === 'View' ? { u: basis.right, v: basis.up, normal: unit3(cross3(basis.right, basis.up)) } : planes[value];
+                if (!this.plane) throw new Error('Choose XY, XZ, YZ or View'); this.planeAtPoint(this.points()[this.selected] || this.m.camera.target); this.preview(true);
+            }
+        } catch (error) { this.report(error.message); }
+    }
+    click(event) {
+        const command = event.target.closest('[data-path-command]'), handle = event.target.closest('[data-path-handle]'); if (!command && !handle || !this.session) return;
+        event.preventDefault(); event.stopPropagation(); this.checkpointInput();
+        try {
+            if (handle) { const h = this.handles.find(h => h.id === handle.dataset.pathHandle); if (h) { this.selected = h.index; this.placing = false; this.render(); } return; }
+            const id = command.dataset.pathCommand;
+            if (id === 'cancel') { this.cancel(); return; } if (id === 'apply') { this.apply(); return; }
+            if (id === 'options' || id === 'options-close') { this.showOptions(id === 'options'); return; }
+            if (this.rejectedFields.size && !['undo', 'redo', 'fit', 'snap'].includes(id)) { this.report('Repair the rejected coordinate or undo the draft first'); return; }
+            this.cancelDrag(); const before = this.session.snapshot();
+            if (id === 'add') { this.placing = !this.placing; this.pickingFace = false; this.showOptions(false); }
+            if (id === 'face') { this.pickingFace = true; this.showOptions(false); }
+            if (id === 'snap') this.snap = !this.snap;
+            if (id === 'closed') this.session.setClosed(!this.session.state.closed);
+            if (id === 'remove') { this.session.remove(this.selected); this.selected = Math.min(this.selected, this.session.state.coordinates.length - 1); }
+            if (id === 'midpoint') {
+                const a = this.session.state.coordinates[this.selected], n = (this.selected + 1) % this.session.state.coordinates.length, next = this.session.state.coordinates[n];
+                if (!a || !next || !this.session.state.closed && !n) throw new Error('Select a vertex with a following segment');
+                const point = Object.fromEntries(['x', 'y', 'z'].map(k => [k, `((${a[k]}) + (${next[k]})) / 2`])); this.session.insert(this.selected + 1, point); this.selected++;
+            }
+            if (id === 'fit') { const points = this.points(); if (points.length) { this.m.camera.fit(points); this.m.changedView(); } }
+            if (id === 'undo' || id === 'redo') { this.session[id](); this.rejectedFields.clear(); this.rejected = false; } else this.session.checkpoint(before);
+            this.render(); this.preview(true);
+        } catch (error) { this.report(error.message); }
+    }
+    apply() {
+        const s = this.session; if (!s || this.applying || this.rejected) return; this.checkpointInput(); this.cancelDrag(); this.preview(true);
+        if (!s.preview || s.error || this.root.querySelector('[data-path-command=apply]').disabled) return;
+        try { s.assertSource(this.w.doc); if (s.changed) { this.applying = true; this.w.edit(s.creation ? 'Create spatial path' : 'Edit spatial path', () => { s.commit(this.w.doc); this.w.selection = new Set([s.id]); }); } this.finish(); }
+        catch (error) { this.report(error.message); if (s.source !== this.w.doc) this.finish(); } finally { this.applying = false; }
+    }
+    finish() {
+        if (!this.session) return; cancelAnimationFrame(this.frame); this.frame = 0; this.drag = null; this.focusBefore = null; this.session.cancel(); this.session = null;
+        this.m.previewDocument = null; this.root.hidden = true; this.m.stage.classList.remove('path3d-active'); this.m.renderer.setDocument(this.w.doc, { showInputs: this.m.showInputs }); this.m.sync(); this.w.updateSelection(); this.m.host.focus({ preventScroll: true });
+    }
+    cancel() { if (this.applying || !this.session) return; if (this.session.source === this.w.doc) this.w.selection = new Set(this.initialSelection); this.finish(); }
+    beforeEdit() { this.cancel(); }
+    externalChange() { if (this.session && !this.applying && (this.session.source !== this.w.doc || this.session.version !== this.w.doc.version || this.w.viewMode !== '3d')) this.cancel(); }
+    keyDown(e) {
+        if (!this.active) return false;
+        if (e.key === 'Escape') { e.preventDefault(); if (this.drag) this.cancelDrag(); else if (this.pickingFace) { this.pickingFace = false; this.render(); } else if (this.focusBefore) { this.rejectedFields.delete(this.selected + ':' + e.target.dataset.pathAxis); this.rejected = this.rejectedFields.size > 0; this.session.restore(this.focusBefore); this.focusBefore = null; e.target.blur(); this.preview(true); } else if (!this.root.querySelector('.path3d-panel').hidden) this.showOptions(false); else this.cancel(); return true; }
+        if (e.target.closest('input,textarea,select')) return false;
+        const h = this.handles?.find(h => h.id === e.target.dataset.pathHandle);
+        if (h && !this.rejectedFields.size && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+            e.preventDefault(); const amount = (['ArrowLeft', 'ArrowDown'].includes(e.key) ? -1 : 1) * (e.shiftKey ? .1 : 1), direction = h.axis ? h.direction : ['ArrowLeft', 'ArrowRight'].includes(e.key) ? this.plane.u : this.plane.v, before = this.session.snapshot();
+            try { this.session.drag(h.index, mul3(direction, amount), before); this.session.checkpoint(before); this.preview(true); } catch (error) { this.report(error.message); } return true;
+        }
+        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.session[e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'](); this.preview(true); return true; }
+        if (e.key === 'Enter' && !e.target.closest('button')) { e.preventDefault(); this.apply(); return true; }
+        if (!e.ctrlKey && !e.metaKey && (e.key.length === 1 || ['Delete', 'Backspace'].includes(e.key))) return true;
+        return false;
+    }
+    dispose() { this.cancel(); this.observer.disconnect(); this.root.remove(); }
+}
+
+return {VisualPath3D};
 })();
 // packages/renderer3d/src/camera.js
 __modules["packages/renderer3d/src/camera.js"]=(()=>{
@@ -7092,6 +7869,7 @@ class VisualInspection3D {
     get persistedDisplay(){return this.mode==='appearance'&&this.source===this.w.doc?this.originalDisplay:this.m.renderer?.displaySettings;}
     report(message=''){const n=this.root.querySelector('.inspect3d-error');n.textContent=message;n.hidden=!message;}
     start(mode){
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         if(!['section','measure','appearance'].includes(mode))throw new Error('Unknown inspection mode');
         this.cancel();this.m.visual.cancel();this.m.visual.closePalette();this.w.closeModal();this.w.closePanels();this.m.input.reset();
         this.source=this.w.doc;this.version=this.w.doc.version;this.signature=JSON.stringify(this.w.doc);this.originalSection=clone(this.m.renderer.section);this.originalDisplay=this.m.renderer.displaySettings;this.base=clone(this.w.doc);this.ids=[...this.w.selection];this.valid=true;
@@ -7268,6 +8046,7 @@ class VisualEditing3D {
         const el = this.root.querySelector('.visual3d-error'); el.textContent = message; el.hidden = !message;
     }
     start(kind, id = null) {
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         this.m.inspection?.cancel();this.w.visual2d?.cancel();
         this.cancel(); this.closePalette(); this.w.closeModal(); this.w.closePanels();
         this.m.input.reset(); this.m.cancelDrag();
@@ -7590,6 +8369,7 @@ class VisualEditing3D {
     beforeEdit(){if(this.session&&!this.applying)this.cancel();}
     click(event){
         const el=event.target.closest('button');if(!el)return;event.stopPropagation();
+        if(el.dataset.action){this.w.action(el.dataset.action).catch(error=>this.w.toast(error.message,true));return;}
         if(el.dataset.visualField||el.dataset.visualLabel){this.openEntry(el.dataset.visualField||el.dataset.visualLabel);return;}
         const action=el.dataset.visualCommand;if(!action)return;
         try{
@@ -7623,10 +8403,11 @@ class VisualEditing3D {
         }catch(error){this.report(error.message);}
     }
     openPalette(){
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         this.cancel();this.w.closeModal();this.w.closePanels();
         this.palette.innerHTML=`<header><div><small>BUILD ON THE CANVAS</small><h3>Create & modify</h3></div>${button('palette-close','Close tools','close')}</header>
-          <label class="visual3d-search">${icon('search')}<input type="search" placeholder="Find a 3D tool…" aria-label="Find a 3D tool"></label><div class="visual3d-palette-body">${[...new Set(VISUAL_TOOLS.map(t=>t.group))].map(group=>`<section><h4>${E(group)}</h4><div>${VISUAL_TOOLS.filter(t=>t.group===group).map(t=>button('create:'+t.id,t.label,['face-profile','sketch-profile'].includes(t.id)?'sketch':t.id==='vertex'?'vertex':actionIcon('3d-op-'+t.id))).join('')}</div></section>`).join('')}<p class="visual3d-empty" hidden>No matching tools.</p></div>`;
-        this.palette.hidden=false;this.palette.querySelector('input').addEventListener('input',e=>{const words=e.target.value.toLowerCase().split(/\s+/);let count=0;for(const b of this.palette.querySelectorAll('[data-visual-command^="create:"]')){b.hidden=!words.every(w=>b.textContent.toLowerCase().includes(w));if(!b.hidden)count++;}for(const section of this.palette.querySelectorAll('section'))section.hidden=![...section.querySelectorAll('button')].some(b=>!b.hidden);this.palette.querySelector('.visual3d-empty').hidden=!!count;});
+          <label class="visual3d-search">${icon('search')}<input type="search" placeholder="Find a 3D tool…" aria-label="Find a 3D tool"></label><div class="visual3d-palette-body">${[...new Set(VISUAL_TOOLS.map(t=>t.group))].map(group=>`<section><h4>${E(group)}</h4><div>${VISUAL_TOOLS.filter(t=>t.group===group).map(t=>button('create:'+t.id,t.label,['face-profile','sketch-profile'].includes(t.id)?'sketch':t.id==='vertex'?'vertex':actionIcon('3d-op-'+t.id))).join('')}</div></section>`).join('')}<section><h4>Spatial curves</h4><div><button type="button" data-action="3d-path">${icon('polyline')}<span>Spatial path</span></button><button type="button" data-action="3d-live-workshop">${icon('formula')}<span>Parametric path workshop</span></button></div></section><p class="visual3d-empty" hidden>No matching tools.</p></div>`;
+        this.palette.hidden=false;this.palette.querySelector('input').addEventListener('input',e=>{const words=e.target.value.toLowerCase().split(/\s+/);let count=0;for(const b of this.palette.querySelectorAll('[data-visual-command^="create:"],[data-action="3d-path"],[data-action="3d-live-workshop"]')){b.hidden=!words.every(w=>b.textContent.toLowerCase().includes(w));if(!b.hidden)count++;}for(const section of this.palette.querySelectorAll('section'))section.hidden=![...section.querySelectorAll('button')].some(b=>!b.hidden);this.palette.querySelector('.visual3d-empty').hidden=!!count;});
         this.palette.querySelector('[data-visual-command=palette-close]').focus({preventScroll:true});
     }
     closePalette(){this.palette.hidden=true;}
@@ -7938,6 +8719,8 @@ return {PointerController};
 })();
 // packages/workbench/src/modeling-workbench.js
 __modules["packages/workbench/src/modeling-workbench.js"]=(()=>{
+const {createLiveWorkspaceExample} = __modules["packages/workbench/src/live-workspace-example.js"];
+const {VisualPath3D} = __modules["packages/workbench/src/visual-path3d.js"];
 const {VisualInspection3D} = __modules["packages/workbench/src/visual-inspection3d.js"];
 const {VisualEditing3D} = __modules["packages/workbench/src/visual-editing3d.js"];
 const {visualStyle} = __modules["packages/renderer3d/src/index.js"];
@@ -7994,22 +8777,23 @@ class ModelingWorkbench {
         }, { signal: workbench.abort.signal });
         this.host = this.stage.querySelector('.viewport3d');
         this.input = new PointerController(this.host, { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), cancel: () => this.cancelDrag(), gesture: ({ scale, dx, dy }) => { this.camera.zoom(scale); this.camera.pan(dx, dy); this.changedView(); }, gestureEnd: () => this.saveView(), wheel: p => { this.camera.zoom(Math.exp(-p.deltaY * .0015)); this.changedView(); this.saveView(); } });
-        this.host.addEventListener('dblclick', () => { if(this.visual.active||this.inspection?.active)return; if(this.w.selected().length===1){ const e=this.w.selected()[0]; try{if(this.pickMode==='face'&&this.hit?.face!==undefined)this.visual.start('offset-face');else if(this.pickMode==='vertex'&&this.hit?.vertex!==undefined)this.visual.start('vertex');else if(e.feature3d)this.visual.start(e.feature3d.kind,e.id);else this.fitSelection();}catch(error){this.w.toast(error.message,true);} }else this.fitSelection(); }, { signal: workbench.abort.signal });
+        this.host.addEventListener('dblclick', () => { if(this.path?.active||this.w.parameters?.active||this.visual.active||this.inspection?.active)return; if(this.w.selected().length===1){ const e=this.w.selected()[0]; try{if(this.pickMode==='face'&&this.hit?.face!==undefined)this.visual.start('offset-face');else if(this.pickMode==='vertex'&&this.hit?.vertex!==undefined)this.visual.start('vertex');else if(e.type==='POLYLINE'&&(e.flags&8))this.path.start(e.id);else if(e.feature3d)this.visual.start(e.feature3d.kind,e.id);else this.fitSelection();}catch(error){this.w.toast(error.message,true);} }else this.fitSelection(); }, { signal: workbench.abort.signal });
         this.host.addEventListener('dragover', e => e.preventDefault(), { signal: workbench.abort.signal });
         this.host.addEventListener('drop', e => { e.preventDefault(); workbench.openFiles([...e.dataTransfer.files]); }, { signal: workbench.abort.signal });
         this.visual = new VisualEditing3D(this);
         this.inspection = new VisualInspection3D(this);
+        this.path = new VisualPath3D(this);
         this.ready = Promise.resolve();
     }
     ensureRenderer() { if (this.renderer)
         return; const w = this.w, requested = w.options.backend3d || new URLSearchParams(location.search).get('renderer3d') || 'auto'; this.renderer = new SpatialRenderer(this.host, { backend: requested, camera: this.camera, onStatus: s => { this.stage.querySelector('.model3d-backend').textContent = s.backend; this.stage.querySelector('.model3d-backend').title = (s.reasons || []).join('\n'); } }); this.renderer.drawOverlay = (ctx, camera) => this.drawGizmo(ctx, camera); this.renderer.onFrame = s => { if (!this.active)
-        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; this.visual?.updatePositions();this.inspection?.updatePositions(); }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
+        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; this.visual?.updatePositions();this.inspection?.updatePositions();this.path?.updatePositions(); }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
         return; this.renderer.setDocument(w.doc, { showInputs: this.showInputs }); this.renderer.resize(); if (!w.model3dCamera)
         this.renderer.fit();
     else
         this.restoreView(); this.renderer.setSelection(w.selection, this.pickMode === 'face' ? this.hit : null); this.saveView(); }); }
     setActive(active) {
-        this.inspection?.cancel();this.w.visual2d?.cancel();this.w.visual2d?.panel.close();
+        this.w.parameters?.cancel(); this.path?.cancel(); this.inspection?.cancel();this.w.visual2d?.cancel();this.w.visual2d?.panel.close();
         this.visual?.cancel();
         if(this.active)this.saveView();
         const w = this.w;
@@ -8035,7 +8819,7 @@ class ModelingWorkbench {
         return; this.w.model3dCamera = this.camera.snapshot(); this.w.model3dDisplay = this.inspection?.persistedDisplay || this.renderer?.displaySettings; this.w.model3dSection = structuredClone(this.inspection?.active ? this.inspection.persistedSection : this.renderer?.section || null); this.w.scheduleRecovery(); }
     changedView() { this.renderer?.invalidate(); this.w.model3dCamera = this.camera.snapshot(); }
     sync() {
-        this.inspection?.externalChange();this.visual?.externalChange();
+        this.path?.externalChange();this.inspection?.externalChange();this.visual?.externalChange();
         const w = this.w, active = w.viewMode === '3d' && (w.doc.activeLayout || 'Model') === 'Model';
         this.active = active;
         this.stage.hidden = !active;
@@ -8093,17 +8877,17 @@ class ModelingWorkbench {
     }
     selectionChanged() { if (!this.active)
         return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); this.syncTimeline(); syncAuthoring3(this); }
-    clearPreview() { this.visual?.cancel(); const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
+    clearPreview() { this.w.parameters?.cancel();this.path?.cancel();this.visual?.cancel(); const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
     } if (preview && this.active)
         this.sync(); }
     selectionCenter() { const points = this.renderer?.scene.items.filter(i => this.w.selection.has(i.id)).flatMap(i => i.points) || []; if (!points.length)
         return null; const b = bounds3(points); return mul3(add3(b.min, b.max), .5); }
-    gizmo() { if(this.visual?.active||this.inspection?.active)return []; const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
+    gizmo() { if(this.path?.active||this.w.parameters?.active||this.visual?.active||this.inspection?.active)return []; const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
         return []; if (isLocked(this.w.selected()[0], this.w.doc))
         return []; const length = this.camera.height * .15; return [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)].map((axis, i) => ({ origin, axis, label: ['X', 'Y', 'Z'][i], color: ['#c46655', '#448f71', '#4d81b8'][i], a: this.camera.project(origin), b: this.camera.project(add3(origin, mul3(axis, length))) })); }
-    drawGizmo(ctx) { if(this.inspection?.active){this.inspection.draw(ctx);return;} if(this.visual?.active){this.visual.draw(ctx);return;} for (const g of this.gizmo()) {
+    drawGizmo(ctx) { if(this.path?.active){this.path.draw(ctx);return;}if(this.w.parameters?.active)return;if(this.inspection?.active){this.inspection.draw(ctx);return;} if(this.visual?.active){this.visual.draw(ctx);return;} for (const g of this.gizmo()) {
         if (!g.a.visible || !g.b.visible)
             continue;
         ctx.strokeStyle = g.color;
@@ -8121,7 +8905,7 @@ class ModelingWorkbench {
     } }
     axisParameter(p, axis, origin) { const r = this.camera.ray(p.x, p.y), o = sub3(r.origin, origin), ad = dot3(axis, r.direction), den = 1 - ad * ad; if (den < 1e-8)
         throw new Error('This axis is parallel to the camera; use exact coordinates or orbit first'); return (dot3(axis, o) - ad * dot3(r.direction, o)) / den; }
-    pointerDown(p) { if(this.inspection?.pointerDown(p)){this.start=null;return;} if(this.visual?.pointerDown(p)){this.start=null;return;} this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
+    pointerDown(p) { if(this.path?.pointerDown(p)){this.start=null;return;}if(this.inspection?.pointerDown(p)){this.start=null;return;} if(this.visual?.pointerDown(p)){this.start=null;return;} this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
         const dx = g.b.x - g.a.x, dy = g.b.y - g.a.y, den = dx * dx + dy * dy, t = den ? ((p.x - g.a.x) * dx + (p.y - g.a.y) * dy) / den : 0;
         if (t > .2 && t < 1.25 && Math.hypot(g.a.x + dx * t - p.x, g.a.y + dy * t - p.y) < 12) {
             try {
@@ -8134,6 +8918,7 @@ class ModelingWorkbench {
         }
     } }
     pointerMove(p) {
+        if(this.path?.pointerMove(p))return;
         if(this.inspection?.pointerMove(p))return;
         if(this.visual?.pointerMove(p))return;
         if (!this.start)
@@ -8166,6 +8951,7 @@ class ModelingWorkbench {
         this.changedView();
     }
     pointerUp(p) {
+        if(this.path?.pointerUp(p)){this.start=null;return;}
         if(this.inspection?.pointerUp(p)){this.start=null;return;}
         if(this.visual?.pointerUp(p)){this.start=null;return;}
         const start = this.start, drag = this.drag;
@@ -8187,6 +8973,8 @@ class ModelingWorkbench {
             return;
         }
         if (start && !this.navigating && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
+            if(this.path?.active){this.path.pickAt(p);return;}
+            if(this.w.parameters?.active)return;
             if(this.inspection?.active){this.inspection.pickAt(p);return;}
             if(this.visual?.active){this.visual.pickAt(p);return;}
             this.hit = this.renderer.pick(p.x, p.y, { mode: this.pickMode, radius: p.pointerType === 'touch' ? 18 : 9 });
@@ -8206,7 +8994,7 @@ class ModelingWorkbench {
         }
         this.saveView();
     }
-    cancelDrag() { this.inspection?.cancelDrag();this.visual?.cancelDrag(); this.start = null; this.drag = null; if(this.visual?.active)return; if (this.previewDocument && !this.operation) {
+    cancelDrag() { this.path?.cancelDrag();this.inspection?.cancelDrag();this.visual?.cancelDrag(); this.start = null; this.drag = null; if(this.path?.active||this.w.parameters?.active||this.visual?.active)return; if (this.previewDocument && !this.operation) {
         this.previewDocument = null;
         if (this.active && this.renderer)
             this.renderer.setDocument(this.w.doc, { showInputs: this.showInputs });
@@ -8220,6 +9008,11 @@ class ModelingWorkbench {
         if (action === 'mode-3d') {
             await this.setActive(true);
             return;
+        }
+        if (action === '3d-live-workshop') {
+            w.openDocument(createLiveWorkspaceExample(), { context: { viewMode: '3d', currentLayer: 'Process' } });
+            w.model3dCamera = null; await this.setActive(true); this.showInputs = true;
+            w.selection = new Set(['live-route']); this.sync(); this.renderer.fit(); this.saveView(); w.updateSelection(); return;
         }
         if (action === '3d-examples') {
             this.examplesDialog();
@@ -8236,6 +9029,11 @@ class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
+        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.session[action==='3d-undo'?'undo':'redo']();this.path.preview(true);return;}
+        const navigationAction=(action.startsWith('3d-view-')&&action!=='3d-view-options')||['3d-fit','3d-capture'].includes(action);
+        if(!navigationAction){this.path?.cancel();this.w.parameters?.cancel();}
+        if(action==='3d-path'&&w.options.modelingInteraction!=='dialog'){this.path.start();return;}
+        if(['3d-edit','3d-vertex'].includes(action)&&w.options.modelingInteraction!=='dialog'){const e=w.selected()[0];if(e?.type==='POLYLINE'&&(e.flags&8)&&!e.feature3d){this.path.start(e.id);return;}}
         if(w.options.modelingInteraction!=='dialog'&&['3d-section','3d-measure','3d-appearance'].includes(action)){this.inspection.start({'3d-section':'section','3d-measure':'measure','3d-appearance':'appearance'}[action]);return;}
         if(this.inspection?.active&&!action.startsWith('3d-view-')&&action!=='3d-fit'&&action!=='3d-capture')this.inspection.cancel();
         if (await displayAction3D(this, action)) return;
@@ -8445,7 +9243,7 @@ class ModelingWorkbench {
         } this.renderer.section = w.modal.querySelector('#model3d-section-enable').checked ? { normal, offset } : null; this.renderer.invalidate(); this.saveView(); w.closeModal(); } }); }
     exportMesh(format) { const e = this.w.selected().find(e => e.type === 'MESH'); if (!e)
         throw new Error('Select a MESH body to export'); downloadFile(this.w.basename() + '.' + format, format === 'obj' ? writeOBJ(e) : writeSTL(e), 'text/plain'); this.w.closeModal(); }
-    dispose() { this.inspection?.dispose();this.visual?.dispose(); this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
+    dispose() { this.path?.dispose();this.inspection?.dispose();this.visual?.dispose(); this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
 }
 
 return {ModelingWorkbench};
@@ -12565,6 +13363,7 @@ return {writeSVG,renderPNG,writeBOM};
 })();
 // packages/workbench/src/index.js
 __modules["packages/workbench/src/index.js"]=(()=>{
+const {VisualParameters} = __modules["packages/workbench/src/visual-parameters.js"];
 const {VisualEditing2D} = __modules["packages/workbench/src/visual-editing2d.js"];
 const {ModelingWorkbench} = __modules["packages/workbench/src/modeling-workbench.js"];
 const {regenerateFeatures, EXAMPLES_3D, create3DExample} = __modules["packages/modeling/src/index.js"];
@@ -12657,6 +13456,7 @@ class Workbench {
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.model3d = new ModelingWorkbench(this);
         this.visual2d = new VisualEditing2D(this);
+        this.parameters = new VisualParameters(this);
         this.iconography = bindIconography(this);
         this.bindEvents();
         bindMobileWorkspace(this);
@@ -13017,7 +13817,7 @@ class Workbench {
         this.hideContext();
     }
     updateUI() {
-        this.visual2d?.sync(); this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
+        this.parameters?.externalChange(); this.visual2d?.sync(); this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -13054,7 +13854,7 @@ class Workbench {
         if (s.message)
             this.$('.render-badge')?.setAttribute('title', s.message);
     }
-    beginBlockEdit(name) { this.visual2d?.cancel();this.visual2d?.panel.close();return startBlockEditor(this,name); }
+    beginBlockEdit(name) { this.parameters?.cancel(); this.model3d?.path?.cancel(); this.visual2d?.cancel();this.visual2d?.panel.close();return startBlockEditor(this,name); }
     saveBlockEdit(close=false) { this.visual2d?.cancel();return finishBlockEditor(this,true,!close); }
     cancelBlockEdit() { return finishBlockEditor(this,false); }
     selected() { return this.doc.entities.filter(e => this.selection.has(e.id)); }
@@ -13073,7 +13873,7 @@ class Workbench {
             this.renderer.setDocument(this.doc);
         this.updateStatus();
     }
-    edit(label, action) { this.visual2d?.beforeEdit(); this.model3d?.inspection?.beforeEdit(); this.model3d?.visual?.beforeEdit(); this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
+    edit(label, action) { this.parameters?.beforeEdit(); this.model3d?.path?.beforeEdit(); this.visual2d?.beforeEdit(); this.model3d?.inspection?.beforeEdit(); this.model3d?.visual?.beforeEdit(); this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
     updateSelection() { this.visual2d?.sync(); this.model3d?.selectionChanged(); scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
@@ -13092,7 +13892,7 @@ class Workbench {
         this.updateSelection();
     }
     setTool(tool) {
-        this.visual2d?.cancel(); this.visual2d?.panel.close();
+        this.parameters?.cancel(); this.visual2d?.cancel(); this.visual2d?.panel.close();
         if(this.model3d?.active) this.model3d.setActive(false);
         if (!TOOL_INFO[tool])
             return;
@@ -13650,6 +14450,7 @@ class Workbench {
         return [];
     }
     pointerDown(p) {
+        if(!this.modal&&this.parameters?.pointerDown(p))return;
         if(!this.modal&&this.visual2d?.pointerDown(p))return;
         if (this.modal || !this.renderer.containsPoint(p))
             return;
@@ -13738,6 +14539,7 @@ class Workbench {
         this.renderer.invalidate();
     }
     pointerMove(p) {
+        if(this.parameters?.pointerMove(p))return;
         if(this.visual2d?.pointerMove(p))return;
         this.shift = p.shift;
         this.pointer = p;
@@ -13844,7 +14646,7 @@ class Workbench {
         this.renderer.invalidate();
     }
     pointerHover(p) {
-        if(this.visual2d?.active)return;
+        if(this.parameters?.active||this.visual2d?.active)return;
         this.lastScreen = p;
         this.shift = p.shift;
         const world = this.camera.world(p);
@@ -13864,6 +14666,7 @@ class Workbench {
         this.renderer.invalidate();
     }
     pointerUp(p) {
+        if(this.parameters?.pointerUp(p))return;
         if(this.visual2d?.pointerUp(p))return;
         const drag = this.drag;
         if (!drag)
@@ -14009,7 +14812,7 @@ class Workbench {
         this.setTool('select');
     }
     cancelGesture() {
-        this.visual2d?.cancelDrag();
+        this.parameters?.cancelDrag(); this.visual2d?.cancelDrag();
         if (this.history?.pending)
             this.history.cancel();
         this.drag = null;
@@ -14019,6 +14822,7 @@ class Workbench {
         this.renderer?.invalidate();
     }
     drawOverlay(ctx, cam) {
+        if(this.parameters?.active)return;
         if(this.visual2d?.active){this.visual2d.draw(ctx,cam);return;}
         ctx.save();
         drawParametricOverlay(this,ctx,cam);
@@ -14391,7 +15195,7 @@ class Workbench {
     }
     editText(e) { if(this.visual2d?.enabled){this.selection=new Set([e.id]);this.visual2d.start('geometry',{field:'text'});return;} this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false, onClose = null } = {}) {
-        this.visual2d?.cancel();this.visual2d?.panel.close();this.model3d?.inspection?.cancel();
+        this.parameters?.cancel();this.model3d?.path?.cancel();this.visual2d?.cancel();this.visual2d?.panel.close();this.model3d?.inspection?.cancel();
         this.closeModal();
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop';
@@ -14663,6 +15467,8 @@ class Workbench {
     }
     keyDown(e) {
         if (this.initializing || this.disposed) return;
+        if(this.parameters?.keyDown(e))return;
+        if(this.model3d?.path?.keyDown(e))return;
         if(this.visual2d?.keyDown(e))return;
         if(this.model3d?.inspection?.keyDown(e))return;
         if(this.model3d?.visual?.keyDown(e))return;
@@ -14774,8 +15580,8 @@ class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.9.1', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>19</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.visual2d?.dispose(); this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.13.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>21</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    dispose() { this.parameters?.dispose(); this.visual2d?.dispose(); this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 function mountWorkbench(element, options = {}) { return new Workbench(element, options); }
 

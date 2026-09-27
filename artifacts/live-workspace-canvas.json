@@ -1,0 +1,412 @@
+{
+  "backend": "canvas",
+  "nativeOrigin": true,
+  "passed": 101,
+  "checks": [
+    {
+      "name": "requested backend actually active",
+      "passed": true
+    },
+    {
+      "name": "3D parameters stay in 3D and use non-modal controls",
+      "passed": true
+    },
+    {
+      "name": "whole-design preview changes native circle and dependent box",
+      "passed": true
+    },
+    {
+      "name": "whole-design changes are isolated from drawing and history",
+      "passed": true
+    },
+    {
+      "name": "actual scrub changes evaluated parameter and preview",
+      "passed": true
+    },
+    {
+      "name": "undo scrub is operation-local",
+      "passed": true
+    },
+    {
+      "name": "redo scrub is operation-local",
+      "passed": true
+    },
+    {
+      "name": "cycles clear preview and disable Apply",
+      "passed": true
+    },
+    {
+      "name": "invalid keyboard/programmatic Apply cannot commit old preview",
+      "passed": true
+    },
+    {
+      "name": "another field cannot accept a rejected oversized expression",
+      "passed": true
+    },
+    {
+      "name": "parameter Apply commits one transaction",
+      "passed": true
+    },
+    {
+      "name": "drawing Undo restores original dimensions",
+      "passed": true
+    },
+    {
+      "name": "drawing Redo restores evaluated design",
+      "passed": true
+    },
+    {
+      "name": "parameters ascii export",
+      "passed": true
+    },
+    {
+      "name": "parameters binary export",
+      "passed": true
+    },
+    {
+      "name": "unchanged parameter Apply does not add history",
+      "passed": true
+    },
+    {
+      "name": "Cancel discards parameter preview",
+      "passed": true
+    },
+    {
+      "name": "same live editor previews in planar mode",
+      "passed": true
+    },
+    {
+      "name": "new named dependency evaluates live",
+      "passed": true
+    },
+    {
+      "name": "added parameter persists",
+      "passed": true
+    },
+    {
+      "name": "parameter filtering keeps only matching row",
+      "passed": true
+    },
+    {
+      "name": "delete parameter is explicit and undoable",
+      "passed": true
+    },
+    {
+      "name": "external source revision cancels parameter preview",
+      "passed": true
+    },
+    {
+      "name": "spatial path starts through non-modal Create palette",
+      "passed": true
+    },
+    {
+      "name": "viewport taps create evaluated WCS polyline vertices",
+      "passed": true
+    },
+    {
+      "name": "path remains transient until Apply",
+      "passed": true
+    },
+    {
+      "name": "exact point accepts named XYZ expressions",
+      "passed": true
+    },
+    {
+      "name": "drag Z handle preserves parameter expression",
+      "passed": true
+    },
+    {
+      "name": "inline coordinate updates preview",
+      "passed": true
+    },
+    {
+      "name": "bad coordinate clears preview",
+      "passed": true
+    },
+    {
+      "name": "bad coordinate cannot apply stale native geometry",
+      "passed": true
+    },
+    {
+      "name": "offset and navigation controls cannot resurrect rejected XYZ preview",
+      "passed": true
+    },
+    {
+      "name": "packed axis handles retain visible axis lettering",
+      "passed": true
+    },
+    {
+      "name": "midpoint inserts a parameter-preserving vertex",
+      "passed": true
+    },
+    {
+      "name": "midpoint undo restores vertex topology",
+      "passed": true
+    },
+    {
+      "name": "closed path preview uses native close flag",
+      "passed": true
+    },
+    {
+      "name": "path Apply is one transaction and retains native parametric metadata",
+      "passed": true
+    },
+    {
+      "name": "path ascii export",
+      "passed": true
+    },
+    {
+      "name": "path binary export",
+      "passed": true
+    },
+    {
+      "name": "parameter editing regenerates persisted spatial path coordinates",
+      "passed": true
+    },
+    {
+      "name": "regenerated path commits evaluated XYZ",
+      "passed": true
+    },
+    {
+      "name": "Edit on canvas reopens native path without a dialog",
+      "passed": true
+    },
+    {
+      "name": "unchanged path edit adds no history",
+      "passed": true
+    },
+    {
+      "name": "keyboard axis editing changes selected native coordinate",
+      "passed": true
+    },
+    {
+      "name": "keyboard coordinate edit has draft undo",
+      "passed": true
+    },
+    {
+      "name": "remove vertex has live preview",
+      "passed": true
+    },
+    {
+      "name": "Cancel restores accepted path topology",
+      "passed": true
+    },
+    {
+      "name": "returning to 2D cancels spatial draft",
+      "passed": true
+    },
+    {
+      "name": "workshop opens six native entities in independent 3D document",
+      "passed": true
+    },
+    {
+      "name": "workshop parameter preview regenerates dependent sweep",
+      "passed": true
+    },
+    {
+      "name": "320x568 live parameter panel stays bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameter confirm stays touch-sized and reachable",
+      "passed": true
+    },
+    {
+      "name": "320x568 parameter input remains readable",
+      "passed": true
+    },
+    {
+      "name": "320x568 collapsed parameters leave interactive canvas",
+      "passed": true
+    },
+    {
+      "name": "320x568 touch Apply commits live dimensions",
+      "passed": true
+    },
+    {
+      "name": "320x568 options panel bounds",
+      "passed": true
+    },
+    {
+      "name": "320x568 path controls bounded",
+      "passed": true
+    },
+    {
+      "name": "320x568 path Apply and Cancel remain visible touch controls",
+      "passed": true
+    },
+    {
+      "name": "320x568 packed handle shows Z instead of a blank button",
+      "passed": true
+    },
+    {
+      "name": "320x568 path XYZ input stays 16px",
+      "passed": true
+    },
+    {
+      "name": "320x568 touch handle gesture produces finite isolated preview",
+      "passed": true
+    },
+    {
+      "name": "320x568 path Apply returns to normal 3D view",
+      "passed": true
+    },
+    {
+      "name": "390x844 live parameter panel stays bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameter confirm stays touch-sized and reachable",
+      "passed": true
+    },
+    {
+      "name": "390x844 parameter input remains readable",
+      "passed": true
+    },
+    {
+      "name": "390x844 collapsed parameters leave interactive canvas",
+      "passed": true
+    },
+    {
+      "name": "390x844 touch Apply commits live dimensions",
+      "passed": true
+    },
+    {
+      "name": "390x844 options panel bounds",
+      "passed": true
+    },
+    {
+      "name": "390x844 path controls bounded",
+      "passed": true
+    },
+    {
+      "name": "390x844 path Apply and Cancel remain visible touch controls",
+      "passed": true
+    },
+    {
+      "name": "390x844 packed handle shows Z instead of a blank button",
+      "passed": true
+    },
+    {
+      "name": "390x844 path XYZ input stays 16px",
+      "passed": true
+    },
+    {
+      "name": "390x844 touch handle gesture produces finite isolated preview",
+      "passed": true
+    },
+    {
+      "name": "two-finger takeover restores unaccepted point drag",
+      "passed": true
+    },
+    {
+      "name": "two-finger release never adds extra path vertices",
+      "passed": true
+    },
+    {
+      "name": "390x844 path Apply returns to normal 3D view",
+      "passed": true
+    },
+    {
+      "name": "844x390 live parameter panel stays bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameter confirm stays touch-sized and reachable",
+      "passed": true
+    },
+    {
+      "name": "844x390 parameter input remains readable",
+      "passed": true
+    },
+    {
+      "name": "844x390 collapsed parameters leave interactive canvas",
+      "passed": true
+    },
+    {
+      "name": "844x390 touch Apply commits live dimensions",
+      "passed": true
+    },
+    {
+      "name": "844x390 options panel bounds",
+      "passed": true
+    },
+    {
+      "name": "844x390 path controls bounded",
+      "passed": true
+    },
+    {
+      "name": "844x390 path Apply and Cancel remain visible touch controls",
+      "passed": true
+    },
+    {
+      "name": "844x390 packed handle shows Z instead of a blank button",
+      "passed": true
+    },
+    {
+      "name": "844x390 path XYZ input stays 16px",
+      "passed": true
+    },
+    {
+      "name": "844x390 touch handle gesture produces finite isolated preview",
+      "passed": true
+    },
+    {
+      "name": "844x390 path Apply returns to normal 3D view",
+      "passed": true
+    },
+    {
+      "name": "1024x768 live parameter panel stays bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameter confirm stays touch-sized and reachable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 parameter input remains readable",
+      "passed": true
+    },
+    {
+      "name": "1024x768 collapsed parameters leave interactive canvas",
+      "passed": true
+    },
+    {
+      "name": "1024x768 touch Apply commits live dimensions",
+      "passed": true
+    },
+    {
+      "name": "1024x768 options panel bounds",
+      "passed": true
+    },
+    {
+      "name": "1024x768 path controls bounded",
+      "passed": true
+    },
+    {
+      "name": "1024x768 path Apply and Cancel remain visible touch controls",
+      "passed": true
+    },
+    {
+      "name": "1024x768 packed handle shows Z instead of a blank button",
+      "passed": true
+    },
+    {
+      "name": "1024x768 path XYZ input stays 16px",
+      "passed": true
+    },
+    {
+      "name": "1024x768 touch handle gesture produces finite isolated preview",
+      "passed": true
+    },
+    {
+      "name": "1024x768 path Apply returns to normal 3D view",
+      "passed": true
+    },
+    {
+      "name": "no uncaught page errors",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

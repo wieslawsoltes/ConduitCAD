@@ -1,0 +1,102 @@
+requested backend actually active
+3D parameters stay in 3D and use non-modal controls
+whole-design preview changes native circle and dependent box
+whole-design changes are isolated from drawing and history
+actual scrub changes evaluated parameter and preview
+undo scrub is operation-local
+redo scrub is operation-local
+cycles clear preview and disable Apply
+invalid keyboard/programmatic Apply cannot commit old preview
+another field cannot accept a rejected oversized expression
+parameter Apply commits one transaction
+drawing Undo restores original dimensions
+drawing Redo restores evaluated design
+parameters ascii export
+parameters binary export
+unchanged parameter Apply does not add history
+Cancel discards parameter preview
+same live editor previews in planar mode
+new named dependency evaluates live
+added parameter persists
+parameter filtering keeps only matching row
+delete parameter is explicit and undoable
+external source revision cancels parameter preview
+spatial path starts through non-modal Create palette
+viewport taps create evaluated WCS polyline vertices
+path remains transient until Apply
+exact point accepts named XYZ expressions
+drag Z handle preserves parameter expression
+inline coordinate updates preview
+bad coordinate clears preview
+bad coordinate cannot apply stale native geometry
+offset and navigation controls cannot resurrect rejected XYZ preview
+packed axis handles retain visible axis lettering
+midpoint inserts a parameter-preserving vertex
+midpoint undo restores vertex topology
+closed path preview uses native close flag
+path Apply is one transaction and retains native parametric metadata
+path ascii export
+path binary export
+parameter editing regenerates persisted spatial path coordinates
+regenerated path commits evaluated XYZ
+Edit on canvas reopens native path without a dialog
+unchanged path edit adds no history
+keyboard axis editing changes selected native coordinate
+keyboard coordinate edit has draft undo
+remove vertex has live preview
+Cancel restores accepted path topology
+returning to 2D cancels spatial draft
+workshop opens six native entities in independent 3D document
+workshop parameter preview regenerates dependent sweep
+320x568 live parameter panel stays bounded
+320x568 parameter confirm stays touch-sized and reachable
+320x568 parameter input remains readable
+320x568 collapsed parameters leave interactive canvas
+320x568 touch Apply commits live dimensions
+320x568 options panel bounds
+320x568 path controls bounded
+320x568 path Apply and Cancel remain visible touch controls
+320x568 packed handle shows Z instead of a blank button
+320x568 path XYZ input stays 16px
+320x568 touch handle gesture produces finite isolated preview
+320x568 path Apply returns to normal 3D view
+390x844 live parameter panel stays bounded
+390x844 parameter confirm stays touch-sized and reachable
+390x844 parameter input remains readable
+390x844 collapsed parameters leave interactive canvas
+390x844 touch Apply commits live dimensions
+390x844 options panel bounds
+390x844 path controls bounded
+390x844 path Apply and Cancel remain visible touch controls
+390x844 packed handle shows Z instead of a blank button
+390x844 path XYZ input stays 16px
+390x844 touch handle gesture produces finite isolated preview
+two-finger takeover restores unaccepted point drag
+two-finger release never adds extra path vertices
+390x844 path Apply returns to normal 3D view
+844x390 live parameter panel stays bounded
+844x390 parameter confirm stays touch-sized and reachable
+844x390 parameter input remains readable
+844x390 collapsed parameters leave interactive canvas
+844x390 touch Apply commits live dimensions
+844x390 options panel bounds
+844x390 path controls bounded
+844x390 path Apply and Cancel remain visible touch controls
+844x390 packed handle shows Z instead of a blank button
+844x390 path XYZ input stays 16px
+844x390 touch handle gesture produces finite isolated preview
+844x390 path Apply returns to normal 3D view
+1024x768 live parameter panel stays bounded
+1024x768 parameter confirm stays touch-sized and reachable
+1024x768 parameter input remains readable
+1024x768 collapsed parameters leave interactive canvas
+1024x768 touch Apply commits live dimensions
+1024x768 options panel bounds
+1024x768 path controls bounded
+1024x768 path Apply and Cancel remain visible touch controls
+1024x768 packed handle shows Z instead of a blank button
+1024x768 path XYZ input stays 16px
+1024x768 touch handle gesture produces finite isolated preview
+1024x768 path Apply returns to normal 3D view
+no uncaught page errors
+{"passed": 101, "backend": "webgpu", "nativeOrigin": true}

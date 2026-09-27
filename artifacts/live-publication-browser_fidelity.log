@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "name": "37-entity independent DXF opens through real File API and import worker",
+      "passed": true
+    },
+    {
+      "name": "solid hatch hides an earlier line where material exists",
+      "passed": true,
+      "detail": [
+        255,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "name": "hatch island hole reveals the earlier blue line",
+      "passed": true,
+      "detail": [
+        0,
+        0,
+        255,
+        255
+      ]
+    },
+    {
+      "name": "nested island is filled again in normal style",
+      "passed": true,
+      "detail": [
+        255,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "name": "hole does not select the hatch using its bounding rectangle",
+      "passed": true
+    },
+    {
+      "name": "filled interior selects the actual hatch",
+      "passed": true
+    },
+    {
+      "name": "ruler strips are clipped in the actual drawing context",
+      "passed": true,
+      "detail": [
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          255,
+          0,
+          0,
+          255
+        ]
+      ]
+    },
+    {
+      "name": "geometry renders immediately inside the drawing clip",
+      "passed": true,
+      "detail": [
+        255,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "name": "drawing gestures cannot begin on rulers",
+      "passed": true
+    },
+    {
+      "name": "library drag handle reserves touch gestures before pointerdown",
+      "passed": true
+    },
+    {
+      "name": "native touch drag places exactly one editable symbol",
+      "passed": true,
+      "detail": 40
+    },
+    {
+      "name": "zoom separator no longer consumes a button-sized gap",
+      "passed": true
+    },
+    {
+      "name": "mobile portrait remains within viewport",
+      "passed": true
+    },
+    {
+      "name": "no uncaught errors in import, rendering, or native touch drag",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "passed": 14,
+  "errors": [],
+  "backend": "Canvas 2D",
+  "hardwareGPUValidation": false
+}

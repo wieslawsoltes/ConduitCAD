@@ -1,0 +1,486 @@
+320x568 uses compact touch workspace
+320x568 root has no horizontal overflow
+320x568 tool rail/dock is in viewport
+320x568 canvas has useful height
+320x568 new active document tab is revealed
+320x568 document chrome has 44px targets
+320x568 save status does not hijack tab scrolling
+320x568 opening chooser does not summon input focus
+320x568 document footer is outside scrolling body
+320x568 documents dialog stays inside viewport
+320x568 documents form body does not overflow horizontally
+320x568 documents modal makes underlying workspace inert
+320x568 documents header and close remain reachable
+320x568 documents visible controls meet touch height
+320x568 documents closing restores non-modal workspace
+320x568 more dialog stays inside viewport
+320x568 more form body does not overflow horizontally
+320x568 more modal makes underlying workspace inert
+320x568 more header and close remain reachable
+320x568 more visible controls meet touch height
+320x568 more closing restores non-modal workspace
+320x568 export dialog stays inside viewport
+320x568 export form body does not overflow horizontally
+320x568 export modal makes underlying workspace inert
+320x568 export header and close remain reachable
+320x568 export visible controls meet touch height
+320x568 export closing restores non-modal workspace
+320x568 parameters dialog stays inside viewport
+320x568 parameters form body does not overflow horizontally
+320x568 parameters modal makes underlying workspace inert
+320x568 parameters header and close remain reachable
+320x568 parameters visible controls meet touch height
+320x568 parameters closing restores non-modal workspace
+320x568 solver-report dialog stays inside viewport
+320x568 solver-report form body does not overflow horizontally
+320x568 solver-report modal makes underlying workspace inert
+320x568 solver-report header and close remain reachable
+320x568 solver-report visible controls meet touch height
+320x568 solver-report closing restores non-modal workspace
+320x568 blocks dialog stays inside viewport
+320x568 blocks form body does not overflow horizontally
+320x568 blocks modal makes underlying workspace inert
+320x568 blocks header and close remain reachable
+320x568 blocks visible controls meet touch height
+320x568 blocks closing restores non-modal workspace
+320x568 help dialog stays inside viewport
+320x568 help form body does not overflow horizontally
+320x568 help modal makes underlying workspace inert
+320x568 help header and close remain reachable
+320x568 help visible controls meet touch height
+320x568 help closing restores non-modal workspace
+320x568 line-styles dialog stays inside viewport
+320x568 line-styles form body does not overflow horizontally
+320x568 line-styles modal makes underlying workspace inert
+320x568 line-styles header and close remain reachable
+320x568 line-styles visible controls meet touch height
+320x568 line-styles closing restores non-modal workspace
+320x568 precision dialog stays inside viewport
+320x568 precision form body does not overflow horizontally
+320x568 precision modal makes underlying workspace inert
+320x568 precision header and close remain reachable
+320x568 precision visible controls meet touch height
+320x568 precision closing restores non-modal workspace
+320x568 properties sheet is bounded
+320x568 properties tab exposes selected state
+320x568 layers sheet is bounded
+320x568 layers tab exposes selected state
+320x568 qa sheet is bounded
+320x568 qa tab exposes selected state
+320x568 library is bounded
+320x568 sheet expands below actual chrome
+390x844 uses compact touch workspace
+390x844 root has no horizontal overflow
+390x844 tool rail/dock is in viewport
+390x844 canvas has useful height
+390x844 new active document tab is revealed
+390x844 document chrome has 44px targets
+390x844 save status does not hijack tab scrolling
+390x844 opening chooser does not summon input focus
+390x844 document footer is outside scrolling body
+390x844 documents dialog stays inside viewport
+390x844 documents form body does not overflow horizontally
+390x844 documents modal makes underlying workspace inert
+390x844 documents header and close remain reachable
+390x844 documents visible controls meet touch height
+390x844 documents closing restores non-modal workspace
+390x844 more dialog stays inside viewport
+390x844 more form body does not overflow horizontally
+390x844 more modal makes underlying workspace inert
+390x844 more header and close remain reachable
+390x844 more visible controls meet touch height
+390x844 more closing restores non-modal workspace
+390x844 export dialog stays inside viewport
+390x844 export form body does not overflow horizontally
+390x844 export modal makes underlying workspace inert
+390x844 export header and close remain reachable
+390x844 export visible controls meet touch height
+390x844 export closing restores non-modal workspace
+390x844 parameters dialog stays inside viewport
+390x844 parameters form body does not overflow horizontally
+390x844 parameters modal makes underlying workspace inert
+390x844 parameters header and close remain reachable
+390x844 parameters visible controls meet touch height
+390x844 parameters closing restores non-modal workspace
+390x844 solver-report dialog stays inside viewport
+390x844 solver-report form body does not overflow horizontally
+390x844 solver-report modal makes underlying workspace inert
+390x844 solver-report header and close remain reachable
+390x844 solver-report visible controls meet touch height
+390x844 solver-report closing restores non-modal workspace
+390x844 blocks dialog stays inside viewport
+390x844 blocks form body does not overflow horizontally
+390x844 blocks modal makes underlying workspace inert
+390x844 blocks header and close remain reachable
+390x844 blocks visible controls meet touch height
+390x844 blocks closing restores non-modal workspace
+390x844 help dialog stays inside viewport
+390x844 help form body does not overflow horizontally
+390x844 help modal makes underlying workspace inert
+390x844 help header and close remain reachable
+390x844 help visible controls meet touch height
+390x844 help closing restores non-modal workspace
+390x844 line-styles dialog stays inside viewport
+390x844 line-styles form body does not overflow horizontally
+390x844 line-styles modal makes underlying workspace inert
+390x844 line-styles header and close remain reachable
+390x844 line-styles visible controls meet touch height
+390x844 line-styles closing restores non-modal workspace
+390x844 precision dialog stays inside viewport
+390x844 precision form body does not overflow horizontally
+390x844 precision modal makes underlying workspace inert
+390x844 precision header and close remain reachable
+390x844 precision visible controls meet touch height
+390x844 precision closing restores non-modal workspace
+390x844 properties sheet is bounded
+390x844 properties tab exposes selected state
+390x844 layers sheet is bounded
+390x844 layers tab exposes selected state
+390x844 qa sheet is bounded
+390x844 qa tab exposes selected state
+390x844 library is bounded
+390x844 sheet expands below actual chrome
+844x390 uses compact touch workspace
+844x390 root has no horizontal overflow
+844x390 tool rail/dock is in viewport
+844x390 canvas has useful height
+844x390 new active document tab is revealed
+844x390 document chrome has 44px targets
+844x390 save status does not hijack tab scrolling
+844x390 opening chooser does not summon input focus
+844x390 document footer is outside scrolling body
+844x390 documents dialog stays inside viewport
+844x390 documents form body does not overflow horizontally
+844x390 documents modal makes underlying workspace inert
+844x390 documents header and close remain reachable
+844x390 documents visible controls meet touch height
+844x390 documents closing restores non-modal workspace
+844x390 more dialog stays inside viewport
+844x390 more form body does not overflow horizontally
+844x390 more modal makes underlying workspace inert
+844x390 more header and close remain reachable
+844x390 more visible controls meet touch height
+844x390 more closing restores non-modal workspace
+844x390 export dialog stays inside viewport
+844x390 export form body does not overflow horizontally
+844x390 export modal makes underlying workspace inert
+844x390 export header and close remain reachable
+844x390 export visible controls meet touch height
+844x390 export closing restores non-modal workspace
+844x390 parameters dialog stays inside viewport
+844x390 parameters form body does not overflow horizontally
+844x390 parameters modal makes underlying workspace inert
+844x390 parameters header and close remain reachable
+844x390 parameters visible controls meet touch height
+844x390 parameters closing restores non-modal workspace
+844x390 solver-report dialog stays inside viewport
+844x390 solver-report form body does not overflow horizontally
+844x390 solver-report modal makes underlying workspace inert
+844x390 solver-report header and close remain reachable
+844x390 solver-report visible controls meet touch height
+844x390 solver-report closing restores non-modal workspace
+844x390 blocks dialog stays inside viewport
+844x390 blocks form body does not overflow horizontally
+844x390 blocks modal makes underlying workspace inert
+844x390 blocks header and close remain reachable
+844x390 blocks visible controls meet touch height
+844x390 blocks closing restores non-modal workspace
+844x390 help dialog stays inside viewport
+844x390 help form body does not overflow horizontally
+844x390 help modal makes underlying workspace inert
+844x390 help header and close remain reachable
+844x390 help visible controls meet touch height
+844x390 help closing restores non-modal workspace
+844x390 line-styles dialog stays inside viewport
+844x390 line-styles form body does not overflow horizontally
+844x390 line-styles modal makes underlying workspace inert
+844x390 line-styles header and close remain reachable
+844x390 line-styles visible controls meet touch height
+844x390 line-styles closing restores non-modal workspace
+844x390 precision dialog stays inside viewport
+844x390 precision form body does not overflow horizontally
+844x390 precision modal makes underlying workspace inert
+844x390 precision header and close remain reachable
+844x390 precision visible controls meet touch height
+844x390 precision closing restores non-modal workspace
+844x390 properties sheet is bounded
+844x390 properties tab exposes selected state
+844x390 layers sheet is bounded
+844x390 layers tab exposes selected state
+844x390 qa sheet is bounded
+844x390 qa tab exposes selected state
+844x390 library is bounded
+820x1180 uses compact touch workspace
+820x1180 root has no horizontal overflow
+820x1180 tool rail/dock is in viewport
+820x1180 canvas has useful height
+820x1180 new active document tab is revealed
+820x1180 document chrome has 44px targets
+820x1180 save status does not hijack tab scrolling
+820x1180 opening chooser does not summon input focus
+820x1180 document footer is outside scrolling body
+820x1180 documents dialog stays inside viewport
+820x1180 documents form body does not overflow horizontally
+820x1180 documents modal makes underlying workspace inert
+820x1180 documents header and close remain reachable
+820x1180 documents visible controls meet touch height
+820x1180 documents closing restores non-modal workspace
+820x1180 more dialog stays inside viewport
+820x1180 more form body does not overflow horizontally
+820x1180 more modal makes underlying workspace inert
+820x1180 more header and close remain reachable
+820x1180 more visible controls meet touch height
+820x1180 more closing restores non-modal workspace
+820x1180 export dialog stays inside viewport
+820x1180 export form body does not overflow horizontally
+820x1180 export modal makes underlying workspace inert
+820x1180 export header and close remain reachable
+820x1180 export visible controls meet touch height
+820x1180 export closing restores non-modal workspace
+820x1180 parameters dialog stays inside viewport
+820x1180 parameters form body does not overflow horizontally
+820x1180 parameters modal makes underlying workspace inert
+820x1180 parameters header and close remain reachable
+820x1180 parameters visible controls meet touch height
+820x1180 parameters closing restores non-modal workspace
+820x1180 solver-report dialog stays inside viewport
+820x1180 solver-report form body does not overflow horizontally
+820x1180 solver-report modal makes underlying workspace inert
+820x1180 solver-report header and close remain reachable
+820x1180 solver-report visible controls meet touch height
+820x1180 solver-report closing restores non-modal workspace
+820x1180 blocks dialog stays inside viewport
+820x1180 blocks form body does not overflow horizontally
+820x1180 blocks modal makes underlying workspace inert
+820x1180 blocks header and close remain reachable
+820x1180 blocks visible controls meet touch height
+820x1180 blocks closing restores non-modal workspace
+820x1180 help dialog stays inside viewport
+820x1180 help form body does not overflow horizontally
+820x1180 help modal makes underlying workspace inert
+820x1180 help header and close remain reachable
+820x1180 help visible controls meet touch height
+820x1180 help closing restores non-modal workspace
+820x1180 line-styles dialog stays inside viewport
+820x1180 line-styles form body does not overflow horizontally
+820x1180 line-styles modal makes underlying workspace inert
+820x1180 line-styles header and close remain reachable
+820x1180 line-styles visible controls meet touch height
+820x1180 line-styles closing restores non-modal workspace
+820x1180 precision dialog stays inside viewport
+820x1180 precision form body does not overflow horizontally
+820x1180 precision modal makes underlying workspace inert
+820x1180 precision header and close remain reachable
+820x1180 precision visible controls meet touch height
+820x1180 precision closing restores non-modal workspace
+820x1180 properties sheet is bounded
+820x1180 properties tab exposes selected state
+820x1180 layers sheet is bounded
+820x1180 layers tab exposes selected state
+820x1180 qa sheet is bounded
+820x1180 qa tab exposes selected state
+820x1180 library is bounded
+820x1180 sheet expands below actual chrome
+1024x768 uses compact touch workspace
+1024x768 root has no horizontal overflow
+1024x768 tool rail/dock is in viewport
+1024x768 canvas has useful height
+1024x768 new active document tab is revealed
+1024x768 document chrome has 44px targets
+1024x768 save status does not hijack tab scrolling
+1024x768 opening chooser does not summon input focus
+1024x768 document footer is outside scrolling body
+1024x768 documents dialog stays inside viewport
+1024x768 documents form body does not overflow horizontally
+1024x768 documents modal makes underlying workspace inert
+1024x768 documents header and close remain reachable
+1024x768 documents visible controls meet touch height
+1024x768 documents closing restores non-modal workspace
+1024x768 more dialog stays inside viewport
+1024x768 more form body does not overflow horizontally
+1024x768 more modal makes underlying workspace inert
+1024x768 more header and close remain reachable
+1024x768 more visible controls meet touch height
+1024x768 more closing restores non-modal workspace
+1024x768 export dialog stays inside viewport
+1024x768 export form body does not overflow horizontally
+1024x768 export modal makes underlying workspace inert
+1024x768 export header and close remain reachable
+1024x768 export visible controls meet touch height
+1024x768 export closing restores non-modal workspace
+1024x768 parameters dialog stays inside viewport
+1024x768 parameters form body does not overflow horizontally
+1024x768 parameters modal makes underlying workspace inert
+1024x768 parameters header and close remain reachable
+1024x768 parameters visible controls meet touch height
+1024x768 parameters closing restores non-modal workspace
+1024x768 solver-report dialog stays inside viewport
+1024x768 solver-report form body does not overflow horizontally
+1024x768 solver-report modal makes underlying workspace inert
+1024x768 solver-report header and close remain reachable
+1024x768 solver-report visible controls meet touch height
+1024x768 solver-report closing restores non-modal workspace
+1024x768 blocks dialog stays inside viewport
+1024x768 blocks form body does not overflow horizontally
+1024x768 blocks modal makes underlying workspace inert
+1024x768 blocks header and close remain reachable
+1024x768 blocks visible controls meet touch height
+1024x768 blocks closing restores non-modal workspace
+1024x768 help dialog stays inside viewport
+1024x768 help form body does not overflow horizontally
+1024x768 help modal makes underlying workspace inert
+1024x768 help header and close remain reachable
+1024x768 help visible controls meet touch height
+1024x768 help closing restores non-modal workspace
+1024x768 line-styles dialog stays inside viewport
+1024x768 line-styles form body does not overflow horizontally
+1024x768 line-styles modal makes underlying workspace inert
+1024x768 line-styles header and close remain reachable
+1024x768 line-styles visible controls meet touch height
+1024x768 line-styles closing restores non-modal workspace
+1024x768 precision dialog stays inside viewport
+1024x768 precision form body does not overflow horizontally
+1024x768 precision modal makes underlying workspace inert
+1024x768 precision header and close remain reachable
+1024x768 precision visible controls meet touch height
+1024x768 precision closing restores non-modal workspace
+1024x768 properties sheet is bounded
+1024x768 properties tab exposes selected state
+1024x768 layers sheet is bounded
+1024x768 layers tab exposes selected state
+1024x768 qa sheet is bounded
+1024x768 qa tab exposes selected state
+1024x768 library is bounded
+1024x768 sheet expands below actual chrome
+tool search includes shared block editing
+tool search hides unrelated basic tools
+empty search has useful status
+constraint authoring dialog stays inside viewport
+constraint authoring form body does not overflow horizontally
+constraint authoring modal makes underlying workspace inert
+constraint authoring header and close remain reachable
+constraint authoring visible controls meet touch height
+constraint authoring closing restores non-modal workspace
+calculated annotation dialog stays inside viewport
+calculated annotation form body does not overflow horizontally
+calculated annotation modal makes underlying workspace inert
+calculated annotation header and close remain reachable
+calculated annotation visible controls meet touch height
+calculated annotation closing restores non-modal workspace
+exact vertex editor dialog stays inside viewport
+exact vertex editor form body does not overflow horizontally
+exact vertex editor modal makes underlying workspace inert
+exact vertex editor header and close remain reachable
+exact vertex editor visible controls meet touch height
+exact vertex editor closing restores non-modal workspace
+block-settings dialog stays inside viewport
+block-settings form body does not overflow horizontally
+block-settings modal makes underlying workspace inert
+block-settings header and close remain reachable
+block-settings visible controls meet touch height
+block-settings closing restores non-modal workspace
+block-author dialog stays inside viewport
+block-author form body does not overflow horizontally
+block-author modal makes underlying workspace inert
+block-author header and close remain reachable
+block-author visible controls meet touch height
+block-author closing restores non-modal workspace
+block-attribute dialog stays inside viewport
+block-attribute form body does not overflow horizontally
+block-attribute modal makes underlying workspace inert
+block-attribute header and close remain reachable
+block-attribute visible controls meet touch height
+block-attribute closing restores non-modal workspace
+block-port dialog stays inside viewport
+block-port form body does not overflow horizontally
+block-port modal makes underlying workspace inert
+block-port header and close remain reachable
+block-port visible controls meet touch height
+block-port closing restores non-modal workspace
+block-save-as dialog stays inside viewport
+block-save-as form body does not overflow horizontally
+block-save-as modal makes underlying workspace inert
+block-save-as header and close remain reachable
+block-save-as visible controls meet touch height
+block-save-as closing restores non-modal workspace
+block editing chrome stays inside phone viewport
+all block actions remain horizontally reachable
+parameter cards keep full expression font size
+mobile parameter form calculates without truncating values
+parameter remove buttons are 44 by 44
+touch Apply preserves parameter expressions
+touch inspector switching updates accessible tab selection
+document manager renames drawing through history
+document rename can be undone
+touch document manager moves tabs right without changing identity
+mobile active controls fit: arc
+mobile active controls hide redundant zoom: arc
+mobile active controls fit: arc-center
+mobile active controls hide redundant zoom: arc-center
+mobile active controls fit: circle-3p
+mobile active controls hide redundant zoom: circle-3p
+mobile active controls fit: circle-diameter
+mobile active controls hide redundant zoom: circle-diameter
+mobile active controls fit: ellipse
+mobile active controls hide redundant zoom: ellipse
+mobile active controls fit: ellipse-arc
+mobile active controls hide redundant zoom: ellipse-arc
+mobile active controls fit: spline
+mobile active controls hide redundant zoom: spline
+mobile active controls fit: bezier
+mobile active controls hide redundant zoom: bezier
+mobile active controls fit: polygon
+mobile active controls hide redundant zoom: polygon
+mobile active controls fit: donut
+mobile active controls hide redundant zoom: donut
+mobile active controls fit: solid
+mobile active controls hide redundant zoom: solid
+mobile active controls fit: face
+mobile active controls hide redundant zoom: face
+mobile active controls fit: hatch
+mobile active controls hide redundant zoom: hatch
+mobile active controls fit: wipeout
+mobile active controls hide redundant zoom: wipeout
+mobile active controls fit: point
+mobile active controls hide redundant zoom: point
+mobile active controls fit: ray
+mobile active controls hide redundant zoom: ray
+mobile active controls fit: xline
+mobile active controls hide redundant zoom: xline
+mobile active controls fit: mtext
+mobile active controls hide redundant zoom: mtext
+mobile active controls fit: leader
+mobile active controls hide redundant zoom: leader
+mobile active controls fit: dim-aligned
+mobile active controls hide redundant zoom: dim-aligned
+mobile active controls fit: dim-horizontal
+mobile active controls hide redundant zoom: dim-horizontal
+mobile active controls fit: dim-vertical
+mobile active controls hide redundant zoom: dim-vertical
+mobile active controls fit: dim-radius
+mobile active controls hide redundant zoom: dim-radius
+mobile active controls fit: dim-diameter
+mobile active controls hide redundant zoom: dim-diameter
+mobile active controls fit: dim-angular
+mobile active controls hide redundant zoom: dim-angular
+mobile active controls fit: dim-angular-lines
+mobile active controls hide redundant zoom: dim-angular-lines
+mobile active controls fit: dim-ordinate-x
+mobile active controls hide redundant zoom: dim-ordinate-x
+mobile active controls fit: dim-ordinate-y
+mobile active controls hide redundant zoom: dim-ordinate-y
+keyboard fits modal including viewport offset
+keyboard leaves exact coordinate expression intact
+keyboard keeps Apply and Cancel visible
+keyboard hides only drawing chrome
+exact entry applies once after keyboard resize
+double submit performs exactly one transaction
+modal focus cycles without leaking into canvas
+wide table has a labeled horizontal scrolling region
+wide table does not cause dialog overflow
+last table column can be reached by scrolling
+desktop does not use compact mode
+desktop retains permanent library and inspector
+desktop command dialog focuses its input
+no uncaught JavaScript exceptions
+{"passed": 485, "errors": []}
