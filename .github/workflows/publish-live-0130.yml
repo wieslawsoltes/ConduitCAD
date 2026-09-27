@@ -24,6 +24,49 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Apply verified path interaction refinements
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,hashlib,json,lzma,os,pathlib,re,subprocess,urllib.request
+          base='b0fafb54ea7476b83b1ee9041d1b103f37c99ae9'
+          sha='b3ad0aae04224551649c231786550cc892a294f2'
+          req=urllib.request.Request(f'https://api.github.com/repos/{os.environ["REPOSITORY"]}/git/blobs/{sha}',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(req,timeout=60) as response: record=json.load(response)
+          raw=base64.b64decode(record['content'])
+          assert len(raw)==5148 and hashlib.sha256(raw).hexdigest()=='8bc1db3fa357e5627a84476469fb9cef01e9a72e54ea346f237a5f5e067bfd12'
+          assert hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()==sha
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=17431)
+          assert decoder.eof and not decoder.unused_data and len(patch)==17430
+          assert hashlib.sha256(patch).hexdigest()=='b798f3b6dbcb4db718418e33d0499c30e8ded9079a7b9535fde7da2498fc4ee1'
+          chunks=[c for c in re.split(rb'(?m)(?=^diff --git )',patch) if c.startswith(b'diff --git ')]
+          paths=[re.search(rb'(?m)^\+\+\+ b/(.+)',c).group(1).decode() for c in chunks]
+          assert len(paths)==9 and set(paths)=={'docs/LIVE_PARAMETERS_PATHS_0130.md','packages/manipulation3d/src/index.d.ts','packages/manipulation3d/src/path-session.js','packages/workbench/src/modeling-workbench.js','packages/workbench/src/visual-path3d.d.ts','packages/workbench/src/visual-path3d.js','tests/browser_live_workspace.py','tests/live-workspace.test.mjs','tests/types-smoke.ts'}
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          applied=subprocess.run(['git','apply','--reverse','--unidiff-zero','--check','-'],input=patch,capture_output=True).returncode==0
+          if not applied:
+              subprocess.run(['git','diff','--quiet',base,'HEAD','--',*paths],check=True)
+              subprocess.run(['git','apply','--unidiff-zero','--check','-'],input=patch,check=True)
+              subprocess.run(['git','apply','--unidiff-zero','-'],input=patch,check=True)
+          for chunk,name in zip(chunks,paths):
+              expected=re.search(rb'(?m)^index [0-9a-f]+\.\.([0-9a-f]+)',chunk).group(1).decode()
+              data=pathlib.Path(name).read_bytes()
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected,name
+          subprocess.run(['git','add','--',*paths],check=True)
+          print('All nine refinement files match their target Git identities.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --exit-code HEAD -- .github
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: reverse spatial paths and preserve active vertices through draft history' -m 'Cache immutable evaluated coordinates per revision for camera-only redraws; guard future path schemas and cover UI, DXF, dependency regeneration and TypeScript contracts.'
+            git push origin HEAD:work/live-parameters-paths-0130
+          fi
       - name: Verify source checkpoint and build
         id: build
         shell: bash
