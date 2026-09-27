@@ -1,0 +1,133 @@
+"""Real input for live parameter previews and native spatial path editing.
+Local opaque origins use the existing explicit memory adapter; CI requires localhost.
+"""
+import json,os,math
+from playwright.sync_api import sync_playwright
+from render_support import Harness,launch,OUT,NATIVE,bounded
+h=Harness();checks=[];errors=[];BACKEND=os.environ.get('LIVE_TEST_BACKEND','canvas')
+def ok(name,value):
+ assert value,name
+ checks.append({'name':name,'passed':True});print(name,flush=True)
+def ev(p,s,a=None):return p.evaluate(s,a)
+def wait(p):
+ p.wait_for_timeout(60)
+ p.wait_for_function('!conduit.parameters.frame&&!conduit.model3d.path.frame')
+def action(p,a):ev(p,'a=>conduit.action(a)',a);wait(p)
+def pc(p,a):p.locator('[data-parameter-command='+a+']').click();wait(p)
+def pathc(p,a):
+ p.locator('[data-path-command='+a+']').scroll_into_view_if_needed();p.locator('[data-path-command='+a+']').click();wait(p)
+def setup(p):
+ action(p,'3d-example:primitives')
+ ev(p,"""()=>{const w=conduit,b=w.doc.entities.find(e=>e.feature3d.kind==='box');b.feature3d.parameters.width='Width';b.feature3d.parameters.height='Rise';b.feature3d.parameters.x=25;
+ w.doc.entities=[b,{id:'circle-live',type:'CIRCLE',layer:'0',c:{x:-35,y:0},r:20,parametric:{radius:'Width/2'}}];w.doc.parameters={Width:'40',Rise:'30',Half:'Width/2'};w.doc.constraints=[];w.selection.clear();w.currentLayer='0';w.history.clear();w.touch();w.updateUI();w.model3d.renderer.fit();}""");wait(p)
+def expression(p,name,value):p.get_by_role('textbox',name='Expression for '+name,exact=True).fill(value);wait(p)
+def exact(p,x,y,z):
+ if p.locator('.path3d-panel').is_hidden():pathc(p,'options')
+ for axis,value in zip('xyz',[x,y,z]):p.locator('[data-path-next='+axis+']').fill(str(value))
+ p.locator('.path3d-next button[type=submit]').click();wait(p)
+def pointer_drag(p,x,y,ex,ey,touch=False):
+ if touch:
+  c=p.context.new_cdp_session(p);c.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y,'id':1}]})
+  for i in range(1,6):c.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':x+(ex-x)*i/5,'y':y+(ey-y)*i/5,'id':1}]})
+  c.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});c.detach()
+ else:p.mouse.move(x,y);p.mouse.down();p.mouse.move(ex,ey,steps=6);p.mouse.up()
+ wait(p)
+def handle(p,id):return ev(p,"""id=>{const m=conduit.model3d,h=m.path.handles.find(h=>h.id===id),r=m.host.getBoundingClientRect();if(!h)throw new Error('Missing '+id);return{x:r.x+h.x,y:r.y+h.y,raw:h.raw,point:h.point,rect:{x:r.x,y:r.y}}}""",id)
+def download(p,name):
+ for fmt,suffix in [('dxf','ascii'),('dxf-binary','binary')]:
+  with p.expect_download() as d:ev(p,'f=>conduit.doExport(f)',fmt)
+  file=OUT/f'live-{BACKEND}-{name}-{suffix}.dxf';d.value.save_as(str(file));ok(name+' '+suffix+' export',file.stat().st_size>100)
+try:
+ with sync_playwright() as driver:
+  browser=launch(driver);ctx=browser.new_context(viewport={'width':1440,'height':1000},accept_downloads=True);p=ctx.new_page();p.on('pageerror',lambda e:errors.append(str(e)));h.load(p,BACKEND);setup(p)
+  backend=ev(p,'conduit.model3d.renderer.backend')
+  ok('requested backend actually active',{'canvas':'Canvas','webgl2':'WebGL2','webgpu':'WebGPU'}[BACKEND] in backend)
+  before=ev(p,'JSON.stringify(conduit.doc)');action(p,'parameters')
+  ok('3D parameters stay in 3D and use non-modal controls',ev(p,'conduit.viewMode==="3d"&&conduit.parameters.active') and p.get_by_role('dialog').count()==0)
+  expression(p,'Width','60');ok('whole-design preview changes native circle and dependent box',ev(p,'conduit.parameters.session.preview.entities[1].r===30&&conduit.parameters.session.values.Half===30'))
+  ok('whole-design changes are isolated from drawing and history',ev(p,'JSON.stringify(conduit.doc)')==before and ev(p,'conduit.history.undoStack.length===0'))
+  control=p.get_by_role('spinbutton',name='Adjust Width',exact=True);r=control.bounding_box();pointer_drag(p,r['x']+r['width']/2,r['y']+22,r['x']+r['width']/2+20,r['y']+22)
+  ok('actual scrub changes evaluated parameter and preview',ev(p,'conduit.parameters.session.values.Width===62&&conduit.parameters.session.preview.entities[1].r===31'))
+  pc(p,'undo');ok('undo scrub is operation-local',ev(p,'conduit.parameters.session.values.Width===60'));pc(p,'redo');ok('redo scrub is operation-local',ev(p,'conduit.parameters.session.values.Width===62'))
+  expression(p,'Width','Half*2');ok('cycles clear preview and disable Apply',ev(p,'!conduit.parameters.session.preview') and p.locator('[data-parameter-command=apply]').is_disabled())
+  ev(p,'conduit.parameters.apply()');ok('invalid keyboard/programmatic Apply cannot commit old preview',ev(p,'JSON.stringify(conduit.doc)')==before)
+  expression(p,'Width','80')
+  f=p.get_by_role('textbox',name='Expression for Width',exact=True)
+  f.evaluate("e=>{e.value='1'.repeat(4097);e.dispatchEvent(new Event('input',{bubbles:true}))}");wait(p)
+  expression(p,'Rise','35');ev(p,'conduit.parameters.apply()')
+  ok('another field cannot accept a rejected oversized expression',ev(p,'conduit.parameters.active') and ev(p,'JSON.stringify(conduit.doc)')==before)
+  expression(p,'Width','80');expression(p,'Rise','30');p.screenshot(path=str(OUT/f'live-{BACKEND}-parameters-desktop.png'));pc(p,'apply')
+  ok('parameter Apply commits one transaction',ev(p,'!conduit.parameters.active&&conduit.history.undoStack.length===1&&conduit.doc.entities[1].r===40'))
+  action(p,'undo');ok('drawing Undo restores original dimensions',ev(p,'conduit.doc.entities[1].r===20'));action(p,'redo');ok('drawing Redo restores evaluated design',ev(p,'conduit.doc.entities[1].r===40'));download(p,'parameters')
+  action(p,'parameters');count=ev(p,'conduit.history.undoStack.length');pc(p,'apply');ok('unchanged parameter Apply does not add history',ev(p,'conduit.history.undoStack.length')==count)
+  action(p,'parameters');expression(p,'Width','90');pc(p,'cancel');ok('Cancel discards parameter preview',ev(p,'conduit.doc.entities[1].r===40'))
+  action(p,'3d-2d');action(p,'parameters');expression(p,'Width','100');ok('same live editor previews in planar mode',ev(p,'conduit.viewMode==="2d"&&conduit.renderer.doc.entities[1].r===50&&conduit.doc.entities[1].r===40'));pc(p,'cancel')
+  action(p,'parameters');pc(p,'add');name=p.locator('.live-parameter-row').last.locator('[data-parameter-field=name]');name.fill('NewSize');p.locator('.live-parameter-row').last.locator('[data-parameter-field=expression]').fill('Width + 10');wait(p)
+  ok('new named dependency evaluates live',ev(p,'conduit.parameters.session.values.NewSize===90'));pc(p,'apply');ok('added parameter persists',ev(p,'conduit.doc.parameters.NewSize==="Width + 10"'))
+  action(p,'parameters');p.locator('.live-parameter-search').fill('NewSize');ok('parameter filtering keeps only matching row',p.locator('.live-parameter-row:visible').count()==1);p.locator('.live-parameter-row:visible [data-parameter-remove]').click();wait(p);pc(p,'apply');ok('delete parameter is explicit and undoable',ev(p,'!Object.hasOwn(conduit.doc.parameters,"NewSize")'));action(p,'undo')
+  # A source mutation invalidates the draft rather than being overwritten.
+  action(p,'parameters');ev(p,'conduit.doc.version++;conduit.updateUI()');ok('external source revision cancels parameter preview',not ev(p,'conduit.parameters.active'))
+  # Pure native spatial path construction, using actual viewport taps and controls.
+  ev(p,"async()=>{await conduit.newDocument('blank');conduit.currentLayer='0';conduit.doc.parameters={Rise:'30',Run:'80'};await conduit.model3d.setActive(true);await conduit.model3d.ready;conduit.model3d.camera.target={x:0,y:0,z:0};conduit.model3d.camera.height=240;conduit.model3d.camera.distance=320;conduit.model3d.changedView();}");wait(p)
+  action(p,'3d-tools');p.locator('.visual3d-palette [data-action="3d-path"]').click();wait(p)
+  ok('spatial path starts through non-modal Create palette',ev(p,'conduit.model3d.path.active') and p.get_by_role('dialog').count()==0)
+  for point in [{'x':-35,'y':-35,'z':0},{'x':35,'y':-35,'z':0}]:
+   q=ev(p,'p=>{const m=conduit.model3d,q=m.camera.project(p),r=m.host.getBoundingClientRect();return{x:r.x+q.x,y:r.y+q.y}}',point);p.mouse.click(q['x'],q['y']);wait(p)
+  ok('viewport taps create evaluated WCS polyline vertices',ev(p,'conduit.model3d.path.session.preview.entities.at(-1).points.length===2'))
+  ok('path remains transient until Apply',ev(p,'conduit.doc.entities.length===0'))
+  exact(p,'Run',20,'Rise');ok('exact point accepts named XYZ expressions',ev(p,'conduit.model3d.path.session.state.coordinates[2].z==="Rise"'));pathc(p,'options-close')
+  h0=handle(p,'z');end=ev(p,'point=>conduit.model3d.camera.project({...point,z:point.z+15})',h0['point']);pointer_drag(p,h0['x'],h0['y'],h0['x']+end['x']-h0['raw']['x'],h0['y']+end['y']-h0['raw']['y'])
+  ok('drag Z handle preserves parameter expression',ev(p,'conduit.model3d.path.session.state.coordinates[2].z.includes("Rise")&&conduit.model3d.path.points()[2].z===45'))
+  p.locator('[data-path-axis=x]').fill('Run+10');wait(p);ok('inline coordinate updates preview',ev(p,'conduit.model3d.path.points()[2].x===90'))
+  p.locator('[data-path-axis=z]').fill('unknown');wait(p);ok('bad coordinate clears preview',ev(p,'!conduit.model3d.path.session.preview') and p.locator('[data-path-command=apply]').is_disabled());ev(p,'conduit.model3d.path.apply()');ok('bad coordinate cannot apply stale native geometry',ev(p,'conduit.doc.entities.length===0'))
+  p.locator('[data-path-axis=z]').fill('Rise + 15');wait(p)
+  p.locator('[data-path-axis=z]').evaluate("e=>{e.value='1'.repeat(4097);e.dispatchEvent(new Event('input',{bubbles:true}))}");wait(p)
+  p.locator('[data-path-axis=x]').fill('Run+10');pathc(p,'options');p.locator('[data-path-offset]').fill('5');wait(p);pathc(p,'options-close');pathc(p,'snap');ev(p,'conduit.model3d.path.apply()')
+  ok('offset and navigation controls cannot resurrect rejected XYZ preview',ev(p,'conduit.model3d.path.active&&conduit.doc.entities.length===0') and p.locator('[data-path-command=apply]').is_disabled())
+  p.locator('[data-path-axis=z]').fill('Rise + 15');wait(p)
+  ok('packed axis handles retain visible axis lettering',p.locator('[data-path-handle=z] span').inner_text()=='Z')
+  p.locator('[data-path-vertex]').select_option('0');pathc(p,'midpoint');ok('midpoint inserts a parameter-preserving vertex',ev(p,'conduit.model3d.path.session.state.coordinates.length===4&&String(conduit.model3d.path.session.state.coordinates[1].x).includes("/ 2")'));pathc(p,'undo');ok('midpoint undo restores vertex topology',ev(p,'conduit.model3d.path.session.state.coordinates.length===3'));pathc(p,'redo')
+  pathc(p,'closed');ok('closed path preview uses native close flag',ev(p,'conduit.model3d.path.session.preview.entities.at(-1).flags===9'));p.screenshot(path=str(OUT/f'live-{BACKEND}-path-desktop.png'));pathc(p,'apply')
+  ok('path Apply is one transaction and retains native parametric metadata',ev(p,'conduit.history.undoStack.length===1&&conduit.doc.entities[0].parametric.kind==="spatial-path"&&conduit.doc.entities[0].points.length===4'))
+  download(p,'path');action(p,'parameters');expression(p,'Rise','50');ok('parameter editing regenerates persisted spatial path coordinates',ev(p,'conduit.parameters.session.preview.entities[0].points.at(-1).z===65'));pc(p,'apply');ok('regenerated path commits evaluated XYZ',ev(p,'conduit.doc.entities[0].points.at(-1).z===65'))
+  action(p,'3d-edit');ok('Edit on canvas reopens native path without a dialog',ev(p,'conduit.model3d.path.active') and p.get_by_role('dialog').count()==0);count=ev(p,'conduit.history.undoStack.length');pathc(p,'apply');ok('unchanged path edit adds no history',ev(p,'conduit.history.undoStack.length')==count)
+  action(p,'3d-edit')
+  zhandle=p.locator('[data-path-handle=z]');zhandle.focus();zhandle.press('ArrowUp');wait(p)
+  ok('keyboard axis editing changes selected native coordinate',ev(p,'conduit.model3d.path.points().at(-1).z===66'))
+  pathc(p,'undo');ok('keyboard coordinate edit has draft undo',ev(p,'conduit.model3d.path.points().at(-1).z===65'))
+  pathc(p,'remove');ok('remove vertex has live preview',ev(p,'conduit.model3d.path.session.state.coordinates.length===3'));pathc(p,'cancel');ok('Cancel restores accepted path topology',ev(p,'conduit.doc.entities[0].points.length===4'))
+  action(p,'3d-edit');action(p,'3d-2d');ok('returning to 2D cancels spatial draft',ev(p,'!conduit.model3d.path.active&&conduit.viewMode==="2d"'))
+  action(p,'mode-3d');action(p,'3d-tools');p.locator('[data-action="3d-live-workshop"]').click();wait(p)
+  ok('workshop opens six native entities in independent 3D document',ev(p,'conduit.doc.name==="Parametric path workshop"&&conduit.doc.entities.length===6&&conduit.viewMode==="3d"'))
+  ev(p,'window.oldSweep=JSON.stringify(conduit.doc.entities.find(e=>e.id==="live-sweep").points)');action(p,'parameters');expression(p,'Rise','100')
+  ok('workshop parameter preview regenerates dependent sweep',ev(p,'conduit.parameters.session.preview.entities.find(e=>e.id==="live-route").points[1].z===100&&JSON.stringify(conduit.parameters.session.preview.entities.find(e=>e.id==="live-sweep").points)!==oldSweep'))
+  pc(p,'cancel')
+  ctx.close()
+  for width,height in [(320,568),(390,844),(844,390),(1024,768)]:
+   ctx=browser.new_context(viewport={'width':width,'height':height},is_mobile=True,has_touch=True,accept_downloads=True);p=ctx.new_page();p.on('pageerror',lambda e:errors.append(str(e)));h.load(p,BACKEND);setup(p);tag=f'{width}x{height}'
+   action(p,'parameters');expression(p,'Width','75')
+   ok(tag+' live parameter panel stays bounded',bounded(p,'.live-parameters'))
+   ok(tag+' parameter confirm stays touch-sized and reachable',p.locator('[data-parameter-command=apply]').evaluate('e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44&&r.bottom<=innerHeight}') and bounded(p,'[data-parameter-command=cancel]'))
+   ok(tag+' parameter input remains readable',p.get_by_role('textbox',name='Expression for Width',exact=True).evaluate('e=>parseFloat(getComputedStyle(e).fontSize)>=16'))
+   pc(p,'collapse');ok(tag+' collapsed parameters leave interactive canvas',p.locator('.live-parameter-body').is_hidden() and ev(p,'conduit.model3d.active'));pc(p,'apply');ok(tag+' touch Apply commits live dimensions',ev(p,'conduit.doc.entities[1].r===37.5'))
+   action(p,'3d-path');exact(p,-40,0,0);exact(p,0,0,'Rise');exact(p,50,0,50)
+   ok(tag+' options panel bounds',bounded(p,'.path3d-panel'))
+   pathc(p,'options-close');ok(tag+' path controls bounded',bounded(p,'.path3d-controls'))
+   ok(tag+' path Apply and Cancel remain visible touch controls',all(p.locator('[data-path-command='+key+']').evaluate('e=>{const r=e.getBoundingClientRect();return r.width>=44&&r.height>=44&&r.right<=innerWidth+.5&&r.bottom<=innerHeight+.5}') for key in ['apply','cancel']))
+   ok(tag+' packed handle shows Z instead of a blank button',p.locator('[data-path-handle=z] span').inner_text()=='Z')
+   ok(tag+' path XYZ input stays 16px',p.locator('[data-path-axis=x]').evaluate('e=>parseFloat(getComputedStyle(e).fontSize)>=16'))
+   h0=handle(p,'z');pointer_drag(p,h0['x'],h0['y'],h0['x'],h0['y']-24,True)
+   ok(tag+' touch handle gesture produces finite isolated preview',ev(p,'!!conduit.model3d.path.session.preview&&conduit.doc.entities.length===2'))
+   if width==390:
+    p.screenshot(path=str(OUT/f'live-{BACKEND}-path-phone.png'))
+    before=ev(p,'JSON.stringify(conduit.model3d.path.session.snapshot())');h0=handle(p,'z');c=ctx.new_cdp_session(p)
+    touch=[{'x':h0['x'],'y':h0['y'],'id':1}];c.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':touch});touch[0]['y']-=18;c.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':touch});touch.append({'x':h0['x']-50,'y':h0['y']-20,'id':2});c.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':touch});c.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[touch[0]]});c.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]});c.detach();wait(p)
+    ok('two-finger takeover restores unaccepted point drag',ev(p,'JSON.stringify(conduit.model3d.path.session.snapshot())')==before)
+    ok('two-finger release never adds extra path vertices',ev(p,'conduit.model3d.path.session.state.coordinates.length===3'))
+   pathc(p,'apply');ok(tag+' path Apply returns to normal 3D view',ev(p,'!conduit.model3d.path.active&&conduit.viewMode==="3d"&&conduit.doc.entities.length===3'))
+   ctx.close()
+  ok('no uncaught page errors',not errors)
+  browser.close()
+finally:
+ h.close();(OUT/f'live-workspace-{BACKEND}.json').write_text(json.dumps({'backend':BACKEND,'nativeOrigin':NATIVE,'passed':len(checks),'checks':checks,'errors':errors},indent=2))
+print(json.dumps({'passed':len(checks),'backend':BACKEND,'nativeOrigin':NATIVE}))

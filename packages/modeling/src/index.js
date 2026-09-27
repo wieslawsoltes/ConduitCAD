@@ -1,3 +1,4 @@
+import { spatialPathPoints as pathPoints, spatialPathUpdates as pathUpdates, MAX_SPATIAL_PATH_POINTS as pathLimit } from './spatial-path.js';
 import { EXAMPLES_3D as examples, create3DExample as createExample } from './examples.js';
 import { MODELING_TOOLS as tools, curvePoints3 as curve, regenerateFeatures as regenerate, addFeature as add, editFeature as edit, removeFeature as remove, bakeFeature as bake, offsetPlanarFace as offset, sectionEntities as section, writeOBJ as obj, writeSTL as stl } from './features.js';
 export const MODELING_TOOLS = tools;
@@ -26,3 +27,7 @@ export const holeTool3 = holeTool;
 export const drillHole3 = drill;
 export const extrudeExtent3 = extent;
 export const combineExtrusion3 = combine;
+
+export const spatialPathPoints = pathPoints;
+export const spatialPathUpdates = pathUpdates;
+export const MAX_SPATIAL_PATH_POINTS = pathLimit;

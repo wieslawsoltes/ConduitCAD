@@ -1,3 +1,4 @@
+import { VisualParameters } from './visual-parameters.js';
 import { VisualEditing2D } from './visual-editing2d.js';
 import { ModelingWorkbench } from './modeling-workbench.js';
 import { regenerateFeatures, EXAMPLES_3D, create3DExample } from '@conduitcad/modeling';
@@ -90,6 +91,7 @@ export class Workbench {
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.model3d = new ModelingWorkbench(this);
         this.visual2d = new VisualEditing2D(this);
+        this.parameters = new VisualParameters(this);
         this.iconography = bindIconography(this);
         this.bindEvents();
         bindMobileWorkspace(this);
@@ -450,7 +452,7 @@ export class Workbench {
         this.hideContext();
     }
     updateUI() {
-        this.visual2d?.sync(); this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
+        this.parameters?.externalChange(); this.visual2d?.sync(); this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -487,7 +489,7 @@ export class Workbench {
         if (s.message)
             this.$('.render-badge')?.setAttribute('title', s.message);
     }
-    beginBlockEdit(name) { this.visual2d?.cancel();this.visual2d?.panel.close();return startBlockEditor(this,name); }
+    beginBlockEdit(name) { this.parameters?.cancel(); this.model3d?.path?.cancel(); this.visual2d?.cancel();this.visual2d?.panel.close();return startBlockEditor(this,name); }
     saveBlockEdit(close=false) { this.visual2d?.cancel();return finishBlockEditor(this,true,!close); }
     cancelBlockEdit() { return finishBlockEditor(this,false); }
     selected() { return this.doc.entities.filter(e => this.selection.has(e.id)); }
@@ -506,7 +508,7 @@ export class Workbench {
             this.renderer.setDocument(this.doc);
         this.updateStatus();
     }
-    edit(label, action) { this.visual2d?.beforeEdit(); this.model3d?.inspection?.beforeEdit(); this.model3d?.visual?.beforeEdit(); this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
+    edit(label, action) { this.parameters?.beforeEdit(); this.model3d?.path?.beforeEdit(); this.visual2d?.beforeEdit(); this.model3d?.inspection?.beforeEdit(); this.model3d?.visual?.beforeEdit(); this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
     updateSelection() { this.visual2d?.sync(); this.model3d?.selectionChanged(); scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
@@ -525,7 +527,7 @@ export class Workbench {
         this.updateSelection();
     }
     setTool(tool) {
-        this.visual2d?.cancel(); this.visual2d?.panel.close();
+        this.parameters?.cancel(); this.visual2d?.cancel(); this.visual2d?.panel.close();
         if(this.model3d?.active) this.model3d.setActive(false);
         if (!TOOL_INFO[tool])
             return;
@@ -1083,6 +1085,7 @@ export class Workbench {
         return [];
     }
     pointerDown(p) {
+        if(!this.modal&&this.parameters?.pointerDown(p))return;
         if(!this.modal&&this.visual2d?.pointerDown(p))return;
         if (this.modal || !this.renderer.containsPoint(p))
             return;
@@ -1171,6 +1174,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerMove(p) {
+        if(this.parameters?.pointerMove(p))return;
         if(this.visual2d?.pointerMove(p))return;
         this.shift = p.shift;
         this.pointer = p;
@@ -1277,7 +1281,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerHover(p) {
-        if(this.visual2d?.active)return;
+        if(this.parameters?.active||this.visual2d?.active)return;
         this.lastScreen = p;
         this.shift = p.shift;
         const world = this.camera.world(p);
@@ -1297,6 +1301,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerUp(p) {
+        if(this.parameters?.pointerUp(p))return;
         if(this.visual2d?.pointerUp(p))return;
         const drag = this.drag;
         if (!drag)
@@ -1442,7 +1447,7 @@ export class Workbench {
         this.setTool('select');
     }
     cancelGesture() {
-        this.visual2d?.cancelDrag();
+        this.parameters?.cancelDrag(); this.visual2d?.cancelDrag();
         if (this.history?.pending)
             this.history.cancel();
         this.drag = null;
@@ -1452,6 +1457,7 @@ export class Workbench {
         this.renderer?.invalidate();
     }
     drawOverlay(ctx, cam) {
+        if(this.parameters?.active)return;
         if(this.visual2d?.active){this.visual2d.draw(ctx,cam);return;}
         ctx.save();
         drawParametricOverlay(this,ctx,cam);
@@ -1824,7 +1830,7 @@ export class Workbench {
     }
     editText(e) { if(this.visual2d?.enabled){this.selection=new Set([e.id]);this.visual2d.start('geometry',{field:'text'});return;} this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
     openModal(title, body, { confirm = null, onConfirm = null, wide = false, onClose = null } = {}) {
-        this.visual2d?.cancel();this.visual2d?.panel.close();this.model3d?.inspection?.cancel();
+        this.parameters?.cancel();this.model3d?.path?.cancel();this.visual2d?.cancel();this.visual2d?.panel.close();this.model3d?.inspection?.cancel();
         this.closeModal();
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop';
@@ -2096,6 +2102,8 @@ export class Workbench {
     }
     keyDown(e) {
         if (this.initializing || this.disposed) return;
+        if(this.parameters?.keyDown(e))return;
+        if(this.model3d?.path?.keyDown(e))return;
         if(this.visual2d?.keyDown(e))return;
         if(this.model3d?.inspection?.keyDown(e))return;
         if(this.model3d?.visual?.keyDown(e))return;
@@ -2207,7 +2215,7 @@ export class Workbench {
             this.toast(error.message, true);
         }
     }
-    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.9.1', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>19</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.visual2d?.dispose(); this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
+    helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.13.0', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>21</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
+    dispose() { this.parameters?.dispose(); this.visual2d?.dispose(); this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }

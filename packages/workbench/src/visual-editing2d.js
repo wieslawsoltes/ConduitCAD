@@ -181,7 +181,7 @@ export class VisualEditing2D {
     beforeEdit(){if(!this.applying)this.cancel();}
     sync(){
         if(this.active&&!this.applying&&(this.session.source!==this.w.doc||this.session.version!==this.w.doc.version||this.w.model3d.active))this.cancel('Drawing or workspace changed');
-        const selected=this.w.selected();this.context.hidden=!this.enabled||this.active||this.w.model3d.active||this.w.tool!=='select'||!selected.length||selected.some(e=>planarEditable(e,this.w.doc));
+        const selected=this.w.selected();this.context.hidden=!!this.w.parameters?.active||!this.enabled||this.active||this.w.model3d.active||this.w.tool!=='select'||!selected.length||selected.some(e=>planarEditable(e,this.w.doc));
         this.context.querySelector('[data-planar-command=geometry]').disabled=selected.length!==1;
     }
     keyDown(e){

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/manipulation2d",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "type": "module",
   "description": "DOM-free native 2D CAD edit sessions, geometric handles and atomic previews",
   "main": "./src/index.js",
@@ -18,9 +18,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@conduitcad/geometry": "0.12.0",
-    "@conduitcad/model": "0.12.0",
-    "@conduitcad/constraints": "0.12.0",
-    "@conduitcad/drawing": "0.12.0"
+    "@conduitcad/geometry": "0.13.0",
+    "@conduitcad/model": "0.13.0",
+    "@conduitcad/constraints": "0.13.0",
+    "@conduitcad/drawing": "0.13.0"
   }
 }

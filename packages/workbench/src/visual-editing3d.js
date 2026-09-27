@@ -50,6 +50,7 @@ export class VisualEditing3D {
         const el = this.root.querySelector('.visual3d-error'); el.textContent = message; el.hidden = !message;
     }
     start(kind, id = null) {
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         this.m.inspection?.cancel();this.w.visual2d?.cancel();
         this.cancel(); this.closePalette(); this.w.closeModal(); this.w.closePanels();
         this.m.input.reset(); this.m.cancelDrag();
@@ -372,6 +373,7 @@ export class VisualEditing3D {
     beforeEdit(){if(this.session&&!this.applying)this.cancel();}
     click(event){
         const el=event.target.closest('button');if(!el)return;event.stopPropagation();
+        if(el.dataset.action){this.w.action(el.dataset.action).catch(error=>this.w.toast(error.message,true));return;}
         if(el.dataset.visualField||el.dataset.visualLabel){this.openEntry(el.dataset.visualField||el.dataset.visualLabel);return;}
         const action=el.dataset.visualCommand;if(!action)return;
         try{
@@ -405,10 +407,11 @@ export class VisualEditing3D {
         }catch(error){this.report(error.message);}
     }
     openPalette(){
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         this.cancel();this.w.closeModal();this.w.closePanels();
         this.palette.innerHTML=`<header><div><small>BUILD ON THE CANVAS</small><h3>Create & modify</h3></div>${button('palette-close','Close tools','close')}</header>
-          <label class="visual3d-search">${icon('search')}<input type="search" placeholder="Find a 3D tool…" aria-label="Find a 3D tool"></label><div class="visual3d-palette-body">${[...new Set(VISUAL_TOOLS.map(t=>t.group))].map(group=>`<section><h4>${E(group)}</h4><div>${VISUAL_TOOLS.filter(t=>t.group===group).map(t=>button('create:'+t.id,t.label,['face-profile','sketch-profile'].includes(t.id)?'sketch':t.id==='vertex'?'vertex':actionIcon('3d-op-'+t.id))).join('')}</div></section>`).join('')}<p class="visual3d-empty" hidden>No matching tools.</p></div>`;
-        this.palette.hidden=false;this.palette.querySelector('input').addEventListener('input',e=>{const words=e.target.value.toLowerCase().split(/\s+/);let count=0;for(const b of this.palette.querySelectorAll('[data-visual-command^="create:"]')){b.hidden=!words.every(w=>b.textContent.toLowerCase().includes(w));if(!b.hidden)count++;}for(const section of this.palette.querySelectorAll('section'))section.hidden=![...section.querySelectorAll('button')].some(b=>!b.hidden);this.palette.querySelector('.visual3d-empty').hidden=!!count;});
+          <label class="visual3d-search">${icon('search')}<input type="search" placeholder="Find a 3D tool…" aria-label="Find a 3D tool"></label><div class="visual3d-palette-body">${[...new Set(VISUAL_TOOLS.map(t=>t.group))].map(group=>`<section><h4>${E(group)}</h4><div>${VISUAL_TOOLS.filter(t=>t.group===group).map(t=>button('create:'+t.id,t.label,['face-profile','sketch-profile'].includes(t.id)?'sketch':t.id==='vertex'?'vertex':actionIcon('3d-op-'+t.id))).join('')}</div></section>`).join('')}<section><h4>Spatial curves</h4><div><button type="button" data-action="3d-path">${icon('polyline')}<span>Spatial path</span></button><button type="button" data-action="3d-live-workshop">${icon('formula')}<span>Parametric path workshop</span></button></div></section><p class="visual3d-empty" hidden>No matching tools.</p></div>`;
+        this.palette.hidden=false;this.palette.querySelector('input').addEventListener('input',e=>{const words=e.target.value.toLowerCase().split(/\s+/);let count=0;for(const b of this.palette.querySelectorAll('[data-visual-command^="create:"],[data-action="3d-path"],[data-action="3d-live-workshop"]')){b.hidden=!words.every(w=>b.textContent.toLowerCase().includes(w));if(!b.hidden)count++;}for(const section of this.palette.querySelectorAll('section'))section.hidden=![...section.querySelectorAll('button')].some(b=>!b.hidden);this.palette.querySelector('.visual3d-empty').hidden=!!count;});
         this.palette.querySelector('[data-visual-command=palette-close]').focus({preventScroll:true});
     }
     closePalette(){this.palette.hidden=true;}

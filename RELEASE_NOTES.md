@@ -1,3 +1,19 @@
+# 0.13.0 — Live design parameters and native spatial paths
+
+- Replace the default parameter manager with an isolated live 2D/3D workspace.
+  Scrub calculated values, retain expressions, inspect dependencies and Apply once.
+- Regenerate native entities, constraints, calculated annotations, dimensions, routes
+  and feature history in detached previews. Guard locked dependencies and stale sources.
+- Add direct native 3D POLYLINE construction/editing with WCS XYZ handles and inline
+  expressions, workplanes, point insertion/removal/closing and independent draft history.
+- Prepare parameter-driven path updates atomically before dependent feature regeneration.
+  Preserve unaffected vertex metadata and round-trip expressions through ASCII/binary DXF.
+- Add a parametric route/sweep/plate workshop, public typed session APIs, real-input
+  responsive regressions and independent native DXF audits. Retain 21 reusable packages.
+- Keep fixed touch confirmation controls, keyboard operation and two-finger gesture
+  rollback. Retain earlier visual editing and all rendering-backend validation gates.
+- Previously pending 0.10–0.12 work is already published at 4b1050ab552d1a26ae961e4a158eca2c4c5625c8.
+
 # 0.12.0 — Planar visual editing and non-modal spatial inspection (source checkpoint)
 
 - Add `@conduitcad/manipulation2d`: guarded native fields, world-space handles,

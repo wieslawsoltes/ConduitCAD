@@ -43,6 +43,10 @@ export function setControlPoint3(entity, index, point) {
         delete draft.feature3d;
     }
     Object.assign(points[index], point);
+    if (draft.parametric?.kind === 'spatial-path') {
+        if (!Array.isArray(draft.parametric.coordinates) || draft.parametric.coordinates.length !== points.length) throw new Error('Invalid spatial path expressions');
+        draft.parametric.coordinates[index] = { x: point.x, y: point.y, z: point.z };
+    }
     if (triangle && (index === 2 || index === 3)) {
         Object.assign(points[2], point);
         Object.assign(points[3], point);

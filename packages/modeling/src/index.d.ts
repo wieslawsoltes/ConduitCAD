@@ -34,3 +34,8 @@ export function extrudeExtent3(profile:Point3[],parameters:ExtrusionParameters3)
 export function combineExtrusion3(tool:Mesh,target?: (CadEntity & Mesh)|null,operation?:0|1|2|3):Mesh;
 export function holeTool3(target:Mesh,parameters?:HoleParameters3,reference?:FaceReference3|null):{mesh:Mesh;frame:FaceFrame3;center:Point3;depth:number};
 export function drillHole3(target:Mesh,parameters?:HoleParameters3,reference?:FaceReference3|null):Mesh;
+
+export const MAX_SPATIAL_PATH_POINTS: 2048;
+export function spatialPathPoints(coordinates: Array<{x: string|number; y: string|number; z: string|number}>, parameters?: CadDocument['parameters'], closed?: boolean): Point3[];
+/** Preparation is pure. regenerateFeatures atomically commits these updates with dependent meshes. */
+export function spatialPathUpdates(document: CadDocument): Map<string, CadEntity>;

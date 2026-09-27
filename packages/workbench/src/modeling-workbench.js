@@ -1,3 +1,5 @@
+import { createLiveWorkspaceExample } from './live-workspace-example.js';
+import { VisualPath3D } from './visual-path3d.js';
 import { VisualInspection3D } from './visual-inspection3d.js';
 import { VisualEditing3D } from './visual-editing3d.js';
 import { visualStyle } from '@conduitcad/renderer3d';
@@ -54,22 +56,23 @@ export class ModelingWorkbench {
         }, { signal: workbench.abort.signal });
         this.host = this.stage.querySelector('.viewport3d');
         this.input = new PointerController(this.host, { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), cancel: () => this.cancelDrag(), gesture: ({ scale, dx, dy }) => { this.camera.zoom(scale); this.camera.pan(dx, dy); this.changedView(); }, gestureEnd: () => this.saveView(), wheel: p => { this.camera.zoom(Math.exp(-p.deltaY * .0015)); this.changedView(); this.saveView(); } });
-        this.host.addEventListener('dblclick', () => { if(this.visual.active||this.inspection?.active)return; if(this.w.selected().length===1){ const e=this.w.selected()[0]; try{if(this.pickMode==='face'&&this.hit?.face!==undefined)this.visual.start('offset-face');else if(this.pickMode==='vertex'&&this.hit?.vertex!==undefined)this.visual.start('vertex');else if(e.feature3d)this.visual.start(e.feature3d.kind,e.id);else this.fitSelection();}catch(error){this.w.toast(error.message,true);} }else this.fitSelection(); }, { signal: workbench.abort.signal });
+        this.host.addEventListener('dblclick', () => { if(this.path?.active||this.w.parameters?.active||this.visual.active||this.inspection?.active)return; if(this.w.selected().length===1){ const e=this.w.selected()[0]; try{if(this.pickMode==='face'&&this.hit?.face!==undefined)this.visual.start('offset-face');else if(this.pickMode==='vertex'&&this.hit?.vertex!==undefined)this.visual.start('vertex');else if(e.type==='POLYLINE'&&(e.flags&8))this.path.start(e.id);else if(e.feature3d)this.visual.start(e.feature3d.kind,e.id);else this.fitSelection();}catch(error){this.w.toast(error.message,true);} }else this.fitSelection(); }, { signal: workbench.abort.signal });
         this.host.addEventListener('dragover', e => e.preventDefault(), { signal: workbench.abort.signal });
         this.host.addEventListener('drop', e => { e.preventDefault(); workbench.openFiles([...e.dataTransfer.files]); }, { signal: workbench.abort.signal });
         this.visual = new VisualEditing3D(this);
         this.inspection = new VisualInspection3D(this);
+        this.path = new VisualPath3D(this);
         this.ready = Promise.resolve();
     }
     ensureRenderer() { if (this.renderer)
         return; const w = this.w, requested = w.options.backend3d || new URLSearchParams(location.search).get('renderer3d') || 'auto'; this.renderer = new SpatialRenderer(this.host, { backend: requested, camera: this.camera, onStatus: s => { this.stage.querySelector('.model3d-backend').textContent = s.backend; this.stage.querySelector('.model3d-backend').title = (s.reasons || []).join('\n'); } }); this.renderer.drawOverlay = (ctx, camera) => this.drawGizmo(ctx, camera); this.renderer.onFrame = s => { if (!this.active)
-        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; this.visual?.updatePositions();this.inspection?.updatePositions(); }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
+        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; this.visual?.updatePositions();this.inspection?.updatePositions();this.path?.updatePositions(); }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
         return; this.renderer.setDocument(w.doc, { showInputs: this.showInputs }); this.renderer.resize(); if (!w.model3dCamera)
         this.renderer.fit();
     else
         this.restoreView(); this.renderer.setSelection(w.selection, this.pickMode === 'face' ? this.hit : null); this.saveView(); }); }
     setActive(active) {
-        this.inspection?.cancel();this.w.visual2d?.cancel();this.w.visual2d?.panel.close();
+        this.w.parameters?.cancel(); this.path?.cancel(); this.inspection?.cancel();this.w.visual2d?.cancel();this.w.visual2d?.panel.close();
         this.visual?.cancel();
         if(this.active)this.saveView();
         const w = this.w;
@@ -95,7 +98,7 @@ export class ModelingWorkbench {
         return; this.w.model3dCamera = this.camera.snapshot(); this.w.model3dDisplay = this.inspection?.persistedDisplay || this.renderer?.displaySettings; this.w.model3dSection = structuredClone(this.inspection?.active ? this.inspection.persistedSection : this.renderer?.section || null); this.w.scheduleRecovery(); }
     changedView() { this.renderer?.invalidate(); this.w.model3dCamera = this.camera.snapshot(); }
     sync() {
-        this.inspection?.externalChange();this.visual?.externalChange();
+        this.path?.externalChange();this.inspection?.externalChange();this.visual?.externalChange();
         const w = this.w, active = w.viewMode === '3d' && (w.doc.activeLayout || 'Model') === 'Model';
         this.active = active;
         this.stage.hidden = !active;
@@ -153,17 +156,17 @@ export class ModelingWorkbench {
     }
     selectionChanged() { if (!this.active)
         return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); this.syncTimeline(); syncAuthoring3(this); }
-    clearPreview() { this.visual?.cancel(); const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
+    clearPreview() { this.w.parameters?.cancel();this.path?.cancel();this.visual?.cancel(); const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
     } if (preview && this.active)
         this.sync(); }
     selectionCenter() { const points = this.renderer?.scene.items.filter(i => this.w.selection.has(i.id)).flatMap(i => i.points) || []; if (!points.length)
         return null; const b = bounds3(points); return mul3(add3(b.min, b.max), .5); }
-    gizmo() { if(this.visual?.active||this.inspection?.active)return []; const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
+    gizmo() { if(this.path?.active||this.w.parameters?.active||this.visual?.active||this.inspection?.active)return []; const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
         return []; if (isLocked(this.w.selected()[0], this.w.doc))
         return []; const length = this.camera.height * .15; return [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)].map((axis, i) => ({ origin, axis, label: ['X', 'Y', 'Z'][i], color: ['#c46655', '#448f71', '#4d81b8'][i], a: this.camera.project(origin), b: this.camera.project(add3(origin, mul3(axis, length))) })); }
-    drawGizmo(ctx) { if(this.inspection?.active){this.inspection.draw(ctx);return;} if(this.visual?.active){this.visual.draw(ctx);return;} for (const g of this.gizmo()) {
+    drawGizmo(ctx) { if(this.path?.active){this.path.draw(ctx);return;}if(this.w.parameters?.active)return;if(this.inspection?.active){this.inspection.draw(ctx);return;} if(this.visual?.active){this.visual.draw(ctx);return;} for (const g of this.gizmo()) {
         if (!g.a.visible || !g.b.visible)
             continue;
         ctx.strokeStyle = g.color;
@@ -181,7 +184,7 @@ export class ModelingWorkbench {
     } }
     axisParameter(p, axis, origin) { const r = this.camera.ray(p.x, p.y), o = sub3(r.origin, origin), ad = dot3(axis, r.direction), den = 1 - ad * ad; if (den < 1e-8)
         throw new Error('This axis is parallel to the camera; use exact coordinates or orbit first'); return (dot3(axis, o) - ad * dot3(r.direction, o)) / den; }
-    pointerDown(p) { if(this.inspection?.pointerDown(p)){this.start=null;return;} if(this.visual?.pointerDown(p)){this.start=null;return;} this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
+    pointerDown(p) { if(this.path?.pointerDown(p)){this.start=null;return;}if(this.inspection?.pointerDown(p)){this.start=null;return;} if(this.visual?.pointerDown(p)){this.start=null;return;} this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
         const dx = g.b.x - g.a.x, dy = g.b.y - g.a.y, den = dx * dx + dy * dy, t = den ? ((p.x - g.a.x) * dx + (p.y - g.a.y) * dy) / den : 0;
         if (t > .2 && t < 1.25 && Math.hypot(g.a.x + dx * t - p.x, g.a.y + dy * t - p.y) < 12) {
             try {
@@ -194,6 +197,7 @@ export class ModelingWorkbench {
         }
     } }
     pointerMove(p) {
+        if(this.path?.pointerMove(p))return;
         if(this.inspection?.pointerMove(p))return;
         if(this.visual?.pointerMove(p))return;
         if (!this.start)
@@ -226,6 +230,7 @@ export class ModelingWorkbench {
         this.changedView();
     }
     pointerUp(p) {
+        if(this.path?.pointerUp(p)){this.start=null;return;}
         if(this.inspection?.pointerUp(p)){this.start=null;return;}
         if(this.visual?.pointerUp(p)){this.start=null;return;}
         const start = this.start, drag = this.drag;
@@ -247,6 +252,8 @@ export class ModelingWorkbench {
             return;
         }
         if (start && !this.navigating && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
+            if(this.path?.active){this.path.pickAt(p);return;}
+            if(this.w.parameters?.active)return;
             if(this.inspection?.active){this.inspection.pickAt(p);return;}
             if(this.visual?.active){this.visual.pickAt(p);return;}
             this.hit = this.renderer.pick(p.x, p.y, { mode: this.pickMode, radius: p.pointerType === 'touch' ? 18 : 9 });
@@ -266,7 +273,7 @@ export class ModelingWorkbench {
         }
         this.saveView();
     }
-    cancelDrag() { this.inspection?.cancelDrag();this.visual?.cancelDrag(); this.start = null; this.drag = null; if(this.visual?.active)return; if (this.previewDocument && !this.operation) {
+    cancelDrag() { this.path?.cancelDrag();this.inspection?.cancelDrag();this.visual?.cancelDrag(); this.start = null; this.drag = null; if(this.path?.active||this.w.parameters?.active||this.visual?.active)return; if (this.previewDocument && !this.operation) {
         this.previewDocument = null;
         if (this.active && this.renderer)
             this.renderer.setDocument(this.w.doc, { showInputs: this.showInputs });
@@ -280,6 +287,11 @@ export class ModelingWorkbench {
         if (action === 'mode-3d') {
             await this.setActive(true);
             return;
+        }
+        if (action === '3d-live-workshop') {
+            w.openDocument(createLiveWorkspaceExample(), { context: { viewMode: '3d', currentLayer: 'Process' } });
+            w.model3dCamera = null; await this.setActive(true); this.showInputs = true;
+            w.selection = new Set(['live-route']); this.sync(); this.renderer.fit(); this.saveView(); w.updateSelection(); return;
         }
         if (action === '3d-examples') {
             this.examplesDialog();
@@ -296,6 +308,11 @@ export class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
+        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.session[action==='3d-undo'?'undo':'redo']();this.path.preview(true);return;}
+        const navigationAction=(action.startsWith('3d-view-')&&action!=='3d-view-options')||['3d-fit','3d-capture'].includes(action);
+        if(!navigationAction){this.path?.cancel();this.w.parameters?.cancel();}
+        if(action==='3d-path'&&w.options.modelingInteraction!=='dialog'){this.path.start();return;}
+        if(['3d-edit','3d-vertex'].includes(action)&&w.options.modelingInteraction!=='dialog'){const e=w.selected()[0];if(e?.type==='POLYLINE'&&(e.flags&8)&&!e.feature3d){this.path.start(e.id);return;}}
         if(w.options.modelingInteraction!=='dialog'&&['3d-section','3d-measure','3d-appearance'].includes(action)){this.inspection.start({'3d-section':'section','3d-measure':'measure','3d-appearance':'appearance'}[action]);return;}
         if(this.inspection?.active&&!action.startsWith('3d-view-')&&action!=='3d-fit'&&action!=='3d-capture')this.inspection.cancel();
         if (await displayAction3D(this, action)) return;
@@ -505,5 +522,5 @@ export class ModelingWorkbench {
         } this.renderer.section = w.modal.querySelector('#model3d-section-enable').checked ? { normal, offset } : null; this.renderer.invalidate(); this.saveView(); w.closeModal(); } }); }
     exportMesh(format) { const e = this.w.selected().find(e => e.type === 'MESH'); if (!e)
         throw new Error('Select a MESH body to export'); downloadFile(this.w.basename() + '.' + format, format === 'obj' ? writeOBJ(e) : writeSTL(e), 'text/plain'); this.w.closeModal(); }
-    dispose() { this.inspection?.dispose();this.visual?.dispose(); this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
+    dispose() { this.path?.dispose();this.inspection?.dispose();this.visual?.dispose(); this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/renderer3d",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Retained spatial scene, WebGPU/WebGL2 rendering and depth-aware picking",
   "type": "module",
   "main": "./src/index.js",
@@ -26,9 +26,9 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@conduitcad/geometry3d": "0.12.0",
-    "@conduitcad/geometry": "0.12.0",
-    "@conduitcad/model": "0.12.0",
-    "@conduitcad/modeling": "0.12.0"
+    "@conduitcad/geometry3d": "0.13.0",
+    "@conduitcad/geometry": "0.13.0",
+    "@conduitcad/model": "0.13.0",
+    "@conduitcad/modeling": "0.13.0"
   }
 }

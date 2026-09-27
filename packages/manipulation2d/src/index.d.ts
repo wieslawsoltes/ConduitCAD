@@ -48,3 +48,22 @@ export class PlanarEditSession {
 }
 export function handles2(session: PlanarEditSession, pixelsPerUnit?: number): PlanarHandle[];
 export function dragHandle2(session: PlanarEditSession, handle: PlanarHandle, delta: Point2, before: Record<string, PlanarValue>, options?: { step?: number; angleStep?: number }): void;
+
+export interface ParameterDraftRow { id: string; name: string; expression: string; }
+/** Isolated whole-design parameter draft. Regeneration belongs to the host process callback. */
+export class ParameterEditSession {
+    constructor(document: CadDocument, options?: { process?: ((draft: CadDocument) => void) | null });
+    readonly source: CadDocument | null; readonly version: number; readonly base: CadDocument | null;
+    readonly rows: ParameterDraftRow[]; readonly values: Record<string, number> | null;
+    readonly preview: CadDocument | null; readonly changed: boolean;
+    readonly undoStack: ParameterDraftRow[][]; readonly redoStack: ParameterDraftRow[][];
+    closed: boolean; revision: number; validatedRevision: number; error: string | null; evaluations: number;
+    assertOpen(): void; row(id: string): ParameterDraftRow;
+    snapshot(): ParameterDraftRow[]; restore(rows: ParameterDraftRow[]): void;
+    set(id: string, changes: Partial<Pick<ParameterDraftRow, 'name' | 'expression'>>): void;
+    add(name?: string, expression?: number | string): string; remove(id: string): void;
+    invalidate(): void; checkpoint(before: ParameterDraftRow[]): void; undo(): boolean; redo(): boolean;
+    scrub(id: string, delta: number, originalValue: number, before: ParameterDraftRow[]): void;
+    dependencies(id: string): string[]; parameterMap(): CadDocument['parameters'];
+    evaluate(): CadDocument; assertSource(document: CadDocument): void; commit(document: CadDocument): void; cancel(): void;
+}

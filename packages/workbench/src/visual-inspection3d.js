@@ -22,6 +22,7 @@ export class VisualInspection3D {
     get persistedDisplay(){return this.mode==='appearance'&&this.source===this.w.doc?this.originalDisplay:this.m.renderer?.displaySettings;}
     report(message=''){const n=this.root.querySelector('.inspect3d-error');n.textContent=message;n.hidden=!message;}
     start(mode){
+        this.w.parameters?.cancel(); this.m.path?.cancel();
         if(!['section','measure','appearance'].includes(mode))throw new Error('Unknown inspection mode');
         this.cancel();this.m.visual.cancel();this.m.visual.closePalette();this.w.closeModal();this.w.closePanels();this.m.input.reset();
         this.source=this.w.doc;this.version=this.w.doc.version;this.signature=JSON.stringify(this.w.doc);this.originalSection=clone(this.m.renderer.section);this.originalDisplay=this.m.renderer.displaySettings;this.base=clone(this.w.doc);this.ids=[...this.w.selection];this.valid=true;

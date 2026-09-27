@@ -1,3 +1,4 @@
+import { spatialPathUpdates } from './spatial-path.js';
 import { faceFrame3, extrudeExtent3, combineExtrusion3, drillHole3 } from './authoring.js';
 import { V3, add3, sub3, mul3, dot3, cross3, unit3, distance3, lerp3, translation3, scaling3, rotation3, multiply4, transform3, ocs3, validateMesh, meshProperties, boxMesh, cylinderMesh, sphereMesh, torusMesh, extrudeMesh, revolveMesh, loftMesh, sweepMesh, booleanMesh, transformMesh, mergeMeshes, spline3, triangles3, faceNormal, sliceMesh } from '@conduitcad/geometry3d';
 import { entity, clone } from '@conduitcad/model';
@@ -207,15 +208,18 @@ function evaluateFeature(f, inputs, variables) {
 }
 /** Two-phase regeneration: evaluate every dependent result before mutating the document. */
 export function regenerateFeatures(doc) {
+    const pathUpdates = spatialPathUpdates(doc);
     const features = doc.entities.filter(e => e.feature3d);
     if (!features.length) {
-        for (const e of doc.entities)
+        for (const e of doc.entities) {
+            if (pathUpdates.has(e.id)) Object.assign(e, pathUpdates.get(e.id));
             delete e.model3dConsumed;
-        return { features: 0, updated: [] };
+        }
+        return { features: 0, updated: [...pathUpdates.keys()] };
     }
     if (features.length > 256)
         throw new Error('Feature history exceeds 256 feature budget');
-    const map = new Map(doc.entities.map(e => [e.id, e]));
+    const map = new Map(doc.entities.map(e => [e.id, pathUpdates.get(e.id) || e]));
     if (map.size !== doc.entities.length)
         throw new Error('Duplicate entity identities');
     const visiting = new Set(), done = new Map(), consumed = new Set(), variables = resolveParameters(doc.parameters || {}), order = [];
@@ -256,7 +260,7 @@ export function regenerateFeatures(doc) {
         visit(e);
     const updated = [];
     for (const e of doc.entities) {
-        const result = done.get(e.id);
+        const result = done.get(e.id) || pathUpdates.get(e.id);
         if (result && result !== e) {
             Object.assign(e, result);
             updated.push(e.id);

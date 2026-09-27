@@ -175,3 +175,20 @@ if(planarHandles[0])dragHandle2(planarSession,planarHandles[0],{x:3,y:4},planarS
 const spatialMeasurement: SpatialMeasurement3 = measurePoints3({x:0,y:0,z:0},{x:3,y:4,z:12});
 const sectionGuide = sectionFrame3({x:0,y:0,z:2},10);
 void fields2;void editFields2;void spatialMeasurement;void sectionGuide;
+
+import { ParameterEditSession } from '@conduitcad/manipulation2d';
+import { SpatialPathSession, type SpatialPathState } from '@conduitcad/manipulation3d';
+import { spatialPathPoints, spatialPathUpdates, MAX_SPATIAL_PATH_POINTS } from '@conduitcad/modeling';
+const liveParameters = new ParameterEditSession(documentModel, {process: draft => { spatialPathUpdates(draft); }});
+const newParameter = liveParameters.add('Rise', '30');
+liveParameters.set(newParameter, {expression: '40'});
+const parameterState = liveParameters.snapshot();
+liveParameters.scrub(newParameter, 2, 40, parameterState);
+const paths = new SpatialPathSession(documentModel, {layer: '0'});
+paths.insert(0, {x: 0, y: 0, z: 0});
+paths.insert(1, {x: 10, y: 10, z: 'Rise'});
+const pathState: SpatialPathState = paths.snapshot();
+paths.drag(1, {z: 2}, pathState);
+const wcsPoints = spatialPathPoints(pathState.coordinates, documentModel.parameters, pathState.closed);
+const pointLimit: 2048 = MAX_SPATIAL_PATH_POINTS;
+void wcsPoints; void pointLimit;

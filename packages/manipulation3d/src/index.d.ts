@@ -62,3 +62,26 @@ export function measurePoints3(first: Point3, second: Point3): SpatialMeasuremen
 export function sectionFrame3(normal: Point3, offset: number, center?: Point3, span?: number): {
     normal: Vec3; offset: number; origin: Vec3; u: Vec3; v: Vec3; corners: Vec3[];
 };
+
+export interface PathCoordinate3 { x: string | number; y: string | number; z: string | number; }
+export interface SpatialPathState {
+    coordinates: PathCoordinate3[];
+    /** Original vertex indices preserve native metadata across insertions and removals. Null denotes a new vertex. */
+    origins: Array<number | null>;
+    closed: boolean;
+}
+export class SpatialPathSession {
+    constructor(document: CadDocument, options?: { id?: string | null; layer?: string });
+    readonly source: CadDocument | null; readonly version: number; readonly base: CadDocument | null;
+    readonly entity: CadEntity; readonly id: string; readonly creation: boolean; readonly changed: boolean;
+    readonly state: SpatialPathState; readonly preview: CadDocument | null;
+    readonly undoStack: SpatialPathState[]; readonly redoStack: SpatialPathState[];
+    closed: boolean; revision: number; validatedRevision: number; error: string | null; evaluations: number;
+    assertOpen(): void; invalidate(): void; validateState(state: SpatialPathState): void;
+    snapshot(): SpatialPathState; restore(state: SpatialPathState): void;
+    set(index: number, axis: 'x' | 'y' | 'z', expression: number | string): void;
+    insert(index: number, point: PathCoordinate3): void; remove(index: number): void; setClosed(value: boolean): void;
+    checkpoint(before: SpatialPathState): void; undo(): boolean; redo(): boolean;
+    drag(index: number, delta: Partial<Point3>, before: SpatialPathState): void;
+    evaluate(): CadDocument; assertSource(document: CadDocument): void; commit(document: CadDocument): string; cancel(): void;
+}

@@ -22,8 +22,8 @@ with sync_playwright() as p:
  ok('desktop startup displays 39 editable DXF entities',page.evaluate('conduit.doc.entities.length===39'))
  ok('default illustrative P&ID has no QA issues',page.evaluate('conduit.checkDrawing().length===0'),page.evaluate('conduit.checkDrawing()'))
  page.get_by_role('button',name='Parameters',exact=True).first.click();page.wait_for_timeout(100)
- ok('parameter dialog opens and traps UI in dialog',page.get_by_role('dialog').is_visible())
- page.keyboard.press('Escape');ok('Escape closes modal',page.get_by_role('dialog').count()==0)
+ ok('parameter editing previews the drawing without a modal',page.get_by_role('region',name='Parameters on canvas').is_visible() and page.get_by_role('dialog').count()==0)
+ page.keyboard.press('Escape');ok('Escape closes live parameter editing',not page.evaluate('conduit.parameters.active'))
  # Actual native pointer drag: move a pump while inspecting dependent connector endpoints.
  data=page.evaluate('''()=>{let e=conduit.doc.entities.find(e=>e.tag==='P-101');conduit.selectEntity(e.id);let p=conduit.camera.screen(e),r=conduit.$('.viewport').getBoundingClientRect();return {id:e.id,x:e.x,y:e.y,sx:r.left+p.x,sy:r.top+p.y};}''')
  page.mouse.move(data['sx'],data['sy']);page.mouse.down();page.mouse.move(data['sx']+33,data['sy']-23,steps=8);page.mouse.up();page.wait_for_timeout(150)

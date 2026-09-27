@@ -54,7 +54,7 @@ export interface CadEntity {
     locked?: boolean;
     dirty?: boolean;
     connector?: Connector;
-    parametric?: Record<string, string | number>;
+    parametric?: ParametricMetadata;
     [key: string]: any;
 }
 export interface LineEntity extends CadEntity {
@@ -350,3 +350,15 @@ export function duplicateBlockDefinition(document: CadDocument, name: string, ne
 export function createBlockDefinition(document: CadDocument, name: string, definition?: Partial<Block>): void;
 export function deleteBlockDefinition(document: CadDocument, name: string): void;
 export function syncInsertAttributes(instance: CadEntity, document: CadDocument): CadEntity[];
+
+/** Native geometry expressions. Other application-specific fields remain extensible. */
+export interface ParametricMetadata {
+    kind?: string;
+    radius?: number | string;
+    length?: number | string;
+    width?: number | string;
+    height?: number | string;
+    version?: number;
+    coordinates?: Array<{ x: number | string; y: number | string; z: number | string }>;
+    [key: string]: unknown;
+}

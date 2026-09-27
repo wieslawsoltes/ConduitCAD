@@ -1,6 +1,6 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.12.0 planar editing and spatial inspection checkpoint.**
+**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.13.0 live parameters and spatial path editing.**
 
 A local-first HTML/JavaScript application with native CAD entities, engineering
 symbol libraries, routed connectors, shared blocks, parametric sketches and a
@@ -8,29 +8,31 @@ faceted 3D feature engine. Desktop and mobile share the same document/history
 model, with separate 2D and 3D cameras. Twenty-one reusable ES-module packages power
 the workbench; no third-party runtime packages or CDN assets are required.
 
-## New: visual 2D editing and non-modal 3D inspection
+## New: live parameters and spatial paths
 
-In 2D select an entity and choose **Edit on canvas**. Native handles, exact inline
-expressions, live TEXT/MTEXT, dimension witnesses, dynamic block grips and previewed
-move/copy, rotate, scale, offset and fillet share one undoable Apply/Cancel. **More /
-Shapes → Visual drafting workshop** opens an editable example without a file download.
-The drawing palette, exact next-point input and drawing options are non-modal.
+**Parameters** now previews the complete design in an interactive 2D/3D workspace:
+edit expressions, scrub values, inspect dependencies and Apply once. Native geometry,
+constraints, dimensions, routed connectors and 3D features regenerate in an isolated
+draft. The responsive panel collapses for model inspection without losing Apply/Cancel.
 
-3D **Section**, **Inspect**, and **Appearance on canvas** now use live viewport controls:
-drag a section plane, pick WCS measurement points, generate native section/guide lines,
-and preview material presets/sliders before accepting. The existing 22 visual 3D tools,
-16 rendering styles and independent 2D/3D cameras remain available.
+**3D → Create → Spatial path** constructs native WCS POLYLINE geometry directly on
+XY/XZ/YZ, view or picked-face planes. Drag XYZ handles, edit coordinate expressions,
+insert midpoints, remove vertices and close paths. Parameter-driven paths regenerate
+Conduit sweeps. **Parametric path workshop** opens an editable route, sweep and plate
+with associated parameter expressions and a 2D footprint.
 
-![Planar visual editing](artifacts/visual-drafting-desktop.png)
+![Live design parameters](artifacts/live-canvas-parameters-desktop.png)
 
-[Workflow, contracts and boundaries](docs/VISUAL_EDITING_2D_3D_0120.md) ·
-[Phone controls](artifacts/visual-drafting-phone.png) ·
-[Reusable planar API](packages/manipulation2d/README.md) ·
-[Validation](docs/VALIDATION_VISUAL_0120.md)
+[Workflows and reusable APIs](docs/LIVE_PARAMETERS_PATHS_0130.md) ·
+[Mobile path editing](artifacts/live-canvas-path-phone.png) ·
+[Earlier published visual editing](docs/PUBLICATION_VISUAL_0120.md)
 
-**This checkpoint is locally committed, not a confirmed GitHub/Pages release.** It
-includes the preceding unpublished 0.10.0 and 0.11.0 work. Native-origin WebGPU,
-physical-device input/performance and OS keyboard acceptance remain unqualified.
+The previous 0.10–0.12 rendering and visual editing work is now committed and published
+at `4b1050ab552d1a26ae961e4a158eca2c4c5625c8`, with native-origin WebGPU execution
+on SwiftShader in CI. Historical checkpoint reports retain their original local scope.
+The current workflow requires full regression validation before deploying this update.
+Physical GPU performance, real touch devices, OS keyboards and screen readers are not
+qualified by emulated browser/software-adapter tests.
 
 ## CAD rendering styles and material inspection
 
@@ -41,11 +43,10 @@ caps valid closed contours without changing native geometry. Adaptive Display st
 a compact live phone preview, per-document settings, material presets, PNG capture and
 an editable material-study drawing preserve the existing 2D workflow.
 
-**This source checkpoint is not a confirmed GitHub/Pages release.** Canvas and
-WebGL2 execute in the local validation environment; the new WebGPU graph is implemented
-but awaits execution through the included native-origin CI gate. See
-[rendering behavior and limits](docs/RENDERING_3D.md) and
-[the current validation record](docs/VALIDATION_RENDERING_0100.md).
+Native-origin Canvas, WebGL2 and WebGPU execution passed the published 0.12.0 CI
+on a software adapter. See [rendering behavior and limits](docs/RENDERING_3D.md),
+[published execution scope](docs/PUBLICATION_VISUAL_0120.md), and the historical
+[local rendering checkpoint](docs/VALIDATION_RENDERING_0100.md).
 
 ![Material and rendering study](artifacts/render-material-study.png)
 
@@ -190,7 +191,7 @@ the packages; DXF extension data remains permissively typed where documented.
 
 The visual-editing checkpoint adds isolated transaction, geometric gesture, on-canvas
 interaction, mobile layout and independent DXF checks. Exact execution scope and counts
-are recorded in [the current validation record](docs/VALIDATION_VISUAL_0120.md).
+are recorded in [the historical 0.12.0 local validation record](docs/VALIDATION_VISUAL_0120.md).
 [0.11.0 3D visual validation](docs/VALIDATION_VISUAL_0110.md) is retained as history.
 [0.10.0 rendering validation](docs/VALIDATION_RENDERING_0100.md) is retained as history.
 The previous [0.9.1 iconography validation](docs/VALIDATION_ICONOGRAPHY_091.md) remains
@@ -199,7 +200,7 @@ The permanent Pages workflow validates the production build and compares hosted
 resource hashes after deployment.
 
 Canvas software depth and WebGL2 execute the new graph with fixture-level regression
-coverage using SwiftShader. The new WebGPU graph is pending native-origin execution. This is not physical GPU performance or universal pixel
+coverage using SwiftShader. Native-origin WebGPU execution passed the 0.12.0 publication gate. This is not physical GPU performance or universal pixel
 equivalence. Emulated touch and keyboard tests are not physical iOS/Android, native
 screen-reader or OS keyboard acceptance. Native IndexedDB/Web Locks recovery has a
 separate suite; crash/eviction durability still requires independent qualification.

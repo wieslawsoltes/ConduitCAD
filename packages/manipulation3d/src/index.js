@@ -1,3 +1,4 @@
+import { SpatialPathSession as PathSession } from './path-session.js';
 import { snapValue3 as snap, rayPlane3 as ray, unitsPerPixel3 as units, beginAxisDrag3 as ba, updateAxisDrag3 as ua, beginPlaneDrag3 as bp, updatePlaneDrag3 as up, beginAngleDrag3 as br, updateAngleDrag3 as ur, expressionDelta3 as expression, perpendicularAxes3 as axes } from './gestures.js';
 import { PROFILE_TYPES as profiles, VISUAL_TOOLS as tools, visualTool3 as tool, inputAccepts3 as accepts, VisualEditSession as Session, visibleFields3 as fields } from './session.js';
 import { visualHandles3 as handles } from './handles.js';
@@ -25,3 +26,5 @@ export const layoutHandles3 = layout;
 import { measurePoints3 as measurement, sectionFrame3 as sectionFrame } from './inspection.js';
 export const measurePoints3 = measurement;
 export const sectionFrame3 = sectionFrame;
+
+export const SpatialPathSession = PathSession;

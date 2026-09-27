@@ -39,6 +39,7 @@ jobs:
           npm run samples:3d
           npm run samples:rendering
           npm run samples:visual2d
+          npm run samples:live
           npm run icons
           npm run build
           npm run pack:packages
@@ -60,12 +61,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_authoring3d browser_iconography browser_planar_visual browser_visual_editing browser_render_styles; do
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_authoring3d browser_iconography browser_planar_visual browser_visual_editing browser_render_styles browser_live_workspace; do
             python "tests/$suite.py"
           done
           for backend in webgl2 webgpu; do
             PLANAR_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_planar_visual.py
             VISUAL_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_visual_editing.py
+            LIVE_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_live_workspace.py
           done
           REQUIRE_WEBGPU=1 xvfb-run -a python tests/browser_render_backends.py
           xvfb-run -a python tests/browser_modeling_backends.py
@@ -73,7 +75,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d audit_rendering audit_visual_editing audit_planar_visual render_symbol_atlas; do
+          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d audit_rendering audit_visual_editing audit_planar_visual audit_live_workspace render_symbol_atlas; do
             python "tests/$suite.py"
           done
       - name: Configure GitHub Pages

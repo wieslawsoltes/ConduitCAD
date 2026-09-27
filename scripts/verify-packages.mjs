@@ -23,8 +23,8 @@ try {
 import { createDemo } from '@conduitcad/symbols';
 import { parseDXF, writeDXF } from '@conduitcad/dxf';
 import { createDocument, line } from '@conduitcad/model';
-import { PlanarEditSession, handles2 } from '@conduitcad/manipulation2d';
-import { measurePoints3, sectionFrame3 } from '@conduitcad/manipulation3d';
+import { ParameterEditSession, PlanarEditSession, handles2 } from '@conduitcad/manipulation2d';
+import { SpatialPathSession, measurePoints3, sectionFrame3 } from '@conduitcad/manipulation3d';
 import { VisualEditSession, layoutHandles3 } from '@conduitcad/manipulation3d';
 const original = createDemo('pid');
 const imported = parseDXF(writeDXF(original));
@@ -44,7 +44,12 @@ const layout = layoutHandles3([{id:'width',x:100,y:100,hasLabel:true}],{width:39
 if (!layout[0].visible) throw new Error('Visual control layout failed.');
 session.cancel();
 const planar = createDocument('Offline planar authoring');planar.entities.push(line({x:0,y:0},{x:100,y:0}));planar.parameters.Width=100;const edit2=new PlanarEditSession(planar,[planar.entities[0].id]);edit2.set('length','Width*2');edit2.evaluate();if(planar.entities[0].b.x!==100||!handles2(edit2).length)throw new Error('Planar preview isolation failed');edit2.commit(planar);if(parseDXF(writeDXF(planar)).entities[0].b.x!==200)throw new Error('Planar native DXF edit failed');if(measurePoints3({x:0,y:0,z:0},{x:3,y:4,z:12}).distance!==13||sectionFrame3({x:0,y:0,z:2},10).offset!==5)throw new Error('Inspection math contract failed');
-console.log(JSON.stringify({ planarSession:true, planarDXF:true, spatialInspection:true, entities: imported.entities.length, visualSession: true, visualDXF: true, visualHandleLayout: true }));`;
+const live = createDocument('Offline live authoring');live.parameters={Rise:'30'};
+const pathSession = new SpatialPathSession(live);pathSession.insert(0,{x:0,y:0,z:0});pathSession.insert(1,{x:0,y:0,z:'Rise'});pathSession.commit(live);
+const params = new ParameterEditSession(live,{process:draft=>{const session=new SpatialPathSession(draft,{id:pathSession.id});session.commit(draft);}});
+params.set(params.rows[0].id,{expression:'50'});if(params.evaluate().entities[0].points[1].z!==50||live.entities[0].points[1].z!==30)throw new Error('Offline parameter/path preview failed');params.commit(live);
+if(parseDXF(writeDXF(live)).entities[0].points[1].z!==50)throw new Error('Offline spatial path DXF contract failed');
+console.log(JSON.stringify({ liveParameters:true, spatialPath:true, planarSession:true, planarDXF:true, spatialInspection:true, entities: imported.entities.length, visualSession: true, visualDXF: true, visualHandleLayout: true }));`;
   const result = JSON.parse(run(process.execPath, ['--input-type=module', '-e', check]));
   const report = { packages: packages.map(pkg => ({ name: pkg.name, version: pkg.version })), registryAccess: false, emptyCache: true, importedAllPackages: true, ...result };
   await mkdir(path.join(root, 'artifacts'), { recursive: true });

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/manipulation3d",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "type": "module",
   "description": "DOM-free on-canvas CAD manipulation, expression-preserving gestures and atomic preview sessions",
   "main": "./src/index.js",
@@ -17,9 +17,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@conduitcad/geometry3d": "0.12.0",
-    "@conduitcad/model": "0.12.0",
-    "@conduitcad/modeling": "0.12.0",
-    "@conduitcad/constraints": "0.12.0"
+    "@conduitcad/geometry3d": "0.13.0",
+    "@conduitcad/model": "0.13.0",
+    "@conduitcad/modeling": "0.13.0",
+    "@conduitcad/constraints": "0.13.0"
   }
 }

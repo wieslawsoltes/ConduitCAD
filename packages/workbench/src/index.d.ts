@@ -15,12 +15,14 @@ export function symbolSVG(block: any, doc: any, extra?: string): string;
 export function mountWorkbench(element: any, options?: WorkbenchOptions): Workbench;
 export class Workbench {
     constructor(root: any, options?: WorkbenchOptions);
+    parameters: import('./visual-parameters.js').VisualParameters;
     visual2d: import('./visual-editing2d.js').VisualEditing2D;
     iconography: import('./iconography.js').IconographyController;
     root: any;
     options: WorkbenchOptions;
     viewMode: "2d" | "3d";
     model3d: {
+        path: import('./visual-path3d.js').VisualPath3D;
         inspection: import('./visual-inspection3d.js').VisualInspection3D;
         visual: import('./visual-editing3d.js').VisualEditing3D;
         active: boolean;
