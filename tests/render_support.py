@@ -26,4 +26,19 @@ def launch(playwright):
 def bounded(page,selector):
  return page.locator(selector).evaluate('e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left>=-.7&&r.top>=-.7&&r.right<=innerWidth+.7&&r.bottom<=innerHeight+.7}')
 def frame(page):
- return page.evaluate("async()=>{const r=conduit.model3d.renderer;return await new Promise(resolve=>requestAnimationFrame(async()=>{r.draw();await r.device?.queue.onSubmittedWorkDone();resolve(r.canvas.toDataURL('image/png').split(',')[1]);}));}")
+ """Capture the submitted pixels, not a canvas buffer that presentation may retire.
+
+ Use the application's snapshot contract on every backend. WebGPU copies into a
+ staging buffer synchronously with draw submission, then maps it asynchronously.
+ Waiting for onSubmittedWorkDone before canvas.toDataURL can capture an expired
+ swapchain frame. No retries, backend substitution, or image tolerances are used.
+ """
+ return page.evaluate("""async()=>{
+  const blob=await conduit.model3d.renderer.capturePNG({annotations:false});
+  return await new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onload=()=>resolve(reader.result.split(',')[1]);
+   reader.onerror=()=>reject(reader.error||new Error('PNG read failed'));
+   reader.readAsDataURL(blob);
+  });
+ }""")

@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from playwright.sync_api import sync_playwright
+from render_support import frame
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'artifacts';OUT.mkdir(exist_ok=True)
 class Handler(http.server.SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
@@ -41,9 +42,20 @@ try:
    # Camera changes must update uniforms/projection only, not rebuild or reupload geometry.
    stable=page.evaluate("()=>{const r=conduit.model3d.renderer,n=r.uploads,s=r.camera.snapshot();r.camera.orbit(31,13);r.draw();const stable=r.uploads===n;Object.assign(r.camera,s);r.draw();return stable}")
    assert stable,'Orbit reuploaded immutable geometry'
-   page.wait_for_timeout(100)
-   data=page.evaluate("async()=>{const r=conduit.model3d.renderer;return await new Promise(resolve=>requestAnimationFrame(async()=>{r.draw();await r.device?.queue.onSubmittedWorkDone();resolve(r.canvas.toDataURL('image/png').split(',')[1]);}));}")
-   (OUT/f'modeling3d-backend-{requested}.png').write_bytes(base64.b64decode(data))
+   data=frame(page)
+   image_path=OUT/f'modeling3d-backend-{requested}.png'
+   image_path.write_bytes(base64.b64decode(data))
+   pixels=np.asarray(Image.open(image_path).convert('RGBA'))
+   assert np.all(pixels[:,:,3]==255),'Opaque viewport capture contains transparent pixels'
+   assert int((pixels[:,:,:3].max(2)-pixels[:,:,:3].min(2)>18).sum())>100,'Captured viewport has no geometry'
+   # Read again after presentation has had two opportunities to retire the canvas
+   # texture. capturePNG must redraw/copy before it awaits mapping, not return a
+   # stale image or depend on a lucky swapchain lifetime. The scene is static.
+   for _ in range(3):
+    page.evaluate('()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')
+    assert frame(page)==data,'Repeated post-presentation capture changed a static frame'
+   report['capture']='production capturePNG, annotations disabled'
+   report['postPresentationCaptures']=3
    if executed and requested=='webgl2':
     page.evaluate("()=>{window.restore3DContext=conduit.model3d.renderer.gl.getExtension('WEBGL_lose_context');if(!window.restore3DContext)throw new Error('Context-loss extension unavailable');window.restore3DContext.loseContext()}")
     page.wait_for_function('conduit.model3d.renderer.gl.isContextLost()')
