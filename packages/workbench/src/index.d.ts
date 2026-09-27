@@ -5,16 +5,31 @@ export interface WorkbenchOptions {
     store?: import('@conduitcad/storage').ProjectStore;
     workspaceKey?: string;
     maxDocuments?: number;
+    /** Visual is the default; dialog preserves the explicit advanced-form workflow. */
+    modelingInteraction?: 'visual' | 'dialog';
+    /** Default non-modal drafting; dialog retains specialist legacy form integrations. */
+    drawingInteraction?: 'visual' | 'dialog';
 }
 export interface DocumentOpenOptions { context?: Record<string, any>; }
 export function symbolSVG(block: any, doc: any, extra?: string): string;
 export function mountWorkbench(element: any, options?: WorkbenchOptions): Workbench;
 export class Workbench {
     constructor(root: any, options?: WorkbenchOptions);
+    visual2d: import('./visual-editing2d.js').VisualEditing2D;
     iconography: import('./iconography.js').IconographyController;
     root: any;
     options: WorkbenchOptions;
     viewMode: "2d" | "3d";
+    model3d: {
+        inspection: import('./visual-inspection3d.js').VisualInspection3D;
+        visual: import('./visual-editing3d.js').VisualEditing3D;
+        active: boolean;
+        camera: import('@conduitcad/renderer3d').OrbitCamera;
+        renderer: import('@conduitcad/renderer3d').SpatialRenderer;
+        previewDocument: import('@conduitcad/model').CadDocument | null;
+        sync(): void;
+        action(command: string): unknown;
+    };
     model3dCamera: import("@conduitcad/renderer3d").CameraState3D | null;
     initializing: boolean;
     documents: import('@conduitcad/workspace').DocumentWorkspace<any>;

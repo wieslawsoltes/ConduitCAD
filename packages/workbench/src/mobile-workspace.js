@@ -50,7 +50,7 @@ export function bindMobileWorkspace(w) {
         if (size !== lastSize) { lastSize = size; w.renderer.resize(); }
         // Scroll only the local scrolling region, not the body or the CAD camera.
         if (keyboard && focused) {
-            const input = document.activeElement, scroller = input.closest('.modal-body,.inspector-content,.library-scroll');
+            const input = document.activeElement, scroller = input.closest('.modal-body,.inspector-content,.library-scroll,.visual3d-options-body,.visual3d-palette-body');
             if (scroller) {
                 const a = input.getBoundingClientRect(), b = scroller.getBoundingClientRect();
                 if (a.bottom > b.bottom - 16) scroller.scrollTop += a.bottom - b.bottom + 16;

@@ -1,0 +1,11 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { createRenderingStudy, VISUAL_STYLES, MATERIAL_PRESETS } from '@conduitcad/renderer3d';
+import { writeDXF, writeDXFBinary } from '@conduitcad/dxf';
+const document=createRenderingStudy();
+await mkdir('samples/rendering',{recursive:true});
+await writeFile('samples/rendering/material-study.conduit.json',JSON.stringify(document,null,2)+'\n');
+await writeFile('samples/rendering/material-study.dxf',writeDXF(document,{version:'AC1032'}));
+await writeFile('samples/rendering/material-study-binary.dxf',writeDXFBinary(document,{version:'AC1032'}));
+await mkdir('artifacts',{recursive:true});
+await writeFile('artifacts/rendering-catalogue.json',JSON.stringify({styles:VISUAL_STYLES,materials:MATERIAL_PRESETS,entities:document.entities.length},null,2)+'\n');
+console.log(`Created editable material study: ${document.entities.length} entities, ${VISUAL_STYLES.length} styles.`);

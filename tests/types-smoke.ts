@@ -137,3 +137,41 @@ const known: boolean = hasIcon(glyph);
 const names: readonly IconName[] = ICON_NAMES;
 const groups: Readonly<Record<string, readonly IconName[]>> = ICON_GROUPS;
 void [markup, known, names, groups];
+
+// Rendering style/material settings remain typed independently of workbench presentation.
+import { VISUAL_STYLES, MATERIAL_PRESETS, normalizeDisplaySettings, normalizeMaterial, createRenderingStudy, type VisualStyleId, type DisplaySettings3D } from '@conduitcad/renderer3d';
+const renderStyle: VisualStyleId = 'shaded-hidden';
+const renderSettings: DisplaySettings3D = normalizeDisplaySettings({style:renderStyle,ambientOcclusion:true});
+spatialRenderer.setDisplaySettings(renderSettings);
+const attachmentBytes:number = spatialRenderer.stats.estimatedAttachmentBytes;
+const capture:Promise<Blob> = spatialRenderer.capturePNG({annotations:true});
+void [VISUAL_STYLES,MATERIAL_PRESETS,normalizeMaterial({metallic:.8}),createRenderingStudy,attachmentBytes,capture];
+
+// The visual interaction core is independent from the DOM workbench.
+import { VisualEditSession, visualHandles3, beginAxisDrag3, updateAxisDrag3, VISUAL_TOOLS } from '@conduitcad/manipulation3d';
+import { createDocument as visualDocument } from '@conduitcad/model';
+import { OrbitCamera as VisualCamera } from '@conduitcad/renderer3d';
+const visualSession = new VisualEditSession(visualDocument('visual consumer'), 'box');
+visualSession.set('width', '100');
+visualSession.evaluate();
+const visualCamera = new VisualCamera();
+const visualHandle = visualHandles3(visualSession, visualCamera)[0];
+const axisGesture = beginAxisDrag3(visualCamera, {x:0,y:0,z:0}, {x:1,y:0,z:0}, {x:0,y:0});
+const visualDistance: number = updateAxisDrag3(axisGesture, {x:20,y:50});
+const visualEntityId: string = visualSession.commit(visualSession.source!).id;
+// @ts-expect-error Controls only accept numbers and expression strings, not scripts/objects.
+visualSession.set('width', {value:20});
+// @ts-expect-error Immutable tool registry cannot be modified by consumers.
+VISUAL_TOOLS[0].fields.push({name:'unsafe',label:'unsafe',value:1});
+void [visualDistance, visualEntityId, visualHandle];
+
+import { PlanarEditSession, handles2, dragHandle2, fields2, editFields2, type PlanarOperation } from '@conduitcad/manipulation2d';
+import { measurePoints3, sectionFrame3, type SpatialMeasurement3 } from '@conduitcad/manipulation3d';
+const planarOperation: PlanarOperation = 'geometry';
+const planarSession = new PlanarEditSession(visualDocument('planar consumer'), [], {operation:planarOperation});
+planarSession.set('radius','Width/2');
+const planarHandles = handles2(planarSession,2);
+if(planarHandles[0])dragHandle2(planarSession,planarHandles[0],{x:3,y:4},planarSession.snapshot(),{step:1});
+const spatialMeasurement: SpatialMeasurement3 = measurePoints3({x:0,y:0,z:0},{x:3,y:4,z:12});
+const sectionGuide = sectionFrame3({x:0,y:0,z:2},10);
+void fields2;void editFields2;void spatialMeasurement;void sectionGuide;

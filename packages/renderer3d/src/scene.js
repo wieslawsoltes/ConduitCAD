@@ -1,5 +1,6 @@
 import { V3, add3, sub3, mul3, dot3, cross3, distance3, identity4, multiply4, translation3, rotation3, scaling3, transform3, ocs3, bounds3, triangulateFace, faceNormal, rayTriangle } from '@conduitcad/geometry3d';
 import { curvePoints3, controlPoints3 } from '@conduitcad/modeling';
+import { normalizeMaterial } from './visual-styles.js';
 import { resolveStyle, evaluateDynamicBlock, dimensionPicture, cleanText } from '@conduitcad/model';
 /** Spatial display list; unsupported entities emit explicit diagnostics instead of invented solids. */
 export function buildScene3D(document, { showInputs = false, maxTriangles = 300000, maxInstances = 50000 } = {}) {
@@ -12,6 +13,8 @@ export function buildScene3D(document, { showInputs = false, maxTriangles = 3000
         if (e.hidden || e.invisible || e.feature3d?.suppressed || (!showInputs && e.model3dConsumed) || layer?.visible === false)
             return;
         const style = resolveStyle(e, document, parentStyle, parentLayer);
+        if (style.opacity <= 0) return;
+        style.material = e.appearance3d || parentStyle?.material;
         try {
             if (e.type === 'INSERT') {
                 if (depth > 24)
@@ -114,7 +117,7 @@ export function buildScene3D(document, { showInputs = false, maxTriangles = 3000
             }
             points = points.map(p => transform3(p, parent));
             let controls=points;try{controls=controlPoints3(e).map(p=>transform3(p,parent));}catch{}
-            const item = { id: owner, sourceId: e.id, points, controls, faces, style };
+            const item = { id: owner, sourceId: e.id, points, controls, faces, style, material: normalizeMaterial({ ...style.material, color:style.color, opacity:style.opacity }, style.color) };
             items.push(item);
             const edgeKeys = new Map();
             for (let face = 0; face < faces.length; face++) {
@@ -122,7 +125,7 @@ export function buildScene3D(document, { showInputs = false, maxTriangles = 3000
                 for (const t of (e.type === '3DFACE' && ids.length === 4 ? [[ids[0], ids[1], ids[2]], [ids[0], ids[2], ids[3]]] : triangulateFace(points, ids))) {
                     if (triangles.length >= maxTriangles)
                         throw new Error('Triangle budget exceeded');
-                    triangles.push({ id: owner, sourceId: e.id, face, indices: t, vertices: t.map(i => points[i]), normal: faceNormal(points, t), color: style.color });
+                    triangles.push({ item: items.length - 1, material: item.material, id: owner, sourceId: e.id, face, indices: t, vertices: t.map(i => points[i]), normal: faceNormal(points, t), color: style.color });
                 }
                 for (let j = 0; j < ids.length; j++) {
                     if (e.type === '3DFACE' && (mask & (1 << j)))
@@ -132,17 +135,19 @@ export function buildScene3D(document, { showInputs = false, maxTriangles = 3000
                     const a = ids[j], b = ids[(j + 1) % ids.length], key = a < b ? a + ':' + b : b + ':' + a;
                     if (edgeKeys.has(key)) {
                         const previous = edgeKeys.get(key);
-                        previous.coplanar = dot3(previous.normal, faceNormal(points, ids)) > 1 - 1e-7;
+                        const normal = faceNormal(points, ids);
+                        previous.adjacent.push(normal);
+                        previous.coplanar = previous.adjacent.every(n => dot3(previous.normal, n) > 1 - 1e-7);
                         continue;
                     }
-                    const edge = { a: points[a], b: points[b], id: owner, color: style.color, edge: true, normal: faceNormal(points, ids) };
+                    const edge = { a: points[a], b: points[b], id: owner, color: style.color, opacity:style.opacity, edge: true, normal: faceNormal(points, ids), adjacent: [faceNormal(points, ids)] };
                     edgeKeys.set(key, edge);
                     lines.push(edge);
                 }
             }
             if (wireOnly)
                 for (let i = 0; i < points.length - (closed ? 0 : 1); i++)
-                    lines.push({ a: points[i], b: points[(i + 1) % points.length], id: owner, color: style.color });
+                    lines.push({ a: points[i], b: points[(i + 1) % points.length], id: owner, color: style.color, opacity:style.opacity });
         }
         catch (error) {
             diagnostics.push({ id: owner, message: error.message });

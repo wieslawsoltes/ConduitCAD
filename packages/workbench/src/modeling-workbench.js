@@ -1,7 +1,11 @@
+import { VisualInspection3D } from './visual-inspection3d.js';
+import { VisualEditing3D } from './visual-editing3d.js';
+import { visualStyle } from '@conduitcad/renderer3d';
+import { displayAction3D, appearanceDialog3D, syncDisplay3D } from './display-workbench.js';
 import { fields3, openOperation3, readOperation3, selectionToolbar3, syncAuthoring3, authoringAction3 } from './authoring-workbench.js';
 import { V3, add3, sub3, mul3, dot3, unit3, distance3, bounds3, meshProperties, validateMesh, triangles3 } from '@conduitcad/geometry3d';
 import { MODELING_TOOLS, EXAMPLES_3D, create3DExample, addFeature, editFeature, removeFeature, bakeFeature, regenerateFeatures, sectionEntities, writeOBJ, writeSTL, controlPoints3, setControlPoint3 } from '@conduitcad/modeling';
-import { SpatialRenderer, OrbitCamera } from '@conduitcad/renderer3d';
+import { SpatialRenderer, OrbitCamera, VISUAL_STYLES } from '@conduitcad/renderer3d';
 import { entity, clone, polyline, circle, isLocked } from '@conduitcad/model';
 import { PointerController } from '@conduitcad/input';
 import { downloadFile } from '@conduitcad/storage';
@@ -35,7 +39,7 @@ export class ModelingWorkbench {
         this.stage = document.createElement('div');
         this.stage.className = 'model3d-stage';
         this.stage.hidden = true;
-        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', 'Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
+        this.stage.innerHTML = `<div class="viewport3d" tabindex="0" role="application" aria-label="3D CAD model. Drag to orbit, two fingers to pan and zoom; tap to select."></div><div class="model3d-top"><div class="model3d-mode"><span class="pill">3D MODEL</span><span class="model3d-backend">Initializing</span></div><div class="model3d-views" role="toolbar" aria-label="3D camera views">${button('3d-2d', '2D Draw')}${button('3d-view-iso', 'ISO')}${button('3d-view-top', 'Top')}${button('3d-view-front', 'Front')}${button('3d-view-right', 'Right')}${button('3d-fit', 'Fit')}${button('3d-display', 'Display styles', '', 'appearance')}${button('3d-view-options', 'View…')}</div></div>${selectionToolbar3()}<div class="model3d-info" role="status" aria-live="polite"></div><div class="model3d-bottom"><div class="model3d-context" role="toolbar" aria-label="Actions for selected 3D geometry"></div><div class="model3d-timeline" role="toolbar" aria-label="3D feature history"></div><div class="model3d-dock" role="toolbar" aria-label="3D modeling tools">${button('3d-tools', 'Create')}${button('3d-edit', 'Edit feature')}${button('3d-op-transform', 'Move / rotate')}${button('3d-bodies', 'Bodies')}${button('3d-measure', 'Inspect')}${button('3d-examples', 'Examples')}${button('3d-undo', 'Undo')}${button('3d-redo', 'Redo')}</div><p class="model3d-hint">Drag to orbit · two fingers pan / pinch · tap to select · axis handles move a body</p></div>`;
         const dock = this.stage.querySelector('.model3d-dock');
         dock.insertBefore(this.stage.querySelector('.model3d-context'), dock.children[1]);
         workbench.$('.canvas-area').append(this.stage);
@@ -50,19 +54,24 @@ export class ModelingWorkbench {
         }, { signal: workbench.abort.signal });
         this.host = this.stage.querySelector('.viewport3d');
         this.input = new PointerController(this.host, { down: p => this.pointerDown(p), move: p => this.pointerMove(p), up: p => this.pointerUp(p), cancel: () => this.cancelDrag(), gesture: ({ scale, dx, dy }) => { this.camera.zoom(scale); this.camera.pan(dx, dy); this.changedView(); }, gestureEnd: () => this.saveView(), wheel: p => { this.camera.zoom(Math.exp(-p.deltaY * .0015)); this.changedView(); this.saveView(); } });
-        this.host.addEventListener('dblclick', () => this.fitSelection(), { signal: workbench.abort.signal });
+        this.host.addEventListener('dblclick', () => { if(this.visual.active||this.inspection?.active)return; if(this.w.selected().length===1){ const e=this.w.selected()[0]; try{if(this.pickMode==='face'&&this.hit?.face!==undefined)this.visual.start('offset-face');else if(this.pickMode==='vertex'&&this.hit?.vertex!==undefined)this.visual.start('vertex');else if(e.feature3d)this.visual.start(e.feature3d.kind,e.id);else this.fitSelection();}catch(error){this.w.toast(error.message,true);} }else this.fitSelection(); }, { signal: workbench.abort.signal });
         this.host.addEventListener('dragover', e => e.preventDefault(), { signal: workbench.abort.signal });
         this.host.addEventListener('drop', e => { e.preventDefault(); workbench.openFiles([...e.dataTransfer.files]); }, { signal: workbench.abort.signal });
+        this.visual = new VisualEditing3D(this);
+        this.inspection = new VisualInspection3D(this);
         this.ready = Promise.resolve();
     }
     ensureRenderer() { if (this.renderer)
         return; const w = this.w, requested = w.options.backend3d || new URLSearchParams(location.search).get('renderer3d') || 'auto'; this.renderer = new SpatialRenderer(this.host, { backend: requested, camera: this.camera, onStatus: s => { this.stage.querySelector('.model3d-backend').textContent = s.backend; this.stage.querySelector('.model3d-backend').title = (s.reasons || []).join('\n'); } }); this.renderer.drawOverlay = (ctx, camera) => this.drawGizmo(ctx, camera); this.renderer.onFrame = s => { if (!this.active)
-        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
+        return; w.$('.stats').textContent = `${s.triangles.toLocaleString()} triangles · ${s.frameMs.toFixed(1)} ms CPU`; this.visual?.updatePositions();this.inspection?.updatePositions(); }; this.ready = this.renderer.ready.then(() => { if (this.disposed)
         return; this.renderer.setDocument(w.doc, { showInputs: this.showInputs }); this.renderer.resize(); if (!w.model3dCamera)
         this.renderer.fit();
     else
         this.restoreView(); this.renderer.setSelection(w.selection, this.pickMode === 'face' ? this.hit : null); this.saveView(); }); }
     setActive(active) {
+        this.inspection?.cancel();this.w.visual2d?.cancel();this.w.visual2d?.panel.close();
+        this.visual?.cancel();
+        if(this.active)this.saveView();
         const w = this.w;
         if (active && (w.doc.activeLayout || 'Model') !== 'Model')
             throw new Error('Choose Model space before entering 3D');
@@ -78,14 +87,15 @@ export class ModelingWorkbench {
         w.scheduleRecovery();
         return this.ready;
     }
-    restoreView() { const s = this.w.model3dCamera; if (!s)
+    restoreView() { if(this.renderer){try{this.renderer.section=this.w.model3dSection||null;}catch{this.renderer.section=null;this.w.model3dSection=null;}}this.renderer?.setDisplaySettings(this.w.model3dDisplay || this.w.doc.metadata?.display3d || {}, { replace:true, tolerant:true }); syncDisplay3D(this); const s = this.w.model3dCamera; if (!s)
         return; const values = [s.yaw, s.pitch, s.distance, s.height, s.target?.x, s.target?.y, s.target?.z]; if (values.every(Number.isFinite) && s.distance > 0 && s.height > 0) {
         Object.assign(this.camera, s, { target: { ...s.target }, pitch: Math.max(-Math.PI / 2 + 1e-6, Math.min(Math.PI / 2 - 1e-6, s.pitch)) });
     } }
     saveView() { if (!this.active)
-        return; this.w.model3dCamera = this.camera.snapshot(); this.w.scheduleRecovery(); }
+        return; this.w.model3dCamera = this.camera.snapshot(); this.w.model3dDisplay = this.inspection?.persistedDisplay || this.renderer?.displaySettings; this.w.model3dSection = structuredClone(this.inspection?.active ? this.inspection.persistedSection : this.renderer?.section || null); this.w.scheduleRecovery(); }
     changedView() { this.renderer?.invalidate(); this.w.model3dCamera = this.camera.snapshot(); }
     sync() {
+        this.inspection?.externalChange();this.visual?.externalChange();
         const w = this.w, active = w.viewMode === '3d' && (w.doc.activeLayout || 'Model') === 'Model';
         this.active = active;
         this.stage.hidden = !active;
@@ -118,6 +128,7 @@ export class ModelingWorkbench {
         this.stage.querySelector('.model3d-info').textContent = this.renderer.scene.diagnostics.length ? `${this.renderer.scene.diagnostics.length} spatial display notice(s) · Inspect for details` : this.previewDocument ? 'PREVIEW · not committed' : `${w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed && !e.hidden).length} visible mesh bodies`;
         this.syncTimeline();
         syncAuthoring3(this);
+        syncDisplay3D(this);
         this.stage.querySelector('[data-action="3d-undo"]').disabled = !w.history.canUndo;
         this.stage.querySelector('[data-action="3d-redo"]').disabled = !w.history.canRedo;
     }
@@ -142,17 +153,17 @@ export class ModelingWorkbench {
     }
     selectionChanged() { if (!this.active)
         return; this.renderer?.setSelection(this.w.selection, this.pickMode === 'face' ? this.hit : null); this.syncTimeline(); syncAuthoring3(this); }
-    clearPreview() { const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
+    clearPreview() { this.visual?.cancel(); const preview = !!this.previewDocument; this.previewDocument = null; this.operation = null; if (this.previewCamera) {
         Object.assign(this.camera, this.previewCamera);
         this.previewCamera = null;
     } if (preview && this.active)
         this.sync(); }
     selectionCenter() { const points = this.renderer?.scene.items.filter(i => this.w.selection.has(i.id)).flatMap(i => i.points) || []; if (!points.length)
         return null; const b = bounds3(points); return mul3(add3(b.min, b.max), .5); }
-    gizmo() { const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
+    gizmo() { if(this.visual?.active||this.inspection?.active)return []; const origin = this.selectionCenter(); if (!origin || this.w.selection.size !== 1 || this.pickMode !== 'body')
         return []; if (isLocked(this.w.selected()[0], this.w.doc))
         return []; const length = this.camera.height * .15; return [V3(1, 0, 0), V3(0, 1, 0), V3(0, 0, 1)].map((axis, i) => ({ origin, axis, label: ['X', 'Y', 'Z'][i], color: ['#c46655', '#448f71', '#4d81b8'][i], a: this.camera.project(origin), b: this.camera.project(add3(origin, mul3(axis, length))) })); }
-    drawGizmo(ctx) { for (const g of this.gizmo()) {
+    drawGizmo(ctx) { if(this.inspection?.active){this.inspection.draw(ctx);return;} if(this.visual?.active){this.visual.draw(ctx);return;} for (const g of this.gizmo()) {
         if (!g.a.visible || !g.b.visible)
             continue;
         ctx.strokeStyle = g.color;
@@ -170,7 +181,7 @@ export class ModelingWorkbench {
     } }
     axisParameter(p, axis, origin) { const r = this.camera.ray(p.x, p.y), o = sub3(r.origin, origin), ad = dot3(axis, r.direction), den = 1 - ad * ad; if (den < 1e-8)
         throw new Error('This axis is parallel to the camera; use exact coordinates or orbit first'); return (dot3(axis, o) - ad * dot3(r.direction, o)) / den; }
-    pointerDown(p) { this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
+    pointerDown(p) { if(this.inspection?.pointerDown(p)){this.start=null;return;} if(this.visual?.pointerDown(p)){this.start=null;return;} this.navigating = false; this.start = { ...p }; this.last = { ...p }; this.drag = null; for (const g of this.gizmo()) {
         const dx = g.b.x - g.a.x, dy = g.b.y - g.a.y, den = dx * dx + dy * dy, t = den ? ((p.x - g.a.x) * dx + (p.y - g.a.y) * dy) / den : 0;
         if (t > .2 && t < 1.25 && Math.hypot(g.a.x + dx * t - p.x, g.a.y + dy * t - p.y) < 12) {
             try {
@@ -183,6 +194,8 @@ export class ModelingWorkbench {
         }
     } }
     pointerMove(p) {
+        if(this.inspection?.pointerMove(p))return;
+        if(this.visual?.pointerMove(p))return;
         if (!this.start)
             return;
         if (!this.drag && !this.navigating && Math.hypot(p.x - this.start.x, p.y - this.start.y) < 7) return;
@@ -213,6 +226,8 @@ export class ModelingWorkbench {
         this.changedView();
     }
     pointerUp(p) {
+        if(this.inspection?.pointerUp(p)){this.start=null;return;}
+        if(this.visual?.pointerUp(p)){this.start=null;return;}
         const start = this.start, drag = this.drag;
         this.start = null;
         this.drag = null;
@@ -232,6 +247,8 @@ export class ModelingWorkbench {
             return;
         }
         if (start && !this.navigating && Math.hypot(p.x - start.x, p.y - start.y) < 7) {
+            if(this.inspection?.active){this.inspection.pickAt(p);return;}
+            if(this.visual?.active){this.visual.pickAt(p);return;}
             this.hit = this.renderer.pick(p.x, p.y, { mode: this.pickMode, radius: p.pointerType === 'touch' ? 18 : 9 });
             if (!this.w.multi && !p.ctrl && !p.shift)
                 this.w.selection.clear();
@@ -249,7 +266,7 @@ export class ModelingWorkbench {
         }
         this.saveView();
     }
-    cancelDrag() { this.start = null; this.drag = null; if (this.previewDocument && !this.operation) {
+    cancelDrag() { this.inspection?.cancelDrag();this.visual?.cancelDrag(); this.start = null; this.drag = null; if(this.visual?.active)return; if (this.previewDocument && !this.operation) {
         this.previewDocument = null;
         if (this.active && this.renderer)
             this.renderer.setDocument(this.w.doc, { showInputs: this.showInputs });
@@ -279,6 +296,15 @@ export class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
+        if(w.options.modelingInteraction!=='dialog'&&['3d-section','3d-measure','3d-appearance'].includes(action)){this.inspection.start({'3d-section':'section','3d-measure':'measure','3d-appearance':'appearance'}[action]);return;}
+        if(this.inspection?.active&&!action.startsWith('3d-view-')&&action!=='3d-fit'&&action!=='3d-capture')this.inspection.cancel();
+        if (await displayAction3D(this, action)) return;
+        if(action==='3d-face-profile'&&w.options.modelingInteraction!=='dialog'){this.visual.start('face-profile');return;}
+        if(action==='3d-exact-dialog'){const e=w.selected()[0];if(e?.feature3d)this.operationDialog(e.feature3d.kind,e.id);else this.vertexDialog();return;}
+        if(action.startsWith('3d-op-')&&w.options.modelingInteraction!=='dialog'){this.visual.start(action.slice(6));return;}
+        if(this.visual?.active && !action.startsWith('3d-view-') && action!=='3d-fit' && !['3d-undo','3d-redo'].includes(action))this.visual.cancel();
+        if(action==='3d-undo'&&this.visual.active){this.visual.historyStep();return;}
+        if(action==='3d-redo'&&this.visual.active){this.visual.historyStep(true);return;}
         if (authoringAction3(this, action)) return;
         if (action.startsWith('3d-op-')) {
             this.operationDialog(action.slice(6));
@@ -300,7 +326,7 @@ export class ModelingWorkbench {
         }
         switch (action) {
             case '3d-tools':
-                this.toolsDialog();
+                w.options.modelingInteraction==='dialog'?this.toolsDialog():this.visual.openPalette();
                 break;
             case '3d-fit':
                 this.renderer.fit();
@@ -312,9 +338,9 @@ export class ModelingWorkbench {
             case '3d-edit': {
                 const e = w.selected()[0];
                 if (e?.feature3d)
-                    this.operationDialog(e.feature3d.kind, e.id);
+                    w.options.modelingInteraction==='dialog'?this.operationDialog(e.feature3d.kind,e.id):this.visual.start(e.feature3d.kind,e.id);
                 else
-                    this.vertexDialog();
+                    w.options.modelingInteraction==='dialog'||e?.type==='INSERT'?this.vertexDialog():this.visual.start('vertex');
                 break;
             }
             case '3d-preview':
@@ -363,13 +389,13 @@ export class ModelingWorkbench {
                 this.renderInspector();
                 break;
             case '3d-vertex':
-                this.vertexDialog();
+                w.options.modelingInteraction==='dialog'?this.vertexDialog():this.visual.start('vertex');
                 break;
             case '3d-appearance':
                 this.appearanceDialog();
                 break;
             case '3d-sketch':
-                this.sketchDialog();
+                w.options.modelingInteraction==='dialog'?this.sketchDialog():this.visual.start('sketch-profile');
                 break;
             case '3d-path':
                 this.pathDialog();
@@ -433,7 +459,7 @@ export class ModelingWorkbench {
             catch (error) {
                 report = `<p class="error-text">${E(error.message)}</p>`;
             }
-        w.$('.inspector-content').innerHTML = `<h3 class="icon-heading">${icon(e ? entityIcon(e) : 'bodies')}${E(e?.label || e?.type || '3D design')}</h3><p class="muted-note">${selected.length ? selected.length + ' selected. ' + (this.hit?.vertex !== undefined ? 'Vertex ' + this.hit.vertex : this.hit?.face !== undefined ? 'Face ' + this.hit.face : 'Body selection') : 'Tap geometry to select. Drag empty space to orbit.'}</p>${report}<div class="model3d-inspector-actions">${button('3d-edit', 'Edit feature / geometry', 'btn primary')}${button('3d-appearance', 'Appearance / layer', 'btn')}${button('3d-vertex', 'Exact XYZ vertices', 'btn')}${button('3d-op-offset-face', 'Press / pull face', 'btn')}${button('3d-multi', w.multi ? 'Multi-select: on' : 'Multi-select: off', 'btn')}${button('3d-view-options', 'Selection & view options', 'btn')}${e?.feature3d ? button('3d-suppress', e.feature3d.suppressed ? 'Restore feature' : 'Suppress feature', 'btn', e.feature3d.suppressed ? 'play' : 'feature-off') + button('3d-bake', 'Detach feature history…', 'btn') + button('3d-remove', 'Delete (guard dependents)', 'btn danger') : ''}</div><h3>Bodies & source sketches</h3>${button('3d-inputs', this.showInputs ? 'Hide consumed inputs' : 'Show consumed inputs', 'btn', this.showInputs ? 'eye-off' : 'inputs')}<div class="model3d-body-list">${w.doc.entities.filter(e => e.feature3d || ['MESH', 'POLYLINE', 'LWPOLYLINE', 'CIRCLE', 'ELLIPSE', 'SPLINE', 'INSERT'].includes(e.type)).slice(0, 256).map(e => button('3d-select:' + e.id, (e.label || e.type), `${w.selection.has(e.id) ? 'active' : ''} ${e.model3dConsumed ? 'consumed' : ''} ${e.feature3d?.suppressed ? 'suppressed' : ''}`, e.feature3d?.suppressed ? 'feature-off' : entityIcon(e))).join('')}</div><p class="muted-note">Consumed source geometry remains in the document. Hidden bodies and complex features can be selected here.</p>`;
+        w.$('.inspector-content').innerHTML = `<h3 class="icon-heading">${icon(e ? entityIcon(e) : 'bodies')}${E(e?.label || e?.type || '3D design')}</h3><p class="muted-note">${selected.length ? selected.length + ' selected. ' + (this.hit?.vertex !== undefined ? 'Vertex ' + this.hit.vertex : this.hit?.face !== undefined ? 'Face ' + this.hit.face : 'Body selection') : 'Tap geometry to select. Drag empty space to orbit.'}</p>${report}<div class="model3d-inspector-actions">${button('3d-edit', 'Edit on canvas', 'btn primary')}${button('3d-exact-dialog', 'Advanced properties…', 'btn','settings')}${button('3d-appearance', w.options.modelingInteraction==='dialog'?'Appearance / layer':'Appearance on canvas', 'btn')}${button('3d-vertex', 'Exact XYZ vertices', 'btn')}${button('3d-op-offset-face', 'Press / pull face', 'btn')}${button('3d-multi', w.multi ? 'Multi-select: on' : 'Multi-select: off', 'btn')}${button('3d-display', 'Display styles', 'btn', 'appearance')}${button('3d-view-options', 'Selection & view options', 'btn')}${e?.feature3d ? button('3d-suppress', e.feature3d.suppressed ? 'Restore feature' : 'Suppress feature', 'btn', e.feature3d.suppressed ? 'play' : 'feature-off') + button('3d-bake', 'Detach feature history…', 'btn') + button('3d-remove', 'Delete (guard dependents)', 'btn danger') : ''}</div><h3>Bodies & source sketches</h3>${button('3d-inputs', this.showInputs ? 'Hide consumed inputs' : 'Show consumed inputs', 'btn', this.showInputs ? 'eye-off' : 'inputs')}<div class="model3d-body-list">${w.doc.entities.filter(e => e.feature3d || ['MESH', 'POLYLINE', 'LWPOLYLINE', 'CIRCLE', 'ELLIPSE', 'SPLINE', 'INSERT'].includes(e.type)).slice(0, 256).map(e => button('3d-select:' + e.id, (e.label || e.type), `${w.selection.has(e.id) ? 'active' : ''} ${e.model3dConsumed ? 'consumed' : ''} ${e.feature3d?.suppressed ? 'suppressed' : ''}`, e.feature3d?.suppressed ? 'feature-off' : entityIcon(e))).join('')}</div><p class="muted-note">Consumed source geometry remains in the document. Hidden bodies and complex features can be selected here.</p>`;
         return true;
     }
     vertexDialog() {
@@ -461,10 +487,9 @@ export class ModelingWorkbench {
             throw new Error('Profile sizes must be positive'); const normal = { XY: V3(0, 0, 1), XZ: V3(0, -1, 0), YZ: V3(1, 0, 0) }[w.modal.querySelector('#model3d-plane').value], e = w.modal.querySelector('#model3d-shape').value === 'circle' ? circle(o, a) : polyline([V3(o.x, o.y), V3(o.x + a, o.y), V3(o.x + a, o.y + b), V3(o.x, o.y + b)], true); e.extrusion = normal; e.elevation = o.z; e.label = 'Sketch profile'; e.layer = 'Annotations'; w.edit('Create planar 3D profile', () => { w.doc.entities.push(e); w.selection = new Set([e.id]); }); w.closeModal(); this.sync(); this.fitSelection(); } }); }
     pathDialog() { const w = this.w; w.openModal('Create a 3D polyline', `<p>One WCS X, Y, Z triple per line. All coordinates support parameter expressions.</p><label class="field">Vertices<textarea id="model3d-path">0, 0, 0\n0, 0, 40\n40, 20, 70\n100, 20, 70</textarea></label><label><input id="model3d-path-closed" type="checkbox">Closed path</label><div class="error-text"></div>`, { confirm: 'Create path', onConfirm: () => { const points = w.modal.querySelector('#model3d-path').value.trim().split(/\n+/).map(line => xyz(line, s => w.eval(s))), closed = w.modal.querySelector('#model3d-path-closed').checked; if (points.length < 2 || points.length > 2048 || points.some((p, i) => i && distance3(p, points[i - 1]) < 1e-9))
             throw new Error('Use 2–2048 distinct adjacent vertices'); const e = entity('POLYLINE', { points, closed, flags: 8, label: '3D path', layer: 'Annotations' }); w.edit('Create 3D path', () => { w.doc.entities.push(e); w.selection = new Set([e.id]); }); w.closeModal(); this.sync(); this.fitSelection(); } }); }
-    appearanceDialog() { const w = this.w, e = w.selected()[0]; if (!e)
-        throw new Error('Select an entity'); if (isLocked(e, w.doc))
-        throw new Error('The selected entity is locked'); w.openModal('3D appearance', `<label class="field">Name<input id="model3d-label" value="${E(e.label || e.type)}"></label><label class="field">Surface / line color<input id="model3d-color" type="color" value="${E(/^#[0-9a-f]{6}$/i.test(e.color) ? e.color : '#648596')}"></label><label class="field">Layer<select id="model3d-layer">${w.doc.layers.map(l => `<option ${l.name === e.layer ? 'selected' : ''}>${E(l.name)}</option>`).join('')}</select></label>`, { confirm: 'Apply appearance', onConfirm: () => { const label = w.modal.querySelector('#model3d-label').value.slice(0, 160), color = w.modal.querySelector('#model3d-color').value, layer = w.modal.querySelector('#model3d-layer').value; w.edit('3D appearance', () => Object.assign(w.doc.entities.find(q => q.id === e.id), { label, color, layer })); w.closeModal(); } }); }
-    viewDialog() { const w = this.w; w.openModal('3D view and selection', `${iconPreferencesMarkup()}<label class="field">Projection<select id="model3d-projection"><option value="ortho">Orthographic</option><option value="perspective" ${this.camera.perspective ? 'selected' : ''}>Perspective</option></select></label><label class="field">Display style<select id="model3d-style">${['shaded-edges', 'shaded', 'wireframe'].map(s => `<option ${s === this.renderer.style ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">Selection mode<select id="model3d-pick">${['body', 'face', 'vertex'].map(s => `<option ${s === this.pickMode ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">One-finger / left-button drag<select id="model3d-nav"><option value="orbit">Orbit</option><option value="pan" ${this.navigation === 'pan' ? 'selected' : ''}>Pan</option></select></label><div class="operation-grid">${['iso', 'top', 'bottom', 'front', 'back', 'left', 'right'].map(s => button('3d-view-' + s, s, 'btn')).join('')}</div><p class="muted-note">${E(this.renderer.backend)}. CPU frame time does not measure GPU execution. Canvas fallback uses a bounded software Z-buffer; CPU timing is not GPU execution time.</p>`, { confirm: 'Apply view', onConfirm: () => { this.camera.perspective = w.modal.querySelector('#model3d-projection').value === 'perspective'; this.renderer.style = w.modal.querySelector('#model3d-style').value; this.pickMode = w.modal.querySelector('#model3d-pick').value; this.navigation = w.modal.querySelector('#model3d-nav').value; this.renderer.upload(); this.changedView(); this.saveView(); w.closeModal(); w.renderInspector(); } }); }
+    async setStyle(name){if(['2d','2dwireframe'].includes(name.toLowerCase())){await this.setActive(false);return;}const style=visualStyle(name.toLowerCase());await this.setActive(true);this.renderer.setDisplaySettings({style:style.id});this.saveView();syncDisplay3D(this);}
+    appearanceDialog() { appearanceDialog3D(this); }
+    viewDialog() { const w = this.w; w.openModal('3D view and selection', `${iconPreferencesMarkup()}<label class="field">Projection<select id="model3d-projection"><option value="ortho">Orthographic</option><option value="perspective" ${this.camera.perspective ? 'selected' : ''}>Perspective</option></select></label><label class="field">Display style<select id="model3d-style">${VISUAL_STYLES.map(s => `<option value="${s.id}" ${s.id === this.renderer.style ? 'selected' : ''}>${E(s.label)}</option>`).join('')}</select></label><label class="field">Selection mode<select id="model3d-pick">${['body', 'face', 'vertex'].map(s => `<option ${s === this.pickMode ? 'selected' : ''}>${s}</option>`).join('')}</select></label><label class="field">One-finger / left-button drag<select id="model3d-nav"><option value="orbit">Orbit</option><option value="pan" ${this.navigation === 'pan' ? 'selected' : ''}>Pan</option></select></label><div class="operation-grid">${button('3d-display','Display style manager','btn','appearance')}${['iso', 'top', 'bottom', 'front', 'back', 'left', 'right'].map(s => button('3d-view-' + s, s, 'btn')).join('')}</div><p class="muted-note">${E(this.renderer.backend)}. CPU frame time does not measure GPU execution. Canvas fallback uses a bounded software Z-buffer; CPU timing is not GPU execution time.</p>`, { confirm: 'Apply view', onConfirm: () => { this.camera.perspective = w.modal.querySelector('#model3d-projection').value === 'perspective'; this.renderer.style = w.modal.querySelector('#model3d-style').value; this.pickMode = w.modal.querySelector('#model3d-pick').value; this.navigation = w.modal.querySelector('#model3d-nav').value; this.changedView(); this.saveView(); w.closeModal(); w.renderInspector(); syncDisplay3D(this); } }); }
     measureDialog() { const w = this.w, selected = w.selected().filter(e => e.type === 'MESH'), items = (selected.length ? selected : w.doc.entities.filter(e => e.type === 'MESH' && !e.model3dConsumed && !e.feature3d?.suppressed)); const values = items.map(e => { try {
         const p = meshProperties(e);
         return `<section><h3>${E(e.label || e.id)}</h3><p>${p.closed ? 'Closed oriented mesh' : 'Open or non-manifold mesh'} · ${p.vertices} vertices · ${p.faces} faces</p><p>Area: ${format(p.area)} ${E(w.doc.units)}²<br>Volume: ${p.volume === null ? 'not reported for an open mesh' : format(p.volume) + ' ' + E(w.doc.units) + '³'}<br>Boundary edges: ${p.boundaryEdges}; non-manifold/orientation edges: ${p.nonManifoldEdges}</p>${p.centroid ? '<p>Volume centroid: ' + [p.centroid.x, p.centroid.y, p.centroid.z].map(format).join(', ') + '</p>' : ''}</section>`;
@@ -472,13 +497,13 @@ export class ModelingWorkbench {
     catch (error) {
         return `<p>${E(error.message)}</p>`;
     } }).join(''); w.openModal('3D measurements & display diagnostics', `${values || '<p>Select a mesh body to measure its surface and topology.</p>'}${this.hit ? '<p>Picked WCS point: ' + [this.hit.point.x, this.hit.point.y, this.hit.point.z].map(format).join(', ') + '</p>' : ''}<h3>Display diagnostics</h3>${this.renderer.scene.diagnostics.map(d => `<p>${E(d.id)}: ${E(d.message)}</p>`).join('') || '<p>No unsupported spatial entities in this scene.</p>'}<p class="muted-note">Area/volume calculations are for the faceted mesh. Closed edge incidence alone is not a self-intersection certificate. External overlapping bodies are measured individually.</p>`); }
-    sectionDialog() { const w = this.w; w.openModal('Section analysis', `<p>Clip the 3D view, or create native LINE section segments from a selected mesh. This is analysis, not a capped solid split.</p><label class="field">Plane normal<select id="model3d-section-axis"><option>x</option><option>y</option><option selected>z</option></select></label>${fields([{ name: 'offset', label: 'Plane offset', value: this.renderer.section?.offset ?? 25 }])}<label><input id="model3d-section-enable" type="checkbox" checked>Enable display clipping</label><label><input id="model3d-section-lines" type="checkbox">Create section LINE entities in drawing</label><div class="error-text"></div>`, { confirm: 'Apply section', onConfirm: () => { const axis = w.modal.querySelector('#model3d-section-axis').value, offset = w.eval(w.modal.querySelector('[data-model-field=offset]').value), normal = { x: V3(1, 0, 0), y: V3(0, 1, 0), z: V3(0, 0, 1) }[axis]; if (w.modal.querySelector('#model3d-section-lines').checked) {
+    sectionDialog() { const w = this.w; w.openModal('Section analysis', `<p>Clip the 3D view, or create native LINE section segments from a selected mesh. Closed contours receive display-only caps; this is not a solid split. Configure cap color/hatching in Display styles.</p><label class="field">Plane normal<select id="model3d-section-axis"><option>x</option><option>y</option><option selected>z</option></select></label>${fields([{ name: 'offset', label: 'Plane offset', value: this.renderer.section?.offset ?? 25 }])}<label><input id="model3d-section-enable" type="checkbox" checked>Enable display clipping</label><label><input id="model3d-section-lines" type="checkbox">Create section LINE entities in drawing</label><div class="error-text"></div>`, { confirm: 'Apply section', onConfirm: () => { const axis = w.modal.querySelector('#model3d-section-axis').value, offset = w.eval(w.modal.querySelector('[data-model-field=offset]').value), normal = { x: V3(1, 0, 0), y: V3(0, 1, 0), z: V3(0, 0, 1) }[axis]; if (w.modal.querySelector('#model3d-section-lines').checked) {
             const e = w.selected().find(e => e.type === 'MESH');
             if (!e)
                 throw new Error('Select a mesh for native section output');
             w.edit('Create mesh section', () => w.doc.entities.push(...sectionEntities(e, axis, offset)));
-        } this.renderer.section = w.modal.querySelector('#model3d-section-enable').checked ? { normal, offset } : null; this.renderer.invalidate(); w.closeModal(); } }); }
+        } this.renderer.section = w.modal.querySelector('#model3d-section-enable').checked ? { normal, offset } : null; this.renderer.invalidate(); this.saveView(); w.closeModal(); } }); }
     exportMesh(format) { const e = this.w.selected().find(e => e.type === 'MESH'); if (!e)
         throw new Error('Select a MESH body to export'); downloadFile(this.w.basename() + '.' + format, format === 'obj' ? writeOBJ(e) : writeSTL(e), 'text/plain'); this.w.closeModal(); }
-    dispose() { this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
+    dispose() { this.inspection?.dispose();this.visual?.dispose(); this.disposed = true; this.input.dispose(); this.renderer?.dispose(); this.stage.remove(); }
 }

@@ -321,3 +321,23 @@ itself is atomic for dependent dimensions, not for earlier caller mutations.
 `dimensionGrips`, `dynamicParameterGrips`, `dynamicGripValue`, `dynamicValues` and
 `validateDynamicBlock` support alternative editors. See CAD_EDITING.md for precise
 supported action geometry and interoperability boundaries.
+
+
+## Non-modal 3D geometry editing (0.11.0)
+
+The default workbench uses on-canvas manipulators and isolated preview sessions:
+
+```js
+await workbench.action('mode-3d');
+await workbench.model3d.ready;
+workbench.model3d.visual.start('box');
+// A user now drags world handles or taps inline expression fields.
+// To select the explicit legacy advanced authoring UI in a host:
+// mountWorkbench(element, {modelingInteraction: 'dialog'});
+```
+
+Headless embedding uses `VisualEditSession` and projection functions from
+`@conduitcad/manipulation3d`. [The package README](../packages/manipulation3d/README.md)
+contains a complete transaction example. Preview documents are read-only by contract;
+use session setters to invalidate the cache. Commit inside the host history boundary,
+then release the session.

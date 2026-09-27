@@ -1,6 +1,6 @@
 {
   "name": "conduit-cad-workspace",
-  "version": "0.9.1",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -19,7 +19,13 @@
     "samples:3d": "node scripts/modeling-samples.mjs",
     "test:3d": "node --test tests/modeling3d*.test.mjs",
     "icons": "node scripts/icon-atlas.mjs",
-    "test:icons": "node --test tests/icons.test.mjs"
+    "test:icons": "node --test tests/icons.test.mjs",
+    "samples:rendering": "node scripts/rendering-samples.mjs",
+    "test:rendering": "node --test tests/render-styles.test.mjs",
+    "gallery:rendering": "node scripts/render-gallery.mjs",
+    "test:visual": "node --test tests/manipulation3d.test.mjs",
+    "test:planar": "node --test tests/manipulation2d.test.mjs",
+    "samples:visual2d": "node scripts/visual-drafting-sample.mjs"
   },
   "engines": {
     "node": ">=22"

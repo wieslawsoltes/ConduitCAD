@@ -23,6 +23,8 @@ try:
     if os.environ.get('CONDUIT_TEST_ORIGIN')=='localhost':page.goto(f'http://127.0.0.1:{server.server_port}/?fresh=1&renderer=canvas')
     else:page.set_content((ROOT/'dist/ConduitCAD.html').read_text().replace("mountWorkbench(document.getElementById('app'))","mountWorkbench(document.getElementById('app'),{backend:'canvas'})"))
     page.wait_for_function('document.documentElement.dataset.ready === "true"')
+    # The default visual path is exercised separately by browser_planar_visual.py.
+    page.evaluate("conduit.options.drawingInteraction='dialog'")
     page.evaluate('''()=>{conduit.store.save=async()=>{};conduit.store.schedule=()=>{};conduit.doc.entities=[];conduit.doc.constraints=[];
       conduit.doc.parameters={};conduit.doc.activeLayout='Model';conduit.currentLayer='0';conduit.gridSnap=false;conduit.objectSnap=false;conduit.ortho=false;
       conduit.history.clear();conduit.selection.clear();conduit.touch();conduit.updateUI();conduit.camera.x=60;conduit.camera.y=30;conduit.camera.scale=1.8;conduit.renderer.invalidate();}''')

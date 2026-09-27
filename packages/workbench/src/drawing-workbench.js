@@ -30,6 +30,7 @@ export function commitDrawing(w, e) {
     return e;
 }
 export function acceptDrawingPoint(w, p) {
+    if(w.drawingOptionsError)throw new Error('Correct or discard the invalid tool options before placing geometry: '+w.drawingOptionsError);
     if (!w.drawingSession) throw new Error('Choose a drawing tool first');
     const e = w.drawingSession.add(p, properties(w), w.doc);
     if (e) commitDrawing(w, e);
@@ -67,6 +68,7 @@ export function updateDrawingControls(w) {
     finish.innerHTML = `${icon('check')} Finish`;
 }
 export function finishDrawing(w, closed = false) {
+    if(w.drawingOptionsError)throw new Error('Correct or discard the invalid tool options before finishing: '+w.drawingOptionsError);
     if (w.drawingSession) { commitDrawing(w, w.drawingSession.finish(closed, properties(w), w.doc)); return true; }
     if (closed && w.tool === 'polyline') {
         const points = validateBoundary(w.draft);

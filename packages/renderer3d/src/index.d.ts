@@ -21,12 +21,37 @@ export interface BackendStatus3D { backend:string;requested?:string;fallback?:bo
 export class SpatialRenderer {
  constructor(host:HTMLElement,options?:{backend?:'auto'|'webgpu'|'webgl2'|'canvas';camera?:OrbitCamera;onStatus?:(status:BackendStatus3D)=>void});
  ready:Promise<void>;camera:OrbitCamera;scene:Scene3D;canvas:HTMLCanvasElement;overlay:HTMLCanvasElement;backend:string;
- section:SectionPlane|null;style:'shaded'|'shaded-edges'|'wireframe';marker:Point3|null;active:boolean;uploads:number;
- stats:{backend:string;triangles:number;segments:number;frameMs:number;uploads:number};
+ readonly displaySettings:DisplaySettings3D;
+ section:SectionPlane|null;style:VisualStyleId;marker:Point3|null;active:boolean;uploads:number;
+ stats:{backend:string;style:VisualStyleId;triangles:number;segments:number;frameMs:number;uploads:number;passes:number;estimatedAttachmentBytes:number;capTriangles:number};
  drawOverlay?:(context:CanvasRenderingContext2D,camera:OrbitCamera)=>void;
  onFrame?:(stats:SpatialRenderer['stats'])=>void;
  setDocument(document:CadDocument,options?:{showInputs?:boolean;maxTriangles?:number;maxInstances?:number}):void;
  setSelection(ids:Set<string>,face?:PickResult3D|null):void;
+ setDisplaySettings(settings:Partial<DisplaySettings3D>,options?:{replace?:boolean;tolerant?:boolean}):DisplaySettings3D;
+ capturePNG(options?:{annotations?:boolean}):Promise<Blob>;
  resize():void;upload():void;invalidate():void;draw():void;fit():void;dispose():void;
  pick(x:number,y:number,options?:{mode?:'body'|'face'|'vertex';radius?:number}):PickResult3D|null;
 }
+
+/** Stable display identifiers; these change presentation, never CAD topology. */
+export type VisualStyleId = 'shaded-edges'|'shaded'|'shaded-hidden'|'wireframe'|'hidden'|'wireframe-hidden'|'realistic'|'realistic-edges'|'conceptual'|'gray'|'sketchy'|'xray'|'flat'|'flat-edges'|'clay'|'normals';
+export interface VisualStyle3D { readonly id:VisualStyleId;readonly label:string;readonly group:string;readonly faces:'none'|'shaded'|'pbr'|'gooch'|'gray'|'clay'|'normals';readonly visible:boolean;readonly hidden:boolean|'solid';readonly smooth:boolean;readonly description:string; }
+export interface DisplaySettings3D {
+ style:VisualStyleId;environment:'studio'|'soft'|'outdoor'|'dark';exposure:number;grid:boolean;ground:boolean;
+ shadows:boolean;ambientOcclusion:boolean;aoStrength:number;aoRadius:number;
+ background:'solid'|'gradient';backgroundColor:string;backgroundTop:string;groundColor:string;
+ edgeColor:string;hiddenColor:string;edgeWidth:number;silhouetteWidth:number;creaseAngle:number;edgeDetail:'feature'|'all';
+ hiddenDash:number;xrayOpacity:number;jitter:number;overhang:number;quality:'draft'|'balanced'|'high';
+ sectionCaps:boolean;capColor:string;capHatch:boolean;
+}
+export interface Material3D { color:string;metallic:number;roughness:number;opacity:number;emission:number; }
+export const VISUAL_STYLES:readonly VisualStyle3D[];
+export const DEFAULT_DISPLAY_SETTINGS:Readonly<DisplaySettings3D>;
+export const ENVIRONMENTS:readonly {readonly id:DisplaySettings3D['environment'];readonly label:string;readonly light:readonly number[];readonly sky:readonly number[];readonly floor:readonly number[]}[];
+export const MATERIAL_PRESETS:readonly Readonly<Omit<Material3D,'emission'> & {id:string;label:string}>[];
+export function visualStyle(id:string):VisualStyle3D;
+export function normalizeDisplaySettings(input?:Partial<DisplaySettings3D>|unknown,options?:{tolerant?:boolean}):DisplaySettings3D;
+export function normalizeMaterial(input?:Partial<Material3D> & {preset?:string},fallbackColor?:string):Material3D;
+/** Create an editable sphere/material and annular-section reference drawing. */
+export function createRenderingStudy():CadDocument;

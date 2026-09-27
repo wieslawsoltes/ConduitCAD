@@ -16,7 +16,7 @@ export const MODELING_TOOLS = [
     { id: 'revolve', label: 'Revolve profile', group: 'Create', inputs: 1, fields: [field('angle', 'Angle · degrees', 360), field('segments', 'Angular segments', 48)] },
     { id: 'loft', label: 'Loft profiles', group: 'Create', inputs: 2, multiple: true, fields: [field('samples', 'Vertices per section', 32)] },
     { id: 'sweep', label: 'Sweep along path', group: 'Create', inputs: 2, fields: [] },
-    { id: 'transform', label: 'Move / rotate / scale', group: 'Modify', inputs: 1, fields: [field('dx', 'Move X', 0), field('dy', 'Move Y', 0), field('dz', 'Move Z', 0), field('rx', 'Rotate X · degrees', 0), field('ry', 'Rotate Y · degrees', 0), field('rz', 'Rotate Z · degrees', 0), field('sx', 'Scale X', 1), field('sy', 'Scale Y', 1), field('sz', 'Scale Z', 1)] },
+    { id: 'transform', label: 'Move / rotate / scale', group: 'Modify', inputs: 1, fields: [field('dx', 'Move X', 0), field('dy', 'Move Y', 0), field('dz', 'Move Z', 0), field('rx', 'Rotate X · degrees', 0), field('ry', 'Rotate Y · degrees', 0), field('rz', 'Rotate Z · degrees', 0), field('sx', 'Scale X', 1), field('sy', 'Scale Y', 1), field('sz', 'Scale Z', 1), field('px', 'Pivot X', 0), field('py', 'Pivot Y', 0), field('pz', 'Pivot Z', 0)] },
     { id: 'offset-face', label: 'Press / pull planar face', group: 'Modify', inputs: 1, fields: [field('face', 'Face index (zero based)', 0), field('distance', 'Normal offset', 5)] },
     { id: 'union', label: 'Boolean union', group: 'Combine', inputs: 2, fields: [] },
     { id: 'subtract', label: 'Boolean cut', group: 'Combine', inputs: 2, fields: [] },
@@ -176,6 +176,8 @@ function evaluateFeature(f, inputs, variables) {
         else if (f.kind === 'transform') {
             const degrees = Math.PI / 180;
             let t = multiply4(translation3(p.dx, p.dy, p.dz), multiply4(rotation3(V3(0, 0, 1), p.rz * degrees), multiply4(rotation3(V3(0, 1, 0), p.ry * degrees), multiply4(rotation3(V3(1, 0, 0), p.rx * degrees), scaling3(p.sx, p.sy, p.sz)))));
+            const pivot = V3(p.px, p.py, p.pz);
+            t = multiply4(translation3(pivot.x, pivot.y, pivot.z), multiply4(t, translation3(-pivot.x, -pivot.y, -pivot.z)));
             m = transformMesh(asMesh(inputs[0]), t);
         }
         else if (f.kind === 'offset-face')

@@ -1,6 +1,6 @@
 {
   "name": "@conduitcad/history",
-  "version": "0.9.1",
+  "version": "0.12.0",
   "description": "Modular Conduit CAD history engine",
   "type": "module",
   "main": "./src/index.js",

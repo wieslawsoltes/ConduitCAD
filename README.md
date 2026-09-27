@@ -1,14 +1,55 @@
 # Conduit CAD
 
-**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.9.1.**
+**Touch-first, DXF-native 2D/3D CAD and diagramming — 0.12.0 planar editing and spatial inspection checkpoint.**
 
 A local-first HTML/JavaScript application with native CAD entities, engineering
 symbol libraries, routed connectors, shared blocks, parametric sketches and a
 faceted 3D feature engine. Desktop and mobile share the same document/history
-model, with separate 2D and 3D cameras. Nineteen reusable ES-module packages power
+model, with separate 2D and 3D cameras. Twenty-one reusable ES-module packages power
 the workbench; no third-party runtime packages or CDN assets are required.
 
-## New: coherent desktop and touch iconography
+## New: visual 2D editing and non-modal 3D inspection
+
+In 2D select an entity and choose **Edit on canvas**. Native handles, exact inline
+expressions, live TEXT/MTEXT, dimension witnesses, dynamic block grips and previewed
+move/copy, rotate, scale, offset and fillet share one undoable Apply/Cancel. **More /
+Shapes → Visual drafting workshop** opens an editable example without a file download.
+The drawing palette, exact next-point input and drawing options are non-modal.
+
+3D **Section**, **Inspect**, and **Appearance on canvas** now use live viewport controls:
+drag a section plane, pick WCS measurement points, generate native section/guide lines,
+and preview material presets/sliders before accepting. The existing 22 visual 3D tools,
+16 rendering styles and independent 2D/3D cameras remain available.
+
+![Planar visual editing](artifacts/visual-drafting-desktop.png)
+
+[Workflow, contracts and boundaries](docs/VISUAL_EDITING_2D_3D_0120.md) ·
+[Phone controls](artifacts/visual-drafting-phone.png) ·
+[Reusable planar API](packages/manipulation2d/README.md) ·
+[Validation](docs/VALIDATION_VISUAL_0120.md)
+
+**This checkpoint is locally committed, not a confirmed GitHub/Pages release.** It
+includes the preceding unpublished 0.10.0 and 0.11.0 work. Native-origin WebGPU,
+physical-device input/performance and OS keyboard acceptance remain unqualified.
+
+## CAD rendering styles and material inspection
+
+Sixteen real-time 3D styles now use separate surface, depth, hidden-edge,
+transparency and presentation passes. Realistic adds GGX metal/roughness shading,
+procedural studio lighting, optional shadows and ambient occlusion. Section analysis
+caps valid closed contours without changing native geometry. Adaptive Display styles,
+a compact live phone preview, per-document settings, material presets, PNG capture and
+an editable material-study drawing preserve the existing 2D workflow.
+
+**This source checkpoint is not a confirmed GitHub/Pages release.** Canvas and
+WebGL2 execute in the local validation environment; the new WebGPU graph is implemented
+but awaits execution through the included native-origin CI gate. See
+[rendering behavior and limits](docs/RENDERING_3D.md) and
+[the current validation record](docs/VALIDATION_RENDERING_0100.md).
+
+![Material and rendering study](artifacts/render-material-study.png)
+
+## Coherent desktop and touch iconography
 
 180 original SVG UI glyphs now identify drawing tools, modeling operations,
 selection modes, camera views, properties, dimensions, blocks, feature history,
@@ -65,7 +106,9 @@ references in one undoable transaction. Parameters/actions, sketch constraints,
 driving dimensions and calculated text use validated expressions and atomic
 regeneration. Test Block previews independent instance values.
 
-**Model in 3D.** Switch to 3D or open a 3D starter. Create primitives, extrusions,
+**Model in 3D.** Switch to 3D or open a 3D starter. Create/Edit uses the on-canvas
+manipulator and dimension ribbon by default; Options exposes additional fields
+without blocking the viewport, with an explicit Advanced form alternative. Create primitives, extrusions,
 revolves, lofts, sweeps, booleans and patterns. Face selection exposes Sketch on face,
 Hole, Press/Pull and Look at face. Holes support simple, counterbore and countersink
 forms. Extrusions support one-sided, symmetric and two-sided extents, start offsets
@@ -108,6 +151,8 @@ have a gradient preview; other retained distributions have documented limitation
 
 | Package | Responsibility |
 |---|---|
+| `@conduitcad/manipulation2d` | Native planar preview sessions, exact fields and geometric handles |
+| `@conduitcad/manipulation3d` | DOM-free visual edit sessions, world gestures, handle layouts |
 | `@conduitcad/icons` | Original decorative SVG registry and immutable discovery data |
 | `@conduitcad/geometry` | Planar double-precision geometry and curve evaluation |
 | `@conduitcad/geometry3d` | Spatial vectors, transforms and curve geometry |
@@ -143,21 +188,26 @@ the packages; DXF extension data remains permissively typed where documented.
 
 ## Validation and implementation notes
 
-The 0.9.1 validation has 602 passing Node tests, inherited browser regressions and a
-146-assertion icon suite, strict TypeScript consumers and clean offline integration
-of all nineteen packages. Raw reports, screenshots and exact execution scope are
-listed in [the current validation record](docs/VALIDATION_ICONOGRAPHY_091.md).
+The visual-editing checkpoint adds isolated transaction, geometric gesture, on-canvas
+interaction, mobile layout and independent DXF checks. Exact execution scope and counts
+are recorded in [the current validation record](docs/VALIDATION_VISUAL_0120.md).
+[0.11.0 3D visual validation](docs/VALIDATION_VISUAL_0110.md) is retained as history.
+[0.10.0 rendering validation](docs/VALIDATION_RENDERING_0100.md) is retained as history.
+The previous [0.9.1 iconography validation](docs/VALIDATION_ICONOGRAPHY_091.md) remains
+a historical release record, not evidence that the new WebGPU graph has executed.
 The permanent Pages workflow validates the production build and compares hosted
 resource hashes after deployment.
 
-Canvas software depth, WebGL2 and WebGPU API paths have fixture-level regression
-coverage using SwiftShader. This is not physical GPU performance or universal pixel
+Canvas software depth and WebGL2 execute the new graph with fixture-level regression
+coverage using SwiftShader. The new WebGPU graph is pending native-origin execution. This is not physical GPU performance or universal pixel
 equivalence. Emulated touch and keyboard tests are not physical iOS/Android, native
 screen-reader or OS keyboard acceptance. Native IndexedDB/Web Locks recovery has a
 separate suite; crash/eviction durability still requires independent qualification.
 
 No MutationObserver, per-frame DOM scan, icon font or remote asset load is used for
-iconography. Existing geometry, solver, DXF and rendering semantics are retained.
+iconography. The visual controller updates its projected handle nodes at frame boundaries
+and does not scan the unrelated document DOM. Existing 2D geometry/solver semantics are
+retained; pivoted transforms are an explicit extension to the 3D feature evaluator.
 CPU-only benchmarks are labeled as such; they are not GPU completion timestamps or
 mobile frame-rate guarantees. Large topology edits and snapshot history still incur
 whole-document costs.
@@ -165,7 +215,7 @@ whole-document costs.
 ## Documentation and license
 
 [DXF compatibility](docs/DXF_COMPATIBILITY.md) · [Drawing tools](docs/DRAWING_TOOLS.md) ·
-[Parametric authoring](docs/PARAMETRIC_AUTHORING.md) · [3D modeling](docs/MODELING_3D.md) ·
+[Parametric authoring](docs/PARAMETRIC_AUTHORING.md) · [Visual 3D editing](docs/VISUAL_EDITING_3D.md) · [3D modeling](docs/MODELING_3D.md) ·
 [Face authoring](docs/AUTHORING_3D_090.md) · [Symbols](docs/SYMBOLS.md) ·
 [Multi-document workflows](docs/MULTI_DOCUMENT.md) · [Mobile UI](docs/MOBILE_UI.md) ·
 [API examples](docs/API.md) · [Release notes](RELEASE_NOTES.md)

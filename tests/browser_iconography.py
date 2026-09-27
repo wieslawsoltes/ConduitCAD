@@ -21,6 +21,8 @@ def load(page):
  if real:page.goto(url)
  else:page.set_content(source.replace('<script>globalThis.__CONDUIT_STANDALONE__=true;','<script>'+memory+'globalThis.__CONDUIT_STANDALONE__=true;').replace("mountWorkbench(document.getElementById('app'))","mountWorkbench(document.getElementById('app'),{backend:'canvas',backend3d:'canvas'})"))
  page.wait_for_function('document.documentElement.dataset.ready==="true"')
+ # Retained advanced-form regression; default visual authoring has its own browser suite.
+ page.evaluate("conduit.options.modelingInteraction='dialog'")
  page.evaluate("conduit.documents.debounce=100000;clearTimeout(conduit.documents.timer);clearTimeout(conduit.toastTimer);document.querySelector('.toast').classList.remove('show')")
 def bounded(page,selector):
  return page.locator(selector).evaluate('e=>{const r=e.getBoundingClientRect();return r.width>0&&r.left>=-.6&&r.top>=-.6&&r.right<=innerWidth+.6&&r.bottom<=innerHeight+.6;}')

@@ -21,6 +21,8 @@ def load(page):
  if native:page.goto(f'http://127.0.0.1:{server.server_port}/?fresh=1&no-sw=1&renderer=canvas&renderer3d=canvas')
  else:page.set_content(source.replace('<script>globalThis.__CONDUIT_STANDALONE__=true;','<script>'+memory+'globalThis.__CONDUIT_STANDALONE__=true;').replace("mountWorkbench(document.getElementById('app'))","mountWorkbench(document.getElementById('app'),{backend:'canvas',backend3d:'canvas'})"))
  page.wait_for_function('document.documentElement.dataset.ready==="true"')
+ # Retained advanced-form regression; default visual authoring has its own browser suite.
+ page.evaluate("conduit.options.modelingInteraction='dialog'")
  page.evaluate("conduit.documents.debounce=100000;clearTimeout(conduit.documents.timer);conduit.newDocument('blank')")
  action(page,'mode-3d');page.wait_for_function('!!conduit.model3d.renderer.backend')
 def action(page,a):page.evaluate('(a)=>conduit.action(a)',a);page.wait_for_timeout(25)

@@ -6,7 +6,7 @@ import { renderBlockBar, restoreHistory, refreshCalculations } from './parametri
 import { escapeHTML as E, icon } from './icons.js';
 import { commandButton, commandContent } from './icons.js';
 
-const defaults = () => ({ viewMode: '2d', model3dCamera: null, tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
+const defaults = () => ({ viewMode: '2d', model3dCamera: null, model3dDisplay: null, model3dSection: null, tool: 'select', category: 'P&ID', librarySearch: '', inspectorTab: 'properties', currentLayer: 'Process', lineStyle: 'process', gridSnap: true, objectSnap: true, ortho: false, multi: false, showConstraintAnnotations: false, draft: [], drawingSession: null, drawingOptions: {}, connectionStart: null, pendingSymbol: null, previewSymbol: null, blockSession: null, lastSolve: null, constraintLabels: [], lastRoutedIds: null, grid: true });
 const fields = Object.keys(defaults());
 const cameraState = w => ({ x: w.camera.x, y: w.camera.y, scale: w.camera.scale });
 const dirty = session => session.revision !== session.savedRevision;
@@ -46,7 +46,7 @@ export function captureActiveDocument(w) {
 }
 function snapshotSession(session) {
     const c = session.context, block = c.blockSession;
-    const state = { model3dCamera: c.model3dCamera, camera: c.camera, selection: [...(c.selection || [])], settings: {}, libraryScroll: c.libraryScroll, inspectorScroll: c.inspectorScroll };
+    const state = { model3dSection: c.model3dSection, model3dDisplay: c.model3dDisplay, model3dCamera: c.model3dCamera, camera: c.camera, selection: [...(c.selection || [])], settings: {}, libraryScroll: c.libraryScroll, inspectorScroll: c.inspectorScroll };
     for (const key of ['viewMode', 'category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle', 'gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations', 'drawingOptions']) state.settings[key] = c[key];
     state.tool = block?.testing ? 'select' : c.tool;
     state.draft = block?.testing ? [] : c.draft;
@@ -65,6 +65,8 @@ function restoreContext(w, document, state = {}) {
     for (const key of ['viewMode', 'category', 'librarySearch', 'inspectorTab', 'currentLayer', 'lineStyle']) if (typeof state.settings?.[key] === 'string') context[key] = state.settings[key];
     for (const key of ['gridSnap', 'objectSnap', 'ortho', 'grid', 'showConstraintAnnotations']) if (typeof state.settings?.[key] === 'boolean') context[key] = state.settings[key];
     for (const key of ['x', 'y', 'scale']) if (Number.isFinite(state.camera?.[key])) context.camera[key] = state.camera[key];
+    if(state.model3dSection && typeof state.model3dSection === "object") context.model3dSection = clone(state.model3dSection);
+    if(state.model3dDisplay && typeof state.model3dDisplay === "object") context.model3dDisplay = clone(state.model3dDisplay);
     if(state.model3dCamera && typeof state.model3dCamera === "object") context.model3dCamera = clone(state.model3dCamera);
     context.camera.scale = Math.min(5000, Math.max(.00001, context.camera.scale));
     if (state.settings?.drawingOptions && typeof state.settings.drawingOptions === 'object') context.drawingOptions = clone(state.settings.drawingOptions);

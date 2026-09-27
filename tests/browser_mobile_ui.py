@@ -32,6 +32,8 @@ def load(page):
     if real_origin:page.goto(url)
     else:page.set_content(source.replace('<script>globalThis.__CONDUIT_STANDALONE__=true;','<script>'+memory+'globalThis.__CONDUIT_STANDALONE__=true;').replace("mountWorkbench(document.getElementById('app'))","mountWorkbench(document.getElementById('app'),{backend:'canvas'})"))
     page.wait_for_function('document.documentElement.dataset.ready==="true"')
+    # The default visual path is exercised separately by browser_planar_visual.py.
+    page.evaluate("conduit.options.drawingInteraction='dialog'")
     page.evaluate("conduit.documents.debounce=100000;clearTimeout(conduit.documents.timer);clearTimeout(conduit.toastTimer);document.querySelector('.toast').classList.remove('show')")
 def fit(page,selector):
     return page.locator(selector).evaluate('(e)=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0&&r.left>=-.5&&r.right<=innerWidth+.5&&r.top>=-.5&&r.bottom<=innerHeight+.5}')

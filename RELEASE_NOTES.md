@@ -1,3 +1,70 @@
+# 0.12.0 — Planar visual editing and non-modal spatial inspection (source checkpoint)
+
+- Add `@conduitcad/manipulation2d`: guarded native fields, world-space handles,
+  isolated previews, source signatures and separate draft undo/redo. Twenty-one packages.
+- Edit 21 planar native entity families through on-canvas handles and inline values:
+  text, curves, weighted splines, polygon boundaries, managed dimensions and block parameters.
+- Replace default move/copy, rotate, scale, offset and fillet forms with visual sessions.
+  Keep the same workflows in the shared block editor and retain native regeneration.
+- Make the drawing catalogue, active tool options and exact point entry non-modal.
+  Add an offline native visual drafting workshop with ASCII/binary DXF versions.
+- Add draggable section planes, picked/exact WCS measurements and native section/guide
+  snapshots. Add isolated appearance previews with presets, sliders and precise coefficients.
+- Preserve expressions on supported dimensions, reject invalid/stale previews, guard
+  incompatible spatial geometry and roll back partial gestures before pinch navigation.
+- Keep touch-sized controls, inline keyboard entry, independently scrolling values and
+  fixed confirmation controls, with Canvas/WebGL2 actual-input and independent DXF tests.
+- Retain explicitly selectable legacy forms for specialist workflows. This does not
+  replace every application dialog or claim universal B-rep/association/native Autodesk parity.
+
+# 0.11.0 — Visual 3D editing instead of primary modal forms (source checkpoint)
+
+- Add `@conduitcad/manipulation3d`: typed, DOM-free isolated editing sessions,
+  expression-preserving axis/plane/angle gestures, world handle descriptions and
+  deterministic collision-free 44-pixel control/label packing. Twenty packages total.
+- Make Create, Edit feature, Hole, Sketch on face, Press/Pull, Move/rotate and native
+  vertex editing visual by default. All 22 tools have non-modal fields and source
+  geometry chips; advanced authoring forms remain an explicit alternative.
+- Add signed primitive/extrusion/face/diameter handles, face-local U/V movement,
+  translation axes, multi-turn Euler rings, rotated scale axes and pivoted transforms.
+  Support native rectangle/circle profiles on XY, XZ and YZ alongside face snapshots.
+- Keep isolated previews stable and coalesce regeneration per animation frame; reject
+  stale source/invalid revisions. Apply makes one atomic history edit. Cancel, undo
+  drafts, pointer cancellation and two-finger takeover never mutate the live drawing.
+- Keep exact expressions linked when dragging. Add inline dimensions, local undo/redo,
+  keyboard increments, conditional non-modal options, source picking, multiple loft
+  sections and guarded direct-vertex detachment.
+- Keep Apply/Cancel outside the scrolling mobile utility strip; honor icon label modes,
+  16-pixel input text, useful canvas area, keyboard-sized visual viewports and reduced
+  motion. Reflow projected labels without covering manipulator targets.
+- Preserve 2D drafting, per-document views/history and all sixteen rendering styles.
+  Add real Canvas/WebGL2 visual-authoring tests and independent ezdxf checks of actual
+  UI-produced ASCII/binary exports. Require corresponding native WebGPU execution in CI.
+- Include the preceding unpublished 0.10.0 rendering work. This remains a faceted mesh
+  feature editor, not full Fusion/AutoCAD, associative face sketch or ACIS parity.
+  Physical devices, real OS keyboards and native WebGPU execution remain unqualified.
+
+# 0.10.0 — CAD rendering styles and material inspection (source checkpoint)
+
+- Implement sixteen visual styles with depth-tested visible/hidden edges, dashed
+  occluded lines, deterministic sketch strokes, smooth/flat normals, Gooch shading,
+  grayscale, clay, normal diagnostics and weighted X-ray/transparency.
+- Add a shared WebGPU/WGSL and WebGL2/GLSL display graph with optional normal/depth AO,
+  cached PCF shadow mapping, GGX material shading, exposure/tone mapping, MSAA and
+  instanced edge quads. Mirror the principal semantics in the bounded Canvas rasterizer.
+- Cap valid section contours using even-odd fills, including annular holes and cuts
+  through existing mesh rings; report open/non-manifold/budget cases explicitly.
+- Add adaptive live Display styles panels, compact mobile model comparison, per-document
+  view/section recovery, named presets, material editing and actual viewport PNG capture.
+- Add an editable nineteen-body material study in native project, ASCII and binary DXF.
+- Preserve native entity color/opacity over stale material metadata; material coefficients
+  use Conduit metadata, not a fabricated native Autodesk MATERIAL database.
+- Enforce attachment memory/dimension budgets, skip unused optional targets, cache
+  camera-independent shadow data, and repair WebGL context restoration/resource fallback.
+- Keep 2D drafting and camera state independent. Add numerical, pixel, DXF and responsive
+  regression gates. Canvas/WebGL2 were executed locally; new WebGPU execution and GitHub
+  publication remain outstanding. This is not offline renderer or full Autodesk parity.
+
 # 0.9.1 — Coherent CAD iconography
 
 - Add a reusable, DOM-free `@conduitcad/icons` package with 180 original inline SVG glyphs. No icon fonts, CDN, sprite IDs or third-party assets.

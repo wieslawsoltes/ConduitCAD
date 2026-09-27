@@ -23,7 +23,7 @@ export const ACTION_ICONS = Object.freeze({
     'block-test':'play', 'block-test-close':'arrow-left', 'block-settings':'settings', 'block-close':'close',
     'document-list':'files', 'document-save-all':'save-all',
     '3d-2d':'sketch', '3d-fit':'fit', '3d-view-options':'settings', '3d-tools':'plus',
-    '3d-edit':'feature-edit', '3d-appearance':'appearance', '3d-bodies':'bodies', '3d-measure':'ruler',
+    '3d-display':'appearance', '3d-capture':'file-image', '3d-edit':'feature-edit', '3d-appearance':'appearance', '3d-bodies':'bodies', '3d-measure':'ruler',
     '3d-examples':'files', '3d-undo':'undo', '3d-redo':'redo', '3d-bake':'unlink', '3d-remove':'trash',
     '3d-vertex':'vertex', '3d-multi':'multi', '3d-inputs':'inputs', '3d-suppress':'feature-off',
     '3d-nav-toggle':'orbit', '3d-clear':'clear-selection', '3d-face-profile':'sketch-face',

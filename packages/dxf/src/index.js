@@ -209,7 +209,7 @@ function parseEntity(original, diagnostics, options = {}) {
     const meta = metadata(original);
     if (typeof meta.id === 'string' && meta.id.length <= 160)
         e.id = meta.id;
-    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed'])
+    for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'ports', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed', 'appearance3d'])
         if (k in meta)
             e[k] = meta[k];
     if (typeof meta.model3dUserHidden === 'boolean') e.hidden = meta.model3dUserHidden;
@@ -772,7 +772,7 @@ export function writeDXF(doc, options = {}) {
         const m = {};
         if (e.id)
             m.id = e.id;
-        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed'])
+        for (const k of ['connector', 'tag', 'label', 'dash', 'width', 'parametric', 'fill', 'locked', 'dimension', 'dynamicParameters', 'dynamicSource', 'calculation', 'feature3d', 'model3dConsumed', 'appearance3d'])
             if (e[k] !== undefined)
                 m[k] = e[k];
         if(e.feature3d || e.model3dConsumed) m.model3dUserHidden = !!e.hidden;

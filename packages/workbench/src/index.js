@@ -1,3 +1,4 @@
+import { VisualEditing2D } from './visual-editing2d.js';
 import { ModelingWorkbench } from './modeling-workbench.js';
 import { regenerateFeatures, EXAMPLES_3D, create3DExample } from '@conduitcad/modeling';
 import { initializeDocuments, claimWorkspace, createDocumentHistory, recoverDocuments, forkRecoveryWorkspace, captureActiveDocument, activateDocument, openDocument, renderDocuments, documentAction, documentKeyDown, documentChanged, scheduleRecovery, requestCloseDocument, disposeDocuments } from './document-workbench.js';
@@ -88,6 +89,7 @@ export class Workbench {
                 this.renderer.invalidate();
             }, longPress: p => this.showContext(p), context: p => this.showContext(p) });
         this.model3d = new ModelingWorkbench(this);
+        this.visual2d = new VisualEditing2D(this);
         this.iconography = bindIconography(this);
         this.bindEvents();
         bindMobileWorkspace(this);
@@ -153,8 +155,8 @@ export class Workbench {
                 if (['TEXT', 'MTEXT'].includes(e.type))
                     this.editText(e);
                 else if(e.type==='INSERT'&&!this.blockSession)startBlockEditor(this,e.block);
-                else
-                    this.openPanel('inspector');
+                else if(this.visual2d.enabled){try{this.visual2d.start();}catch(error){this.toast(error.message,true);}}
+                else this.openPanel('inspector');
             }
         }, opt);
         this.$('.viewport').addEventListener('dragover', e => { e.preventDefault(); }, opt);
@@ -257,6 +259,7 @@ export class Workbench {
         if (action.startsWith('document-')) { await documentAction(this, action); return; }
         if (action === 'new') { this.newDialog(); return; }
         if (action === 'open') { this.closeModal(); this.$('.file-input').click(); return; }
+        if(this.visual2d?.action(action))return;
         if(drawingAction(this,action))return;
         if(parametricAction(this,action))return;
         if(cadEditingAction(this,action))return;
@@ -446,7 +449,8 @@ export class Workbench {
         }
         this.hideContext();
     }
-    updateUI() { this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
+    updateUI() {
+        this.visual2d?.sync(); this.model3d?.sync(); this.$('.doc-name').textContent = this.doc.name; this.$('.unit-label').textContent = this.doc.units; this.$('.layout-select').innerHTML = (this.doc.layouts || ['Model']).map(l => `<option ${l === this.doc.activeLayout ? 'selected' : ''}>${E(l)}</option>`).join(''); this.renderLibrary(); this.renderInspector(); this.updateStatus(); this.updateTools(); this.updateHistory(); renderDocuments(this); }
     updateStatus() {
         this.$('.status-document').textContent = `${this.doc.entities.length} entities · ${this.doc.units}`;
         for (const [action, on] of [['toggle-grid', this.renderer?.grid], ['toggle-snap', this.objectSnap], ['toggle-ortho', this.ortho]]) {
@@ -463,6 +467,7 @@ export class Workbench {
         }
     }
     updateFrame(stats) {
+        this.visual2d?.updatePositions();
         if(this.model3d?.active) return;
         const layout = this.doc.activeLayout || 'Model';
         this.$('.view-label').textContent = layout === 'Model' ? 'MODEL SPACE / TOP' : `PAPER SPACE / ${layout}`;
@@ -482,8 +487,8 @@ export class Workbench {
         if (s.message)
             this.$('.render-badge')?.setAttribute('title', s.message);
     }
-    beginBlockEdit(name) { return startBlockEditor(this,name); }
-    saveBlockEdit(close=false) { return finishBlockEditor(this,true,!close); }
+    beginBlockEdit(name) { this.visual2d?.cancel();this.visual2d?.panel.close();return startBlockEditor(this,name); }
+    saveBlockEdit(close=false) { this.visual2d?.cancel();return finishBlockEditor(this,true,!close); }
     cancelBlockEdit() { return finishBlockEditor(this,false); }
     selected() { return this.doc.entities.filter(e => this.selection.has(e.id)); }
     eval(source) { return evaluateExpression(source, this.doc.parameters); }
@@ -501,8 +506,8 @@ export class Workbench {
             this.renderer.setDocument(this.doc);
         this.updateStatus();
     }
-    edit(label, action) { this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
-    updateSelection() { this.model3d?.selectionChanged(); scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
+    edit(label, action) { this.visual2d?.beforeEdit(); this.model3d?.inspection?.beforeEdit(); this.model3d?.visual?.beforeEdit(); this.history.run(label, () => { action(); this.solveConstraints(); this.touch(); }); this.updateUI(); }
+    updateSelection() { this.visual2d?.sync(); this.model3d?.selectionChanged(); scheduleRecovery(this); this.renderInspector(); this.renderer.invalidate(); this.root.dispatchEvent(new CustomEvent('conduit:selection', { detail: { ids: [...this.selection] } })); }
     selectEntity(id, focus = false) {
         this.selection = new Set([id]);
         if (focus) {
@@ -520,6 +525,7 @@ export class Workbench {
         this.updateSelection();
     }
     setTool(tool) {
+        this.visual2d?.cancel(); this.visual2d?.panel.close();
         if(this.model3d?.active) this.model3d.setActive(false);
         if (!TOOL_INFO[tool])
             return;
@@ -538,6 +544,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     updateTools() {
+        this.visual2d?.sync();
         scheduleRecovery(this);
         this.root.querySelectorAll('[data-tool]').forEach(b => { b.classList.toggle('active', b.dataset.tool === this.tool); b.setAttribute('aria-pressed', String(b.dataset.tool === this.tool)); });
         this.$('.viewport')?.classList.toggle('drawing', !['select', 'pan'].includes(this.tool));
@@ -1076,6 +1083,7 @@ export class Workbench {
         return [];
     }
     pointerDown(p) {
+        if(!this.modal&&this.visual2d?.pointerDown(p))return;
         if (this.modal || !this.renderer.containsPoint(p))
             return;
         this.hideContext();
@@ -1163,6 +1171,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerMove(p) {
+        if(this.visual2d?.pointerMove(p))return;
         this.shift = p.shift;
         this.pointer = p;
         this.lastScreen = p;
@@ -1268,6 +1277,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerHover(p) {
+        if(this.visual2d?.active)return;
         this.lastScreen = p;
         this.shift = p.shift;
         const world = this.camera.world(p);
@@ -1287,6 +1297,7 @@ export class Workbench {
         this.renderer.invalidate();
     }
     pointerUp(p) {
+        if(this.visual2d?.pointerUp(p))return;
         const drag = this.drag;
         if (!drag)
             return;
@@ -1347,6 +1358,7 @@ export class Workbench {
                 return;
             }
             if (drag.kind === 'text') {
+                if(this.visual2d.enabled){this.visual2d.beginText(drag.p);return;}
                 this.ask('Place text', [{ name: 'text', label: 'Text', value: 'Label' }, { name: 'height', label: 'Text height · ' + this.doc.units, value: '14' }], v => { this.edit('Add text', () => this.doc.entities.push(text(drag.p, v.text, this.eval(v.height), { layer: 'Annotations', layout: this.doc.activeLayout }))); this.setTool('select'); });
                 return;
             }
@@ -1430,6 +1442,7 @@ export class Workbench {
         this.setTool('select');
     }
     cancelGesture() {
+        this.visual2d?.cancelDrag();
         if (this.history?.pending)
             this.history.cancel();
         this.drag = null;
@@ -1439,6 +1452,7 @@ export class Workbench {
         this.renderer?.invalidate();
     }
     drawOverlay(ctx, cam) {
+        if(this.visual2d?.active){this.visual2d.draw(ctx,cam);return;}
         ctx.save();
         drawParametricOverlay(this,ctx,cam);
         const selected = this.selected();
@@ -1808,14 +1822,16 @@ export class Workbench {
         search.querySelector('input').placeholder = shapesOnly ? 'Arc, hatch, spline, dimension…' : 'Find any tool, edit or command…';
         body.prepend(search); bindDrawingSearch(this);
     }
-    editText(e) { this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
-    openModal(title, body, { confirm = null, onConfirm = null, wide = false } = {}) {
+    editText(e) { if(this.visual2d?.enabled){this.selection=new Set([e.id]);this.visual2d.start('geometry',{field:'text'});return;} this.ask('Edit text', [{ name: 'text', label: 'Content', value: e.text || '', multiline: true }], v => this.edit('Edit text', () => { e.text = v.text; e.dirty = true; })); }
+    openModal(title, body, { confirm = null, onConfirm = null, wide = false, onClose = null } = {}) {
+        this.visual2d?.cancel();this.visual2d?.panel.close();this.model3d?.inspection?.cancel();
         this.closeModal();
         const backdrop = document.createElement('div');
         backdrop.className = 'modal-backdrop';
         backdrop.innerHTML = `<section class="modal ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="modal-title"><header class="modal-head"><h2 id="modal-title">${E(title)}</h2>${iconButton('modal-close', 'close', 'Close dialog')}</header><div class="modal-body">${body}</div>${confirm ? `<footer class="modal-foot">${btn('modal-close', 'Cancel', null, 'btn')}${btn('modal-confirm', confirm, 'check', 'btn primary')}</footer>` : ''}</section>`;
         document.body.append(backdrop);
         this.modal = backdrop;
+        this.modalOnClose = onClose;
         this.iconography?.prepare(backdrop);
         this.previousFocus = document.activeElement;
         this.modalCleanup = prepareMobileDialog(this, backdrop);
@@ -1864,6 +1880,8 @@ export class Workbench {
         this.iconography?.hide();
         this.model3d?.clearPreview();
         if (this.modal) {
+            const onClose = this.modalOnClose; this.modalOnClose = null;
+            onClose?.();
             this.modalCleanup?.(); this.modalCleanup = null;
             this.modal.remove();
             this.modal = null;
@@ -1901,7 +1919,7 @@ export class Workbench {
     scheduleRecovery() { scheduleRecovery(this); }
     documentChanged() { documentChanged(this); }
     basename() { return (this.doc.name || 'drawing').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_'); }
-    exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button><button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
+    exportDialog() { const report = exportReport(this.doc); this.openModal('Export your drawing', `<p>Choose an editable CAD file, a full project, or a presentation format. Files are generated locally.</p><label class="field">DXF target version<select id="dxf-version"><option value="AC1015">AutoCAD 2000 · AC1015</option><option value="AC1018">AutoCAD 2004 · AC1018</option><option value="AC1021">AutoCAD 2007 · AC1021</option><option value="AC1024" selected>AutoCAD 2010 · AC1024</option><option value="AC1027">AutoCAD 2013 · AC1027</option><option value="AC1032">AutoCAD 2018 · AC1032</option></select></label><label class="field">DXF export mode<select id="dxf-mode"><option value="normalized">Normalized editable DXF</option><option value="preserve" ${report.preservationAvailable ? '' : 'disabled'}>Preserve source records · guarded edits</option></select></label><label class="dxf-strict-option"><input id="dxf-strict" type="checkbox"><span>Reject known normalized data loss</span></label><p class="muted-note">Preserving mode keeps the source version and foreign records. Structural edits and dependent geometry are rejected, never silently merged.</p><div class="export-grid"><button class="export-option" data-export="dxf">${icon('line')}<span><strong>DXF drawing</strong><small>ASCII DXF with native dimensions, layouts, meshes and blocks.</small></span></button><button class="export-option" data-export="dxf-binary">${icon('line')}<span><strong>Binary DXF</strong><small>Compact typed DXF, same version and preservation choices.</small></span></button>${report.preservationAvailable ? `<button class="export-option" data-export="dxf-graph">${icon('graph')}<span><strong>DXF object graph</strong><small>Source handles, references and diagnostics as JSON.</small></span></button>` : ''}<button class="export-option" data-export="project">${icon('save')}<span><strong>Conduit project</strong><small>Full document, ports, constraints, parameters and original input.</small></span></button><button class="export-option" data-export="svg">${icon('screen')}<span><strong>SVG vector</strong><small>Scalable engineering artwork and text.</small></span></button>${this.viewMode==='3d'?`<button class="export-option" data-action="3d-capture">${icon('file-image')}<span><strong>3D viewport PNG</strong><small>Current camera, materials, style, clipping and annotations.</small></span></button>`:''}<button class="export-option" data-export="png">${icon('rect')}<span><strong>PNG image</strong><small>Full drawing, 2400 pixels wide.</small></span></button><button class="export-option" data-export="bom">${icon('layers')}<span><strong>Equipment schedule</strong><small>CSV: block, tag, layer, position and rotation.</small></span></button><button class="export-option" data-export="graph">${icon('graph')}<span><strong>Connection graph</strong><small>JSON: nodes, ports, edges and adjacency.</small></span></button>${report.originalAvailable ? `<button class="export-option" data-export="original">${icon('folder')}<span><strong>Original DXF</strong><small>Exact imported source, without your edits. Preserves unsupported records.</small></span></button>` : ''}</div>${report.warnings.length ? `<div class="hint-box"><strong>Normalized DXF export limitations</strong><br>${report.warnings.map(E).join('<br>')}</div>` : ''}<p class="muted-note">Conduit metadata is application-specific. Other CAD tools will not automatically solve Conduit constraints or reroute connections. Keep the project file as your editable master.</p>`, { wide: true }); }
     async doExport(format) {
         if(this.blockSession)throw new Error('Save or close the block editor before exporting');
         const name = this.basename(), version = this.modal?.querySelector('#dxf-version')?.value || 'AC1024';
@@ -2000,9 +2018,10 @@ export class Workbench {
             overlay.remove();
         }
     }
-    commandDialog() { this.openModal('Command palette', `<div class="command-input">${icon('code')}<input id="cad-command" placeholder="LINE 0,0 100,50" autocomplete="off" spellcheck="false" aria-label="CAD command"></div><div class="error-text"></div><p class="muted-note">Enter executes. Commands use drawing units and comma-separated point coordinates.</p><table class="keyboard-table"><tr><td>Line with exact endpoints</td><td>LINE 0,0 100,50</td></tr><tr><td>New point-driven tools</td><td>ARC / ELLIPSE / SPLINE / HATCH / MTEXT</td></tr><tr><td>Exact native 3-point arc</td><td>ARC 0,0 50,50 100,0</td></tr><tr><td>Next absolute / relative point</td><td>NEXT 10,20 / NEXT @50&lt;30</td></tr><tr><td>Complete path</td><td>FINISH / CLOSE</td></tr><tr><td>Circle with center and radius</td><td>CIRCLE 0,0 25</td></tr><tr><td>Rectangle · x, y, width, height</td><td>RECT 0 0 120 80</td></tr><tr><td>Move selected objects</td><td>MOVE 10 -20</td></tr><tr><td>Transforms and editing</td><td>ROTATE 45 / OFFSET 10</td></tr><tr><td>Named parameter</td><td>PARAM size=100</td></tr><tr><td>History and view</td><td>UNDO / REDO / FIT</td></tr></table>`, { confirm: 'Run command', onConfirm: () => { this.executeCommand(this.modal.querySelector('#cad-command').value); this.closeModal(); } }); }
+    commandDialog() { this.openModal('Command palette', `<div class="command-input">${icon('code')}<input id="cad-command" placeholder="LINE 0,0 100,50" autocomplete="off" spellcheck="false" aria-label="CAD command"></div><div class="error-text"></div><p class="muted-note">Enter executes. Commands use drawing units and comma-separated point coordinates.</p><table class="keyboard-table"><tr><td>Line with exact endpoints</td><td>LINE 0,0 100,50</td></tr><tr><td>New point-driven tools</td><td>ARC / ELLIPSE / SPLINE / HATCH / MTEXT</td></tr><tr><td>Exact native 3-point arc</td><td>ARC 0,0 50,50 100,0</td></tr><tr><td>Next absolute / relative point</td><td>NEXT 10,20 / NEXT @50&lt;30</td></tr><tr><td>Complete path</td><td>FINISH / CLOSE</td></tr><tr><td>Circle with center and radius</td><td>CIRCLE 0,0 25</td></tr><tr><td>Rectangle · x, y, width, height</td><td>RECT 0 0 120 80</td></tr><tr><td>Move selected objects</td><td>MOVE 10 -20</td></tr><tr><td>Transforms and editing</td><td>ROTATE 45 / OFFSET 10</td></tr><tr><td>Named parameter</td><td>PARAM size=100</td></tr><tr><td>3D display style / return to 2D</td><td>VSCURRENT realistic / hidden / xray / 2d</td></tr><tr><td>History and view</td><td>UNDO / REDO / FIT</td></tr></table>`, { confirm: 'Run command', onConfirm: async () => { await this.executeCommand(this.modal.querySelector('#cad-command').value); this.closeModal(); } }); }
     executeCommand(source) {
         const s = source.trim(), split = s.indexOf(' '), cmd = (split < 0 ? s : s.slice(0, split)).toUpperCase(), rest = split < 0 ? '' : s.slice(split + 1).trim(), args = rest.replace(/,/g, ' ').split(/\s+/).filter(Boolean);
+        if(['VSCURRENT','SHADEMODE','VISUALSTYLE'].includes(cmd)){if(!rest)throw new Error('Use VSCURRENT realistic / shaded / hidden / wireframe-hidden / xray / 2d');return this.model3d.setStyle(rest);}
         if(cmd==='BEDIT'){startBlockEditor(this,rest||this.selected()[0]?.block);return;}
         if(cmd==='BSAVE'){finishBlockEditor(this,true,true);return;}
         if(cmd==='BCLOSE'){finishBlockEditor(this,rest.toLowerCase()!=='discard');return;}
@@ -2076,7 +2095,11 @@ export class Workbench {
         this.toast(cmd + ' completed');
     }
     keyDown(e) {
-        if (this.initializing || this.disposed) return;        if (documentKeyDown(this, e)) return;
+        if (this.initializing || this.disposed) return;
+        if(this.visual2d?.keyDown(e))return;
+        if(this.model3d?.inspection?.keyDown(e))return;
+        if(this.model3d?.visual?.keyDown(e))return;
+        if (documentKeyDown(this, e)) return;
         const input = e.target.closest?.('input,textarea,select,[contenteditable=true]');
         if (e.key === 'Escape') {
             e.preventDefault();
@@ -2185,6 +2208,6 @@ export class Workbench {
         }
     }
     helpDialog() { const stats = this.renderer.stats; this.openModal('Conduit CAD · 0.9.1', `<p><strong>Touch-first drafting and diagramming, built on native DXF entities.</strong> All drawing, import, routing, rendering and saving run on your device.</p><div class="about-stats"><div><b>${SYMBOLS.length}</b><small>SYMBOL MASTERS</small></div><div><b>19</b><small>ES MODULE PACKAGES</small></div><div><b>${E(stats.compositor || stats.backend)}</b><small>ACTIVE COMPOSITOR</small></div></div>${iconPreferencesMarkup()}<div class="section-label">TOUCH & PEN</div><p>Tap a tool, then tap points or drag to draw. Drag a selected object to move it. Use two fingers to pan and zoom without drawing. Drag the grab handle of a library symbol onto the canvas; a simple tap on its card arms placement. Hold the canvas for object actions. Drag a visible port to connect. A magnifier appears during touch editing.</p><div class="section-label">KEYBOARD</div><table class="keyboard-table">${[['Select / Pan', 'V / H or Space'], ['Line / Polyline / Rectangle', 'L / P / R'], ['Circle / Text / Dimension', 'C / T / D'], ['Arc / Ellipse / Spline', 'A / E / B'], ['Connect / Fit', 'K / F'], ['Grid / Snap / Ortho', 'G / S / O'], ['Add to selection', 'Shift-click'], ['Undo / Redo', 'Ctrl/⌘ Z / Shift Z'], ['Duplicate / Copy / Paste', 'Ctrl/⌘ D / C / V'], ['Open / Save project', 'Ctrl/⌘ O / S'], ['Command palette', 'Ctrl/⌘ K'], ['Complete polyline / Cancel', 'Enter / Escape']].map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table><div class="section-label" style="margin-top:20px">COMPATIBILITY BOUNDARY</div><p>This release combines planar drafting with mesh-based 3D feature modeling, not full AutoCAD or Fusion parity. It imports common ASCII/binary DXF entities and preserves the original input. Normalized export is not a lossless rewrite of every DXF feature. DWG, curved boundary-representation modeling, ACIS solids, proprietary Autodesk dynamic-action evaluation, XREF resolution, associative hatch editing, tilted/perspective paper viewports and block XCLIP, complete SHX/MTEXT font fidelity and standards certification remain outside this release. Native hatch edges, island holes, line patterns, OCS projection and mesh wireframes are supported. Shared block editing, constraint-based and action-based Conduit blocks, analytic planar solving and calculated annotations are supported. Unshifted two-color LINEAR gradients render natively; other gradient distributions retain their data with a diagnosed flat preview.</p><div class="section-label">RENDERER DIAGNOSTICS</div><p>${stats.segments.toLocaleString()} compiled segments · ${stats.buildMs.toFixed(2)} ms scene build · ${stats.frameMs.toFixed(2)} ms last CPU frame submission. These are CPU wall times, not GPU timestamps.</p><p class="muted-note">${E(this.rendererMessage || 'No backend initialization warnings.')}<br>Use HTTPS or localhost for the WebGPU path. Fallbacks are selected automatically when initialization or device recovery fails.</p>`, { wide: true }); }
-    dispose() { this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
+    dispose() { this.visual2d?.dispose(); this.model3d?.dispose(); this.input.reset(); this.cancelGesture(); const saved = disposeDocuments(this); this.abort.abort(); this.input.dispose(); this.renderer.dispose(); this.closeModal(); clearTimeout(this.toastTimer); this.root.innerHTML = ''; return saved; }
 }
 export function mountWorkbench(element, options = {}) { return new Workbench(element, options); }
