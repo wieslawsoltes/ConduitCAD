@@ -41,6 +41,10 @@ parameter editing regenerates persisted spatial path coordinates
 regenerated path commits evaluated XYZ
 Edit on canvas reopens native path without a dialog
 unchanged path edit adds no history
+camera-only navigation reuses immutable evaluated coordinates
+Reverse direction keeps closed-path start and selected physical vertex
+Reverse direction has its own draft undo
+reverse undo keeps the same physical vertex active
 keyboard axis editing changes selected native coordinate
 keyboard coordinate edit has draft undo
 remove vertex has live preview
@@ -59,6 +63,8 @@ workshop parameter preview regenerates dependent sweep
 320x568 packed handle shows Z instead of a blank button
 320x568 path XYZ input stays 16px
 320x568 touch handle gesture produces finite isolated preview
+320x568 touch Reverse preserves selected vertex
+320x568 reverse undo restores original topology
 320x568 path Apply returns to normal 3D view
 390x844 live parameter panel stays bounded
 390x844 parameter confirm stays touch-sized and reachable
@@ -73,6 +79,8 @@ workshop parameter preview regenerates dependent sweep
 390x844 touch handle gesture produces finite isolated preview
 two-finger takeover restores unaccepted point drag
 two-finger release never adds extra path vertices
+390x844 touch Reverse preserves selected vertex
+390x844 reverse undo restores original topology
 390x844 path Apply returns to normal 3D view
 844x390 live parameter panel stays bounded
 844x390 parameter confirm stays touch-sized and reachable
@@ -85,6 +93,8 @@ two-finger release never adds extra path vertices
 844x390 packed handle shows Z instead of a blank button
 844x390 path XYZ input stays 16px
 844x390 touch handle gesture produces finite isolated preview
+844x390 touch Reverse preserves selected vertex
+844x390 reverse undo restores original topology
 844x390 path Apply returns to normal 3D view
 1024x768 live parameter panel stays bounded
 1024x768 parameter confirm stays touch-sized and reachable
@@ -97,6 +107,8 @@ two-finger release never adds extra path vertices
 1024x768 packed handle shows Z instead of a blank button
 1024x768 path XYZ input stays 16px
 1024x768 touch handle gesture produces finite isolated preview
+1024x768 touch Reverse preserves selected vertex
+1024x768 reverse undo restores original topology
 1024x768 path Apply returns to normal 3D view
 no uncaught page errors
-{"passed": 101, "backend": "webgpu", "nativeOrigin": true}
+{"passed": 113, "backend": "webgpu", "nativeOrigin": true}

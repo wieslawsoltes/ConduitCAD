@@ -5517,7 +5517,7 @@ class SpatialPathSession {
     constructor(document, { id = null, layer = '0' } = {}) {
         this.source = document; this.version = document.version; this.signature = JSON.stringify(document); this.base = clone(document);
         const existing = id ? document.entities.find(e => e.id === id) : null;
-        if (id && (!existing || existing.type !== 'POLYLINE' || !(existing.flags & 8) || (existing.flags & (2 | 4 | 16 | 64)) || existing.feature3d || existing.connector || existing.parametric && existing.parametric.kind !== 'spatial-path' || existing.points?.some(p => p.bulge)))
+        if (id && (!existing || existing.type !== 'POLYLINE' || !(existing.flags & 8) || (existing.flags & (2 | 4 | 16 | 64)) || existing.feature3d || existing.connector || existing.parametric && (existing.parametric.kind !== 'spatial-path' || existing.parametric.version !== 1) || existing.points?.some(p => p.bulge)))
             throw new Error('Choose an ordinary native 3D polyline');
         if (existing && isLocked(existing, document)) throw new Error('The spatial path is locked');
         const outputLayer = document.layers.find(l => l.name === (existing?.layer || layer));
@@ -5529,12 +5529,40 @@ class SpatialPathSession {
         this.state = { coordinates: clone(coordinates), origins: this.entity.points.map((_, i) => i), closed: !!this.entity.closed };
         this.validateState(this.state);
         this.initial = this.snapshot(); this.preview = null; this.error = null; this.revision = 0; this.validatedRevision = -1; this.closed = false; this.evaluations = 0;
-        this.undoStack = []; this.redoStack = [];
+        this.undoStack = []; this.redoStack = []; this.pointCache = null; this.pointEvaluations = 0;
     }
     assertOpen() { if (this.closed) throw new Error('This spatial path edit has ended'); }
     snapshot() { return clone(this.state); }
     get changed() { return this.creation || JSON.stringify(this.initial) !== JSON.stringify(this.state); }
-    invalidate() { this.preview = null; this.validatedRevision = -1; this.error = null; this.revision++; }
+    invalidate() { this.pointCache = null; this.preview = null; this.validatedRevision = -1; this.error = null; this.revision++; }
+    /** Immutable, revision-cached coordinates for overlays, including an unfinished 0/1-point path.
+     * Use set/insert/remove/restore to edit state; camera reprojection must not parse expressions.
+     * Invalid revisions cache the error, never a prior valid set of coordinates.
+     */
+    points() {
+        this.assertOpen();
+        if (!this.pointCache) {
+            this.pointEvaluations++;
+            try {
+                const points = this.state.coordinates.map(p => Object.freeze(Object.fromEntries(['x', 'y', 'z'].map(axis => {
+                    const value = evaluateExpression(p[axis], this.base.parameters);
+                    if (Math.abs(value) > 1e12) throw new Error('Spatial coordinates must stay within ±1e12 drawing units');
+                    return [axis, value];
+                }))));
+                this.pointCache = { points: Object.freeze(points), error: null };
+            } catch (error) { this.pointCache = { points: null, error }; }
+        }
+        if (this.pointCache.error) throw this.pointCache.error;
+        return this.pointCache.points;
+    }
+    /** Reverse traversal without dropping vertex metadata or changing a closed path's first vertex. */
+    reverse() {
+        this.assertOpen();
+        const state = this.snapshot(), start = state.closed ? 1 : 0;
+        state.coordinates = [...state.coordinates.slice(0, start), ...state.coordinates.slice(start).reverse()];
+        state.origins = [...state.origins.slice(0, start), ...state.origins.slice(start).reverse()];
+        if (JSON.stringify(state) !== JSON.stringify(this.state)) this.restore(state);
+    }
     validateState(state) {
         if (!state || typeof state.closed !== 'boolean' || !Array.isArray(state.coordinates) || state.coordinates.length > 2048) throw new Error('Invalid spatial path snapshot');
         if (!Array.isArray(state.origins) || state.origins.length !== state.coordinates.length || state.origins.some(i => i !== null && (!Number.isInteger(i) || i < 0 || i >= this.entity.points.length)) || new Set(state.origins.filter(i => i !== null)).size !== state.origins.filter(i => i !== null).length) throw new Error('Invalid path vertex provenance');
@@ -5586,7 +5614,7 @@ class SpatialPathSession {
     }
     assertSource(document) { this.assertOpen(); if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed. Restart spatial path editing.'); }
     commit(document) { this.assertSource(document); const draft = this.evaluate(); document.entities = clone(draft.entities); return this.id; }
-    cancel() { this.closed = true; this.source = null; this.base = null; this.preview = null; this.undoStack = []; this.redoStack = []; }
+    cancel() { this.pointCache = null; this.closed = true; this.source = null; this.base = null; this.preview = null; this.undoStack = []; this.redoStack = []; }
 }
 
 return {SpatialPathSession};
@@ -7013,7 +7041,7 @@ class VisualPath3D {
           <form class="path3d-next"><fieldset><legend>Add an exact WCS point</legend><div>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-next="${k}" value="0" autocomplete="off" spellcheck="false"></label>`).join('')}</div></fieldset><button type="submit">${icon('plus')}Add exact point</button></form>
           <p>Coordinates retain parameter expressions in Conduit metadata. Other DXF readers receive evaluated native vertices. Picked planes are snapshots, not associative face sketches.</p></div></section>
           <section class="path3d-controls" role="region" aria-label="Spatial path editing"><header><strong>${icon('polyline')}Spatial path</strong><span class="path3d-status" role="status"></span></header>
-          <div class="path3d-commandbar"><div class="path3d-utilities">${b('add', 'Add points', 'plus')}${b('options', 'Plane / exact point', 'properties')}${b('midpoint', 'Insert midpoint', 'point')}${b('remove', 'Remove vertex', 'trash')}${b('closed', 'Close path', 'polyline')}${b('snap', 'Snap 1', 'snap')}${b('undo', 'Undo draft', 'undo')}${b('redo', 'Redo draft', 'redo')}${b('fit', 'Fit preview', 'fit')}</div><div class="path3d-confirm">${b('cancel', 'Cancel', 'close')}${b('apply', 'Apply', 'check')}</div></div>
+          <div class="path3d-commandbar"><div class="path3d-utilities">${b('add', 'Add points', 'plus')}${b('options', 'Plane / exact point', 'properties')}${b('midpoint', 'Insert midpoint', 'point')}${b('remove', 'Remove vertex', 'trash')}${b('closed', 'Close path', 'polyline')}${b('reverse', 'Reverse direction', 'rotate')}${b('snap', 'Snap 1', 'snap')}${b('undo', 'Undo draft', 'undo')}${b('redo', 'Redo draft', 'redo')}${b('fit', 'Fit preview', 'fit')}</div><div class="path3d-confirm">${b('cancel', 'Cancel', 'close')}${b('apply', 'Apply', 'check')}</div></div>
           <div class="path3d-coordinates"><label>Vertex<select data-path-vertex aria-label="Active path vertex"></select></label>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-axis="${k}" aria-label="Path vertex ${k.toUpperCase()} expression" autocomplete="off" spellcheck="false"></label>`).join('')}</div><p class="path3d-error" role="alert" hidden></p></section>`;
         m.stage.append(this.root); const opt = { signal: this.w.abort.signal };
         this.root.addEventListener('click', e => this.click(e), opt);
@@ -7037,7 +7065,7 @@ class VisualPath3D {
         this.root.querySelector('[data-path-command=add]').focus({ preventScroll: true }); return session;
     }
     value(source) { const n = evaluateExpression(source, this.session.base.parameters); if (Math.abs(n) > 1e12) throw new Error('Coordinates must stay within ±1e12'); return n; }
-    points() { return this.session.state.coordinates.map(p => ({ x: this.value(p.x), y: this.value(p.y), z: this.value(p.z) })); }
+    points() { return this.session.points(); }
     showOptions(open) { this.root.classList.toggle('options-open', open); this.root.querySelector('.path3d-panel').hidden = !open; this.root.querySelector('[data-path-command=options]').setAttribute('aria-expanded', String(open)); this.updatePositions(); }
     report(message = '') { const e = this.root.querySelector('.path3d-error'); e.textContent = message; e.hidden = !message; }
     reject(error) { if (!this.session) return; this.rejected = true; cancelAnimationFrame(this.frame); this.frame = 0; this.session.invalidate(); this.session.error = error.message; this.m.previewDocument = null; this.m.renderer.setDocument(this.w.doc, { showInputs: this.m.showInputs }); this.m.renderer.invalidate(); this.report(error.message); this.render(); }
@@ -7071,6 +7099,7 @@ class VisualPath3D {
         try { this.value(this.offset); } catch { apply.disabled = true; }
         for (const id of ['undo', 'redo']) this.root.querySelector(`[data-path-command=${id}]`).disabled = !s[id + 'Stack'].length;
         this.root.querySelector('[data-path-command=remove]').disabled = this.selected < 0;
+        this.root.querySelector('[data-path-command=reverse]').disabled = count < 2;
         this.root.querySelector('[data-path-command=midpoint]').disabled = count < 2 || (!s.state.closed && this.selected === count - 1);
         for (const [id, pressed] of [['add', this.placing], ['closed', s.state.closed], ['snap', this.snap]]) this.root.querySelector(`[data-path-command=${id}]`).setAttribute('aria-pressed', String(pressed));
         let length = 0; try { const points = this.points(); points.forEach((p, i) => { if (i) length += distance3(p, points[i - 1]); }); if (s.state.closed && count > 2) length += distance3(points.at(-1), points[0]); } catch {}
@@ -7212,6 +7241,7 @@ class VisualPath3D {
             if (id === 'face') { this.pickingFace = true; this.showOptions(false); }
             if (id === 'snap') this.snap = !this.snap;
             if (id === 'closed') this.session.setClosed(!this.session.state.closed);
+            if (id === 'reverse') { const count = this.session.state.coordinates.length; this.session.reverse(); this.selected = this.session.state.closed ? (count - this.selected) % count : count - 1 - this.selected; }
             if (id === 'remove') { this.session.remove(this.selected); this.selected = Math.min(this.selected, this.session.state.coordinates.length - 1); }
             if (id === 'midpoint') {
                 const a = this.session.state.coordinates[this.selected], n = (this.selected + 1) % this.session.state.coordinates.length, next = this.session.state.coordinates[n];
@@ -7219,9 +7249,22 @@ class VisualPath3D {
                 const point = Object.fromEntries(['x', 'y', 'z'].map(k => [k, `((${a[k]}) + (${next[k]})) / 2`])); this.session.insert(this.selected + 1, point); this.selected++;
             }
             if (id === 'fit') { const points = this.points(); if (points.length) { this.m.camera.fit(points); this.m.changedView(); } }
-            if (id === 'undo' || id === 'redo') { this.session[id](); this.rejectedFields.clear(); this.rejected = false; } else this.session.checkpoint(before);
+            if (id === 'undo' || id === 'redo') { this.restoreHistory(id); this.rejectedFields.clear(); this.rejected = false; } else this.session.checkpoint(before);
             this.render(); this.preview(true);
         } catch (error) { this.report(error.message); }
+    }
+    restoreHistory(direction) {
+        const s = this.session; if (!s || !['undo', 'redo'].includes(direction)) return false;
+        const origin = s.state.origins[this.selected], coordinate = JSON.stringify(s.state.coordinates[this.selected]);
+        if (!s[direction]()) return false;
+        let index = origin == null ? -1 : s.state.origins.indexOf(origin);
+        if (index < 0) {
+            // New draft vertices have no imported provenance. Only unambiguous unchanged coordinates identify them.
+            const matches = s.state.coordinates.flatMap((p, i) => JSON.stringify(p) === coordinate ? [i] : []);
+            if (matches.length === 1) index = matches[0];
+        }
+        this.selected = index >= 0 ? index : Math.max(-1, Math.min(s.state.coordinates.length - 1, this.selected));
+        return true;
     }
     apply() {
         const s = this.session; if (!s || this.applying || this.rejected) return; this.checkpointInput(); this.cancelDrag(); this.preview(true);
@@ -7245,7 +7288,7 @@ class VisualPath3D {
             e.preventDefault(); const amount = (['ArrowLeft', 'ArrowDown'].includes(e.key) ? -1 : 1) * (e.shiftKey ? .1 : 1), direction = h.axis ? h.direction : ['ArrowLeft', 'ArrowRight'].includes(e.key) ? this.plane.u : this.plane.v, before = this.session.snapshot();
             try { this.session.drag(h.index, mul3(direction, amount), before); this.session.checkpoint(before); this.preview(true); } catch (error) { this.report(error.message); } return true;
         }
-        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.session[e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'](); this.preview(true); return true; }
+        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.restoreHistory(e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'); this.preview(true); return true; }
         if (e.key === 'Enter' && !e.target.closest('button')) { e.preventDefault(); this.apply(); return true; }
         if (!e.ctrlKey && !e.metaKey && (e.key.length === 1 || ['Delete', 'Backspace'].includes(e.key))) return true;
         return false;
@@ -9816,7 +9859,7 @@ class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
-        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.session[action==='3d-undo'?'undo':'redo']();this.path.preview(true);return;}
+        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.restoreHistory(action==='3d-undo'?'undo':'redo');this.path.preview(true);return;}
         const navigationAction=(action.startsWith('3d-view-')&&action!=='3d-view-options')||['3d-fit','3d-capture'].includes(action);
         if(!navigationAction){this.path?.cancel();this.w.parameters?.cancel();}
         if(action==='3d-path'&&w.options.modelingInteraction!=='dialog'){this.path.start();return;}

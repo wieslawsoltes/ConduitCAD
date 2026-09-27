@@ -9,7 +9,7 @@
         "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 33.800000000046566,
+        "frameMs": 26.600000000093132,
         "uploads": 5,
         "passes": 2,
         "estimatedAttachmentBytes": 17876544,
@@ -40,6 +40,8 @@
         "--enable-features=Vulkan",
         "--use-vulkan=swiftshader"
       ],
+      "capture": "production capturePNG, annotations disabled",
+      "postPresentationCaptures": 3,
       "filledMaskIoU": 1.0,
       "flatInteriorAgreement": 1.0,
       "stableGeometryUploads": true
@@ -53,7 +55,7 @@
         "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0,
+        "frameMs": 0.10000000009313226,
         "uploads": 5,
         "passes": 2,
         "estimatedAttachmentBytes": 17876544,
@@ -84,6 +86,8 @@
         "--enable-features=Vulkan",
         "--use-vulkan=swiftshader"
       ],
+      "capture": "production capturePNG, annotations disabled",
+      "postPresentationCaptures": 3,
       "contextRestore": true,
       "filledMaskIoU": 0.9904488378306171,
       "flatInteriorAgreement": 1.0,
@@ -98,7 +102,7 @@
         "style": "shaded",
         "triangles": 2798,
         "segments": 2793,
-        "frameMs": 0.40000000002328306,
+        "frameMs": 0.39999999990686774,
         "uploads": 3,
         "passes": 2,
         "estimatedAttachmentBytes": 17876544,
@@ -129,6 +133,8 @@
         "--enable-features=Vulkan",
         "--use-vulkan=swiftshader"
       ],
+      "capture": "production capturePNG, annotations disabled",
+      "postPresentationCaptures": 3,
       "deviceLossFallback": "WebGL2",
       "filledMaskIoU": 0.9900818166638838,
       "flatInteriorAgreement": 1.0,
