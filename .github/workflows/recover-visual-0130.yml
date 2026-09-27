@@ -1,0 +1,41 @@
+name: Inspect interrupted visual editing upload
+on:
+  push:
+    branches: [work/visual-workspace-0130]
+    paths: [.github/workflows/recover-visual-0130.yml, .recovery/visual-0130/**]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate preserved source fragments without changing application
+        run: |
+          python - <<'PY'
+          import hashlib,json,lzma,pathlib,re,subprocess
+          out=pathlib.Path('recovered');out.mkdir()
+          parts=sorted(pathlib.Path('.recovery/visual-0130').glob('part-*.xz'))
+          raw=b''.join(p.read_bytes() for p in parts)
+          (out/'uploaded.xz').write_bytes(raw)
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=16*1024*1024)
+          (out/'prefix.patch').write_bytes(patch)
+          report={'baseline':'f4823402d7ba6cb7b7186ee60bf32a5f7e8b1080','completeXZ':decoder.eof,'compressedBytes':len(raw),'patchBytes':len(patch),'compressedSHA256':hashlib.sha256(raw).hexdigest(),'patchSHA256':hashlib.sha256(patch).hexdigest(),'files':[]}
+          for i,chunk in enumerate(re.split(rb'(?m)(?=^diff --git )',patch)):
+              if not chunk.startswith(b'diff --git '):continue
+              f=out/f'file-{i:03}.patch';f.write_bytes(chunk)
+              check=subprocess.run(['git','apply','--unidiff-zero','--check',str(f)],capture_output=True,text=True)
+              report['files'].append({'file':f.name,'header':chunk.splitlines()[0].decode(),'applicable':check.returncode==0,'error':check.stderr})
+          (out/'report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conduitcad-0130-recovered-upload
+          path: recovered
+          retention-days: 30
