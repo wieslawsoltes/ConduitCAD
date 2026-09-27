@@ -1,0 +1,166 @@
+name: Publish and qualify pending visual editing sources
+on:
+  push:
+    branches: [work/visual-workspace-0130]
+    paths: [.github/workflows/publish-visual-0130.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: conduitcad-visual-publication
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/visual-workspace-0130
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify and restore complete saved 0.12.0 source checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import base64,hashlib,lzma,pathlib,re,subprocess
+          base='f4823402d7ba6cb7b7186ee60bf32a5f7e8b1080'
+          root=pathlib.Path('.recovery/visual-0130')
+          raw=b''.join((root/f'part-{i:02}.xz').read_bytes() for i in range(1,8))
+          assert len(raw)==84000 and hashlib.sha256(raw).hexdigest()=='68bf86cb22a0301a605000563b11688f638d6306e95e1d67096949ce4acff332'
+          # Exact base64 transcription correction, independently verified against
+          # the existing saved 0.12.0 source archive. Original bytes stay in history.
+          encoded=base64.b64encode(raw)
+          assert encoded[24075:24076]==b'C'
+          raw=base64.b64decode(encoded[:24075]+encoded[24076:32000]+b'b'+encoded[32000:])
+          raw+=b''.join((root/f'part-{i:02}.xz').read_bytes() for i in range(8,20))
+          assert len(raw)==154388 and hashlib.sha256(raw).hexdigest()=='3830fd51ae04e80fe3b1ff734fe6409188a787accce653626c3370025f0ac905'
+          decoder=lzma.LZMADecompressor(memlimit=256*1024*1024)
+          patch=decoder.decompress(raw,max_length=665372)
+          assert decoder.eof and not decoder.unused_data and len(patch)==665371
+          assert hashlib.sha256(patch).hexdigest()=='ef8ae5c6d2ee841e37cb75bbb60babd0d9cea0e487571fd1f4c5836d1c867d83'
+          chunks=[c for c in re.split(rb'(?m)(?=^diff --git )',patch) if c.startswith(b'diff --git ')]
+          assert len(chunks)==101
+          paths=[]
+          for chunk in chunks:
+              name=re.search(rb'(?m)^\+\+\+ b/(.+)',chunk).group(1).decode()
+              p=pathlib.PurePosixPath(name)
+              assert not p.is_absolute() and '..' not in p.parts and '\\' not in name
+              assert not any(x in p.parts for x in ('.git','.github','node_modules'))
+              assert p.parts[0] in ('README.md','RELEASE_NOTES.md','docs','package.json','packages','scripts','tests')
+              paths.append(name)
+          assert len(set(paths))==101
+          subprocess.run(['git','merge-base','--is-ancestor',base,'HEAD'],check=True)
+          already=subprocess.run(['git','apply','--reverse','--unidiff-zero','--check','-'],input=patch,capture_output=True).returncode==0
+          if not already:
+              subprocess.run(['git','diff','--quiet',base,'HEAD','--',*paths],check=True)
+              subprocess.run(['git','apply','--unidiff-zero','--check','-'],input=patch,check=True)
+              subprocess.run(['git','apply','--unidiff-zero','-'],input=patch,check=True)
+          for chunk,name in zip(chunks,paths):
+              expected=re.search(rb'(?m)^index [0-9a-f]+\.\.([0-9a-f]+)',chunk).group(1).decode()
+              data=pathlib.Path(name).read_bytes()
+              assert hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()==expected,name
+          subprocess.run(['git','add','--',*paths],check=True)
+          print('All 101 recovered source paths match the saved 0.12.0 target Git identities.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat: publish pending rendering and WYSIWYG 2D/3D editing through 0.12.0' -m 'Recover all 101 source changes from the saved f9618a887765d65766622f09ddbb8d016b36ce90 checkpoint with verified patch and per-file hashes. Includes prior rendering modes, visual 3D manipulation and native planar editing. Validation and generated deliveries follow separately.'
+            git push origin HEAD:work/visual-workspace-0130
+          fi
+          echo "Source checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Unit tests, builds, examples and reusable contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/bootstrap.mjs
+          mkdir -p artifacts
+          npm test 2>&1 | tee artifacts/publication-unit.log
+          npm run catalog
+          node scripts/drawing-tool-samples.mjs
+          npm run samples:3d
+          npm run samples:rendering
+          npm run samples:visual2d
+          npm run icons
+          npm run build
+          rm -f artifacts/npm/*-0.9.1.tgz
+          npm run pack:packages
+          node scripts/verify-packages.mjs
+          npx --yes --package typescript@5.8.3 tsc -p tests/tsconfig.json
+      - name: Install independent validators
+        run: |
+          python -m pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+          python - <<'PY' >> "$GITHUB_ENV"
+          from playwright.sync_api import sync_playwright
+          with sync_playwright() as p:print('CHROMIUM_EXECUTABLE='+p.chromium.executable_path)
+          PY
+      - name: All native-origin browser and GPU suites without failure waivers
+        env:
+          CONDUIT_TEST_ORIGIN: localhost
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+          run_suite() {
+            name="$1"; shift
+            "$@" > "artifacts/publication-$name.log" 2>&1
+            code=$?
+            tail -n 18 "artifacts/publication-$name.log"
+            echo "$name: exit $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          }
+          for suite in browser_smoke browser_workflows browser_fidelity browser_symbols browser_interop browser_cad_editing browser_parametric browser_drawing_tools browser_documents browser_mobile_ui browser_modeling3d browser_authoring3d browser_iconography browser_planar_visual browser_visual_editing browser_render_styles; do
+            run_suite "$suite" python "tests/$suite.py"
+          done
+          for backend in webgl2 webgpu; do
+            run_suite "planar-$backend" env PLANAR_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_planar_visual.py
+            run_suite "visual-$backend" env VISUAL_TEST_BACKEND="$backend" xvfb-run -a python tests/browser_visual_editing.py
+          done
+          run_suite render-backends env REQUIRE_WEBGPU=1 xvfb-run -a python tests/browser_render_backends.py
+          run_suite modeling-backends xvfb-run -a python tests/browser_modeling_backends.py
+          exit "$status"
+      - name: Independent DXF and geometry audits
+        if: success() || failure()
+        shell: bash
+        run: |
+          set -uo pipefail
+          status=0
+          for suite in audit_dxf audit_fidelity audit_symbol_library audit_interop audit_cad_editing audit_parametric audit_drawing_tools audit_modeling3d audit_rendering audit_visual_editing audit_planar_visual render_symbol_atlas; do
+            python "tests/$suite.py" > "artifacts/publication-$suite.log" 2>&1
+            code=$?
+            tail -n 12 "artifacts/publication-$suite.log"
+            echo "$suite: exit $code" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$code" -ne 0 ]; then status=1; fi
+          done
+          exit "$status"
+      - name: Commit validated generated deliveries
+        run: |
+          git add -A -- artifacts samples docs
+          git add -f dist artifacts/npm
+          if ! git diff --cached --quiet; then
+            git commit -m 'build: qualified visual editing application, 21 packages, examples and evidence'
+            git push origin HEAD:work/visual-workspace-0130
+          fi
+          echo "Validated checkpoint: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve exact source and history even if validation fails
+        if: always()
+        run: |
+          git archive --format=zip --prefix=ConduitCAD/ HEAD > "$RUNNER_TEMP/ConduitCAD-publication-source.zip"
+          git bundle create "$RUNNER_TEMP/ConduitCAD-publication.bundle" HEAD ^f4823402d7ba6cb7b7186ee60bf32a5f7e8b1080
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conduitcad-visual-publication
+          path: |
+            ${{ runner.temp }}/ConduitCAD-publication-source.zip
+            ${{ runner.temp }}/ConduitCAD-publication.bundle
+            artifacts
+          retention-days: 30
