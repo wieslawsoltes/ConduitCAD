@@ -8,7 +8,7 @@ export class SpatialPathSession {
     constructor(document, { id = null, layer = '0' } = {}) {
         this.source = document; this.version = document.version; this.signature = JSON.stringify(document); this.base = clone(document);
         const existing = id ? document.entities.find(e => e.id === id) : null;
-        if (id && (!existing || existing.type !== 'POLYLINE' || !(existing.flags & 8) || (existing.flags & (2 | 4 | 16 | 64)) || existing.feature3d || existing.connector || existing.parametric && existing.parametric.kind !== 'spatial-path' || existing.points?.some(p => p.bulge)))
+        if (id && (!existing || existing.type !== 'POLYLINE' || !(existing.flags & 8) || (existing.flags & (2 | 4 | 16 | 64)) || existing.feature3d || existing.connector || existing.parametric && (existing.parametric.kind !== 'spatial-path' || existing.parametric.version !== 1) || existing.points?.some(p => p.bulge)))
             throw new Error('Choose an ordinary native 3D polyline');
         if (existing && isLocked(existing, document)) throw new Error('The spatial path is locked');
         const outputLayer = document.layers.find(l => l.name === (existing?.layer || layer));
@@ -20,12 +20,40 @@ export class SpatialPathSession {
         this.state = { coordinates: clone(coordinates), origins: this.entity.points.map((_, i) => i), closed: !!this.entity.closed };
         this.validateState(this.state);
         this.initial = this.snapshot(); this.preview = null; this.error = null; this.revision = 0; this.validatedRevision = -1; this.closed = false; this.evaluations = 0;
-        this.undoStack = []; this.redoStack = [];
+        this.undoStack = []; this.redoStack = []; this.pointCache = null; this.pointEvaluations = 0;
     }
     assertOpen() { if (this.closed) throw new Error('This spatial path edit has ended'); }
     snapshot() { return clone(this.state); }
     get changed() { return this.creation || JSON.stringify(this.initial) !== JSON.stringify(this.state); }
-    invalidate() { this.preview = null; this.validatedRevision = -1; this.error = null; this.revision++; }
+    invalidate() { this.pointCache = null; this.preview = null; this.validatedRevision = -1; this.error = null; this.revision++; }
+    /** Immutable, revision-cached coordinates for overlays, including an unfinished 0/1-point path.
+     * Use set/insert/remove/restore to edit state; camera reprojection must not parse expressions.
+     * Invalid revisions cache the error, never a prior valid set of coordinates.
+     */
+    points() {
+        this.assertOpen();
+        if (!this.pointCache) {
+            this.pointEvaluations++;
+            try {
+                const points = this.state.coordinates.map(p => Object.freeze(Object.fromEntries(['x', 'y', 'z'].map(axis => {
+                    const value = evaluateExpression(p[axis], this.base.parameters);
+                    if (Math.abs(value) > 1e12) throw new Error('Spatial coordinates must stay within ±1e12 drawing units');
+                    return [axis, value];
+                }))));
+                this.pointCache = { points: Object.freeze(points), error: null };
+            } catch (error) { this.pointCache = { points: null, error }; }
+        }
+        if (this.pointCache.error) throw this.pointCache.error;
+        return this.pointCache.points;
+    }
+    /** Reverse traversal without dropping vertex metadata or changing a closed path's first vertex. */
+    reverse() {
+        this.assertOpen();
+        const state = this.snapshot(), start = state.closed ? 1 : 0;
+        state.coordinates = [...state.coordinates.slice(0, start), ...state.coordinates.slice(start).reverse()];
+        state.origins = [...state.origins.slice(0, start), ...state.origins.slice(start).reverse()];
+        if (JSON.stringify(state) !== JSON.stringify(this.state)) this.restore(state);
+    }
     validateState(state) {
         if (!state || typeof state.closed !== 'boolean' || !Array.isArray(state.coordinates) || state.coordinates.length > 2048) throw new Error('Invalid spatial path snapshot');
         if (!Array.isArray(state.origins) || state.origins.length !== state.coordinates.length || state.origins.some(i => i !== null && (!Number.isInteger(i) || i < 0 || i >= this.entity.points.length)) || new Set(state.origins.filter(i => i !== null)).size !== state.origins.filter(i => i !== null).length) throw new Error('Invalid path vertex provenance');
@@ -77,5 +105,5 @@ export class SpatialPathSession {
     }
     assertSource(document) { this.assertOpen(); if (document !== this.source || JSON.stringify(document) !== this.signature) throw new Error('The drawing changed. Restart spatial path editing.'); }
     commit(document) { this.assertSource(document); const draft = this.evaluate(); document.entities = clone(draft.entities); return this.id; }
-    cancel() { this.closed = true; this.source = null; this.base = null; this.preview = null; this.undoStack = []; this.redoStack = []; }
+    cancel() { this.pointCache = null; this.closed = true; this.source = null; this.base = null; this.preview = null; this.undoStack = []; this.redoStack = []; }
 }

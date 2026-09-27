@@ -5,6 +5,6 @@ export class VisualPath3D {
     readonly active: boolean; readonly session: SpatialPathSession | null;
     readonly root: HTMLElement; readonly frame: number; selected: number;
     start(id?: string | null): SpatialPathSession; preview(immediate?: boolean): void;
-    apply(): void; cancel(): void; cancelDrag(): void; beforeEdit(): void;
+    restoreHistory(direction: 'undo' | 'redo'): boolean; apply(): void; cancel(): void; cancelDrag(): void; beforeEdit(): void;
     externalChange(): void; keyDown(event: KeyboardEvent): boolean; dispose(): void;
 }

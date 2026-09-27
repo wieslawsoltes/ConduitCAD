@@ -79,6 +79,8 @@ export class SpatialPathSession {
     closed: boolean; revision: number; validatedRevision: number; error: string | null; evaluations: number;
     assertOpen(): void; invalidate(): void; validateState(state: SpatialPathState): void;
     snapshot(): SpatialPathState; restore(state: SpatialPathState): void;
+    /** Cached immutable display coordinates; use session methods to invalidate. */
+    points(): ReadonlyArray<Readonly<Vec3>>; readonly pointEvaluations: number; reverse(): void;
     set(index: number, axis: 'x' | 'y' | 'z', expression: number | string): void;
     insert(index: number, point: PathCoordinate3): void; remove(index: number): void; setClosed(value: boolean): void;
     checkpoint(before: SpatialPathState): void; undo(): boolean; redo(): boolean;

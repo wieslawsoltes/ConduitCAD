@@ -52,3 +52,58 @@ test('parameter-driven path and sweep update together in one parameter draft',()
 import { createLiveWorkspaceExample } from '../packages/workbench/src/live-workspace-example.js';
 test('workshop has six native editable entities and independent repeatable geometry',()=>{const d=createLiveWorkspaceExample(),copy=createLiveWorkspaceExample();assert.equal(d.entities.length,6);assert.equal(d.entities.filter(e=>e.type==='MESH').length,2);assert.equal(d.entities.find(e=>e.id==='live-route').points[1].z,70);d.parameters.Rise={value:110};regenerateFeatures(d);assert.equal(d.entities.find(e=>e.id==='live-route').points[1].z,110);assert.equal(copy.entities.find(e=>e.id==='live-route').points[1].z,70);});
 test('parameter previews mark changed native geometry dirty for record-preserving writers',()=>{const d=design();d.entities[0].dirty=false;const s=new ParameterEditSession(d,{process});s.set(row(s,'Size'),{expression:'90'});assert.equal(s.evaluate().entities[0].dirty,true);assert.equal(d.entities[0].dirty,false);});
+
+test('display coordinates are immutable and cached across repeated camera-only reads', () => {
+ const {d,id}=pathFixture(),s=new SpatialPathSession(d,{id}),points=s.points();
+ for(let i=0;i<120;i++)assert.equal(s.points(),points);
+ assert.equal(s.pointEvaluations,1);assert.equal(s.evaluations,0);
+ assert.throws(()=>{points[1].z=999;},TypeError);assert.throws(()=>points.push({x:0,y:0,z:0}),TypeError);
+ near(s.points()[1].z,30);near(d.entities[0].points[1].z,30);
+ const before=s.snapshot();s.set(1,'z','Rise+10');s.checkpoint(before);
+ assert.notEqual(s.points(),points);near(s.points()[1].z,40);assert.equal(s.pointEvaluations,2);
+ s.undo();near(s.points()[1].z,30);s.redo();near(s.points()[1].z,40);
+});
+test('an invalid coordinate revision never returns or repeatedly evaluates old cached points', () => {
+ const {d,id}=pathFixture(),s=new SpatialPathSession(d,{id});s.points();s.set(1,'z','unknown');
+ for(let i=0;i<120;i++)assert.throws(()=>s.points(),/Unknown parameter/);
+ assert.equal(s.pointEvaluations,2);assert.equal(s.preview,null);
+ s.set(1,'z','Rise');near(s.points()[1].z,30);assert.equal(s.pointEvaluations,3);
+ s.cancel();assert.equal(s.pointCache,null);assert.throws(()=>s.points(),/ended/);
+});
+test('unfinished display coordinates remain available without accepting an invalid native path', () => {
+ const s=new SpatialPathSession(createDocument());assert.deepEqual(s.points(),[]);
+ s.insert(0,{x:'3+4',y:0,z:0});assert.deepEqual(s.points(),[{x:7,y:0,z:0}]);
+ assert.throws(()=>s.evaluate(),/vertices/);s.set(0,'x',1e13);assert.throws(()=>s.points(),/1e12/);
+});
+test('reversing an open spatial path retains expression and native vertex provenance', () => {
+ const {d,id}=pathFixture();d.entities[0].points.forEach((p,i)=>{p.extra={name:'point-'+i};});
+ const before=JSON.stringify(d),s=new SpatialPathSession(d,{id}),snapshot=s.snapshot();
+ s.reverse();s.checkpoint(snapshot);assert.deepEqual(s.state.origins,[2,1,0]);
+ const points=s.evaluate().entities[0].points;
+ assert.deepEqual(points.map(p=>p.extra.name),['point-2','point-1','point-0']);
+ assert.equal(s.state.coordinates[0].x,'Run');assert.equal(JSON.stringify(d),before);
+ s.undo();assert.deepEqual(s.snapshot(),snapshot);s.redo();s.reverse();assert.deepEqual(s.snapshot(),snapshot);
+});
+test('closed-path reversal retains start identity and closure without duplicate endpoints', () => {
+ const {d,id}=pathFixture(),s=new SpatialPathSession(d,{id});s.setClosed(true);s.reverse();
+ assert.deepEqual(s.state.origins,[0,2,1]);const e=s.evaluate().entities[0];assert.equal(e.flags,9);assert.equal(e.points.length,3);
+ const cache=s.points();s.reverse();assert.notEqual(s.points(),cache);assert.deepEqual(s.state.origins,[0,1,2]);
+});
+test('reversal is an atomic history operation and a dependent sweep regenerates', () => {
+ let {d,id}=pathFixture();const c=circle({x:0,y:0},2);d.entities.push(c);const body=addFeature(d,'sweep',{segments:12},[c.id,id]);
+ const before=JSON.stringify(d),s=new SpatialPathSession(d,{id}),history=new History({capture:()=>d,restore:x=>d=x});s.reverse();
+ s.evaluate();assert.equal(JSON.stringify(d),before);history.run('Reverse path',()=>s.commit(d));
+ assert.equal(d.entities.find(e=>e.id===id).points[0].x,80);assert.ok(d.entities.find(e=>e.id===body.id));
+ history.undo();assert.equal(JSON.stringify(d),before);history.redo();assert.equal(d.entities.find(e=>e.id===id).points[0].x,80);
+});
+test('future spatial path metadata is rejected, never silently downgraded', () => {
+ const {d,id}=pathFixture();d.entities[0].parametric.version=2;const before=JSON.stringify(d);
+ assert.throws(()=>new SpatialPathSession(d,{id}),/ordinary/);assert.equal(JSON.stringify(d),before);
+});
+for(const [name,writer] of [['ASCII',writeDXF],['binary',writeDXFBinary]])test(name+' reversed native path retains traversal and expressions through DXF',()=>{
+ const {d,id}=pathFixture(),s=new SpatialPathSession(d,{id});s.reverse();s.commit(d);
+ const reloaded=parseDXF(writer(d)),e=reloaded.entities.find(e=>e.type==='POLYLINE');
+ assert.deepEqual(e.points.map(p=>[p.x,p.y,p.z]),[[80,0,30],[0,0,30],[0,0,0]]);
+ assert.equal(e.parametric.coordinates[0].x,'Run');reloaded.parameters.Run=100;regenerateFeatures(reloaded);
+ assert.equal(reloaded.entities.find(candidate=>candidate.id===e.id).points[0].x,100);
+});

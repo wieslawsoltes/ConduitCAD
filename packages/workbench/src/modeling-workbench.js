@@ -308,7 +308,7 @@ export class ModelingWorkbench {
         }
         if (!this.active)
             await this.setActive(true);
-        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.session[action==='3d-undo'?'undo':'redo']();this.path.preview(true);return;}
+        if(this.path?.active&&['3d-undo','3d-redo'].includes(action)){this.path.cancelDrag();this.path.restoreHistory(action==='3d-undo'?'undo':'redo');this.path.preview(true);return;}
         const navigationAction=(action.startsWith('3d-view-')&&action!=='3d-view-options')||['3d-fit','3d-capture'].includes(action);
         if(!navigationAction){this.path?.cancel();this.w.parameters?.cancel();}
         if(action==='3d-path'&&w.options.modelingInteraction!=='dialog'){this.path.start();return;}

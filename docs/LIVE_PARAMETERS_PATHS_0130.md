@@ -42,7 +42,10 @@ parameter expressions. A drag starts from the gesture's original expression, so
 
 **Add exact point** appends WCS coordinates. **Insert midpoint** inserts component-wise
 expressions halfway to the following vertex. **Remove vertex** and **Close path**
-preview topology changes. The selector reaches every vertex; the viewport presents
+preview topology changes. **Reverse direction** reverses traversal while keeping the
+selected physical vertex selected. Closed paths retain their first vertex; native
+vertex metadata and expressions travel with their vertex. This has its own draft
+undo and regenerates dependent sweeps on Apply. The selector reaches every vertex; the viewport presents
 at most 24 nearby vertex handles plus the three axes, keeping touch hit targets
 bounded. The original vertex metadata is retained for unaffected vertices across
 insertions/removals and draft undo. A two-finger takeover or resize rolls back an
@@ -73,6 +76,9 @@ that consume them may reject invalid resulting geometry.
 The parameter panel accepts at most 1,024 rows and 4,096 characters per expression.
 Names cannot collide with reserved evaluator names or named constraints. Preview
 work is coalesced to animation frames and camera movement only reprojects controls;
+overlay coordinate evaluation is revision-cached (including errors), so repeated
+camera-only redraws do not reparse path expressions. The reusable `points()` result
+is deeply frozen and must be edited through session methods, not mutated. Feature
 regeneration is still synchronous and clones the drawing. This is not a guarantee
 of million-entity interactive solving. Fully associative face sketches, arbitrary
 persistent topology naming, exact curved B-rep/ACIS and every specialist dialog are

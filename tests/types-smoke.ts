@@ -192,3 +192,7 @@ paths.drag(1, {z: 2}, pathState);
 const wcsPoints = spatialPathPoints(pathState.coordinates, documentModel.parameters, pathState.closed);
 const pointLimit: 2048 = MAX_SPATIAL_PATH_POINTS;
 void wcsPoints; void pointLimit;
+
+const cachedPathCoordinates: ReadonlyArray<Readonly<{x: number; y: number; z: number}>> = paths.points();
+paths.reverse();
+const coordinateEvaluations: number = paths.pointEvaluations;

@@ -21,7 +21,7 @@ export class VisualPath3D {
           <form class="path3d-next"><fieldset><legend>Add an exact WCS point</legend><div>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-next="${k}" value="0" autocomplete="off" spellcheck="false"></label>`).join('')}</div></fieldset><button type="submit">${icon('plus')}Add exact point</button></form>
           <p>Coordinates retain parameter expressions in Conduit metadata. Other DXF readers receive evaluated native vertices. Picked planes are snapshots, not associative face sketches.</p></div></section>
           <section class="path3d-controls" role="region" aria-label="Spatial path editing"><header><strong>${icon('polyline')}Spatial path</strong><span class="path3d-status" role="status"></span></header>
-          <div class="path3d-commandbar"><div class="path3d-utilities">${b('add', 'Add points', 'plus')}${b('options', 'Plane / exact point', 'properties')}${b('midpoint', 'Insert midpoint', 'point')}${b('remove', 'Remove vertex', 'trash')}${b('closed', 'Close path', 'polyline')}${b('snap', 'Snap 1', 'snap')}${b('undo', 'Undo draft', 'undo')}${b('redo', 'Redo draft', 'redo')}${b('fit', 'Fit preview', 'fit')}</div><div class="path3d-confirm">${b('cancel', 'Cancel', 'close')}${b('apply', 'Apply', 'check')}</div></div>
+          <div class="path3d-commandbar"><div class="path3d-utilities">${b('add', 'Add points', 'plus')}${b('options', 'Plane / exact point', 'properties')}${b('midpoint', 'Insert midpoint', 'point')}${b('remove', 'Remove vertex', 'trash')}${b('closed', 'Close path', 'polyline')}${b('reverse', 'Reverse direction', 'rotate')}${b('snap', 'Snap 1', 'snap')}${b('undo', 'Undo draft', 'undo')}${b('redo', 'Redo draft', 'redo')}${b('fit', 'Fit preview', 'fit')}</div><div class="path3d-confirm">${b('cancel', 'Cancel', 'close')}${b('apply', 'Apply', 'check')}</div></div>
           <div class="path3d-coordinates"><label>Vertex<select data-path-vertex aria-label="Active path vertex"></select></label>${['x', 'y', 'z'].map(k => `<label>${k.toUpperCase()}<input data-path-axis="${k}" aria-label="Path vertex ${k.toUpperCase()} expression" autocomplete="off" spellcheck="false"></label>`).join('')}</div><p class="path3d-error" role="alert" hidden></p></section>`;
         m.stage.append(this.root); const opt = { signal: this.w.abort.signal };
         this.root.addEventListener('click', e => this.click(e), opt);
@@ -45,7 +45,7 @@ export class VisualPath3D {
         this.root.querySelector('[data-path-command=add]').focus({ preventScroll: true }); return session;
     }
     value(source) { const n = evaluateExpression(source, this.session.base.parameters); if (Math.abs(n) > 1e12) throw new Error('Coordinates must stay within ±1e12'); return n; }
-    points() { return this.session.state.coordinates.map(p => ({ x: this.value(p.x), y: this.value(p.y), z: this.value(p.z) })); }
+    points() { return this.session.points(); }
     showOptions(open) { this.root.classList.toggle('options-open', open); this.root.querySelector('.path3d-panel').hidden = !open; this.root.querySelector('[data-path-command=options]').setAttribute('aria-expanded', String(open)); this.updatePositions(); }
     report(message = '') { const e = this.root.querySelector('.path3d-error'); e.textContent = message; e.hidden = !message; }
     reject(error) { if (!this.session) return; this.rejected = true; cancelAnimationFrame(this.frame); this.frame = 0; this.session.invalidate(); this.session.error = error.message; this.m.previewDocument = null; this.m.renderer.setDocument(this.w.doc, { showInputs: this.m.showInputs }); this.m.renderer.invalidate(); this.report(error.message); this.render(); }
@@ -79,6 +79,7 @@ export class VisualPath3D {
         try { this.value(this.offset); } catch { apply.disabled = true; }
         for (const id of ['undo', 'redo']) this.root.querySelector(`[data-path-command=${id}]`).disabled = !s[id + 'Stack'].length;
         this.root.querySelector('[data-path-command=remove]').disabled = this.selected < 0;
+        this.root.querySelector('[data-path-command=reverse]').disabled = count < 2;
         this.root.querySelector('[data-path-command=midpoint]').disabled = count < 2 || (!s.state.closed && this.selected === count - 1);
         for (const [id, pressed] of [['add', this.placing], ['closed', s.state.closed], ['snap', this.snap]]) this.root.querySelector(`[data-path-command=${id}]`).setAttribute('aria-pressed', String(pressed));
         let length = 0; try { const points = this.points(); points.forEach((p, i) => { if (i) length += distance3(p, points[i - 1]); }); if (s.state.closed && count > 2) length += distance3(points.at(-1), points[0]); } catch {}
@@ -220,6 +221,7 @@ export class VisualPath3D {
             if (id === 'face') { this.pickingFace = true; this.showOptions(false); }
             if (id === 'snap') this.snap = !this.snap;
             if (id === 'closed') this.session.setClosed(!this.session.state.closed);
+            if (id === 'reverse') { const count = this.session.state.coordinates.length; this.session.reverse(); this.selected = this.session.state.closed ? (count - this.selected) % count : count - 1 - this.selected; }
             if (id === 'remove') { this.session.remove(this.selected); this.selected = Math.min(this.selected, this.session.state.coordinates.length - 1); }
             if (id === 'midpoint') {
                 const a = this.session.state.coordinates[this.selected], n = (this.selected + 1) % this.session.state.coordinates.length, next = this.session.state.coordinates[n];
@@ -227,9 +229,22 @@ export class VisualPath3D {
                 const point = Object.fromEntries(['x', 'y', 'z'].map(k => [k, `((${a[k]}) + (${next[k]})) / 2`])); this.session.insert(this.selected + 1, point); this.selected++;
             }
             if (id === 'fit') { const points = this.points(); if (points.length) { this.m.camera.fit(points); this.m.changedView(); } }
-            if (id === 'undo' || id === 'redo') { this.session[id](); this.rejectedFields.clear(); this.rejected = false; } else this.session.checkpoint(before);
+            if (id === 'undo' || id === 'redo') { this.restoreHistory(id); this.rejectedFields.clear(); this.rejected = false; } else this.session.checkpoint(before);
             this.render(); this.preview(true);
         } catch (error) { this.report(error.message); }
+    }
+    restoreHistory(direction) {
+        const s = this.session; if (!s || !['undo', 'redo'].includes(direction)) return false;
+        const origin = s.state.origins[this.selected], coordinate = JSON.stringify(s.state.coordinates[this.selected]);
+        if (!s[direction]()) return false;
+        let index = origin == null ? -1 : s.state.origins.indexOf(origin);
+        if (index < 0) {
+            // New draft vertices have no imported provenance. Only unambiguous unchanged coordinates identify them.
+            const matches = s.state.coordinates.flatMap((p, i) => JSON.stringify(p) === coordinate ? [i] : []);
+            if (matches.length === 1) index = matches[0];
+        }
+        this.selected = index >= 0 ? index : Math.max(-1, Math.min(s.state.coordinates.length - 1, this.selected));
+        return true;
     }
     apply() {
         const s = this.session; if (!s || this.applying || this.rejected) return; this.checkpointInput(); this.cancelDrag(); this.preview(true);
@@ -253,7 +268,7 @@ export class VisualPath3D {
             e.preventDefault(); const amount = (['ArrowLeft', 'ArrowDown'].includes(e.key) ? -1 : 1) * (e.shiftKey ? .1 : 1), direction = h.axis ? h.direction : ['ArrowLeft', 'ArrowRight'].includes(e.key) ? this.plane.u : this.plane.v, before = this.session.snapshot();
             try { this.session.drag(h.index, mul3(direction, amount), before); this.session.checkpoint(before); this.preview(true); } catch (error) { this.report(error.message); } return true;
         }
-        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.session[e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'](); this.preview(true); return true; }
+        if ((e.ctrlKey || e.metaKey) && ['z', 'y'].includes(e.key.toLowerCase())) { e.preventDefault(); this.cancelDrag(); this.rejectedFields.clear(); this.rejected = false; this.restoreHistory(e.shiftKey || e.key.toLowerCase() === 'y' ? 'redo' : 'undo'); this.preview(true); return true; }
         if (e.key === 'Enter' && !e.target.closest('button')) { e.preventDefault(); this.apply(); return true; }
         if (!e.ctrlKey && !e.metaKey && (e.key.length === 1 || ['Delete', 'Backspace'].includes(e.key))) return true;
         return false;
